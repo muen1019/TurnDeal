@@ -1431,6 +1431,11 @@
     "RequestSnapshot": {
       "type": "object",
       "properties": {
+        "product_details": {
+          "description": "Backend-snapshotted public SKU display data; optional for historical snapshots. No private seller policies.",
+          "type": "array", "maxItems": 100,
+          "items": {"type":"object","properties":{"product_id":{"$ref":"#/$defs/Id"},"name":{"type":"string"},"color":{"type":["string","null"]}},"required":["product_id","name","color"],"additionalProperties":false}
+        },
         "formatter": {"$ref": "#/$defs/FormatterSummary"},
         "model": {"$ref": "#/$defs/LlmModel"},
         "request_id": {
@@ -4161,6 +4166,28 @@
                   "additionalProperties": false
                 }
               ]
+            },
+            "next_request_id": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "workflow_error": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "can_clarify": {
+              "type": "boolean"
+            },
+            "workflow_enabled": {
+              "type": "boolean"
             }
           },
           "required": [
@@ -4169,11 +4196,55 @@
             "mode",
             "status",
             "error",
-            "result"
+            "result",
+            "next_request_id",
+            "workflow_error",
+            "can_clarify",
+            "workflow_enabled"
           ],
           "additionalProperties": false
         }
       ]
+    },
+    "ImprovementClarification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "improvement_id",
+        "feedback"
+      ],
+      "properties": {
+        "improvement_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "feedback": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "pattern": "\\S"
+        }
+      }
+    },
+    "ImprovementClarificationResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "improvement_id",
+        "status"
+      ],
+      "properties": {
+        "request_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "improvement_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "status": {
+          "type": "string",
+          "const": "queued"
+        }
+      }
     }
   }
 }

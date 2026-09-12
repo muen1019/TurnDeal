@@ -31,17 +31,20 @@ export function createRuntimeApp({buyerId=()=> 'demo_buyer',autoProcess=true,pur
     res.status(result.status).json(result.body);
   }catch(e){next(e);}});
   app.get('/api/requests/:request_id',(req,res,next)=>{try{res.json(store.snapshot(req.params.request_id,buyerId(req)));}catch(e){next(e);}});
-  const improvement=installImprover(app,store,buyerId,improverOptions);
+  const improvement=installImprover(app,store,buyerId,{...improverOptions,autoProcess});
   app.post('/api/requests/:request_id/decisions',(req,res,next)=>{try{
     const body=validate(req.body?.action==='accept'?'AcceptDecision':'RejectDecision',req.body),buyer=buyerId(req),id=req.params.request_id;
     store.snapshot(id,buyer);
     const result=store.idempotent(buyer,'POST',`/api/requests/${id}/decisions`,req.header('Idempotency-Key'),body,()=>{
       const decision=store.decide(buyer,id,body);
-      if(body.selection_version===1&&body.rejected_offer_ids.length)improvement.improver.repository.enqueueSelection(buyer,id);
+      if(body.selection_version===1&&body.rejected_offer_ids.length){
+        const job=improvement.improver.repository.enqueueSelection(buyer,id);
+        if(body.action==='reject')improvement.enableWorkflow(buyer,id,job);
+      }
       return decision;
     });
     res.status(result.status).json(result.body);
-    const job=store.db.prepare('SELECT improvement_id FROM improver_jobs WHERE parent_request_id=? AND buyer_id=?').get(id,buyer);
+    const job=store.db.prepare('SELECT improvement_id FROM improver_jobs WHERE parent_request_id=? AND buyer_id=? AND source_improvement_id IS NULL').get(id,buyer);
     if(job)improvement.schedule(buyer,job.improvement_id);
   }catch(e){next(e);}});
   installPurchases(app,store,buyerId,purchaseOptions);

@@ -396,7 +396,7 @@ export function OfferDeck({
     <section className="offer-ui offer-deck" aria-labelledby="offer-deck-title">
       <div className="offer-deck__header">
         <p>方案 {ranking?.rank ?? '-'} / {totalOffers}</p>
-        <h2 id="offer-deck-title">{offerName(offer)}</h2>
+        <h2 id="offer-deck-title">{offerName(offer,snapshot)}</h2>
       </div>
 
       <div className="offer-deck__stage" data-dragging={phase === 'dragging' ? 'true' : 'false'}>
@@ -529,7 +529,7 @@ function OfferCard({snapshot, offer, ranking, sellerName, label, pending = false
       <div className="offer-card__content">
         <div>
           <p className="offer-card__seller">{sellerName}</p>
-          <h3 id={`offer-card-${offer.offer_id}`}>{offerName(offer)}</h3>
+          <h3 id={`offer-card-${offer.offer_id}`}>{offerName(offer,snapshot)}</h3>
         </div>
         <div className="offer-card__labels">
           {ranking ? <StatusPill>第 {ranking.rank} 名</StatusPill> : null}

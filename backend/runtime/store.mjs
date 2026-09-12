@@ -46,6 +46,8 @@ export class RuntimeStore {
     // Startup only: never silently repeat a paid call after a crash.
     for(const row of db.prepare('SELECT * FROM requests WHERE result_state_json IS NOT NULL').all()) {
       const s=JSON.parse(row.result_state_json);
+      // A committed child not dispatched before a crash is safe to start once; no model ran yet.
+      if(s.status==='formatting'&&db.prepare('SELECT 1 FROM improver_workflows WHERE next_request_id=?').get(s.request_id)&&!db.prepare('SELECT 1 FROM formatter_runs WHERE request_id=?').get(s.request_id))continue;
       if(active.includes(s.status)) {
         if(row.published_snapshot_json) {
           const published=JSON.parse(row.published_snapshot_json);
@@ -87,15 +89,20 @@ export class RuntimeStore {
     });
   }
   modelFor(id){return selectedModel(this.db.prepare('SELECT llm_model FROM requests WHERE request_id=?').get(id)?.llm_model??undefined);}
-  create(buyer,documents,clarification,refinement,modelChoice){
+  create(buyer,documents,clarification,refinement,modelChoice,lineage){
     const id=`req_${randomUUID()}`,time=new Date(this.now()).toISOString();
     const profile=this.buyerProfile(buyer);
     let weights=profile?.weights??null;
-    if(!clarification&&!refinement&&!documents.preference_md.trim()&&profile?.colors.length){
+    if(!lineage&&!clarification&&!refinement&&!documents.preference_md.trim()&&profile?.colors.length){
       const colors={black:'黑色',white:'白色',blue:'藍色',red:'紅色',rose:'粉色'};
       documents={...documents,preference_md:'偏好'+profile.colors.map(c=>colors[c]).join('或')};
     }
     let parent=null;
+    if(lineage){
+      parent=this.snapshot(lineage.parent_request_id,buyer);
+      if(parent.status!=='rejected'||parent.documents.revision>=9)fail(422,'lineage_invalid','無法建立下一輪，請開始新需求。');
+      weights=JSON.parse(this.db.prepare('SELECT ranking_weights_json FROM requests WHERE request_id=?').get(parent.request_id).ranking_weights_json??'null');
+    }
     if(refinement){
       parent=this.snapshot(refinement.parent_request_id,buyer);
       if(parent.status!=='rejected'||parent.decision?.action!=='reject')fail(409,'clarification_conflict','請先送出不適合的原因，再調整需求。');
@@ -144,7 +151,8 @@ export class RuntimeStore {
   async run(id,buyer){
     const initial=this.snapshot(id,buyer);
     const model=this.modelFor(id);
-    if(initial.parent_request_id){
+    const frozen=this.db.prepare('SELECT formatter_json FROM improver_workflows WHERE next_request_id=? AND buyer_id=?').get(id,buyer);
+    if(initial.parent_request_id&&!frozen){
       const parent=this.snapshot(initial.parent_request_id,buyer);
       if(parent.status==='rejected'){
         const formatter=await refinementQuestions(parent,{apiKey:this.apiKey,...this.formatterOptions,model});
@@ -155,7 +163,15 @@ export class RuntimeStore {
     const weights=JSON.parse(this.db.prepare('SELECT ranking_weights_json FROM requests WHERE request_id=?').get(id).ranking_weights_json??'null');
     const formatterConfig={db:this.db,userId:buyer,registrations:[],timeoutMs:30000,existingRequestId:id,now:()=>new Date(this.now()),rankingWeights:weights??undefined};
     const formatter=this.apiKey?createLlmFormatterService(formatterConfig,{apiKey:this.apiKey,...this.formatterOptions,model}):createFormatterService(formatterConfig);
-    const {result}=await formatter.submit({intent_md:initial.documents.intent_md,preference_md:initial.documents.preference_md,idempotency_key:`http:${id}`});
+    let result;
+    if(frozen){
+      result=JSON.parse(frozen.formatter_json);assertContract('FormatterResult',result);
+      if(weights)result.normalized_intent={...result.normalized_intent,ranking_weights:weights};
+      this.transaction(()=>{
+        this.db.prepare('UPDATE requests SET normalized_intent_json=? WHERE request_id=? AND user_id=?').run(JSON.stringify(result.normalized_intent),id,buyer);
+        this.db.prepare('INSERT INTO formatter_runs VALUES(?,?,?,?,?,?,?)').run(id,buyer,`http:${id}`,JSON.stringify(initial.documents),'[]',JSON.stringify(result),new Date(this.now()).toISOString());
+      });
+    }else ({result}=await formatter.submit({intent_md:initial.documents.intent_md,preference_md:initial.documents.preference_md,idempotency_key:`http:${id}`}));
     let s={...initial,formatter:formatterSummary(result,initial.documents.preference_md,readSavedPreferences(this.db,buyer).preferences),intent:result.normalized_intent,status:result.status==='ready'?'orchestrating':'needs_clarification',
       error:result.status==='ready'?null:{code:'needs_clarification',message:result.questions.join(' '),fields:['intent_md']}};
     this.save(s);if(result.status!=='ready')return;

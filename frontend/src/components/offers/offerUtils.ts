@@ -74,8 +74,8 @@ export function findRank(snapshot: RequestSnapshot, offerId: string): RankedOffe
   return snapshot.ranked_offers.find((ranked) => ranked.offer_id === offerId) ?? null;
 }
 
-export function offerName(offer: Offer): string {
-  return offer.items.map((item) => categoryLabel(item.category)).join(' + ');
+export function offerName(offer: Offer,snapshot?:RequestSnapshot): string {
+  return offer.items.map((item) => snapshot?.product_details?.find(p=>p.product_id===item.product_id)?.name??categoryLabel(item.category)).join(' + ');
 }
 
 export function mediaForOffer(offer: Offer): string {

@@ -69,7 +69,14 @@ describe('Improver revisions and evidence',()=>{
   });
   it('cannot drop source preference hard requirements when committing the new global snapshot',async()=>{
     const {job}=await setup('這次預算改成 800 元',{preference:'只接受黑色'});
-    expect(()=>validateCandidate(job.context,patchProposal(job.context),'llm')).toThrow('unauthorized_intent_change');
+    const valid=patchProposal(job.context);
+    expect(validateCandidate(job.context,valid,'deterministic').status).toBe('ready');
+    const dropped=structuredClone(valid);dropped.intent.markdown=dropped.intent.markdown.replace('只接受黑色','');dropped.intent.changes[0].after=dropped.intent.markdown;
+    expect(()=>validateCandidate(job.context,dropped,'llm')).toThrow('unauthorized_intent_change');
+  });
+  it('account ranking weights do not falsely invalidate a verified budget change',async()=>{
+    const {job}=await setup();job.context.hard_constraints.ranking_weights={price:70,delivery:40,trust:50,color:30};
+    expect(validateCandidate(job.context,patchProposal(job.context),'deterministic').status).toBe('ready');
   });
   it('protects required constraints inherited from SQLite even when absent from Markdown',async()=>{
     const {job}=await setup();
@@ -142,8 +149,9 @@ describe('Durable jobs and concurrent revisions',()=>{
     const dir=mkdtempSync(join(tmpdir(),'improver-upgrade-'));dirs.push(dir);const dbPath=join(dir,'old.sqlite');
     const {store,id}=await setup(undefined,{dbPath});const snapshot=store.snapshot(id,buyer);
     const access=store.improvementStorage();access.transaction(()=>{
-      access.run('DROP TABLE improver_intent_revisions');access.run('DROP TABLE improver_jobs');access.run('DROP TABLE improver_global_preferences');
+      access.run('DROP TABLE improver_workflows');access.run('DROP TABLE improver_intent_revisions');access.run('DROP TABLE improver_jobs');access.run('DROP TABLE improver_global_preferences');
       access.run("DELETE FROM schema_migrations WHERE version='004_buyer_request_improver'");
+      access.run("DELETE FROM schema_migrations WHERE version='006_improver_followups'");
     });
     store.close();stores.splice(stores.indexOf(store),1);
     const reopened=await OfferStore.open({dbPath,now:()=>new Date('2026-09-12T02:00:00Z')});stores.push(reopened);

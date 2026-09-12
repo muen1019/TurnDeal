@@ -46,7 +46,9 @@ export function authorizedIntent(context: ImprovementContext): {markdown:string;
 }
 
 function semantic(intent: NormalizedIntent): string {
-  return JSON.stringify({...intent,required_features:[...intent.required_features].sort(),
+  // Ranking weights are a separately frozen account setting, never a text-authorized hard constraint.
+  const {ranking_weights:_weights,...purchaseIntent}=intent;
+  return JSON.stringify({...purchaseIntent,required_features:[...intent.required_features].sort(),
     product_preferences:intent.product_preferences.map(({source_text,preference_id,...p})=>p).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b)))});
 }
 function hardSemantic(intent:NormalizedIntent):string {
@@ -101,7 +103,10 @@ export function validateCandidate(context: ImprovementContext, value: unknown, p
 /** No API needed; fixture strategy uses the same evidence rules and validation as the model. */
 export function deterministicProposal(context: ImprovementContext): RevisionProposal {
   const authorized=authorizedIntent(context);
-  const markdown=authorized.markdown===context.source_documents.intent_md?authorized.markdown+'\n':authorized.markdown;
+  const base=authorized.markdown===context.source_documents.intent_md?authorized.markdown+'\n':authorized.markdown;
+  // Preserve request-scoped preferences when the follow-up switches to the committed global document.
+  const priorPreference=context.source_documents.preference_md.trim();
+  const markdown=priorPreference&&!base.includes(priorPreference)?base+'\n'+priorPreference:base;
   const operations=supportedStatements(context.evidence).filter(s=>!context.global_preference.entries.some(e=>e.scope===s.scope&&e.value===s.value)).map((s,i)=>({
     operation:'add' as const,preference_id:`explicit_${context.improvement_id}_${i}`,before:null,value:s.value,scope:s.scope,evidence_id:s.evidence_id,explicit_quote:s.quote,
   }));

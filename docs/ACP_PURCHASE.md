@@ -1,5 +1,7 @@
 # ACP 測試購買 API
 
+更新：目前前端已接入建立結帳、收件資料、確認、取消及訂單恢復，見 [TurnDeal workflow](TURNDEAL_WORKFLOW.md)。以下「本提交未含前端」描述原 PR #2 的交付邊界。
+
 2026-09-12 已實作於 Node 24 整合 runtime。本提交僅交付後端 API，前端接線另行交付。後端透過真正 HTTP 呼叫本地 ACP 測試商家，保存 checkout、模擬付款與訂單。採用只保存選擇；按「確認測試購買」才提交交易。略過不建立購買。
 
 這是測試交易，不會實際扣款或出貨，也不是 ChatGPT Instant Checkout。OpenAI API key 僅用於另行啟用的模型功能，不能用來取得商家交易權限或 ChatGPT 儲存的付款資料。

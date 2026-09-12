@@ -36,7 +36,7 @@ interface PendingBoot {
   error: string;
 }
 
-export function useWorkspace(options: {model?:LlmModel} = {}) {
+export function useWorkspace(options: {model?:LlmModel;fullImprover?:boolean} = {}) {
   const [boot] = useState(() => loadWorkspace());
   const [pendingBoot] = useState<PendingBoot>(() => {
     try {
@@ -391,7 +391,7 @@ export function useWorkspace(options: {model?:LlmModel} = {}) {
               if(conversation.snapshot && (result.source_documents.revision!==conversation.snapshot.documents.revision || result.source_documents.intent_md!==conversation.snapshot.documents.intent_md || result.source_documents.preference_md!==conversation.snapshot.documents.preference_md)) throw new ApiFailure(0,'invalid_response','回傳文件不符合原需求。');
               return patchConversation(workspace, conversation.id, {
                 feedback: "",
-                refinementRequested: true,
+                refinementRequested: pendingValue.body.selection_version!==1,
                 feedbackHistory: [
                   ...(conversation.feedbackHistory ?? []),
                   String(pendingValue.body.feedback ?? ""),
@@ -645,7 +645,7 @@ export function useWorkspace(options: {model?:LlmModel} = {}) {
     submit({
       kind: "accept",
       path: decisionPath(conversation.requestId!),
-      body: { action: "accept", offer_id: offer.offer_id },
+      body: { action: "accept", offer_id: offer.offer_id,...(options.fullImprover&&!import.meta.env.VITE_OFFERMESH_MOCK?{selection_version:1,rejected_offer_ids:conversation.skipped.filter(id=>id!==offer.offer_id&&conversation.snapshot!.ranked_offers.some(r=>r.offer_id===id))}:{}) },
       conversationId: conversation.id,
       requestId: conversation.requestId,
     });
@@ -674,7 +674,7 @@ export function useWorkspace(options: {model?:LlmModel} = {}) {
     submit({
       kind: "reject",
       path: decisionPath(conversation.requestId),
-      body: { action: "reject", feedback: text },
+      body: { action: "reject", feedback: text,...(options.fullImprover&&!import.meta.env.VITE_OFFERMESH_MOCK&&conversation.snapshot?.status==='awaiting_user'&&conversation.snapshot.ranked_offers.length?{selection_version:1,rejected_offer_ids:conversation.snapshot.ranked_offers.map(r=>r.offer_id)}:{}) },
       conversationId: conversation.id,
       requestId: conversation.requestId,
     });
@@ -765,6 +765,14 @@ export function useWorkspace(options: {model?:LlmModel} = {}) {
     review,
     newConversation,
     selectConversation,
+    openFollowup: async (id:string) => {
+      if(isLocked())throw new Error('pending');
+      const conversation=live(),parent=conversation.snapshot;
+      const child=await getSnapshot(id);
+      if(!parent||parent.status!=='rejected'||child.parent_request_id!==parent.request_id||child.root_request_id!==parent.root_request_id||live().id!==conversation.id)throw new Error('lineage_mismatch');
+      patch(conversation.id,{requestId:id,snapshot:child,message:child.documents.intent_md,skipped:[],feedback:'',refinementRequested:false,clarificationDraft:undefined});
+      setVerified(id);setError('');navigate(child.status==='awaiting_user'?'offers':'chat',id,undefined,true);setRefresh(v=>v+1);
+    },
     clearHistory: () => {
       if(isLocked()||ref.current.conversations.some(c=>processing(c.snapshot?.status)))return;
       const conversation=freshConversation();
