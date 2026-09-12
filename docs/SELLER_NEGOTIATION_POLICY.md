@@ -1,5 +1,7 @@
 # Seller 私有議價格式 v0.1
 
+最新目標設計見 [SELLER_POLICY_DESIGN.md](SELLER_POLICY_DESIGN.md)。本文件保留既有私有格式及模板的定義；新設計尚未修改此契約，尤其不含運底價與固定輪次折扣不可直接視為新政策的總價底線與合法價格區間。
+
 Tech Lead 定義格式，Negotiation owner 填值並實作 Seller handler。本次只新增契約、待填模板及驗證器，不啟用任何新賣家策略、不寫入 SQLite。本私有政策 v0.1 對齊目前共用契約 v0.2：最多五輪，可提前 final；不取代 canonical 五家 Seller 的策略格式。
 
 ## 交接檔案

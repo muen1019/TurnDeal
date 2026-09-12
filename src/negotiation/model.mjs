@@ -4,6 +4,15 @@ export const buyerOutput = objectSchema({
   action: { type: 'string', enum: ['negotiate', 'stop'] },
   target_option_index: { type: 'integer' },
 });
+export const buyerTradeoffOutput = objectSchema({
+  ...buyerOutput.properties,
+  proposal: { anyOf: [{ type: 'null' }, objectSchema({
+    kind: { type: 'string', enum: ['lower_price', 'add_gift', 'exchange_gift', 'compare', 'request_benefit'] },
+    target_total_twd: { type: ['integer', 'null'] },
+    reference_offer_id: { type: ['string', 'null'] },
+    benefit_kind: { type: ['string', 'null'], enum: [null, 'delivery_guarantee', 'late_compensation', 'future_coupon', 'return_extension', 'warranty_extension', 'priority_support', 'exchange_guarantee'] },
+  })] },
+});
 export const sellerOutput = objectSchema({
   outcome: { type: 'string', enum: ['offered', 'refused'] },
   product_id: { type: ['string', 'null'] },
@@ -11,6 +20,10 @@ export const sellerOutput = objectSchema({
   include_bundle: { type: 'boolean' },
   is_final: { type: 'boolean' },
   message: { type: 'string' },
+});
+export const sellerPersonaOutput = objectSchema({
+  ...sellerOutput.properties,
+  benefit_ids: { type: 'array', items: { type: 'string' } },
 });
 
 export class LimitReached extends Error {

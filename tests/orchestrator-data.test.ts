@@ -3,6 +3,19 @@ import { test } from 'node:test';
 import { DatabaseSync } from 'node:sqlite';
 import { initializeDatabase } from '../scripts/db.mjs';
 import { createOrchestratorDataTools } from '../src/orchestrator/data-tools.ts';
+import { applySalesProfiles } from '../scripts/lib/sales-profiles.mjs';
+
+test('seller identity exposes the persisted persona without exposing its negotiation limits', () => {
+  const db = new DatabaseSync(':memory:');
+  try {
+    initializeDatabase(db); applySalesProfiles(db);
+    const tools = createOrchestratorDataTools({db,userId:'user_demo_001',registeredSellerIds:[]});
+    const sellers=tools.list_sellers();
+    assert.equal(sellers.find(s=>s.seller_id==='seller_e')?.persona,'margin_guardian');
+    assert.equal(sellers.find(s=>s.seller_id==='seller_a')?.persona,'price_optimizer');
+    for(const key of ['objective','policy_json','cost_twd','discount','floor','min_margin']) assert.ok(!JSON.stringify(sellers).includes(key));
+  } finally {db.close();}
+});
 
 test('Orchestrator input resolves seeded data without Seller private policy', () => {
   const db = new DatabaseSync(':memory:');

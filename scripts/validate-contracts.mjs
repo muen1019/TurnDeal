@@ -113,7 +113,15 @@ console.log(`✓ parsed ${jsonFiles.length} contract JSON files`);
 const salesProfiles = await readJson('contracts/fixtures/sales-profiles.json');
 salesProfiles.profiles.forEach(p => validateContract('SellerSalesProfile', p));
 assert.equal(new Set(salesProfiles.profiles.map(p => p.seller_id)).size, 5);
-assert.ok(salesProfiles.profiles.some(p => p.bundle_discount_twd > 0 && p.always_offer_bundle));
+assert.deepEqual(salesProfiles.profiles.map(p => p.persona_policy.persona),
+  ['price_optimizer', 'speed_seller', 'bundle_curator', 'loyalty_builder', 'margin_guardian']);
+assert.equal(salesProfiles.profiles.find(p => p.seller_id === 'seller_c').gift_exchange_discount_twd, 30);
+const tradeoffs = await readJson('contracts/fixtures/negotiation-tradeoffs.json');
+tradeoffs.proposals.forEach(p => validateContract('NegotiationProposal', p));
+validateContract('NegotiationProposalResponse', tradeoffs.counteroffer);
+assert.throws(() => validateContract('NegotiationProposal', { ...tradeoffs.proposals[0], variant: 'standalone' }));
+assert.throws(() => validateContract('NegotiationProposal', { ...tradeoffs.proposals[1], reference_offer_id: null }));
+assert.throws(() => validateContract('NegotiationProposal', { ...tradeoffs.proposals[2], benefit_kind: 'invented_service' }));
 
 const sharing = await readJson('contracts/fixtures/negotiation-sharing.json');
 validateContract('SharedNegotiationContext', sharing.context);

@@ -11,13 +11,16 @@ import { evaluate } from '../src/evaluator/index.mjs';
 import { validateRanking } from '../src/evaluator/ranking.mjs';
 import { applySalesProfiles, salesProfiles } from './lib/sales-profiles.mjs';
 import { reportHtml, reportMarkdown, fallbackSummary } from './lib/e2e-report.mjs';
-import { negotiate } from '../src/negotiation/manager.mjs';
+import { negotiate, DEFAULT_OPTIONS } from '../src/negotiation/manager.mjs';
 import { NegotiationRepository } from '../src/negotiation/repository.mjs';
 import { check } from '../src/negotiation/contracts.mjs';
 import { validateSellerList } from './lib/contract-validation.mjs';
+import { buyerMessage, sellerMessage } from '../src/negotiation/tradeoffs.mjs';
+import { formatIntent } from '../src/formatter/parser.ts';
+import { economicallyValid } from '../src/negotiation/economics.mjs';
 
 const args = process.argv.slice(2);
-assert.ok(args.length >= 1 && args.length <= 2 && ['--live', '--offline'].includes(args[0]) && (!args[1] || args[1] === '--evaluate'), 'Specify --live or --offline and optionally --evaluate');
+assert.ok(args.length >= 1 && args.length <= 3 && ['--live', '--offline'].includes(args[0]) && args.slice(1).every(a=>['--evaluate','--after-sales'].includes(a)) && new Set(args).size===args.length, 'Specify --live or --offline and optionally --evaluate / --after-sales');
 const live = args[0] === '--live';
 const full = args.includes('--evaluate');
 const env = fileURLToPath(new URL('../.env', import.meta.url));
@@ -40,7 +43,11 @@ function verify(name, work) {
 try {
   initializeDatabase(db); applySalesProfiles(db);
   const start = performance.now();
-  const input = full ? prepareHandoffE2E(db) : prepareDemoRequest(db);
+  const documents={intent_md:`我想買無線靜音滑鼠，預算1000元，7天內到貨，必須黑色，必須小尺寸，${args.includes('--after-sales')?'售後優先':'價格優先'}`,preference_md:''};
+  const formatted=formatIntent(documents);
+  assert.equal(formatted.status,'ready');
+  const input = full ? prepareHandoffE2E(db,{intent:formatted.normalized_intent,documents}) : prepareDemoRequest(db,{intent:formatted.normalized_intent});
+  verify('文字需求經 Formatter 轉換並保留價格／售後優先權',()=>assert.deepEqual(formatted.normalized_intent.preferences,[args.includes('--after-sales')?'after_sales_first':'price_first']));
   if (full) verify('遠端 handoff.prepare 實際選出五家，計畫與 Discovery 已保存並可重播', () => {
     assert.equal(input.plan.discovery.returned_count, 5);
     assert.equal(input.plan.rfqs.length, 5);
@@ -59,7 +66,11 @@ try {
   const history = repository.history(input.requestId, input.buyerId);
   const traces = history.at(-1).traces;
   verify('輸出契約與五家分支狀態正確', () => { check('NegotiationOutput', result); validateSellerList(result.seller_agents); assert.equal(result.seller_agents.length, 5); });
-  verify('五家皆提供可履約方案，交給 Evaluator', () => { assert.equal(result.status, 'evaluating'); assert.equal(new Set(result.offers.map(o => o.seller_id)).size, 5); assert.equal(result.offers.length, 7); });
+  verify('五家皆有合格方案，未授權的組合另行保留', () => {
+    assert.equal(result.status, 'evaluating');
+    assert.equal(new Set(result.offers.filter(o => o.eligibility.status === 'eligible').map(o => o.seller_id)).size, 5);
+    assert.ok(result.offers.length >= 5 && result.offers.length <= 6);
+  });
   verify('每輪只使用上一個已提交 context', () => {
     assert.deepEqual(history.map(s => s.context.context_revision), Array.from({ length: history.length }, (_, i) => i));
     traces.forEach(t => assert.equal(t.context_revision, t.round - 1));
@@ -76,10 +87,11 @@ try {
   });
   verify('最終報價符合金額、期限、庫存、SKU、數量與交期硬限制', () => {
     for (const offer of result.offers) {
-      assert.equal(offer.eligibility.status, 'eligible'); assert.ok(offer.total_price_twd <= intent.max_total_twd);
+      assert.ok(['eligible','needs_confirmation'].includes(offer.eligibility.status)); assert.ok(offer.total_price_twd <= intent.max_total_twd);
       assert.ok(offer.delivery_days <= intent.delivery_days_max); assert.ok(Date.parse(offer.expires_at) > Date.now());
       const seller = catalog.sellers.find(s => s.seller_id === offer.seller_id);
       const mouse = seller.products.find(p => p.product_id === offer.items[0].product_id);
+      assert.ok(economicallyValid(seller,mouse,offer.total_price_twd,offer.benefits ?? [],offer.items.find(i=>i.role==='addon')?.product_id ?? null));
       assert.ok(offer.total_price_twd >= mouse.floor_price_twd);
       assert.ok(intent.required_features.every(f => mouse.features.includes(f))); assert.equal(mouse.attributes.color, 'black');
       for (const item of offer.items) assert.ok(item.quantity === 1 && seller.products.some(p => p.product_id === item.product_id && p.stock > 0 && p.delivery_days <= offer.delivery_days));
@@ -91,20 +103,51 @@ try {
     assert.equal(offerOf('seller_b').delivery_days, 1);
     assert.ok(result.offers.filter(o => o.seller_id !== 'seller_b').every(o => o.delivery_days > 1));
   });
-  verify('C 免費周邊與 D 組合便宜 NT$30 均實際出現', () => {
-    for (const [id, discount] of [['seller_c', 0], ['seller_d', 30]]) {
-      const base = offerOf(id), bundle = offerOf(id, 'bundle');
-      assert.equal(base.total_price_twd - bundle.total_price_twd, discount); assert.equal(bundle.optional_addons, true);
-      assert.equal(bundle.baseline_offer_id, base.offer_id); assert.ok(bundle.items.some(i => i.category === 'mouse_pad'));
+  verify('C 曾提供免費滑鼠墊；折現後的加價方案不冒充免費', () => {
+    const cOffers = history.at(-1).offers.filter(o => o.seller_id === 'seller_c');
+    assert.ok(cOffers.some(o => o.variant === 'bundle' && o.eligibility.status === 'eligible' &&
+      cOffers.some(b => b.offer_id === o.baseline_offer_id && b.total_price_twd === o.total_price_twd)));
+    const base = offerOf('seller_c'), bundle = offerOf('seller_c','bundle');
+    assert.ok(bundle?.optional_addons); assert.equal(bundle.baseline_offer_id, base.offer_id);
+    if (bundle.total_price_twd > base.total_price_twd) {
+      assert.equal(bundle.eligibility.status, 'needs_confirmation');
+      assert.ok(!result.eligible_offer_ids.includes(bundle.offer_id));
     }
   });
-  verify('E 不接受模型降價，第一輪固定 NT$679', () => {
-    assert.equal(offerOf('seller_e').total_price_twd, 679);
-    assert.equal(result.seller_agents.find(s => s.seller_id === 'seller_e').rounds.length, 1);
+  if (full) verify('Discovery 公開條件匹配，不公開成本或靠 Persona 標籤加分',()=> {
+    const serialized=JSON.stringify(input.plan.discovery);
+    for(const key of ['unit_cost_twd','min_margin_bps','max_total_discount_twd','policy_json']) assert.ok(!serialized.includes(key));
+    assert.equal(input.plan.discovery.candidates[0].seller.seller_id,args.includes('--after-sales')?'seller_e':'seller_a');
+  });
+  verify('B／D／E 保護售價，分別提供物流、回購與售後權益', () => {
+    for (const [id, price, kinds] of [['seller_b',799,['delivery_guarantee','late_compensation']],
+      ['seller_d',709,['future_coupon','return_extension']], ['seller_e',899,['warranty_extension','priority_support','exchange_guarantee']]]) {
+      const offer = offerOf(id); assert.equal(offer.total_price_twd, price);
+      assert.deepEqual(offer.benefits.map(b => b.kind).sort(), [...kinds].sort());
+      assert.equal(result.seller_agents.find(s => s.seller_id === id).rounds.length, 3);
+    }
+  });
+  verify('每筆權益來自可用且有模擬履約證據的 Catalog；未來券不抵本次價格', () => {
+    for (const offer of result.offers) for (const benefit of offer.benefits ?? []) {
+      const seller = catalog.sellers.find(s => s.seller_id === offer.seller_id);
+      assert.ok(seller.benefits.some(b => b.enabled && b.available_units > 0 && JSON.stringify(b.definition) === JSON.stringify(benefit)));
+      assert.equal(benefit.simulation, true); assert.ok(benefit.conditions);
+    }
+    const coupon = offerOf('seller_d').benefits.find(b => b.kind === 'future_coupon');
+    assert.equal(coupon.amount_twd,50); assert.equal(coupon.minimum_spend_twd,1000); assert.equal(coupon.requires_membership,true);
+    assert.equal(offerOf('seller_d').total_price_twd,709);
+  });
+  verify('條件交換有實際對應回覆，取消贈品折讓累計不超過 NT$30', () => {
+    assert.ok(traces.some(t => t.rfq?.proposal?.kind === 'exchange_gift'));
+    const discounts = traces.filter(t => t.seller_id === 'seller_c').reduce((sum,t) => sum + (t.result?.proposal_response?.exchange_discount_twd ?? 0),0);
+    assert.ok(discounts > 0 && discounts <= 30);
+    for (const t of traces.filter(t => t.rfq?.proposal && t.result?.outcome === 'offered')) {
+      assert.ok(t.result.proposal_response); assert.ok(buyerMessage(t.rfq.proposal)); assert.ok(sellerMessage(t.result));
+    }
   });
   verify('最終 Offer ID 唯一，Evaluator ID 集合完整', () => {
     assert.equal(new Set(result.offers.map(o => o.offer_id)).size, result.offers.length);
-    assert.deepEqual([...result.eligible_offer_ids].sort(), result.offers.map(o => o.offer_id).sort());
+    assert.deepEqual([...result.eligible_offer_ids].sort(), result.offers.filter(o => o.eligibility.status === 'eligible').map(o => o.offer_id).sort());
     assert.ok(result.seller_agents.every(s => s.final_offer_ids.every(id => result.offers.some(o => o.offer_id === id && o.seller_id === s.seller_id))));
   });
   const providers = { openai: 0, deterministic: 0 };
@@ -114,7 +157,7 @@ try {
       assert.ok(result.usage.calls > 0 && traces.some(t => t.buyer_provider === 'openai') && traces.some(t => t.seller_provider === 'openai'));
     } else assert.equal(result.usage.calls, 0);
   });
-  verify('執行未超過固定模型呼叫與 token 預留上限', () => { assert.ok(result.usage.calls <= 50); assert.ok(result.usage.reserved_tokens <= 250000); });
+  verify('執行未超過固定模型呼叫與 token 預留上限', () => { assert.ok(result.usage.calls <= DEFAULT_OPTIONS.max_calls); assert.ok(result.usage.reserved_tokens <= DEFAULT_OPTIONS.max_tokens); });
   verify('SQLite Offer 不可變且完整持久化', () => {
     assert.equal(db.prepare('SELECT count(*) AS n FROM negotiation_offers WHERE request_id = ?').get(input.requestId).n, history.at(-1).offers.length);
     assert.throws(() => db.prepare("UPDATE negotiation_offers SET offer_json = '{}' WHERE request_id = ?").run(input.requestId), /immutable/);
@@ -125,9 +168,9 @@ try {
     model: process.env.EVALUATOR_MODEL || 'gpt-4.1-2025-04-14' }) : null;
   const evaluationDuration = full ? Number(((performance.now() - evaluationStart) / 1000).toFixed(2)) : 0;
   if (evaluation) {
-    verify('Evaluator 排完全部七個有效 ID，產生五個賣家方案並符合價格優先', () => {
+    verify('Evaluator 排完全部合格 ID，產生五個賣家方案並符合指定偏好', () => {
       assert.equal(evaluation.status, 'awaiting_user'); check('RequestSnapshot', evaluation.snapshot);
-      assert.equal(evaluation.snapshot.ranked_offers.length, 7); assert.equal(evaluation.solutions.length, 5);
+      assert.equal(evaluation.snapshot.ranked_offers.length, result.eligible_offer_ids.length); assert.equal(evaluation.solutions.length, 5);
       const storedInput = JSON.parse(db.prepare('SELECT input_json FROM evaluation_runs WHERE request_id=?').get(input.requestId).input_json);
       validateRanking({ ranked_offers: evaluation.snapshot.ranked_offers }, storedInput);
       assert.ok(!/sponsored|campaign|floor_price|private_policy/.test(JSON.stringify(storedInput)));
@@ -160,17 +203,20 @@ try {
       standalone: offerOf(profile.seller_id) ?? null, bundle: offerOf(profile.seller_id, 'bundle') ?? null,
       sponsored: input.orchestration.sponsored_placement?.seller_id === profile.seller_id, stop_reason: branch.stop_reason,
       rounds: traces.filter(t => t.seller_id === profile.seller_id).map(t => ({ round: t.round, target_total_twd: t.rfq?.target_total_twd ?? null,
+        proposal: t.rfq?.proposal ?? null, buyer_message: t.rfq ? buyerMessage(t.rfq.proposal) : '目前沒有需要調整的條件，停止協商。',
+        seller_message: t.result ? sellerMessage(t.result) : null, proposal_response: t.result?.proposal_response ?? null,
         outcome: t.result?.outcome ?? t.stop_reason, buyer_provider: t.buyer_provider ?? null, seller_provider: t.seller_provider ?? null,
-        offers: history.at(-1).offers.filter(o => o.seller_id === profile.seller_id && o.round === t.round).map(o => ({ variant: o.variant, total_price_twd: o.total_price_twd })) })) };
+        offers: history.at(-1).offers.filter(o => o.seller_id === profile.seller_id && o.round === t.round).map(o => ({ variant: o.variant, total_price_twd: o.total_price_twd, eligibility: o.eligibility, benefits: o.benefits ?? [] })) })) };
   });
   if (evaluation) solutions = evaluation.solutions.map(group => ({ ...solutions.find(s => s.seller_id === group.seller_id),
     ranking: group, recommended: evaluation.snapshot.offers.find(o => o.offer_id === group.recommended_offer_id) }));
   const fallbacks = fallbackSummary(traces);
   const duration = Number(((performance.now() - start) / 1000).toFixed(2));
   const report = { mode: live ? 'live' : 'offline', model, started_at: startedAt, duration_seconds: duration,
-    request_id: input.requestId, status: evaluation?.status ?? result.status, offer_count: result.offers.length, usage: result.usage, providers, fallbacks,
-    ...(full ? { pipeline: { stages: ['Parsed SQLite Request', 'Upstream handoff.prepare / Discovery', 'Five-round manager / registered Sellers', 'Backend validation', 'Evaluator', 'SQLite snapshot / replay'],
-      upstream_commit: 'cdce6e5', handoff_id: input.plan.handoff_id, discovery_run_id: input.plan.discovery.run_id,
+    limits: DEFAULT_OPTIONS,
+    request_id: input.requestId, preferences:intent.preferences, status: evaluation?.status ?? result.status, offer_count: result.offers.length, usage: result.usage, providers, fallbacks,
+    ...(full ? { pipeline: { stages: ['Text / deterministic Formatter / SQLite Request', 'Upstream handoff.prepare / Discovery', 'Five-round manager / registered Sellers', 'Backend validation', 'Evaluator', 'SQLite snapshot / replay'],
+      handoff_id: input.plan.handoff_id, discovery_run_id: input.plan.discovery.run_id,
       policy_version: input.plan.discovery.policy_version, selected_seller_ids: input.orchestration.seller_agents.map(s => s.seller_id) },
       negotiation_duration_seconds: negotiationDuration, evaluation_duration_seconds: evaluationDuration, evaluation } : {}),
     passed: checks.every(c => c.passed), checks, solutions };

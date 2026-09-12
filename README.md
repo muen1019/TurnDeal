@@ -279,3 +279,10 @@ npx --yes @fission-ai/openspec@1.13.0 validate define-offer-result-ui-api --stri
 ```
 
 change 維持未封存，尚待任務表中的完整視覺與裝置驗收。根目錄契約測試驗證統一 v0.3 共用契約與 Result fixtures。
+
+
+## Hackathon 新增：經濟 Persona 與條件交換
+
+五家 Seller 由 Catalog、私有政策與協商狀態控制，支援加贈滑鼠墊、取消贈品換折扣、回購券、物流與售後權益。權益使用 SQLite 登錄的模擬履約證據，未來券不折抵本次價格。`npm run test:e2e:full` 可產生含逐輪決策對話與五個推薦方案的 HTML 報告；真實模型使用 `npm run test:e2e:full:live`。設計、限制與測試說明見 [SELLER_PERSONAS.md](docs/SELLER_PERSONAS.md)。
+
+本次進一步將 Persona 預先綁定賣家，新增 SKU 成本／讓步政策，真實模型在 Backend 的合法範圍內選價。公開售後條件可用於 Discovery 匹配及 Evaluator 排序，Persona 名稱與私有底價不參與排名。使用 `node scripts/e2e-negotiation.mjs --live --evaluate --after-sales` 可查看售後優先的五方案報告；預設為價格優先。實作與尚未支援的通用規則見 [SELLER_POLICY_IMPLEMENTATION.md](docs/SELLER_POLICY_IMPLEMENTATION.md)。

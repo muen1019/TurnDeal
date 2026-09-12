@@ -1,5 +1,7 @@
 # Orchestrator 前段探索與評分 v0.2
 
+最新政策為 discovery-score-v0.5：新增已驗證公開售後條件，並將明確 price_first 與目標價接近度分開。新公式、Persona 隔離與缺資料處理見 [SELLER_POLICY_IMPLEMENTATION.md](SELLER_POLICY_IMPLEMENTATION.md)。下文保留 v0.4 的基準說明，歷史紀錄不重算。
+
 狀態：已實作 TypeScript service、固定測資、SQLite 快照與執行紀錄。政策版本 `discovery-score-v0.4`。不需要 LLM；輸入為已解析條件，自然語言解析仍交给 Formatter。
 
 v0.3 將 target_total_twd 改為選填；未提供時價格分數與權重為 0，price_difference_twd=null，其他有效項目按原比例重新分配。可只傳 `{ category: 'mouse' }`。明確提供的 max_total_twd 仍是獨立硬限制，不自動當成目標價。若提供價格，須為正整數；null、0、負數及字串均拒絕。歷史執行紀錄保留原政策版本，不重新計算。
