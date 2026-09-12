@@ -3,6 +3,8 @@ import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { validateContract, validateSellerList, validateNegotiationTrace } from "./lib/contract-validation.mjs";
+
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const contractsDir = path.join(root, "contracts");
 
@@ -108,7 +110,7 @@ for (const file of jsonFiles) {
 }
 console.log(`✓ parsed ${jsonFiles.length} contract JSON files`);
 
-const schema = await readJson("contracts/a2a-commerce.v0.1.schema.json");
+const schema = await readJson("contracts/a2a-commerce.v0.2.schema.json");
 const expectedDefs = [
   "CreateRequest",
   "DocumentBundle",
@@ -170,12 +172,17 @@ const sellerStore = await readJson("contracts/fixtures/sellers.json");
 assert.equal(sellerStore.source_snapshot_id, marketplace.snapshot_id, "Seller catalog must name its source snapshot");
 assert.ok(sellerStore.data_classification.public_snapshot_fields.includes("source_ids"), "catalog must identify public provenance fields");
 assert.ok(sellerStore.data_classification.synthetic_demo_fields.includes("floor_price_twd"), "private floor prices must be labeled synthetic");
-assert.equal(sellerStore.sellers.length, 3, "demo must have exactly three Sellers");
+assert.equal(sellerStore.sellers.length, 5, "demo must have exactly five Sellers");
+validateContract("SellerFixtureStore", sellerStore);
+for (const seller of sellerStore.sellers) {
+  const discounts = seller.strategy.round_discounts_twd;
+  assert.ok(discounts.every((value, i) => i === 0 || value >= discounts[i - 1]), "Discount schedules must be nondecreasing");
+}
 const sellerIds = sellerStore.sellers.map((seller) => seller.seller_id);
 unique(sellerIds, "seller IDs");
 assert.deepEqual(
   sellerStore.sellers.map((seller) => seller.strategy.type),
-  ["lowest_price_slow_delivery", "premium_fast_delivery", "value_bundle"],
+  ["lowest_price_slow_delivery", "premium_fast_delivery", "value_bundle", "balanced_delivery", "firm_price"],
   "Seller strategies must remain visibly different",
 );
 
@@ -198,6 +205,7 @@ assert.ok(products.some((product) => product.attributes.color !== "black"), "cat
 console.log("✓ Seller catalog has sourced products plus deterministic synthetic strategies");
 
 const demoScenarios = await readJson("contracts/fixtures/demo-scenarios.json");
+validateContract("DemoScenarioSuite", demoScenarios);
 assert.equal(demoScenarios.scenarios.length, 10, "demo matrix must contain ten agreed scenarios");
 unique(demoScenarios.scenarios.map((scenario) => scenario.scenario_id), "demo scenario IDs");
 for (const scenario of demoScenarios.scenarios) {
@@ -210,7 +218,7 @@ for (const scenario of demoScenarios.scenarios) {
   }
 }
 const scenarioFaults = new Set(demoScenarios.scenarios.flatMap((scenario) => scenario.runtime_faults));
-for (const requiredFault of ["seller_b_timeout_both_rounds", "seller_c_round_two_refused", "clock_after_all_offer_expiry", "evaluator_invents_offer_id"]) {
+for (const requiredFault of ["seller_b_timeout_round_one", "seller_c_round_two_refused", "clock_after_all_offer_expiry", "evaluator_invents_offer_id"]) {
   assert.ok(scenarioFaults.has(requiredFault), `scenario matrix must cover ${requiredFault}`);
 }
 assert.ok(demoScenarios.scenarios.some((scenario) => scenario.intent.bundle_mode === "disabled"), "scenario matrix must cover disabled bundles");
@@ -218,18 +226,26 @@ assert.ok(demoScenarios.scenarios.some((scenario) => scenario.expected.request_s
 console.log("✓ demo matrix covers preferences, no-match, timeout, refusal, expiry and model attacks");
 
 const happy = await readJson("contracts/fixtures/happy-path.json");
-assert.equal(happy.orchestration.seller_agents.length, 3, "happy path must discover all Sellers");
+validateNegotiationTrace(happy);
+validateContract("CreateRequest", happy.request.create_request);
+validateContract("DocumentBundle", happy.request.documents);
+validateContract("NormalizedIntent", happy.request.normalized_intent);
+validateContract("RequestSnapshot", happy.snapshot);
+validateContract("EvaluatorInput", happy.evaluator_input);
+validateContract("EvaluatorOutput", happy.evaluator_output);
+assert.equal(happy.orchestration.seller_agents.length, 5, "happy path must discover all Sellers");
 assert.deepEqual(
   happy.orchestration.seller_agents.map((seller) => seller.listing_rank),
-  [1, 2, 3],
+  [1, 2, 3, 4, 5],
   "natural listing ranks must be contiguous",
 );
 assert.ok(sellerIds.includes(happy.orchestration.sponsored_placement.seller_id), "Sponsored Seller must already be eligible");
 
-assert.equal(happy.rfqs.length, 6, "three Sellers need one RFQ for each of two rounds");
+assert.equal(happy.rfqs.length, 19, "A/B/C negotiate five rounds, D three, E one");
 for (const sellerId of sellerIds) {
   const sellerRfqs = happy.rfqs.filter((rfq) => rfq.seller_id === sellerId);
-  assert.deepEqual(sellerRfqs.map((rfq) => rfq.round), [1, 2], `${sellerId} needs round 1 and 2 RFQs`);
+  const count = sellerStore.sellers.find(s => s.seller_id === sellerId).strategy.final_round ?? 5;
+  assert.deepEqual(sellerRfqs.map((rfq) => rfq.round), Array.from({ length: count }, (_, i) => i + 1), `${sellerId} RFQs must stop at its final round or round five`);
   for (const rfq of sellerRfqs) {
     assert.equal("source_text" in rfq, false, "RFQ cannot contain original source text at root");
     assert.ok(rfq.product_preferences.every((preference) => !("source_text" in preference)), "RFQ preferences must omit source text");
@@ -237,10 +253,11 @@ for (const sellerId of sellerIds) {
   }
 }
 
-assert.equal(happy.negotiations.length, 3, "happy path must include three negotiation branches");
+assert.equal(happy.negotiations.length, 5, "happy path must include five negotiation branches");
 const finalDraftBySeller = new Map();
 for (const negotiation of happy.negotiations) {
-  assert.deepEqual(negotiation.rounds.map((round) => round.result.round), [1, 2], `${negotiation.seller_id} must negotiate twice`);
+  const strategy = sellerStore.sellers.find(s => s.seller_id === negotiation.seller_id).strategy;
+  assert.deepEqual(negotiation.rounds.map((round) => round.result.round), Array.from({ length: strategy.final_round ?? 5 }, (_, i) => i + 1));
   for (const round of negotiation.rounds) {
     assert.equal(round.result.seller_id, negotiation.seller_id, "Seller branches cannot cross identities");
     assert.ok(round.result.drafts.every((draft) => !("eligibility" in draft)), "Seller drafts cannot self-declare eligibility");
@@ -252,20 +269,17 @@ for (const negotiation of happy.negotiations) {
       );
     }
   }
-  finalDraftBySeller.set(negotiation.seller_id, negotiation.rounds[1].result.drafts[0]);
+  finalDraftBySeller.set(negotiation.seller_id, negotiation.rounds.at(-1).result.drafts[0]);
 
   const seller = sellerStore.sellers.find((entry) => entry.seller_id === negotiation.seller_id);
   const primaryProduct = seller.products.find((product) => product.category === "mouse" && product.attributes.color === "black");
-  const expectedRoundPrices = [
-    primaryProduct.list_price_twd - seller.strategy.round_1_discount_twd,
-    primaryProduct.list_price_twd - seller.strategy.round_2_discount_twd,
-  ];
+  const expectedRoundPrices = seller.strategy.round_discounts_twd.slice(0, seller.strategy.final_round ?? 5).map(discount => primaryProduct.list_price_twd - discount);
   assert.deepEqual(
     negotiation.rounds.map((round) => round.result.drafts[0].total_price_twd),
     expectedRoundPrices,
     `${negotiation.seller_id} prices must follow its deterministic discounts`,
   );
-  assert.ok(expectedRoundPrices[1] >= primaryProduct.floor_price_twd, `${negotiation.seller_id} final price cannot cross its synthetic floor`);
+  assert.ok(expectedRoundPrices.every(price => price >= primaryProduct.floor_price_twd), `${negotiation.seller_id} final price cannot cross its synthetic floor`);
 }
 
 const aFinal = finalDraftBySeller.get("seller_a");
@@ -285,6 +299,13 @@ const offerIds = snapshot.offers.map((offer) => offer.offer_id);
 unique(offerIds, "formal offer IDs");
 for (const offer of snapshot.offers) {
   assertOfferShape(offer);
+  const branch = happy.negotiations.find(n => n.seller_id === offer.seller_id);
+  const draft = branch?.rounds.at(-1).result.drafts.find(d => d.variant === offer.variant);
+  assert.ok(draft, "Final snapshot offers must resolve to their Seller's last proposal");
+  assert.equal(offer.round, branch.rounds.at(-1).result.round);
+  const { offer_id, seller_id, round, baseline_offer_id, eligibility, ...offerTerms } = offer;
+  const { draft_ref, baseline_draft_ref, ...draftTerms } = draft;
+  assert.deepEqual(offerTerms, draftTerms, "Backend-assigned IDs must retain every negotiated commercial term");
   assert.equal(offer.eligibility.status, "eligible", `${offer.offer_id} must be eligible in happy path`);
   assert.ok(offer.total_price_twd <= snapshot.intent.max_total_twd, `${offer.offer_id} exceeds the hard budget`);
   assert.ok(offer.delivery_days <= snapshot.intent.delivery_days_max, `${offer.offer_id} misses the delivery limit`);
@@ -316,7 +337,73 @@ assert.equal("campaigns" in happy.evaluator_input, false, "Evaluator input must 
 sameSet(happy.evaluator_input.offers.map((offer) => offer.offer_id), eligibleIds, "Evaluator input must contain only every eligible offer");
 assert.notEqual(happy.evaluator_output.ranked_offers[0].offer_id.startsWith("offer_b"), true, "Sponsored Seller must not automatically rank first");
 sameSet(happy.fallback_output.ranked_offer_ids, eligibleIds, "fallback must rank the same eligible set");
-console.log("✓ happy path proves isolated two-round negotiation and safe independent ranking");
+console.log("✓ happy path proves five-Seller negotiation capped at five rounds with early finals and safe independent ranking");
+
+// Boundary and lifecycle regression checks exercise real schema validation and
+// cross-object semantics, including valid smaller discovery results.
+for (const count of [0, 1, 4, 5]) {
+  const result = structuredClone(happy.orchestration);
+  result.seller_agents = result.seller_agents.slice(0, count);
+  result.sponsored_placement = null;
+  validateContract("OrchestrationResult", result);
+  validateSellerList(result.seller_agents);
+}
+const sixth = structuredClone(happy.orchestration);
+sixth.seller_agents.push({ ...structuredClone(sixth.seller_agents[0]), seller_id: "seller_f", listing_rank: 6 });
+assert.throws(() => validateContract("OrchestrationResult", sixth), /OrchestrationResult/);
+assert.throws(() => validateContract("RequestSnapshot", { ...snapshot, seller_agents: sixth.seller_agents }), /RequestSnapshot/);
+const duplicate = structuredClone(happy.orchestration.seller_agents);
+duplicate[1].seller_id = duplicate[0].seller_id;
+assert.throws(() => validateSellerList(duplicate), /Seller IDs must be unique/);
+assert.throws(() => validateSellerList(happy.orchestration.seller_agents, { seller_id: "seller_f" }), /already be selected/);
+
+for (const [definition, example] of [
+  ["SellerRFQ", happy.rfqs[0]],
+  ["SellerNegotiationResult", happy.negotiations[0].rounds[0].result],
+  ["SellerRound", happy.orchestration.seller_agents[0].rounds[0]],
+  ["Offer", snapshot.offers[0]],
+]) {
+  for (const round of [0, 6, 1.5]) assert.throws(() => validateContract(definition, { ...example, round }), new RegExp(definition));
+  for (const round of [1, 5]) validateContract(definition, { ...example, round });
+}
+const resumeFinal = structuredClone(happy);
+const finished = resumeFinal.negotiations.find(n => n.seller_id === "seller_e");
+const finishedSeller = resumeFinal.orchestration.seller_agents.find(s => s.seller_id === "seller_e");
+finished.rounds.push({ ...structuredClone(finished.rounds[0]), result: { ...finished.rounds[0].result, round: 2 } });
+finishedSeller.rounds.push({ ...finishedSeller.rounds[0], round: 2 });
+resumeFinal.rfqs.push({ ...structuredClone(resumeFinal.rfqs.find(q => q.seller_id === "seller_e")), round: 2, previous_offer_ids: finishedSeller.rounds[0].offer_ids });
+assert.throws(() => validateNegotiationTrace(resumeFinal), /final branch cannot receive another round/);
+
+for (const outcome of ["refused", "timeout", "error"]) {
+  const seller = structuredClone(happy.orchestration.seller_agents[0]);
+  seller.rounds = [seller.rounds[0], { round: 2, outcome, is_final: false, offer_ids: [] }];
+  seller.status = outcome;
+  seller.stop_reason = outcome;
+  seller.final_offer_ids = seller.rounds[0].offer_ids;
+  validateSellerList([seller]); // Retains the last validated quote after failure.
+  const result = { ...happy.negotiations[0].rounds[0].result, round: 2, outcome, is_final: false, drafts: [] };
+  validateContract("SellerNegotiationResult", result);
+  assert.throws(() => validateContract("SellerNegotiationResult", { ...result, is_final: true }), /SellerNegotiationResult/);
+  seller.rounds.push({ round: 3, outcome: "offered", is_final: false, offer_ids: ["late_offer"] });
+  assert.throws(() => validateSellerList([seller]), /failed branch cannot receive another round/);
+}
+for (const stop_reason of ["no_adjustment", "global_deadline", "call_budget", "token_budget"]) {
+  const seller = structuredClone(happy.orchestration.seller_agents[0]);
+  seller.rounds = seller.rounds.slice(0, 2);
+  seller.stop_reason = stop_reason;
+  seller.final_offer_ids = seller.rounds.at(-1).offer_ids;
+  validateSellerList([seller]);
+}
+const sixthRound = structuredClone(happy.orchestration.seller_agents[0]);
+sixthRound.rounds.push({ ...sixthRound.rounds.at(-1), round: 6 });
+assert.throws(() => validateSellerList([sixthRound]), /SellerAgent/);
+const repeatedRound = structuredClone(happy.orchestration.seller_agents[0]);
+repeatedRound.rounds[1].round = 1;
+assert.throws(() => validateSellerList([repeatedRound]), /contiguous and unique/);
+const prematureLimit = structuredClone(happy.orchestration.seller_agents[0]);
+prematureLimit.rounds = prematureLimit.rounds.slice(0, 2);
+assert.throws(() => validateSellerList([prematureLimit]), /max_rounds requires completed round five/);
+console.log("✓ rejects sixth Seller/round, duplicate branches and dispatch after final/failure; allows smaller lists and bounded early stops");
 
 const edge = await readJson("contracts/fixtures/edge-cases.json");
 for (const testCase of edge.cases) {
@@ -331,6 +418,16 @@ for (const attack of edge.evaluator_output_attacks) {
 console.log("✓ edge cases reject hard-constraint violations and invalid model-selected IDs");
 
 const api = await readJson("contracts/fixtures/api-examples.json");
+validateContract("CreateRequest", api.create_request.body);
+validateContract("AcceptDecision", api.accept_decision.body);
+validateContract("RejectDecision", api.reject_decision_alternative.body);
+validateContract("RedeemRequest", api.redeem.body);
+validateContract("RequestSnapshot", api.create_request.response);
+validateContract("DecisionResult", api.accept_decision.response);
+validateContract("DecisionResult", api.reject_decision_alternative.response);
+validateContract("RedemptionReceipt", api.redeem.response);
+assert.equal(api.redeem.response.offer_id, api.accept_decision.body.offer_id);
+assert.equal(api.redeem.response.total_price_twd, snapshot.offers.find(o => o.offer_id === api.redeem.body.offer_id).total_price_twd, "Redemption receipt must retain the immutable accepted price");
 for (const example of [api.create_request, api.accept_decision, api.reject_decision_alternative, api.redeem]) {
   assert.ok(example.http.headers["Idempotency-Key"], `${example.http.method} ${example.http.path} needs Idempotency-Key`);
 }

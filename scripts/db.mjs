@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import path from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { fileURLToPath } from "node:url";
@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dataDirectory = path.join(root, "data");
 const databasePath = path.join(dataDirectory, "offermesh.sqlite");
-const migrationPath = path.join(root, "db", "migrations", "001_initial.sql");
+const migrationsDirectory = path.join(root, "db", "migrations");
 
 function readJson(relativePath) {
   return JSON.parse(readFileSync(path.join(root, relativePath), "utf8"));
@@ -15,6 +15,28 @@ function readJson(relativePath) {
 
 function json(value) {
   return JSON.stringify(value);
+}
+
+function applyMigrations(db) {
+  for (const filename of readdirSync(migrationsDirectory).filter(name => /^\d+_.+\.sql$/.test(name)).sort()) {
+    const version = filename.slice(0, -4);
+    const hasMigrations = db.prepare("SELECT 1 FROM sqlite_schema WHERE name = 'schema_migrations'").get();
+    if (hasMigrations && db.prepare("SELECT 1 FROM schema_migrations WHERE version = ?").get(version)) continue;
+    // SQLite table rebuilds require this pragma outside the migration transaction.
+    db.exec("PRAGMA foreign_keys = OFF");
+    db.exec("BEGIN IMMEDIATE");
+    try {
+      db.exec(readFileSync(path.join(migrationsDirectory, filename), "utf8"));
+      assert.deepEqual(db.prepare("PRAGMA foreign_key_check").all(), [], `${version} must preserve references`);
+      db.prepare("INSERT INTO schema_migrations (version, applied_at) VALUES (?, ?)").run(version, new Date().toISOString());
+      db.exec("COMMIT");
+    } catch (error) {
+      db.exec("ROLLBACK");
+      throw error;
+    } finally {
+      db.exec("PRAGMA foreign_keys = ON");
+    }
+  }
 }
 
 function insertMarketplaceSources(db, marketplace) {
@@ -60,8 +82,8 @@ function insertCatalog(db, sellerStore) {
 
   const insertSeller = db.prepare(`
     INSERT INTO sellers (
-      seller_id, name, enabled, strategy_type, round_1_discount_twd,
-      round_2_discount_twd, bundle_mode, personal_band, personal_rating,
+      seller_id, name, enabled, strategy_type, round_discounts_json,
+      final_round, bundle_mode, personal_band, personal_rating,
       personal_count, marketplace_rating, marketplace_count
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
@@ -87,8 +109,8 @@ function insertCatalog(db, sellerStore) {
       seller.name,
       Number(seller.enabled),
       seller.strategy.type,
-      seller.strategy.round_1_discount_twd,
-      seller.strategy.round_2_discount_twd,
+      json(seller.strategy.round_discounts_twd),
+      seller.strategy.final_round,
       seller.strategy.bundle_mode,
       seller.trust.personal_band,
       seller.trust.personal_rating,
@@ -177,8 +199,8 @@ function insertCanonicalFlow(db, happy) {
   const insertRequestSeller = db.prepare(`
     INSERT INTO request_sellers (
       request_id, seller_id, listing_rank, match_reason,
-      candidate_products_json, status, final_offer_ids_json
-    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+      candidate_products_json, status, final_offer_ids_json, stop_reason
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `);
   for (const seller of happy.snapshot.seller_agents) {
     insertRequestSeller.run(
@@ -189,14 +211,15 @@ function insertCanonicalFlow(db, happy) {
       json(seller.candidate_products),
       seller.status,
       json(seller.final_offer_ids),
+      seller.stop_reason,
     );
   }
 
   const insertRound = db.prepare(`
     INSERT INTO negotiation_rounds (
       request_id, seller_id, round, outcome, buyer_message,
-      seller_message, drafts_json, started_at, completed_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      seller_message, drafts_json, started_at, completed_at, is_final
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
   for (const negotiation of happy.negotiations) {
     for (const round of negotiation.rounds) {
@@ -210,6 +233,7 @@ function insertCanonicalFlow(db, happy) {
         json(round.result.drafts),
         createdAt,
         updatedAt,
+        Number(round.result.is_final),
       );
     }
   }
@@ -270,12 +294,10 @@ function initializeDatabase(db) {
   db.exec("PRAGMA foreign_keys = ON");
   db.exec("PRAGMA journal_mode = WAL");
   db.exec("PRAGMA synchronous = NORMAL");
-  db.exec(readFileSync(migrationPath, "utf8"));
+  applyMigrations(db);
 
   db.exec("BEGIN IMMEDIATE");
   try {
-    db.prepare("INSERT INTO schema_migrations (version, applied_at) VALUES (?, ?)")
-      .run("001_initial", new Date().toISOString());
     insertMarketplaceSources(db, marketplace);
     insertCatalog(db, sellerStore);
     insertCanonicalFlow(db, happy);
@@ -290,6 +312,71 @@ function getCount(db, table) {
   return Number(db.prepare(`SELECT COUNT(*) AS count FROM ${table}`).get().count);
 }
 
+function insertRow(db, table, row) {
+  // Table/column names come exclusively from this script and SQLite schema metadata.
+  const keys = Object.keys(row);
+  return db.prepare(`INSERT INTO ${table} (${keys.join(", ")}) VALUES (${keys.map(() => "?").join(", ")})`).run(...Object.values(row));
+}
+
+function verifyNegotiationConstraints(db) {
+  db.exec("SAVEPOINT constraint_checks");
+  try {
+    const round = db.prepare("SELECT * FROM negotiation_rounds WHERE seller_id = 'seller_a' AND round = 1").get();
+    const offer = db.prepare("SELECT * FROM offers WHERE offer_id = 'offer_a_r5'").get();
+    for (const value of [0, 6, 1.5]) {
+      assert.throws(() => insertRow(db, "negotiation_rounds", { ...round, round: value }), /CHECK|INTEGER/);
+      assert.throws(() => insertRow(db, "offers", { ...offer, offer_id: "invalid_round", round: value }), /CHECK|INTEGER/);
+    }
+    assert.throws(() => insertRow(db, "negotiation_rounds", { ...round, is_final: 1, outcome: "timeout" }), /CHECK/);
+    const seller = db.prepare("SELECT * FROM sellers WHERE seller_id = 'seller_a'").get();
+    insertRow(db, "sellers", { ...seller, seller_id: "seller_f" });
+    const branch = db.prepare("SELECT * FROM request_sellers WHERE seller_id = 'seller_a'").get();
+    assert.throws(() => insertRow(db, "request_sellers", { ...branch, seller_id: "seller_f", listing_rank: 6 }), /at most five/);
+    assert.throws(() => db.prepare("UPDATE request_sellers SET listing_rank = 6 WHERE seller_id = 'seller_a'").run(), /at most five/);
+    for (const schedule of [[0, 1], [0, 1, 2, 3, 4, 5], [0, 1, -1, 3, 4], [0, 1, 0, 3, 4], [0, 1, 2, 3, 4.5]]) {
+      assert.throws(() => db.prepare("UPDATE sellers SET round_discounts_json = ? WHERE seller_id = 'seller_a'").run(json(schedule)), /CHECK|discount schedule/);
+    }
+  } finally {
+    db.exec("ROLLBACK TO constraint_checks");
+    db.exec("RELEASE constraint_checks");
+  }
+}
+
+function verifyLegacyMigration() {
+  const db = new DatabaseSync(":memory:");
+  try {
+    db.exec(readFileSync(path.join(migrationsDirectory, "001_initial.sql"), "utf8"));
+    const time = "2026-09-12T10:00:00+08:00";
+    insertRow(db, "schema_migrations", { version: "001_initial", applied_at: time });
+    insertRow(db, "users", { user_id: "legacy_user", display_name: "Legacy buyer", created_at: time, updated_at: time });
+    insertRow(db, "sellers", { seller_id: "legacy_seller", name: "Legacy Seller", enabled: 1, strategy_type: "value_bundle", round_1_discount_twd: 30, round_2_discount_twd: 60, bundle_mode: "free_optional_mouse_pad", personal_band: "neutral", personal_rating: null, personal_count: 0, marketplace_rating: null, marketplace_count: 0 });
+    insertRow(db, "terms", { terms_id: "legacy_terms", warranty_months: 12, return_days: 7, payment_obligation: "one_time" });
+    insertRow(db, "requests", { request_id: "legacy_request", user_id: "legacy_user", parent_request_id: null, revision: 1, intent_md: "Mouse", preference_md: "", normalized_intent_json: "{}", status: "redeemed", published_snapshot_json: '{"legacy":true}', created_at: time, updated_at: time });
+    insertRow(db, "request_sellers", { request_id: "legacy_request", seller_id: "legacy_seller", listing_rank: 1, match_reason: "Legacy match", candidate_products_json: "[]", status: "offered", final_offer_ids_json: '["legacy_standalone","legacy_bundle"]' });
+    insertRow(db, "negotiation_rounds", { request_id: "legacy_request", seller_id: "legacy_seller", round: 2, outcome: "offered", buyer_message: "Legacy buyer", seller_message: "Legacy quote", drafts_json: "[]", started_at: time, completed_at: time });
+    const offer = { offer_id: "legacy_standalone", request_id: "legacy_request", seller_id: "legacy_seller", round: 2, variant: "standalone", baseline_offer_id: null, items_json: "[]", primary_features_json: "[]", total_price_twd: 569, delivery_days: 3, terms_id: "legacy_terms", optional_addons: 0, expires_at: "2026-09-12T18:00:00+08:00", eligibility_status: "eligible", eligibility_reason_codes_json: "[]", created_at: time };
+    insertRow(db, "offers", offer);
+    insertRow(db, "offers", { ...offer, offer_id: "legacy_bundle", variant: "bundle", baseline_offer_id: "legacy_standalone", optional_addons: 1 });
+    insertRow(db, "decisions", { decision_id: "legacy_decision", request_id: "legacy_request", offer_id: "legacy_bundle", action: "accept", created_at: time });
+    insertRow(db, "redemptions", { redemption_id: "legacy_redemption", decision_id: "legacy_decision", request_id: "legacy_request", offer_id: "legacy_bundle", status: "succeeded", total_price_twd: 569, failure_code: null, redeemed_at: time, created_at: time });
+    const preserved = ["requests", "offers", "decisions", "redemptions"].map(table => [table, db.prepare(`SELECT * FROM ${table}`).all()]);
+    applyMigrations(db);
+    applyMigrations(db); // Applying already-recorded migrations must be a no-op.
+    for (const [table, rows] of preserved) assert.deepEqual(db.prepare(`SELECT * FROM ${table}`).all(), rows, `${table} must survive the v0.2 migration unchanged`);
+    assert.deepEqual(JSON.parse(db.prepare("SELECT round_discounts_json FROM sellers").get().round_discounts_json), [30, 60, 60, 60, 60]);
+    assert.equal(db.prepare("SELECT is_final FROM negotiation_rounds").get().is_final, 0);
+    assert.equal(db.prepare("SELECT stop_reason FROM request_sellers").get().stop_reason, null);
+    assert.equal(getCount(db, "schema_migrations"), 2);
+    assert.equal(db.prepare("PRAGMA foreign_keys").get().foreign_keys, 1);
+    assert.deepEqual(db.prepare("PRAGMA foreign_key_check").all(), []);
+    assert.throws(() => db.exec("UPDATE offers SET total_price_twd = 1"), /offers are immutable/);
+    assert.throws(() => db.exec("UPDATE requests SET published_snapshot_json = '{}'"), /published request snapshots are immutable/);
+    console.log("✓ v0.1 migration preserves quotes, bundle references, accepted/redemption records and immutable snapshots");
+  } finally {
+    db.close();
+  }
+}
+
 function verifyDatabase(db) {
   db.exec("PRAGMA foreign_keys = ON");
   const integrity = db.prepare("PRAGMA integrity_check").get().integrity_check;
@@ -297,19 +384,19 @@ function verifyDatabase(db) {
   assert.deepEqual(db.prepare("PRAGMA foreign_key_check").all(), [], "foreign keys must be valid");
 
   const expectedCounts = {
-    schema_migrations: 1,
+    schema_migrations: 2,
     users: 1,
     marketplace_sources: 11,
-    sellers: 3,
+    sellers: 5,
     terms: 1,
-    products: 7,
-    product_sources: 15,
-    seller_inventory: 7,
+    products: 9,
+    product_sources: 19,
+    seller_inventory: 9,
     campaigns: 1,
     requests: 1,
-    request_sellers: 3,
-    negotiation_rounds: 6,
-    offers: 4,
+    request_sellers: 5,
+    negotiation_rounds: 19,
+    offers: 6,
     evaluations: 1,
     feedback_events: 0,
     user_preferences: 0,
@@ -344,14 +431,14 @@ function verifyDatabase(db) {
   const eligibleIds = offerRows.map((offer) => offer.offer_id).sort();
   assert.deepEqual(rankedIds, eligibleIds, "evaluation must rank every eligible offer exactly once");
 
-  const originalPrice = db.prepare("SELECT total_price_twd FROM offers WHERE offer_id = ?").get("offer_a_r2").total_price_twd;
+  const originalPrice = db.prepare("SELECT total_price_twd FROM offers WHERE offer_id = ?").get("offer_a_r5").total_price_twd;
   assert.throws(
-    () => db.prepare("UPDATE offers SET total_price_twd = total_price_twd + 1 WHERE offer_id = ?").run("offer_a_r2"),
+    () => db.prepare("UPDATE offers SET total_price_twd = total_price_twd + 1 WHERE offer_id = ?").run("offer_a_r5"),
     /offers are immutable/,
     "offer immutability trigger must block updates",
   );
   assert.equal(
-    db.prepare("SELECT total_price_twd FROM offers WHERE offer_id = ?").get("offer_a_r2").total_price_twd,
+    db.prepare("SELECT total_price_twd FROM offers WHERE offer_id = ?").get("offer_a_r5").total_price_twd,
     originalPrice,
     "blocked offer update must not change data",
   );
@@ -362,6 +449,8 @@ function verifyDatabase(db) {
     WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
   `).get().count);
   assert.equal(tableCount, 19, "database must expose 17 domain tables plus migration and source-link tables");
+
+  verifyNegotiationConstraints(db);
 
   return { integrity, tableCount, counts: expectedCounts };
 }
@@ -374,6 +463,7 @@ function printReport(report, label) {
   console.log(`✓ seeded: ${report.counts.marketplace_sources} sources, ${report.counts.sellers} Sellers, ${report.counts.products} products`);
   console.log(`✓ canonical flow: ${report.counts.requests} request, ${report.counts.negotiation_rounds} rounds, ${report.counts.offers} offers, ${report.counts.evaluations} evaluation`);
   console.log("✓ immutable Offer trigger: active");
+  console.log("✓ five-Seller/five-round limits and discount schedule constraints: active");
 }
 
 function main() {
@@ -383,6 +473,7 @@ function main() {
   const force = args.has("--force");
 
   if (isMemory) {
+    verifyLegacyMigration();
     const db = new DatabaseSync(":memory:");
     try {
       initializeDatabase(db);
