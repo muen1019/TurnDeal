@@ -1,6 +1,14 @@
 # OfferMesh
 
-文件定義正本：[intent.md / preference.md 定義與分類](docs/INTENT_PREFERENCE_SPEC.md)。preference 是長期偏好的可讀表示，intent 是本輪購買目標／限制／例外；目前 API preference_md 是本輪快照，不是更新長期偏好的命令。前端儲存僅限分頁，長期偏好更新尚未實作。
+文件定義正本：[intent.md / preference.md 定義與分類](docs/INTENT_PREFERENCE_SPEC.md)。preference 是長期偏好的可讀表示，intent 是本輪購買目標／限制／例外；目前 API preference_md 是本輪快照，不是更新長期偏好的命令。前端儲存僅限分頁；Improver 已有內部偏好版本寫入，前端帳戶偏好同步尚未接入。
+
+## Buyer Request Improver
+
+已實作 Context Builder、LLM Revision Engine、語意驗證、SQLite 工作／文件版本與恢復。每次改善保存新版 intent；全域 preference 僅依明確長期表述提出並驗證 patch。既有 v0.3 reject 回應與原始快照保持不變。
+
+`npm run test:improver` 執行核心與 Node 24 runtime 內部整合測試；`npm run demo:improver` 執行離線合成案例。明示執行 `npm run demo:improver:live` 才使用 `.env` 的 `API_KEY` 呼叫模型，模型名稱由 `IMPROVER_MODEL` 控制（預設 gpt-4.1-mini）。詳見 [使用方式與接線邊界](docs/BUYER_REQUEST_IMPROVER.md) 及 [驗證紀錄](docs/IMPROVER_TEST_REPORT.md)。
+
+整合版 runtime 已接上 selection_version: 1：API 接受採用時一併提供的拒絕紀錄，或完整拒絕集合，並排入改善工作。決策與工作原子保存，API 提供進度、需求草稿與澄清問題，前端接線不在本提交內。只憑滑動不更新全域偏好；自動 child、澄清後再提交及全域偏好編輯器仍未實作。
 
 ## 完整前後端入口（最新）
 
@@ -287,3 +295,7 @@ npx --yes @fission-ai/openspec@1.13.0 validate define-offer-result-ui-api --stri
 ```
 
 change 維持未封存，尚待任務表中的完整視覺與裝置驗收。根目錄契約測試驗證統一 v0.3 共用契約與 Result fixtures。
+
+## ACP 測試購買
+
+整合 runtime 已支援購買 API → ACP HTTP 測試商家 → 模擬付款 → 持久化訂單。前端接線不在本提交內。採用不自動下單，須另提交明確確認；不會實際扣款或出貨。操作、六個 API payload 與正式付款邊界見 [ACP 購買說明](docs/ACP_PURCHASE.md)，實跑證據見 [驗證報告](docs/ACP_PURCHASE_TEST_REPORT.md)。
