@@ -1,5 +1,9 @@
 # A2A Commerce shared contract v0.3
 
+`intent_md` 為本輪意圖原文；`preference_md` 為本次偏好來源快照，不更新帳戶偏好。`NormalizedIntent` 為合併後執行資料。定義、分類與儲存見 [文件語意規格](../docs/INTENT_PREFERENCE_SPEC.md)。
+
+完整流程接線新增三個 Status：orchestrating、negotiating、evaluating，前端必須持續輪詢而不是視為終止。現行三個 HTTP 路由不變，詳見 [完整接線說明](../docs/RUN_FULL_APP.md)。
+
 唯一有效契約為 [a2a-commerce.v0.3.schema.json](a2a-commerce.v0.3.schema.json)。Backend OpenAPI、前後端生成型別、Ajv 驗證器與目前 fixtures 全部引用此契約。
 
 協商功能遷移至 v0.3：五家 Seller、最多五輪、明確 final 與 Backend 停止原因。本次依使用者確認的新版 spec，新增 optional `SellerRFQ.competitive_terms`、`SellerNegotiationResult.withdrawn_offer_ids`，以及 `CompetitiveOfferReference`、`SharedNegotiationContext`、`NegotiationOutput`。舊 payload 可省略 optional 欄位，既有 fixtures 仍有效；新增 `fixtures/negotiation-sharing.json` 驗證上一輪來源與去識別化邊界。Evaluator 契約不變。[目標 System Design](../docs/SYSTEM_DESIGN.md) 的 Swipe、文件修訂與長期偏好尚未遷移。

@@ -4,6 +4,8 @@ These instructions apply to every change in this repository.
 
 ## Unified Result contract
 
+Integrated full application: root npm run dev starts backend/runtime with Node 24 / node:sqlite and the existing frontend, using one data/app.sqlite. backend/src remains the legacy Node 20 mock Result server for compatibility tests. See docs/RUN_FULL_APP.md. Live API keys must never enter the frontend child environment. Status now includes orchestrating, negotiating and evaluating; keep every consumer and generated type aligned. Only configured canonical A-E sellers negotiate; discovery_seller_* policies remain inactive.
+
 Use contracts/a2a-commerce.v0.3.schema.json for all active producers and consumers. main's five-seller/five-round types and catalog are combined with local accept/reject=200 and original feedback/source_documents handoff. Contracts under contracts/archive are historical, never alternative live API inputs.
 
 Backend persistence uses db/migrations including 003_result_decisions.sql. Published snapshots and offers stay immutable; Result state and saved decisions are separate columns. Result automatically backs up and migrates its earlier SQLite layout without regenerating old prices. Root database scripts use Node 24; backend/frontend use Node 20.19.5.
@@ -18,6 +20,8 @@ Backend persistence uses db/migrations including 003_result_decisions.sql. Publi
 6. If implementation and contract disagree, update the contract through an explicit reviewed change before changing consumers.
 
 ## Product invariants
+
+- Document semantics follow docs/INTENT_PREFERENCE_SPEC.md: intent_md is request-scoped; preference_md in CreateRequest is a request-bound snapshot, not a persistent preference update. NormalizedIntent is the effective request data. Frontend saved definitions are sessionStorage templates, not account-level persistence. Do not claim automatic Markdown generation, category-scoped long-term revisions or feedback learning until implemented. Formatting must never mutate user_preferences.
 
 - The user flow is Request, Format, Orchestrate, Negotiate, Evaluate, Result or Feedback.
 - The MVP supports one wireless mouse as the primary item and at most one mouse pad as an add-on.

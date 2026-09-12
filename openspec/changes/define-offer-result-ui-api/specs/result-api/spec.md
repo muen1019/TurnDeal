@@ -1,8 +1,24 @@
 ## Purpose
 
-接收 intent／preference，以 deterministic mock 產生優惠組合，並提供真正可持久化的 accept／reject API。Buyer Agent 的文件改寫、下一輪編排及交易兌換不屬於本服務。
+接收本輪 intent／preference 快照，提供真正可持久化的 accept／reject API。完整入口 backend/runtime 已串接 Formatter、Discovery、Negotiation、Evaluator；舊 backend/src 的 deterministic mock 僅為相容展示與測試。Buyer Agent 的 Markdown 文件改寫、長期偏好更新、linked child 編排及交易兌換仍不屬於現行服務。
 
 ## ADDED Requirements
+
+### Requirement: Preserve document scope and preference provenance
+The API SHALL follow docs/INTENT_PREFERENCE_SPEC.md. Both documents SHALL be preserved as request-scoped original text. Omitted preference_md and an explicit empty string currently normalize to empty text; neither clears durable preferences nor prevents Formatter from reading active user_preferences. Explicit preference_md overrides matching attributes for this request only, not the entire durable profile. Current Formatter SHALL produce NormalizedIntent and a persisted formatter_runs snapshot without updating user_preferences or replacing submitted Markdown with generated text.
+
+#### Scenario: Submit temporary preference text
+- **WHEN** a buyer submits preference_md or a conflicting same-attribute choice in intent_md
+- **THEN** the effective request follows intent_md > preference_md > active SQLite product preferences
+- **AND** no durable profile write or Markdown preference revision is performed
+
+#### Scenario: Omit preference text
+- **WHEN** preference_md is absent or empty
+- **THEN** the request stores an empty preference_md and Formatter can inherit active product preferences
+- **AND** the API does not invent a preference_revision_id or claim that a long-term Markdown document was loaded
+
+### Requirement: Distinguish integrated and legacy mock execution
+The root integrated runtime SHALL return formatting immediately, then use the existing services for orchestrating, negotiating and evaluating, preserving one request_id and buyer scope. Offline mode SHALL run real deterministic module execution without paid calls; live mode SHALL use server-only credentials with module-level safe fallbacks. The MockResultProvider requirements below apply only to the retained legacy server, not to the integrated execution provider. Both profiles SHALL obey the same document scope, result schema, decision safety and idempotency rules.
 
 ### Requirement: Version the changed result contract before implementation
 The implementation SHALL use a unified v0.3 successor to the main v0.2 contract and the local Result contract. It SHALL define rejected, RejectDecisionResult and RequestSnapshot.decision as specified in design.md section 2, and update OpenAPI, fixtures and validators together before changing consumers. The current v0.1 artifacts SHALL NOT be described as compatible with this change.

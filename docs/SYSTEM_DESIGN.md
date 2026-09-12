@@ -1,4 +1,4 @@
-> 現行 Result API 已統一 v0.3；accept/reject 與資料庫遷移見 [統一契約](UNIFIED_RESULT_CONTRACT.md)。本文其餘完整 Agent pipeline 屬目標設計。
+> 現行完整服務已接通 Formatter → Discovery → Negotiation → Evaluator → UI 決策，見 [啟動與接線](RUN_FULL_APP.md)。文件語意以 [intent / preference 定義](INTENT_PREFERENCE_SPEC.md) 為準：intent 是本輪購買意圖；長期 preference 與本次 preference_md 快照不同；NormalizedIntent 是合併後執行條件。本文後續包含未實作的長期 Markdown 版本、Preference Updater、child／revise 與兌換規劃，不得當作現行 API 保證。
 
 > 文件定位：目標系統設計；五家 Seller／最多五輪已遷移至 v0.3 JSON Schema／fixtures，其餘差異如下。
 >
@@ -8,24 +8,24 @@
 
 ## Repo 整合狀態
 
-目前契約與驗收以 [v0.3 schema](../contracts/a2a-commerce.v0.3.schema.json)、[開發規則](DEVELOPMENT_RULES.md) 與 [AGENTS.md](../AGENTS.md) 為準。五家 Seller、最多五輪同步排程、共享競爭條件、模型／fallback 及 SQLite 稽核已實作於 [協商模組](NEGOTIATION.md)。完整 Backend pipeline 仍需整合；第 9 節其餘 API 草案不是現有 HTTP API 已支援的宣告。
+目前契約與驗收以 [v0.3 schema](../contracts/a2a-commerce.v0.3.schema.json)、[開發規則](DEVELOPMENT_RULES.md) 與 [AGENTS.md](../AGENTS.md) 為準。五家 Seller、最多五輪同步排程、共享競爭條件、模型／fallback 及 SQLite 稽核已接入 backend/runtime。第 9 節超出現行三個 HTTP 操作的 API 草案仍是目標，不是現有支援宣告。
 
-| 主題 | Repo v0.2 基準 | 本文目標／剩餘遷移範圍 |
+| 主題 | Repo 目前實作 | 本文目標／剩餘遷移範圍 |
 | --- | --- | --- |
-| Seller 名單 | 五家測資；OrchestrationResult／RequestSnapshot 的 seller_agents 最多五家，驗證 ID 唯一與 listing_rank 連續 | 依自然排序選前五家合格 Seller，各派一個 Buyer Agent；不足五家依實際數量。實際 discovery／派發服務仍待實作 |
-| 議價輪次 | 已有五輪同步 barrier、round timeout、deadline、成本上限與分支提前停止 | HTTP／UI 需串接模組進度事件 |
+| Seller 名單 | 已接 Discovery／派發；完整 UI 使用已配置的 A–E，最多五家合格 Seller | 120 筆／15 家搜尋仍可獨立使用；其議價策略模板未啟用 |
+| 議價輪次 | 五輪同步 barrier、timeout、deadline、成本上限、提前停止及 HTTP snapshot 進度已接線 | 更詳細即時逐句展示仍可擴充 |
 | 資訊共享 | 已有 SharedNegotiationContext 與 optional RFQ competitive_terms，使用者已確認新版隱私邊界 | Seller 只取得仍有效、可比較的去識別化條件，不取得競爭者身分／ID／私有資料 |
-| 決策 | reject + feedback 建立 child | reject 處理目前 Offer；revise + feedback 建立 child；更新 RejectDecision／DecisionResult |
+| 決策 | accept/reject 保存到 SQLite；reject 保留原文，不建立 child | revise／child 需另行版本化契約 |
 | Swipe 狀態 | 沒有逐張 DecisionSession 或 all_rejected | 新增 session、current_offer_id、互動事件與 all_rejected；更新 RequestSnapshot／Status |
-| 偏好來源 | ProductPreference 沒有 source；交易偏好為字串 | explicit／behavioral 分層，有來源的交易偏好與證據，更新 Formatter／Evaluator input |
+| 偏好來源 | 本輪 intent > 本次 preference 快照 > DB active 商品偏好；保留 source_text | 品類作用域、explicit／behavioral 分層、長期交易偏好及更新流程待實作 |
 | 文件版本 | DocumentBundle 的 Request revision | 另增長期 preference_revision_id 與背景更新紀錄；新版本不改既有 Request 快照 |
 | 時間預算 | 五輪上限；時間／成本停止原因可記錄，實際 timeout／deadline 數值待 Backend 量測與設定 | 五輪上限、round timeout、global deadline 與成本限制；舊版 8 秒不作五輪完成承諾 |
-| Evaluator 失敗 | 必須提供 deterministic fallback | 本文規劃 invalid／unavailable 進 failed；這項差異尚待取捨，現行 v0.2 繼續遵守 fallback 規則 |
+| Evaluator 失敗 | 已有 deterministic fallback | 正文的 invalid／unavailable → failed 為未採用規劃，現行仍遵守安全 fallback |
 | 持久化與恢復 | 已有 migration／seed、協商輸入快照、不可變 Offer／context revisions、完成重播與重啟中斷標記 | 待整合交易端 runtime Offer 讀取、DecisionSession、偏好工作與新版 Swipe 語意 |
 
 後續契約遷移仍應以獨立升版變更，同步 schema、fixtures、驗證器、受影響 consumer 及共同規則，經專案既定 review 流程後合併。不要直接拿本文件尚未遷移的 payload 傳給 v0.2 consumer。文件中的錯誤狀態、fallback 與跨 Seller 資訊邊界亦須一併對齊。
 
-合併 main 時已保留新增的 Marketplace 公開來源快照與 SQLite 實作，見 [資料來源政策](../contracts/fixtures/MARKETPLACE_DATA.md) 與 [資料庫說明](../db/README.md)。目前資料庫的有原因回饋仍採建立 child 的 v0.1 語意；本文件的 reject／revise 分離尚需遷移。
+合併 main 時保留 Marketplace 公開來源快照與 SQLite，見 [資料來源政策](../contracts/fixtures/MARKETPLACE_DATA.md) 與 [資料庫說明](../db/README.md)。歷史 child 欄位不代表現行 reject 會建立 child；目前回饋只保存、不改寫 intent 或長期 preference。
 
 原文引用的完整 REFERENCE.md 尚未取得；[來源待補清單](REFERENCE.md) 保留原編號與引用位置，未補上來源前不能視為已核實的參考文獻。
 
@@ -292,7 +292,7 @@ intent.md
 preference.md
 ```
 
-`intent.md` 描述本次交易的主要購買目標，例如：
+`intent.md` 描述本次交易的購買目標、硬限制與臨時偏好；不是生成或覆寫長期 preference.md 的指令。例如：
 
 ```markdown
 # 購買需求
@@ -303,7 +303,7 @@ preference.md
 - 最晚七天內送達
 ```
 
-`preference.md` 描述商品與交易偏好，例如：
+長期 `preference.md` 描述跨次商品與交易偏好；API `preference_md` 則是提供給本次 Request 的來源快照，不直接修改長期文件。例如：
 
 ```markdown
 # 商品偏好
@@ -331,7 +331,7 @@ document revision
 
 本系統不額外訓練 Preference Model。
 
-所有可被 Orchestrator 與 Evaluator 使用的長期個人化資訊，都保存於版本化的：
+目標設計是將長期偏好保存為可讀、可版本化的 Markdown。**目前尚未建立該 Markdown 版本庫**；已實作的是 SQLite user_preferences 商品屬性與每次 formatter_runs 的來源快照。目標表示為：
 
 ```text
 preference.md
@@ -2525,9 +2525,9 @@ Swipe History
 
 ## 3. Request：Buyer Agent 提交需求文件
 
-**輸入：** `intent_md` 必填、`preference_md` 選填，都是 UTF-8 Markdown 字串。客戶端可送出自己的檔案內容；省略 preference_md 時取該 Buyer 最新已提交的長期偏好，沒有紀錄則為空字串。明示 preference_md 時作為本次完整偏好文件快照，不直接覆蓋長期文件。API 不接受本機路徑、任意 URL 或自動讀取使用者磁碟。
+**目前輸入：** `intent_md` 必填、`preference_md` 選填，都是 UTF-8 Markdown 字串。省略 preference_md 目前保存為空字串；Formatter 仍讀取該 Buyer 的 active user_preferences，並不是自動讀取一份長期 Markdown。明示 preference_md 是本輪快照，依相同屬性覆寫低優先來源，不更新帳戶偏好。API 不接受本機路徑、任意 URL 或自動讀取使用者磁碟。
 
-**責任：** 驗證 request 格式與大小，建立 `request_id`、`root_request_id` 與第 1 版文件，記錄 preference_revision_id（使用長期偏好時為來源 ID，否則 null）；立即回 `202`，背景執行 Format。買家身分取自已驗證 session；MVP 可固定一個 Demo buyer，不能相信 body 傳入的 buyer_id 來讀取別人的交易信任。
+**目前責任：** 驗證格式與大小，建立 request_id、root_request_id 與第 1 版文件；立即回 202，背景執行 Format。Formatter 保存實際採用的 DB 偏好列，不存在現行 preference_revision_id API 欄位；長期 Markdown 來源版本待擴充。買家身分由伺服器決定，MVP 固定 Demo buyer，不相信 body 的 buyer_id。
 
 **輸出：** 初始 RequestSnapshot，status 為 `formatting`，商家、優惠與排序陣列皆為空。前端每秒 GET，讓清單在 Orchestrator 完成後提早顯示，不等待所有議價完成。
 

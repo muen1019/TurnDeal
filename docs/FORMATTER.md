@@ -4,11 +4,13 @@
 
 ## 範圍
 
+文件定義、分類、來源優先順序與目前／待辦的界線以 [INTENT_PREFERENCE_SPEC.md](INTENT_PREFERENCE_SPEC.md) 為準。本輪解析不更新長期偏好，不自動生成新的 Markdown 文件。
+
 本版為可離線重現的 **中文規則 Formatter**，不是 LLM，也不宣稱理解任意自然語言。已串接：
 
 文字 → 解析與驗證 → 合併使用者偏好 → SQLite Request／Formatter 快照 → Discovery → RFQ → 第一輪 Seller 函式。
 
-Seller 策略仍由 Negotiation owner 實作，Demo 明確使用測試替身。既有 NormalizedIntent／SellerRFQ 不破壞性改版，FormatterResult 已整合到現行共用 v0.3 schema；Result HTTP server 尚未接入此 service。
+FormatterResult 使用共用 v0.3 schema；根目錄完整服務已接上 HTTP、五家議價與 Evaluator，見 [RUN_FULL_APP.md](RUN_FULL_APP.md)。本文件的 formatter 單獨 demo 仍使用 Seller 測試替身，不代表完整服務也使用替身。
 
 ## 支援的輸入例子
 

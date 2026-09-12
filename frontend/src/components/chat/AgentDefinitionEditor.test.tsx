@@ -32,6 +32,14 @@ function renderEditor(overrides: Partial<AgentDefinitionEditorProps> = {}) {
 }
 
 describe("AgentDefinitionEditor actions", () => {
+  it("distinguishes request templates from durable preference writes", () => {
+    const {rerender}=renderEditor();
+    expect(screen.getByText(/此處是意圖模板/)).toBeInTheDocument();
+    expect(screen.getByText(/目前不會更新 SQLite 長期偏好/)).toBeInTheDocument();
+    rerender(<AgentDefinitionEditor {...baseProps({activeTab:'preference'})} />);
+    expect(screen.getByText(/本輪例外不覆寫長期偏好/)).toBeInTheDocument();
+    expect(screen.getByText(/仍會繼承後端已保存的商品偏好/)).toBeInTheDocument();
+  });
   it("calls save and cancel for a valid dirty definition", () => {
     const { props } = renderEditor({ dirty: true });
 

@@ -1,5 +1,7 @@
 # OfferMesh Result Backend
 
+**完整服務請改用根目錄 `npm run dev`（Node 24）**：backend/runtime/ 已串接 Formatter、Discovery、Negotiation、Evaluator 與決策保存，詳見 [完整接線說明](../docs/RUN_FULL_APP.md)。下方 Node 20 / sql.js 指的是保留的 legacy mock server，不是最新完整入口。
+
 已實作 Express 5、TypeScript 與 SQLite（sql.js）的 Result API。HTTP 正本為 [openapi.json](openapi.json)，所有模組使用 [共用 v0.3 schema](../contracts/a2a-commerce.v0.3.schema.json)。五家／五輪資料與原始回饋交接已統一。
 
 ## 啟動與測試

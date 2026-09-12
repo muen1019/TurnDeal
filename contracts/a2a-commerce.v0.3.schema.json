@@ -141,6 +141,9 @@
       "type": "string",
       "enum": [
         "formatting",
+        "orchestrating",
+        "negotiating",
+        "evaluating",
         "awaiting_user",
         "needs_clarification",
         "needs_confirmation",
@@ -172,6 +175,7 @@
     },
     "DocumentBundle": {
       "type": "object",
+      "description": "Immutable request-scoped original text, not generated Markdown or a durable preference update. See docs/INTENT_PREFERENCE_SPEC.md.",
       "properties": {
         "revision": {
           "type": "integer",
@@ -197,6 +201,7 @@
     },
     "CreateRequest": {
       "type": "object",
+      "description": "intent_md describes this purchase and its temporary constraints/preferences. preference_md is a request-bound preference snapshot; omission/empty text does not clear active SQLite product preferences. Neither field updates the durable profile.",
       "properties": {
         "intent_md": {
           "type": "string",

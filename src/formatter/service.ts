@@ -14,6 +14,8 @@ type Submission = { request_id: string; result: FormatResult };
 export function createFormatterService(options: {
   db: DatabaseSync; userId: string; registrations: SellerRegistration[]; timeoutMs: number; now?: () => Date;
   formatter?: typeof formatIntent;
+  // Backend-only: complete a previously persisted HTTP formatting request.
+  existingRequestId?: string;
 }) {
   const {db,userId}=options;
   const now=options.now??(()=>new Date());
@@ -28,6 +30,7 @@ export function createFormatterService(options: {
       const previous=db.prepare('SELECT * FROM formatter_runs WHERE user_id=? AND idempotency_key=?').get(userId,args.idempotency_key);
       if(previous) {
         if(previous.input_json!==JSON.stringify(input)) throw new Error('idempotency_conflict');
+        if(options.existingRequestId && previous.request_id!==options.existingRequestId) throw new Error('idempotency_conflict');
         db.exec('RELEASE format_request');
         return {request_id:String(previous.request_id),result:JSON.parse(String(previous.result_json))};
       }
@@ -47,12 +50,20 @@ export function createFormatterService(options: {
       const result=(options.formatter??formatIntent)(input,preferences);
       if(invalid.length) {result.status='needs_clarification';result.normalized_intent=null;result.questions.push(...invalid);}
       assertContract('FormatterResult',result);
-      const requestId=`req_${randomUUID()}`;
+      const requestId=options.existingRequestId??`req_${randomUUID()}`;
       const timestamp=now().toISOString();
+      if(options.existingRequestId) {
+        const existing=db.prepare('SELECT * FROM requests WHERE request_id=? AND user_id=?').get(requestId,userId);
+        if(!existing) throw new Error('not_found: request');
+        if(existing.status!=='formatting'||existing.published_snapshot_json!==null||existing.intent_md!==input.intent_md||existing.preference_md!==input.preference_md) throw new Error('state_conflict');
+        db.prepare('UPDATE requests SET normalized_intent_json=?,status=?,updated_at=? WHERE request_id=?')
+          .run(JSON.stringify(result.normalized_intent),result.status==='ready'?'orchestrating':'needs_clarification',timestamp,requestId);
+      } else {
       db.prepare(`INSERT INTO requests (request_id,user_id,parent_request_id,revision,intent_md,preference_md,
         normalized_intent_json,status,published_snapshot_json,created_at,updated_at) VALUES (?,?,NULL,1,?,?,?,?,NULL,?,?)`)
         .run(requestId,userId,input.intent_md,input.preference_md,JSON.stringify(result.normalized_intent),
           result.status==='ready'?'orchestrating':'needs_clarification',timestamp,timestamp);
+      }
       db.prepare('INSERT INTO formatter_runs VALUES (?,?,?,?,?,?,?)').run(requestId,userId,args.idempotency_key,
         JSON.stringify(input),JSON.stringify(rows),JSON.stringify(result),timestamp);
       db.exec('RELEASE format_request');

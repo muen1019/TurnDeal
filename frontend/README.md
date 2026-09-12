@@ -1,5 +1,7 @@
 # OfferMesh Chat 與商品滑卡
 
+完整接線已完成：請在專案根目錄以 Node 24 執行 `npm run dev`，前端自動連到整合 API 3201。預設為離線策略模式；`npm run dev:secure` 可隱藏輸入 key 啟用模型。詳見 [完整接線說明](../docs/RUN_FULL_APP.md)。
+
 已實作 React、TypeScript、Vite 工作區。Chat 將已儲存的 intent.md、preference.md 與本次輸入合成 CreateRequest；後端產生 mock 商品組合，前端依後端排名顯示。
 
 UI 使用滿版水藍色背景，沒有米色底與外框。整頁不捲動，工作區依視窗可用高度調整；長對話、文件和明細只在元件內捲動。商品頁與回饋頁不顯示原始 JSON、識別碼、決策資料或交接文件。

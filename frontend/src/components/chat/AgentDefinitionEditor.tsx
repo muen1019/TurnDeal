@@ -33,7 +33,7 @@ export function AgentDefinitionEditor({
       <div className="agent-editor-heading">
         <div>
           <h2 id="agent-editor-title">Buyer Agent 定義</h2>
-          <p className="chat-introduction">調整代理理解與購買原則</p>
+          <p className="chat-introduction">區分本輪購買意圖與偏好來源；目前設定只儲存在此分頁。</p>
         </div>
         <span className="agent-save-state" data-dirty={isDirty}>
           <span aria-hidden="true" />
@@ -87,15 +87,15 @@ export function AgentDefinitionEditor({
       <div className="agent-editor-footer" id="agent-editor-state" aria-live="polite">
         <div>
           {activeTab === "intent" ? (
-            <p>intent.md 會和每次新需求組成送出的購買意圖。</p>
+            <p>intent.md：本輪購買意圖。此處是意圖模板，會加上本次輸入；預算、交期與臨時偏好請寫在本次需求，避免沿用舊條件。</p>
           ) : (
-            <p>preference.md 可留空，會原樣套用到下一次需求。</p>
+            <p>preference.md：偏好來源，例如喜歡的顏色、尺寸與排序原則。送出時保存為本輪快照；本輪例外不覆寫長期偏好。可留空，仍會繼承後端已保存的商品偏好。</p>
           )}
           <p className="agent-counter" data-invalid={currentTooLong}>
             {Array.from(currentValue).length.toLocaleString("zh-TW")} /{" "}
             {DOC_LIMIT.toLocaleString("zh-TW")}
           </p>
-          <p>儲存後套用於下一次需求。</p>
+          <p>儲存後套用於下一次需求；目前不會更新 SQLite 長期偏好或建立磁碟 .md 檔案。</p>
           {currentValue !== currentSaved ? (
             <p className="chat-warning">這個分頁有尚未儲存的變更。</p>
           ) : null}
