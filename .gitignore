@@ -12,6 +12,22 @@ data/*.db
 data/backups/
 
 # Logs and editor state
+*.bak-*
 *.log
 .DS_Store
 .vscode/
+
+# Result application artifacts
+**/node_modules/
+**/dist/
+**/.vite/
+**/test-results/
+**/__pycache__/
+*.pyc
+**/playwright-report/
+**/*.sqlite
+**/*.sqlite-*
+**/data/
+.env
+.env.*
+!.env.example

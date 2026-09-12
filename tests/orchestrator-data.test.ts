@@ -47,7 +47,7 @@ test('Request ownership, unpublished intent and long-term preference changes', (
     db.exec(`INSERT INTO user_preferences VALUES ('pref_new', 'user_demo_001', 'color', 'in', '["red"]',
       'preferred', 1, NULL, 1, '2026-09-12T11:00:00Z', '2026-09-12T11:00:00Z')`);
     assert.deepEqual(tools.get_request_preferences({ request_id: 'req_demo_001' }), before);
-    db.exec(`INSERT INTO requests VALUES ('req_pending', 'user_demo_001', NULL, 1, 'mouse', '', 'null',
+    db.exec(`INSERT INTO requests (request_id,user_id,parent_request_id,revision,intent_md,preference_md,normalized_intent_json,status,published_snapshot_json,created_at,updated_at) VALUES ('req_pending', 'user_demo_001', NULL, 1, 'mouse', '', 'null',
       'formatting', NULL, '2026-09-12T11:00:00Z', '2026-09-12T11:00:00Z')`);
     assert.throws(() => tools.load_discovery_input({ request_id: 'req_pending', now: '2026-09-12T11:00:00Z' }),
       { code: 'intent_not_ready' });
