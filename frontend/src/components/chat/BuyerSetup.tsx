@@ -1,5 +1,6 @@
 import {useRef,useState} from 'react';
-import {ArrowLeft,ArrowRight,Check,CreditCard,MapPin,ShieldCheck,SlidersHorizontal,UserRound} from 'lucide-react';
+import {ArrowLeft,ArrowRight,Check,CreditCard,ShieldCheck,SlidersHorizontal,UserRound} from 'lucide-react';
+import {ShippingAddressFields,validShippingRegion} from './ShippingAddressFields';
 import type {BuyerProfile} from '../../contract.generated';
 export const defaultBuyerProfile:BuyerProfile={name:'',shipping_address:'',payment_method:'later',weights:{price:45,delivery:20,trust:20,color:15},colors:[]};
 const emptyShipping={email:'',city:'',state:'',postal_code:'',country:'TW' as const};
@@ -15,7 +16,7 @@ export function BuyerSetup({initial,onSave,onCancel,busy,error,uncertain,onRetry
     if(!draft.name.trim()){setLocalError('請先填寫名稱。');jump(0);return;}
     if(/sk-[A-Za-z0-9_-]{16,}|(?:\d[ -]?){13,19}/.test(draft.name+' '+draft.shipping_address)){setLocalError('請勿填寫 API key、信用卡號或金融帳號。');jump(0);return;}
     const shipping=draft.shipping_details;
-    if(!draft.shipping_address.trim()||!shipping||!shipping.city.trim()||!shipping.state.trim()||!/^\S+@\S+\.\S+$/.test(shipping.email)||!/^\d{3}(\d{2,3})?$/.test(shipping.postal_code)){setLocalError('請填妥收件電子郵件、縣市、區域、郵遞區號與街道地址。');jump(0);return;}
+    if(!draft.shipping_address.trim()||!shipping||!validShippingRegion({...shipping,line_one:draft.shipping_address})||!/^\S+@\S+\.\S+$/.test(shipping.email)||!/^\d{3}(\d{2,3})?$/.test(shipping.postal_code)){setLocalError('請填妥收件電子郵件、縣市、區域、郵遞區號與街道地址。');jump(0);return;}
     setLocalError('');
     if(step===0){jump(1);return;}
     if(!activeTotal){setLocalError('至少提高一項有效偏好的重要程度。');return;}
@@ -29,9 +30,8 @@ export function BuyerSetup({initial,onSave,onCancel,busy,error,uncertain,onRetry
       <fieldset disabled={busy||uncertain} className="setup-fields">
         {step===0?<>
           <label className="setup-label"><span><UserRound size={16}/> 名稱（收件人） <small>必填</small></span><input autoComplete="off" maxLength={60} placeholder="你的稱呼" value={draft.name} onChange={e=>change('name',e.target.value)}/></label>
-          {([['email','電子郵件'],['city','城市／縣市'],['state','區域'],['postal_code','郵遞區號']] as const).map(([key,label])=><label className="setup-label" key={key}><span>{label} <small>必填</small></span><input aria-label={label} autoComplete="off" type={key==='email'?'email':'text'} inputMode={key==='postal_code'?'numeric':undefined} maxLength={key==='postal_code'?6:100} value={draft.shipping_details?.[key]??''} onChange={e=>change('shipping_details',{...draft.shipping_details??emptyShipping,[key]:e.target.value})}/></label>)}
-          <p className="setup-footnote">配送國家：台灣。資料會自動帶入測試結帳，確認後才建立訂單。</p>
-          <label className="setup-label"><span><MapPin size={16}/> 運送地址 <small>必填</small></span><textarea autoComplete="off" rows={2} maxLength={240} placeholder="街道、門牌與樓層" value={draft.shipping_address} onChange={e=>change('shipping_address',e.target.value)}/></label>
+          <label className="setup-label"><span>電子郵件 <small>必填</small></span><input aria-label="電子郵件" type="email" autoComplete="off" maxLength={100} value={draft.shipping_details?.email??''} onChange={e=>change('shipping_details',{...draft.shipping_details??emptyShipping,email:e.target.value})}/></label>
+          <ShippingAddressFields value={{...draft.shipping_details??emptyShipping,line_one:draft.shipping_address}} onChange={value=>setDraft(d=>({...d,shipping_address:value.line_one,shipping_details:{...d.shipping_details??emptyShipping,city:value.city,state:value.state,postal_code:value.postal_code}}))}/>
           <label className="setup-label"><span><CreditCard size={16}/> 偏好付款方式</span><select value={draft.payment_method} onChange={e=>change('payment_method',e.target.value as BuyerProfile['payment_method'])}><option value="later">結帳時再決定</option><option value="card">信用卡</option><option value="mobile">行動支付</option><option value="cash_on_delivery">貨到付款</option></select></label>
           <div className="setup-privacy"><ShieldCheck size={18}/><p>Demo 請使用虛構資料。不收卡號或安全碼，基本資料不會送給 AI，也不會自動付款。</p></div>
         </>:<>

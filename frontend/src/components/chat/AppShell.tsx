@@ -2,9 +2,7 @@ import {
   MessageCircle,
   MousePointer2,
   PanelLeft,
-  Plus,
   Settings,
-  SlidersHorizontal,
   UserRound,
   Trash2,
   X,
@@ -67,7 +65,6 @@ export function AppShell({
         </div>
         <div className="chat-header-actions">
           <button ref={toggle} className="icon-button mobile-navigation-toggle" type="button" onClick={()=>setNavigationOpen(v=>!v)} aria-label="切換導覽" aria-controls="history-sidebar" aria-expanded={navigationOpen}><PanelLeft size={20}/></button>
-          <button className="icon-button" type="button" onClick={onNewConversation} aria-label="開始新對話"><Plus size={20}/></button>
           <button
             className="icon-button"
             type="button"
@@ -82,9 +79,9 @@ export function AppShell({
         </div>
       </header>
 
-      {mobile&&navigationOpen&&<div className="history-backdrop" onClick={close} aria-hidden="true"/>}
+      {mobile&&<div className="history-backdrop" data-open={navigationOpen} onClick={close} aria-hidden="true"/>}
       <aside ref={sidebar} id="history-sidebar" className="chat-sidebar" aria-label="Buyer Agent navigation" role={mobile?'dialog':undefined} aria-modal={mobile&&navigationOpen?true:undefined} inert={mobile&&!navigationOpen}>
-        <div className="history-drawer-heading"><div><span>YOUR SPACE</span><h2>購物紀錄</h2></div><button className="icon-button" onClick={close} aria-label="關閉歷史紀錄"><X size={22}/></button></div>
+        <div className="history-drawer-heading"><div><span>TURNDEAL · YOUR COLLECTION</span><h2>購物紀錄<span className="history-count">{recentRequests.length}</span></h2></div><button className="icon-button" onClick={close} aria-label="關閉歷史紀錄"><X size={22}/></button></div>
         <div className="chat-agent-card">
           <p className="chat-agent-title">Buyer Agent</p>
           <p className="chat-agent-status">
@@ -105,17 +102,6 @@ export function AppShell({
             <MessageCircle size={21} aria-hidden="true" />
             <span>AI 對話</span>
           </button>
-          <button
-            className="chat-nav-button"
-            data-active={activeView === "definitions"}
-            type="button"
-            onClick={()=>choose(onSettings)}
-            aria-label="代理設定"
-            aria-current={activeView === "definitions" ? "page" : undefined}
-          >
-            <SlidersHorizontal size={21} aria-hidden="true" />
-            <span>代理設定</span>
-          </button>
         </nav>
 
         <section className="chat-recents" aria-labelledby="chat-recents-title">
@@ -126,7 +112,6 @@ export function AppShell({
               type="button"
               onClick={()=>choose(onNewConversation)}
             >
-              <Plus size={17} aria-hidden="true" />
               <span>新對話</span>
             </button>
           </div>
@@ -148,7 +133,7 @@ export function AppShell({
                   aria-label={request.title}
                   aria-current={request.isActive ? "page" : undefined}
                 >
-                  <PanelLeft size={18} aria-hidden="true" />
+                  <span className="history-item-icon"><MessageCircle size={18} aria-hidden="true" /></span>
                   <span>
                     <strong>{request.title}</strong>
                     {request.subtitle ? <small>{request.subtitle}</small> : null}
@@ -162,12 +147,7 @@ export function AppShell({
           </div>
         </section>
 
-        <button className="chat-account-button" type="button" onClick={()=>choose(onSettings)} aria-label="我的 Buyer Agent 設定">
-          <span className="chat-avatar chat-avatar-small" aria-hidden="true">
-            <UserRound size={17} />
-          </span>
-          <span>我的 Buyer Agent</span>
-        </button>
+
       </aside>
 
       <main

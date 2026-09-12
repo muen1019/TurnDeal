@@ -12,6 +12,7 @@ export default defineConfig(({ command }) => {
   return {
     define: {
       'import.meta.env.VITE_OFFERMESH_MOCK': JSON.stringify(enableDevMock),
+      'import.meta.env.VITE_OFFERMESH_MOBILE_LIVE': JSON.stringify(process.env.OFFERMESH_MOBILE_DEMO==='1'&&process.env.OFFERMESH_RUNTIME_MODE==='live'),
       'import.meta.env.VITE_OFFERMESH_RUNTIME_MODE': JSON.stringify(process.env.OFFERMESH_RUNTIME_MODE ?? ''),
     },
     plugins: [react(), enableDevMock && createOfferMeshMockPlugin({ scenario: mockScenario })],

@@ -9,6 +9,8 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "dev:mobile": "node scripts/mobile-preview.mjs",
+    "dev:mobile:secure": "powershell -NoProfile -File scripts/run-app-secure.ps1 -Mobile",
+    "predev:mobile:secure": "npm --prefix backend run build",
     "predev:mobile": "npm --prefix backend run build",
     "dev:secure": "powershell -NoProfile -File scripts/run-app-secure.ps1",
     "test:runtime": "node --test tests/runtime.test.mjs tests/purchase.test.mjs tests/buyer-profile.test.mjs tests/refinement.test.mjs tests/mobile-demo.test.mjs",
