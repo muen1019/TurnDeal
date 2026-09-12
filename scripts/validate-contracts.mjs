@@ -123,6 +123,11 @@ const expectedDefs = [
   "DecisionResult",
   "RedemptionReceipt",
   "ErrorResponse",
+  "MarketplaceEvidence",
+  "MarketplaceSourceSnapshot",
+  "CatalogProductFixture",
+  "SellerFixtureStore",
+  "DemoScenarioSuite",
 ];
 for (const definition of expectedDefs) {
   assert.ok(schema.$defs[definition], `missing shared definition ${definition}`);
@@ -138,7 +143,33 @@ assert.equal(openAiFormat.schema.anyOf, undefined, "Structured Outputs root cann
 assertStrictStructuredSchema(openAiFormat.schema);
 console.log("✓ Evaluator Structured Outputs schema is strict-compatible");
 
+const marketplace = await readJson("contracts/fixtures/marketplace-source-snapshot.json");
+assert.equal(marketplace.usage_policy.live_checkout_allowed, false, "fixtures cannot authorize live checkout");
+assert.equal(marketplace.usage_policy.price_guarantee, false, "snapshot prices cannot be guaranteed");
+const sourceIds = marketplace.sources.map((source) => source.source_id);
+unique(sourceIds, "marketplace source IDs");
+assert.ok(marketplace.sources.some((source) => source.marketplace === "shopee_tw"), "snapshot needs a Shopee Taiwan source");
+assert.ok(marketplace.sources.some((source) => source.marketplace === "amazon_ie"), "snapshot needs an Amazon source");
+assert.ok(marketplace.sources.some((source) => source.marketplace === "logitech_official"), "snapshot needs manufacturer specifications");
+for (const source of marketplace.sources) {
+  assert.doesNotThrow(() => new URL(source.url), `${source.source_id} needs a valid source URL`);
+  if (source.source_type === "manufacturer_spec") {
+    assert.equal(source.price, null, `${source.source_id} manufacturer spec cannot masquerade as a marketplace price`);
+  }
+  if (source.freshness === "stale_cached_reference") {
+    assert.ok(source.notes.some((note) => note.includes("never use")), `${source.source_id} must explicitly prohibit stale-price decisions`);
+  }
+  if (source.marketplace === "shopee_tw" && source.price) {
+    assert.equal(source.price.currency, "TWD", `${source.source_id} Taiwan price must use TWD`);
+    assert.equal(source.freshness, "current", `${source.source_id} demo price source must be current`);
+  }
+}
+console.log("✓ marketplace snapshot separates current Taiwan prices from stale reference data");
+
 const sellerStore = await readJson("contracts/fixtures/sellers.json");
+assert.equal(sellerStore.source_snapshot_id, marketplace.snapshot_id, "Seller catalog must name its source snapshot");
+assert.ok(sellerStore.data_classification.public_snapshot_fields.includes("source_ids"), "catalog must identify public provenance fields");
+assert.ok(sellerStore.data_classification.synthetic_demo_fields.includes("floor_price_twd"), "private floor prices must be labeled synthetic");
 assert.equal(sellerStore.sellers.length, 3, "demo must have exactly three Sellers");
 const sellerIds = sellerStore.sellers.map((seller) => seller.seller_id);
 unique(sellerIds, "seller IDs");
@@ -151,10 +182,40 @@ assert.deepEqual(
 const products = sellerStore.sellers.flatMap((seller) => seller.products);
 unique(products.map((product) => product.product_id), "product IDs");
 for (const product of products) {
+  assert.ok(product.brand && product.model && product.name, `${product.product_id} needs a real product identity`);
+  assert.ok(Number.isInteger(product.source_price_twd) && product.source_price_twd > 0, `${product.product_id} needs an integer TWD source price`);
   assert.ok(product.floor_price_twd <= product.list_price_twd, `${product.product_id} floor cannot exceed list price`);
   assert.ok(Number.isInteger(product.stock) && product.stock >= 0, `${product.product_id} stock must be a non-negative integer`);
+  assert.ok(product.source_ids.length > 0, `${product.product_id} needs provenance`);
+  assert.ok(product.source_ids.every((sourceId) => sourceIds.includes(sourceId)), `${product.product_id} has an unresolved source ID`);
+  const referencedShopeePrices = marketplace.sources
+    .filter((source) => product.source_ids.includes(source.source_id) && source.marketplace === "shopee_tw" && source.price)
+    .map((source) => source.price.amount);
+  assert.ok(referencedShopeePrices.includes(product.source_price_twd), `${product.product_id} source price must resolve to Shopee evidence`);
 }
-console.log("✓ Seller catalog has three deterministic, internally valid strategies");
+assert.ok(products.some((product) => product.stock === 0), "catalog needs an out-of-stock variant for discovery tests");
+assert.ok(products.some((product) => product.attributes.color !== "black"), "catalog needs color-mismatch variants");
+console.log("✓ Seller catalog has sourced products plus deterministic synthetic strategies");
+
+const demoScenarios = await readJson("contracts/fixtures/demo-scenarios.json");
+assert.equal(demoScenarios.scenarios.length, 10, "demo matrix must contain ten agreed scenarios");
+unique(demoScenarios.scenarios.map((scenario) => scenario.scenario_id), "demo scenario IDs");
+for (const scenario of demoScenarios.scenarios) {
+  const eligibleIds = scenario.expected.eligible_offer_ids;
+  unique(eligibleIds, `${scenario.scenario_id} eligible IDs`);
+  if (scenario.expected.recommended_offer_id === null) {
+    assert.equal(eligibleIds.length, 0, `${scenario.scenario_id} can omit recommendation only when no offers are eligible`);
+  } else {
+    assert.ok(eligibleIds.includes(scenario.expected.recommended_offer_id), `${scenario.scenario_id} recommendation must be eligible`);
+  }
+}
+const scenarioFaults = new Set(demoScenarios.scenarios.flatMap((scenario) => scenario.runtime_faults));
+for (const requiredFault of ["seller_b_timeout_both_rounds", "seller_c_round_two_refused", "clock_after_all_offer_expiry", "evaluator_invents_offer_id"]) {
+  assert.ok(scenarioFaults.has(requiredFault), `scenario matrix must cover ${requiredFault}`);
+}
+assert.ok(demoScenarios.scenarios.some((scenario) => scenario.intent.bundle_mode === "disabled"), "scenario matrix must cover disabled bundles");
+assert.ok(demoScenarios.scenarios.some((scenario) => scenario.expected.request_status === "no_match"), "scenario matrix must cover no-match results");
+console.log("✓ demo matrix covers preferences, no-match, timeout, refusal, expiry and model attacks");
 
 const happy = await readJson("contracts/fixtures/happy-path.json");
 assert.equal(happy.orchestration.seller_agents.length, 3, "happy path must discover all Sellers");
@@ -192,6 +253,19 @@ for (const negotiation of happy.negotiations) {
     }
   }
   finalDraftBySeller.set(negotiation.seller_id, negotiation.rounds[1].result.drafts[0]);
+
+  const seller = sellerStore.sellers.find((entry) => entry.seller_id === negotiation.seller_id);
+  const primaryProduct = seller.products.find((product) => product.category === "mouse" && product.attributes.color === "black");
+  const expectedRoundPrices = [
+    primaryProduct.list_price_twd - seller.strategy.round_1_discount_twd,
+    primaryProduct.list_price_twd - seller.strategy.round_2_discount_twd,
+  ];
+  assert.deepEqual(
+    negotiation.rounds.map((round) => round.result.drafts[0].total_price_twd),
+    expectedRoundPrices,
+    `${negotiation.seller_id} prices must follow its deterministic discounts`,
+  );
+  assert.ok(expectedRoundPrices[1] >= primaryProduct.floor_price_twd, `${negotiation.seller_id} final price cannot cross its synthetic floor`);
 }
 
 const aFinal = finalDraftBySeller.get("seller_a");

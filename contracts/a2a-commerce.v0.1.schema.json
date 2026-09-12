@@ -834,6 +834,222 @@
       },
       "required": ["ranked_offers"],
       "additionalProperties": false
+    },
+    "MarketplacePrice": {
+      "type": "object",
+      "properties": {
+        "amount": {"type": "number", "exclusiveMinimum": 0},
+        "currency": {"type": "string", "enum": ["TWD", "EUR", "USD"]},
+        "includes_tax": {"type": "string", "enum": ["yes", "no", "unknown"]},
+        "includes_shipping": {"type": "string", "enum": ["yes", "no", "unknown"]}
+      },
+      "required": ["amount", "currency", "includes_tax", "includes_shipping"],
+      "additionalProperties": false
+    },
+    "MarketplaceEvidence": {
+      "type": "object",
+      "properties": {
+        "source_id": {"$ref": "#/$defs/Id"},
+        "marketplace": {"type": "string", "enum": ["shopee_tw", "amazon_ie", "logitech_official"]},
+        "source_type": {"type": "string", "enum": ["marketplace_listing", "marketplace_search_result", "manufacturer_spec"]},
+        "product_key": {"$ref": "#/$defs/Id"},
+        "title": {"type": "string", "minLength": 1, "maxLength": 500},
+        "url": {"type": "string", "format": "uri"},
+        "retrieved_at": {"$ref": "#/$defs/Timestamp"},
+        "observed_at": {"anyOf": [{"$ref": "#/$defs/Timestamp"}, {"type": "null"}]},
+        "freshness": {"type": "string", "enum": ["current", "current_cached", "stale_cached_reference"]},
+        "availability": {"type": "string", "enum": ["listed", "in_stock", "sold_out", "unknown", "not_applicable"]},
+        "price": {"anyOf": [{"$ref": "#/$defs/MarketplacePrice"}, {"type": "null"}]},
+        "facts": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "notes": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      },
+      "required": ["source_id", "marketplace", "source_type", "product_key", "title", "url", "retrieved_at", "observed_at", "freshness", "availability", "price", "facts", "notes"],
+      "additionalProperties": false
+    },
+    "MarketplaceSourceSnapshot": {
+      "type": "object",
+      "properties": {
+        "fixture_version": {"type": "string", "const": "0.2"},
+        "snapshot_id": {"$ref": "#/$defs/Id"},
+        "retrieved_at": {"$ref": "#/$defs/Timestamp"},
+        "purpose": {"type": "string", "minLength": 1},
+        "usage_policy": {
+          "type": "object",
+          "properties": {
+            "live_checkout_allowed": {"const": false},
+            "price_guarantee": {"const": false},
+            "taiwan_demo_price_sources": {"type": "array", "items": {"const": "shopee_tw"}, "minItems": 1, "uniqueItems": true},
+            "reference_only_sources": {"type": "array", "items": {"type": "string", "enum": ["amazon_ie", "logitech_official"]}, "minItems": 1, "uniqueItems": true},
+            "notes": {"type": "array", "items": {"type": "string", "minLength": 1}, "minItems": 1}
+          },
+          "required": ["live_checkout_allowed", "price_guarantee", "taiwan_demo_price_sources", "reference_only_sources", "notes"],
+          "additionalProperties": false
+        },
+        "sources": {"type": "array", "items": {"$ref": "#/$defs/MarketplaceEvidence"}, "minItems": 1}
+      },
+      "required": ["fixture_version", "snapshot_id", "retrieved_at", "purpose", "usage_policy", "sources"],
+      "additionalProperties": false
+    },
+    "CatalogProductFixture": {
+      "type": "object",
+      "properties": {
+        "product_id": {"$ref": "#/$defs/Id"},
+        "category": {"$ref": "#/$defs/ProductCategory"},
+        "brand": {"type": "string", "minLength": 1},
+        "model": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "features": {"type": "array", "items": {"type": "string", "minLength": 1}, "minItems": 1, "uniqueItems": true},
+        "attributes": {"$ref": "#/$defs/ProductAttributes"},
+        "source_price_twd": {"$ref": "#/$defs/MoneyTwd"},
+        "list_price_twd": {"$ref": "#/$defs/MoneyTwd"},
+        "floor_price_twd": {"$ref": "#/$defs/MoneyTwd"},
+        "stock": {"type": "integer", "minimum": 0},
+        "delivery_days": {"type": "integer", "minimum": 1},
+        "terms_id": {"$ref": "#/$defs/Id"},
+        "source_ids": {"type": "array", "items": {"$ref": "#/$defs/Id"}, "minItems": 1, "uniqueItems": true}
+      },
+      "required": ["product_id", "category", "brand", "model", "name", "features", "attributes", "source_price_twd", "list_price_twd", "floor_price_twd", "stock", "delivery_days", "terms_id", "source_ids"],
+      "additionalProperties": false
+    },
+    "SellerFixtureStore": {
+      "type": "object",
+      "properties": {
+        "fixture_version": {"type": "string", "const": "0.2"},
+        "generated_at": {"$ref": "#/$defs/Timestamp"},
+        "source_snapshot_id": {"$ref": "#/$defs/Id"},
+        "data_classification": {
+          "type": "object",
+          "properties": {
+            "public_snapshot_fields": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+            "synthetic_demo_fields": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+            "notice": {"type": "string", "minLength": 1}
+          },
+          "required": ["public_snapshot_fields", "synthetic_demo_fields", "notice"],
+          "additionalProperties": false
+        },
+        "terms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "terms_id": {"$ref": "#/$defs/Id"},
+              "warranty_months": {"type": "integer", "minimum": 0},
+              "return_days": {"type": "integer", "minimum": 0},
+              "payment_obligation": {"const": "one_time"}
+            },
+            "required": ["terms_id", "warranty_months", "return_days", "payment_obligation"],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "sellers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "seller_id": {"$ref": "#/$defs/Id"},
+              "name": {"type": "string", "minLength": 1},
+              "enabled": {"type": "boolean"},
+              "strategy": {
+                "type": "object",
+                "properties": {
+                  "type": {"type": "string", "enum": ["lowest_price_slow_delivery", "premium_fast_delivery", "value_bundle"]},
+                  "round_1_discount_twd": {"type": "integer", "minimum": 0},
+                  "round_2_discount_twd": {"type": "integer", "minimum": 0},
+                  "bundle_mode": {"type": "string", "enum": ["none", "free_optional_mouse_pad"]}
+                },
+                "required": ["type", "round_1_discount_twd", "round_2_discount_twd", "bundle_mode"],
+                "additionalProperties": false
+              },
+              "trust": {"$ref": "#/$defs/Trust"},
+              "products": {"type": "array", "items": {"$ref": "#/$defs/CatalogProductFixture"}, "minItems": 1}
+            },
+            "required": ["seller_id", "name", "enabled", "strategy", "trust", "products"],
+            "additionalProperties": false
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "campaigns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "campaign_id": {"$ref": "#/$defs/Id"},
+              "seller_id": {"$ref": "#/$defs/Id"},
+              "enabled": {"type": "boolean"},
+              "target_category": {"$ref": "#/$defs/ProductCategory"},
+              "bid_twd": {"$ref": "#/$defs/MoneyTwd"},
+              "starts_at": {"$ref": "#/$defs/Timestamp"},
+              "ends_at": {"$ref": "#/$defs/Timestamp"}
+            },
+            "required": ["campaign_id", "seller_id", "enabled", "target_category", "bid_twd", "starts_at", "ends_at"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["fixture_version", "generated_at", "source_snapshot_id", "data_classification", "terms", "sellers", "campaigns"],
+      "additionalProperties": false
+    },
+    "DemoScenarioSuite": {
+      "type": "object",
+      "properties": {
+        "fixture_version": {"type": "string", "const": "0.2"},
+        "catalog_fixture": {"const": "sellers.json"},
+        "source_snapshot": {"const": "marketplace-source-snapshot.json"},
+        "canonical_flow_fixture": {"const": "happy-path.json"},
+        "scenarios": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "scenario_id": {"$ref": "#/$defs/Id"},
+              "title": {"type": "string", "minLength": 1},
+              "intent": {
+                "type": "object",
+                "properties": {
+                  "max_total_twd": {"$ref": "#/$defs/MoneyTwd"},
+                  "delivery_days_max": {"type": "integer", "minimum": 1},
+                  "required_features": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+                  "preferences": {"type": "array", "items": {"type": "string", "enum": ["price_first", "delivery_first", "trust_first"]}, "minItems": 1, "uniqueItems": true},
+                  "required_color": {"type": "string", "minLength": 1},
+                  "preferred_shape": {"type": ["string", "null"]},
+                  "bundle_mode": {"type": "string", "enum": ["disabled", "related_no_extra_cost", "related_with_cap"]}
+                },
+                "required": ["max_total_twd", "delivery_days_max", "required_features", "preferences", "required_color", "preferred_shape", "bundle_mode"],
+                "additionalProperties": false
+              },
+              "runtime_faults": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+              "expected": {
+                "type": "object",
+                "properties": {
+                  "request_status": {"$ref": "#/$defs/Status"},
+                  "seller_statuses": {
+                    "type": "object",
+                    "properties": {
+                      "seller_a": {"type": "string", "enum": ["offered", "refused", "timeout", "error", "no_match"]},
+                      "seller_b": {"type": "string", "enum": ["offered", "refused", "timeout", "error", "no_match"]},
+                      "seller_c": {"type": "string", "enum": ["offered", "refused", "timeout", "error", "no_match"]}
+                    },
+                    "required": ["seller_a", "seller_b", "seller_c"],
+                    "additionalProperties": false
+                  },
+                  "eligible_offer_ids": {"type": "array", "items": {"$ref": "#/$defs/Id"}, "uniqueItems": true},
+                  "recommended_offer_id": {"anyOf": [{"$ref": "#/$defs/Id"}, {"type": "null"}]},
+                  "reason_codes": {"type": "array", "items": {"$ref": "#/$defs/EligibilityReasonCode"}, "uniqueItems": true}
+                },
+                "required": ["request_status", "seller_statuses", "eligible_offer_ids", "recommended_offer_id", "reason_codes"],
+                "additionalProperties": false
+              }
+            },
+            "required": ["scenario_id", "title", "intent", "runtime_faults", "expected"],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": ["fixture_version", "catalog_fixture", "source_snapshot", "canonical_flow_fixture", "scenarios"],
+      "additionalProperties": false
     }
   }
 }

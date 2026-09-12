@@ -25,7 +25,7 @@ OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commer
 
 ## Demo 可靠性
 
-- Seller 商品、庫存與策略使用固定測資，結果可重現。
+- Seller 商品使用有來源與擷取時間的公開 Marketplace 快照；庫存、底價與策略是明確標示的固定模擬資料，結果可重現。
 - 規則引擎提供完整 fallback，OpenAI API 不可用時主流程仍能完成。
 - Sponsored 只影響 Discovery 顯示，不進入 Evaluator input 或分數。
 - UI 不宣稱真實付款，只在使用者確認後執行模擬兌換。
@@ -41,8 +41,12 @@ OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commer
 │  ├─ a2a-commerce.v0.1.schema.json  共用 JSON Schema
 │  ├─ openai/                        Evaluator Structured Outputs schema
 │  └─ fixtures/                      Seller、成功流程、邊界與 API 測資
+├─ db/
+│  ├─ migrations/                    SQLite schema 與版本
+│  └─ README.md                      資料分區與初始化說明
 ├─ scripts/
-│  └─ validate-contracts.mjs         無第三方相依的契約驗證器
+│  ├─ validate-contracts.mjs         無第三方相依的契約驗證器
+│  └─ db.mjs                         SQLite migration、seed 與完整性檢查
 └─ package.json                      共用測試指令
 ```
 
@@ -54,9 +58,13 @@ OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commer
 - [Codex／專案共同規則](AGENTS.md)
 - [Evaluator Structured Outputs schema](contracts/openai/evaluator-output.schema.json)
 - [三家 Seller 測資](contracts/fixtures/sellers.json)
+- [Marketplace 公開資料快照](contracts/fixtures/marketplace-source-snapshot.json)
+- [Marketplace 測資來源政策](contracts/fixtures/MARKETPLACE_DATA.md)
 - [完整成功情境](contracts/fixtures/happy-path.json)
+- [完整 Demo 情境矩陣](contracts/fixtures/demo-scenarios.json)
 - [安全與失敗情境](contracts/fixtures/edge-cases.json)
 - [API request/response 範例](contracts/fixtures/api-examples.json)
+- [SQLite schema 與操作說明](db/README.md)
 
 `contracts/a2a-commerce.v0.1.schema.json` 是跨模組唯一資料契約。任何欄位改名、刪除、型別變更、enum 收窄或狀態語意改變，都必須先討論並升版，不能由單一模組自行修改。
 
@@ -81,7 +89,17 @@ cd sea-hackathon
 npm test
 ```
 
-目前契約測試需要 Node.js 20 以上，不需安裝第三方 package。
+目前專案使用 Node.js 內建 SQLite，需要 Node.js 24 以上，不需安裝第三方 package。
+
+## SQLite
+
+```bash
+npm run db:init      # 第一次建立本機資料庫
+npm run db:check     # 檢查完整性、外鍵、seed 與不可變規則
+npm run db:rebuild   # 依 migration 與 fixture 重建
+```
+
+資料庫位於 `data/offermesh.sqlite` 且不會提交到 Git；團隊共同維護的是 migration、seed 程式和 fixture。
 
 ## 每次開始開發
 

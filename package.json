@@ -3,8 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
-    "test": "npm run test:contracts",
-    "test:contracts": "node scripts/validate-contracts.mjs"
+    "test": "npm run test:contracts && npm run test:db",
+    "test:contracts": "node scripts/validate-contracts.mjs",
+    "test:db": "node scripts/db.mjs --memory",
+    "db:init": "node scripts/db.mjs",
+    "db:rebuild": "node scripts/db.mjs --force",
+    "db:check": "node scripts/db.mjs --check"
   }
 }

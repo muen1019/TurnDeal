@@ -1,0 +1,219 @@
+{
+  "fixture_version": "0.2",
+  "snapshot_id": "marketplace_snapshot_2026_09_12",
+  "retrieved_at": "2026-09-12T11:05:00+08:00",
+  "purpose": "Public marketplace and manufacturer evidence used to seed a deterministic Taiwan demo catalog.",
+  "usage_policy": {
+    "live_checkout_allowed": false,
+    "price_guarantee": false,
+    "taiwan_demo_price_sources": ["shopee_tw"],
+    "reference_only_sources": ["amazon_ie", "logitech_official"],
+    "notes": [
+      "Marketplace prices are point-in-time observations and may exclude shipping, coupons, membership discounts or variant differences.",
+      "Amazon cached prices are retained only as cross-market reference data and must not be converted into TWD offers.",
+      "Inventory, seller floor price, delivery promise, trust history and negotiation behavior are synthetic demo data."
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "src_shopee_tw_m240_graphite_20260912",
+      "marketplace": "shopee_tw",
+      "source_type": "marketplace_search_result",
+      "product_key": "logitech_m240_graphite",
+      "title": "Logitech M240 Silent Bluetooth Mouse - Graphite",
+      "url": "https://shopee.tw/list/Logitech%E7%BE%85%E6%8A%80/M240",
+      "retrieved_at": "2026-09-12T11:05:00+08:00",
+      "observed_at": "2026-09-12T11:05:00+08:00",
+      "freshness": "current",
+      "availability": "listed",
+      "price": {
+        "amount": 629,
+        "currency": "TWD",
+        "includes_tax": "unknown",
+        "includes_shipping": "unknown"
+      },
+      "facts": ["silent_click", "bluetooth", "graphite", "official_company_stock_claim"],
+      "notes": ["Selected Shopee Direct listing price; coupons and card promotions are excluded."]
+    },
+    {
+      "source_id": "src_shopee_tw_m350s_graphite_20260912",
+      "marketplace": "shopee_tw",
+      "source_type": "marketplace_search_result",
+      "product_key": "logitech_m350s_graphite",
+      "title": "Logitech Pebble Mouse 2 M350s - Graphite",
+      "url": "https://shopee.tw/list/Logitech%E7%BE%85%E6%8A%80/M350",
+      "retrieved_at": "2026-09-12T11:05:00+08:00",
+      "observed_at": "2026-09-12T11:05:00+08:00",
+      "freshness": "current",
+      "availability": "listed",
+      "price": {
+        "amount": 799,
+        "currency": "TWD",
+        "includes_tax": "unknown",
+        "includes_shipping": "unknown"
+      },
+      "facts": ["silent_click", "bluetooth", "graphite", "multi_device"],
+      "notes": ["Selected Shopee Direct listing price; lower third-party listings also appeared in search results."]
+    },
+    {
+      "source_id": "src_shopee_tw_m331_black_20260912",
+      "marketplace": "shopee_tw",
+      "source_type": "marketplace_search_result",
+      "product_key": "logitech_m331_black",
+      "title": "Logitech M331 SilentPlus Wireless Mouse - Black",
+      "url": "https://shopee.tw/list/Logitech%E7%BE%85%E6%8A%80/M331",
+      "retrieved_at": "2026-09-12T11:05:00+08:00",
+      "observed_at": "2026-09-12T11:05:00+08:00",
+      "freshness": "current",
+      "availability": "listed",
+      "price": {
+        "amount": 699,
+        "currency": "TWD",
+        "includes_tax": "unknown",
+        "includes_shipping": "unknown"
+      },
+      "facts": ["silent_click", "wireless_usb", "black", "right_handed"],
+      "notes": ["Selected Shopee Direct listing price; M331 is the Taiwan-market naming used by the listing."]
+    },
+    {
+      "source_id": "src_shopee_tw_studio_mouse_pad_graphite_20260912",
+      "marketplace": "shopee_tw",
+      "source_type": "marketplace_search_result",
+      "product_key": "logitech_studio_mouse_pad_graphite",
+      "title": "Logitech Studio Series Mouse Pad - Graphite",
+      "url": "https://shopee.tw/list/Logitech%E7%BE%85%E6%8A%80/%E6%BB%91%E9%BC%A0%E5%A2%8A",
+      "retrieved_at": "2026-09-12T11:05:00+08:00",
+      "observed_at": "2026-09-12T11:05:00+08:00",
+      "freshness": "current",
+      "availability": "listed",
+      "price": {
+        "amount": 199,
+        "currency": "TWD",
+        "includes_tax": "unknown",
+        "includes_shipping": "unknown"
+      },
+      "facts": ["non_slip", "graphite", "studio_series"],
+      "notes": ["Search results showed several Studio Series color variants at the same price."]
+    },
+    {
+      "source_id": "src_shopee_tw_m221_black_20260912",
+      "marketplace": "shopee_tw",
+      "source_type": "marketplace_search_result",
+      "product_key": "logitech_m221_black",
+      "title": "Logitech M221 Silent Wireless Mouse - Black",
+      "url": "https://shopee.tw/list/Logitech%E7%BE%85%E6%8A%80/M221",
+      "retrieved_at": "2026-09-12T11:05:00+08:00",
+      "observed_at": "2026-09-12T11:05:00+08:00",
+      "freshness": "current",
+      "availability": "listed",
+      "price": {
+        "amount": 549,
+        "currency": "TWD",
+        "includes_tax": "unknown",
+        "includes_shipping": "unknown"
+      },
+      "facts": ["silent_click", "wireless_usb", "black"],
+      "notes": ["Kept as an additional discovery/exclusion fixture and not used by the canonical three-offer flow."]
+    },
+    {
+      "source_id": "src_amazon_ie_m240_graphite_cached",
+      "marketplace": "amazon_ie",
+      "source_type": "marketplace_listing",
+      "product_key": "logitech_m240_graphite",
+      "title": "Logitech M240 Silent Bluetooth Mouse - Graphite",
+      "url": "https://www.amazon.ie/Logitech-Bluetooth-Wireless-Portable-Compatible/dp/B07W6HCFYX",
+      "retrieved_at": "2026-09-12T11:05:00+08:00",
+      "observed_at": null,
+      "freshness": "stale_cached_reference",
+      "availability": "unknown",
+      "price": {
+        "amount": 14.58,
+        "currency": "EUR",
+        "includes_tax": "yes",
+        "includes_shipping": "unknown"
+      },
+      "facts": ["silent_click", "bluetooth", "graphite", "eighteen_month_battery_claim"],
+      "notes": ["Search index cache was about 1.2 years old; never use this price for eligibility or checkout."]
+    },
+    {
+      "source_id": "src_amazon_ie_m350s_graphite_cached",
+      "marketplace": "amazon_ie",
+      "source_type": "marketplace_listing",
+      "product_key": "logitech_m350s_graphite",
+      "title": "Logitech Pebble Mouse 2 M350s - Graphite",
+      "url": "https://www.amazon.ie/Logitech-Bluetooth-Lightweight-Customisable-Easy-Switch/dp/B07W7LHVBN",
+      "retrieved_at": "2026-09-12T11:05:00+08:00",
+      "observed_at": null,
+      "freshness": "stale_cached_reference",
+      "availability": "unknown",
+      "price": {
+        "amount": 21.01,
+        "currency": "EUR",
+        "includes_tax": "yes",
+        "includes_shipping": "unknown"
+      },
+      "facts": ["silent_click", "bluetooth", "graphite", "multi_device", "ambidextrous"],
+      "notes": ["Search index cache was about 1.2 years old; never use this price for eligibility or checkout."]
+    },
+    {
+      "source_id": "src_logitech_m240_specs",
+      "marketplace": "logitech_official",
+      "source_type": "manufacturer_spec",
+      "product_key": "logitech_m240_graphite",
+      "title": "Logitech M240 for Business technical specifications",
+      "url": "https://www.logitech.com/en-us/products/mice/m240-wireless-mouse-business.html",
+      "retrieved_at": "2026-09-12T11:05:00+08:00",
+      "observed_at": "2026-09-12T11:05:00+08:00",
+      "freshness": "current",
+      "availability": "not_applicable",
+      "price": null,
+      "facts": ["99x60x39_mm", "75.2_g", "ambidextrous", "silent_touch", "400_to_4000_dpi"],
+      "notes": ["Business variant dimensions and core physical characteristics are used for the demo product attributes."]
+    },
+    {
+      "source_id": "src_logitech_m350s_specs",
+      "marketplace": "logitech_official",
+      "source_type": "manufacturer_spec",
+      "product_key": "logitech_m350s_graphite",
+      "title": "Logitech Pebble Mouse 2 M350s technical specifications",
+      "url": "https://www.logitech.com/en-ae/products/mice/pebble-2-m350s-wireless-mouse.html",
+      "retrieved_at": "2026-09-12T11:05:00+08:00",
+      "observed_at": null,
+      "freshness": "current_cached",
+      "availability": "not_applicable",
+      "price": null,
+      "facts": ["106.7x58.7x26.62_mm", "76_g", "ambidextrous", "silent_touch", "400_to_4000_dpi", "three_devices"],
+      "notes": []
+    },
+    {
+      "source_id": "src_logitech_m330_specs_for_m331",
+      "marketplace": "logitech_official",
+      "source_type": "manufacturer_spec",
+      "product_key": "logitech_m331_black",
+      "title": "Logitech M330 Silent Plus technical specifications",
+      "url": "https://www.logitech.com/en-ae/products/mice/m330-silent-plus-mouse.910-004909.html",
+      "retrieved_at": "2026-09-12T11:05:00+08:00",
+      "observed_at": null,
+      "freshness": "current_cached",
+      "availability": "not_applicable",
+      "price": null,
+      "facts": ["105.4x67.9x38.4_mm", "78_g", "right_handed", "silent_touch", "1000_dpi"],
+      "notes": ["M330 manufacturer dimensions are used as a documented proxy for the Taiwan-market M331 fixture; verify before production use."]
+    },
+    {
+      "source_id": "src_logitech_studio_mouse_pad_specs",
+      "marketplace": "logitech_official",
+      "source_type": "manufacturer_spec",
+      "product_key": "logitech_studio_mouse_pad_graphite",
+      "title": "Logitech Mouse Pad Studio Series technical specifications",
+      "url": "https://www.logitech.com/en-ae/products/mice/mouse-pad-studio-series.956-000051.html",
+      "retrieved_at": "2026-09-12T11:05:00+08:00",
+      "observed_at": null,
+      "freshness": "current_cached",
+      "availability": "not_applicable",
+      "price": null,
+      "facts": ["230x200x2_mm", "73_g", "anti_slip_base", "anti_fraying_stitches"],
+      "notes": []
+    }
+  ]
+}
