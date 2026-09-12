@@ -61,7 +61,38 @@ export type EligibilityReasonCode =
   | 'bundle_disabled'
   | 'terms_changed'
   | 'addon_not_optional';
+export type RejectDecision = RejectDecision1 & {
+  action: 'reject';
+  feedback: string;
+  selection_version?: 1;
+  rejected_offer_ids?: Id[];
+};
+export type RejectDecision1 =
+  | {
+      feedback?: string;
+    }
+  | {
+      rejected_offer_ids: Id[];
+      feedback?: '';
+    };
 export type DecisionResult = AcceptDecisionResult | RejectDecisionResult;
+export type RejectDecisionResult = RejectDecisionResult1 & {
+  action: 'reject';
+  request_id: Id;
+  status: 'rejected';
+  feedback: string;
+  source_documents: DocumentBundle;
+  selection_version?: 1;
+  rejected_offer_ids?: Id[];
+};
+export type RejectDecisionResult1 =
+  | {
+      feedback?: string;
+    }
+  | {
+      rejected_offer_ids: Id[];
+      feedback?: '';
+    };
 export type RFQProductPreference =
   | {
       preference_id: Id;
@@ -79,6 +110,24 @@ export type RFQProductPreference =
       max: number | null;
     };
 export type EligibleOffer = unknown;
+export type ImprovementStatus = null | {
+  improvement_id: Id;
+  request_id: Id;
+  mode: 'accepted_with_rejections' | 'all_rejected';
+  status: 'queued' | 'running' | 'ready' | 'needs_clarification' | 'failed';
+  error: string | null;
+  result: null | {
+    intent_revision_id: Id;
+    intent_state: 'ready' | 'draft';
+    documents: {
+      revision: number;
+      intent_md: string;
+      preference_md: string;
+    };
+    preference_updated: boolean;
+    questions: string[];
+  };
+};
 
 export interface CommerceTypes {
   FormatterResult: FormatterResult;
@@ -144,6 +193,7 @@ export interface CommerceTypes {
   SellerBenefit: SellerBenefit;
   SellerPersonaPolicy: SellerPersonaPolicy;
   SellerSkuPolicy: SellerSkuPolicy;
+  ImprovementStatus: ImprovementStatus;
 }
 export interface FormatterResult {
   parser_version: 'formatter-rules-v0.1' | 'formatter-llm-v0.1';
@@ -197,10 +247,9 @@ export interface CreateRequest {
 export interface AcceptDecision {
   action: 'accept';
   offer_id: Id;
-}
-export interface RejectDecision {
-  action: 'reject';
-  feedback: string;
+  selection_version?: 1;
+  rejected_offer_ids?: Id[];
+  feedback?: string;
 }
 export interface RedeemRequest {
   request_id: Id;
@@ -354,13 +403,9 @@ export interface AcceptDecisionResult {
   status: 'accepted';
   selected_offer_id: Id;
   expires_at: Timestamp;
-}
-export interface RejectDecisionResult {
-  action: 'reject';
-  request_id: Id;
-  status: 'rejected';
-  feedback: string;
-  source_documents: DocumentBundle;
+  selection_version?: 1;
+  rejected_offer_ids?: Id[];
+  feedback?: string;
 }
 export interface RedemptionReceipt {
   redemption_id: Id;

@@ -9,8 +9,12 @@
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "dev:secure": "powershell -NoProfile -File scripts/run-app-secure.ps1",
-    "test:runtime": "node --test tests/runtime.test.mjs",
-    "test": "npm run test:contracts && npm run test:db && npm run test:orchestrator && npm run test:seller-policies && npm run test:unit && npm run test:negotiation && npm run test:evaluator && npm run test:formatter && npm run test:runtime",
+    "test:runtime": "node --test tests/runtime.test.mjs tests/purchase.test.mjs",
+    "test:purchase": "node --test tests/purchase.test.mjs",
+    "test": "npm run test:contracts && npm run test:db && npm run test:orchestrator && npm run test:seller-policies && npm run test:unit && npm run test:negotiation && npm run test:evaluator && npm run test:formatter && npm run test:runtime && npm run test:improver",
+    "test:improver": "npm --prefix backend run test:improver && npm --prefix backend run build && node --test tests/improver-runtime.test.mjs tests/improver-selection.test.mjs",
+    "demo:improver": "npm --prefix backend run build && node backend/runtime/demo-improver.mjs",
+    "demo:improver:live": "npm --prefix backend run build && node backend/runtime/demo-improver.mjs --live",
     "test:formatter": "node --test tests/formatter.test.ts tests/formatter-llm.test.ts tests/document-semantics.test.ts",
     "demo:formatter:llm": "node examples/formatter-llm.ts",
     "demo:formatter:secure": "powershell -NoProfile -File scripts/run-formatter-secure.ps1",
@@ -34,7 +38,9 @@
     "test:e2e:live": "node scripts/e2e-negotiation.mjs --live",
     "test:e2e:full": "node scripts/e2e-negotiation.mjs --offline --evaluate",
     "test:e2e:full:live": "node scripts/e2e-negotiation.mjs --live --evaluate",
-    "demo:negotiate": "node scripts/negotiate.mjs"
+    "demo:negotiate": "node scripts/negotiate.mjs",
+    "predev": "npm --prefix backend run build",
+    "pretest": "npm --prefix backend run build"
   },
   "dependencies": {
     "ajv": "^8.20.0",

@@ -1,0 +1,5900 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://offermesh.local/contracts/purchase.v1.schema.json",
+  "title": "PurchaseTypes",
+  "$defs": {
+    "SharedFormatterResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "parser_version",
+        "status",
+        "normalized_intent",
+        "target_total_twd",
+        "questions",
+        "warnings"
+      ],
+      "properties": {
+        "parser_version": {
+          "enum": [
+            "formatter-rules-v0.1",
+            "formatter-llm-v0.1"
+          ]
+        },
+        "status": {
+          "enum": [
+            "ready",
+            "needs_clarification"
+          ]
+        },
+        "normalized_intent": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SharedNormalizedIntent"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "target_total_twd": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "ready"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "normalized_intent": {
+                "$ref": "#/$defs/SharedNormalizedIntent"
+              },
+              "questions": {
+                "maxItems": 0
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "normalized_intent": {
+                "type": "null"
+              },
+              "questions": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "SharedNegotiationRound": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 5
+    },
+    "SharedBranchStopReason": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        null,
+        "seller_final",
+        "refused",
+        "timeout",
+        "error",
+        "no_adjustment",
+        "max_rounds",
+        "global_deadline",
+        "call_budget",
+        "token_budget"
+      ]
+    },
+    "SharedId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+    },
+    "SharedTimestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "SharedMoneyTwd": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "SharedProductCategory": {
+      "type": "string",
+      "enum": [
+        "mouse",
+        "mouse_pad"
+      ]
+    },
+    "SharedStatus": {
+      "type": "string",
+      "enum": [
+        "formatting",
+        "orchestrating",
+        "negotiating",
+        "evaluating",
+        "awaiting_user",
+        "needs_clarification",
+        "needs_confirmation",
+        "no_match",
+        "failed",
+        "accepted",
+        "rejected"
+      ]
+    },
+    "SharedEligibilityReasonCode": {
+      "type": "string",
+      "enum": [
+        "related_bundle",
+        "no_extra_cost",
+        "within_addon_cap",
+        "addon_consent_required",
+        "baseline_unavailable",
+        "over_budget",
+        "missing_feature",
+        "quantity_changed",
+        "delivery_too_late",
+        "expired",
+        "invalid_offer",
+        "unrelated_addon",
+        "bundle_disabled",
+        "terms_changed",
+        "addon_not_optional"
+      ]
+    },
+    "SharedDocumentBundle": {
+      "type": "object",
+      "description": "Immutable request-scoped original text, not generated Markdown or a durable preference update. See docs/INTENT_PREFERENCE_SPEC.md.",
+      "properties": {
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "intent_md": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20000,
+          "pattern": "\\S"
+        },
+        "preference_md": {
+          "type": "string",
+          "maxLength": 20000
+        }
+      },
+      "required": [
+        "revision",
+        "intent_md",
+        "preference_md"
+      ],
+      "additionalProperties": false
+    },
+    "SharedCreateRequest": {
+      "type": "object",
+      "description": "intent_md describes this purchase and its temporary constraints/preferences. preference_md is a request-bound preference snapshot; omission/empty text does not clear active SQLite product preferences. Neither field updates the durable profile.",
+      "properties": {
+        "intent_md": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20000,
+          "pattern": "\\S"
+        },
+        "preference_md": {
+          "type": "string",
+          "maxLength": 20000,
+          "default": ""
+        }
+      },
+      "required": [
+        "intent_md"
+      ],
+      "additionalProperties": false
+    },
+    "SharedAcceptDecision": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "const": "accept"
+        },
+        "offer_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "selection_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "rejected_offer_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedId"
+          },
+          "uniqueItems": true,
+          "maxItems": 100
+        },
+        "feedback": {
+          "type": "string",
+          "maxLength": 2000
+        }
+      },
+      "required": [
+        "action",
+        "offer_id"
+      ],
+      "additionalProperties": false,
+      "dependentRequired": {
+        "selection_version": [
+          "rejected_offer_ids"
+        ],
+        "rejected_offer_ids": [
+          "selection_version"
+        ],
+        "feedback": [
+          "selection_version"
+        ]
+      }
+    },
+    "SharedRejectDecision": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "const": "reject"
+        },
+        "feedback": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "selection_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "rejected_offer_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedId"
+          },
+          "uniqueItems": true,
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "action",
+        "feedback"
+      ],
+      "additionalProperties": false,
+      "dependentRequired": {
+        "selection_version": [
+          "rejected_offer_ids"
+        ],
+        "rejected_offer_ids": [
+          "selection_version"
+        ]
+      },
+      "anyOf": [
+        {
+          "properties": {
+            "feedback": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          }
+        },
+        {
+          "required": [
+            "selection_version",
+            "rejected_offer_ids"
+          ],
+          "properties": {
+            "rejected_offer_ids": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/SharedId"
+              },
+              "minItems": 1
+            },
+            "feedback": {
+              "type": "string",
+              "const": ""
+            }
+          }
+        }
+      ]
+    },
+    "SharedRedeemRequest": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "offer_id": {
+          "$ref": "#/$defs/SharedId"
+        }
+      },
+      "required": [
+        "request_id",
+        "offer_id"
+      ],
+      "additionalProperties": false
+    },
+    "SharedNegotiationPolicy": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "bundle_mode": {
+              "const": "disabled"
+            },
+            "allowed_addon_categories": {
+              "type": "array",
+              "maxItems": 0
+            },
+            "max_addon_increment_twd": {
+              "const": 0
+            }
+          },
+          "required": [
+            "bundle_mode",
+            "allowed_addon_categories",
+            "max_addon_increment_twd"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "bundle_mode": {
+              "const": "related_no_extra_cost"
+            },
+            "allowed_addon_categories": {
+              "type": "array",
+              "items": {
+                "const": "mouse_pad"
+              },
+              "uniqueItems": true,
+              "maxItems": 1
+            },
+            "max_addon_increment_twd": {
+              "const": 0
+            }
+          },
+          "required": [
+            "bundle_mode",
+            "allowed_addon_categories",
+            "max_addon_increment_twd"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "bundle_mode": {
+              "const": "related_with_cap"
+            },
+            "allowed_addon_categories": {
+              "type": "array",
+              "items": {
+                "const": "mouse_pad"
+              },
+              "minItems": 1,
+              "maxItems": 1,
+              "uniqueItems": true
+            },
+            "max_addon_increment_twd": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "bundle_mode",
+            "allowed_addon_categories",
+            "max_addon_increment_twd"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "SharedCategoricalProductPreference": {
+      "type": "object",
+      "properties": {
+        "preference_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "strength": {
+          "type": "string",
+          "enum": [
+            "required",
+            "preferred"
+          ]
+        },
+        "source_text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "attribute": {
+          "type": "string",
+          "enum": [
+            "size_class",
+            "color",
+            "shape"
+          ]
+        },
+        "operator": {
+          "type": "string",
+          "enum": [
+            "in",
+            "not_in"
+          ]
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "preference_id",
+        "strength",
+        "source_text",
+        "attribute",
+        "operator",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "SharedRangeProductPreference": {
+      "type": "object",
+      "properties": {
+        "preference_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "strength": {
+          "type": "string",
+          "enum": [
+            "required",
+            "preferred"
+          ]
+        },
+        "source_text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "attribute": {
+          "type": "string",
+          "enum": [
+            "length_mm",
+            "width_mm",
+            "height_mm"
+          ]
+        },
+        "operator": {
+          "const": "range"
+        },
+        "min": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "max": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "preference_id",
+        "strength",
+        "source_text",
+        "attribute",
+        "operator",
+        "min",
+        "max"
+      ],
+      "additionalProperties": false,
+      "not": {
+        "properties": {
+          "min": {
+            "type": "null"
+          },
+          "max": {
+            "type": "null"
+          }
+        },
+        "required": [
+          "min",
+          "max"
+        ]
+      }
+    },
+    "SharedProductPreference": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/SharedCategoricalProductPreference"
+        },
+        {
+          "$ref": "#/$defs/SharedRangeProductPreference"
+        }
+      ]
+    },
+    "SharedNormalizedIntent": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "const": "mouse"
+        },
+        "max_total_twd": {
+          "$ref": "#/$defs/SharedMoneyTwd"
+        },
+        "delivery_days_max": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "required_features": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "preferences": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "price_first",
+              "delivery_first",
+              "trust_first",
+              "after_sales_first"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "product_preferences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedProductPreference"
+          }
+        },
+        "negotiation_policy": {
+          "$ref": "#/$defs/SharedNegotiationPolicy"
+        }
+      },
+      "required": [
+        "category",
+        "max_total_twd",
+        "delivery_days_max",
+        "required_features",
+        "preferences",
+        "product_preferences",
+        "negotiation_policy"
+      ],
+      "additionalProperties": false
+    },
+    "SharedProductAttributes": {
+      "type": "object",
+      "properties": {
+        "size_class": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "color": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "shape": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "length_mm": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "width_mm": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "height_mm": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "size_class",
+        "color",
+        "shape",
+        "length_mm",
+        "width_mm",
+        "height_mm"
+      ],
+      "additionalProperties": false
+    },
+    "SharedProductMatch": {
+      "type": "object",
+      "properties": {
+        "product_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "attributes": {
+          "$ref": "#/$defs/SharedProductAttributes"
+        },
+        "matched_preference_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedId"
+          },
+          "uniqueItems": true
+        },
+        "unmatched_preference_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedId"
+          },
+          "uniqueItems": true
+        },
+        "pending_checks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "availability",
+              "delivery"
+            ]
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "product_id",
+        "attributes",
+        "matched_preference_ids",
+        "unmatched_preference_ids",
+        "pending_checks"
+      ],
+      "additionalProperties": false
+    },
+    "SharedTrust": {
+      "type": "object",
+      "properties": {
+        "personal_band": {
+          "type": "string",
+          "enum": [
+            "positive",
+            "neutral",
+            "negative"
+          ]
+        },
+        "personal_rating": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 5
+        },
+        "personal_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "marketplace_rating": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 5
+        },
+        "marketplace_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "personal_band",
+        "personal_rating",
+        "personal_count",
+        "marketplace_rating",
+        "marketplace_count"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "personal_count": {
+                "const": 0
+              }
+            },
+            "required": [
+              "personal_count"
+            ]
+          },
+          "then": {
+            "properties": {
+              "personal_rating": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "marketplace_count": {
+                "const": 0
+              }
+            },
+            "required": [
+              "marketplace_count"
+            ]
+          },
+          "then": {
+            "properties": {
+              "marketplace_rating": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "SharedSellerRound": {
+      "type": "object",
+      "properties": {
+        "round": {
+          "$ref": "#/$defs/SharedNegotiationRound"
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "offered",
+            "refused",
+            "timeout",
+            "error"
+          ]
+        },
+        "is_final": {
+          "type": "boolean",
+          "description": "Seller explicitly ends this branch; valid only with an offered outcome."
+        },
+        "offer_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedId"
+          },
+          "uniqueItems": true,
+          "maxItems": 2
+        }
+      },
+      "required": [
+        "round",
+        "outcome",
+        "is_final",
+        "offer_ids"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "offered"
+              }
+            },
+            "required": [
+              "outcome"
+            ]
+          },
+          "then": {
+            "properties": {
+              "offer_ids": {
+                "minItems": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "is_final": {
+                "const": false
+              },
+              "offer_ids": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "SharedSellerAgent": {
+      "type": "object",
+      "description": "One Buyer branch for a selected Seller. Backend assigns stop_reason; null means active. IDs and round order require cross-object validation.",
+      "properties": {
+        "seller_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "listing_rank": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "match_reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "candidate_products": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedProductMatch"
+          },
+          "minItems": 1
+        },
+        "trust": {
+          "$ref": "#/$defs/SharedTrust"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "pending",
+            "negotiating",
+            "offered",
+            "refused",
+            "timeout",
+            "error"
+          ]
+        },
+        "rounds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedSellerRound"
+          },
+          "maxItems": 5
+        },
+        "stop_reason": {
+          "$ref": "#/$defs/SharedBranchStopReason"
+        },
+        "final_offer_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedId"
+          },
+          "uniqueItems": true,
+          "maxItems": 2
+        }
+      },
+      "required": [
+        "seller_id",
+        "name",
+        "listing_rank",
+        "match_reason",
+        "candidate_products",
+        "trust",
+        "status",
+        "rounds",
+        "stop_reason",
+        "final_offer_ids"
+      ],
+      "additionalProperties": false
+    },
+    "SharedSponsoredPlacement": {
+      "type": "object",
+      "properties": {
+        "seller_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "campaign_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "label": {
+          "const": "Sponsored"
+        }
+      },
+      "required": [
+        "seller_id",
+        "campaign_id",
+        "label"
+      ],
+      "additionalProperties": false
+    },
+    "SharedDiscoveryProductCheck": {
+      "type": "object",
+      "properties": {
+        "product_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "required_mismatch",
+            "required_attribute_unknown",
+            "feature_mismatch",
+            "out_of_stock",
+            "delivery_too_late"
+          ]
+        },
+        "preference_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SharedId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "missing_attribute": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "size_class",
+            "color",
+            "shape",
+            "length_mm",
+            "width_mm",
+            "height_mm",
+            null
+          ]
+        }
+      },
+      "required": [
+        "product_id",
+        "reason",
+        "preference_id",
+        "missing_attribute"
+      ],
+      "additionalProperties": false
+    },
+    "SharedDiscoveryExclusion": {
+      "type": "object",
+      "properties": {
+        "seller_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "seller_unavailable",
+            "no_matching_product",
+            "insufficient_product_data"
+          ]
+        },
+        "product_checks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedDiscoveryProductCheck"
+          }
+        }
+      },
+      "required": [
+        "seller_id",
+        "reason",
+        "product_checks"
+      ],
+      "additionalProperties": false
+    },
+    "SharedOrchestrationResult": {
+      "type": "object",
+      "properties": {
+        "seller_agents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedSellerAgent"
+          },
+          "maxItems": 5
+        },
+        "discovery_exclusions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedDiscoveryExclusion"
+          }
+        },
+        "sponsored_placement": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SharedSponsoredPlacement"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "seller_agents",
+        "discovery_exclusions",
+        "sponsored_placement"
+      ],
+      "additionalProperties": false
+    },
+    "SharedOfferItem": {
+      "type": "object",
+      "properties": {
+        "product_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "category": {
+          "$ref": "#/$defs/SharedProductCategory"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "primary",
+            "addon"
+          ]
+        },
+        "quantity": {
+          "const": 1
+        }
+      },
+      "required": [
+        "product_id",
+        "category",
+        "role",
+        "quantity"
+      ],
+      "additionalProperties": false
+    },
+    "SharedEligibility": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "eligible",
+            "needs_confirmation",
+            "rejected"
+          ]
+        },
+        "reason_codes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedEligibilityReasonCode"
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "status",
+        "reason_codes"
+      ],
+      "additionalProperties": false
+    },
+    "SharedOffer": {
+      "type": "object",
+      "properties": {
+        "offer_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "seller_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "round": {
+          "$ref": "#/$defs/SharedNegotiationRound"
+        },
+        "variant": {
+          "type": "string",
+          "enum": [
+            "standalone",
+            "bundle"
+          ]
+        },
+        "baseline_offer_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SharedId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedOfferItem"
+          },
+          "minItems": 1,
+          "maxItems": 2
+        },
+        "primary_features": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "total_price_twd": {
+          "$ref": "#/$defs/SharedMoneyTwd"
+        },
+        "delivery_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "terms_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "optional_addons": {
+          "type": "boolean"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/SharedTimestamp"
+        },
+        "eligibility": {
+          "$ref": "#/$defs/SharedEligibility"
+        },
+        "benefits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedSellerBenefit"
+          },
+          "maxItems": 5
+        }
+      },
+      "required": [
+        "offer_id",
+        "seller_id",
+        "round",
+        "variant",
+        "baseline_offer_id",
+        "items",
+        "primary_features",
+        "total_price_twd",
+        "delivery_days",
+        "terms_id",
+        "optional_addons",
+        "expires_at",
+        "eligibility"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "variant": {
+                "const": "standalone"
+              }
+            },
+            "required": [
+              "variant"
+            ]
+          },
+          "then": {
+            "properties": {
+              "baseline_offer_id": {
+                "type": "null"
+              },
+              "items": {
+                "minItems": 1,
+                "maxItems": 1,
+                "contains": {
+                  "type": "object",
+                  "properties": {
+                    "category": {
+                      "const": "mouse"
+                    },
+                    "role": {
+                      "const": "primary"
+                    }
+                  },
+                  "required": [
+                    "category",
+                    "role"
+                  ]
+                }
+              },
+              "optional_addons": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "variant": {
+                "const": "bundle"
+              }
+            },
+            "required": [
+              "variant"
+            ]
+          },
+          "then": {
+            "properties": {
+              "baseline_offer_id": {
+                "$ref": "#/$defs/SharedId"
+              },
+              "items": {
+                "minItems": 2,
+                "maxItems": 2,
+                "allOf": [
+                  {
+                    "contains": {
+                      "type": "object",
+                      "properties": {
+                        "category": {
+                          "const": "mouse"
+                        },
+                        "role": {
+                          "const": "primary"
+                        }
+                      },
+                      "required": [
+                        "category",
+                        "role"
+                      ]
+                    },
+                    "minContains": 1,
+                    "maxContains": 1
+                  },
+                  {
+                    "contains": {
+                      "type": "object",
+                      "properties": {
+                        "category": {
+                          "const": "mouse_pad"
+                        },
+                        "role": {
+                          "const": "addon"
+                        }
+                      },
+                      "required": [
+                        "category",
+                        "role"
+                      ]
+                    },
+                    "minContains": 1,
+                    "maxContains": 1
+                  }
+                ]
+              },
+              "optional_addons": {
+                "const": true
+              }
+            }
+          }
+        }
+      ]
+    },
+    "SharedRankedOffer": {
+      "type": "object",
+      "properties": {
+        "rank": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "offer_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "tradeoffs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "maxItems": 5
+        }
+      },
+      "required": [
+        "rank",
+        "offer_id",
+        "reason",
+        "tradeoffs"
+      ],
+      "additionalProperties": false
+    },
+    "SharedApiError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "fields"
+      ],
+      "additionalProperties": false
+    },
+    "SharedRequestSnapshot": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "root_request_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "parent_request_id": {
+          "type": "null"
+        },
+        "status": {
+          "$ref": "#/$defs/SharedStatus"
+        },
+        "documents": {
+          "$ref": "#/$defs/SharedDocumentBundle"
+        },
+        "intent": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SharedNormalizedIntent"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "seller_agents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedSellerAgent"
+          },
+          "maxItems": 5
+        },
+        "discovery_exclusions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedDiscoveryExclusion"
+          }
+        },
+        "sponsored_placement": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SharedSponsoredPlacement"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "offers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedOffer"
+          }
+        },
+        "ranked_offers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedRankedOffer"
+          }
+        },
+        "confirmation_offer_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedId"
+          },
+          "uniqueItems": true
+        },
+        "selected_offer_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SharedId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "next_request_id": {
+          "type": "null"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SharedApiError"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "decision": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SharedDecisionResult"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "request_id",
+        "root_request_id",
+        "parent_request_id",
+        "status",
+        "documents",
+        "intent",
+        "seller_agents",
+        "discovery_exclusions",
+        "sponsored_placement",
+        "offers",
+        "ranked_offers",
+        "confirmation_offer_ids",
+        "selected_offer_id",
+        "next_request_id",
+        "error",
+        "decision"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "formatting"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "intent": {
+                "type": "null"
+              },
+              "seller_agents": {
+                "maxItems": 0
+              },
+              "offers": {
+                "maxItems": 0
+              },
+              "ranked_offers": {
+                "maxItems": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "awaiting_user"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "intent": {
+                "$ref": "#/$defs/SharedNormalizedIntent"
+              },
+              "ranked_offers": {
+                "minItems": 1
+              },
+              "selected_offer_id": {
+                "type": "null"
+              },
+              "error": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "needs_confirmation"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "ranked_offers": {
+                "maxItems": 0
+              },
+              "confirmation_offer_ids": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "no_match"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "ranked_offers": {
+                "maxItems": 0
+              },
+              "confirmation_offer_ids": {
+                "maxItems": 0
+              },
+              "error": {
+                "$ref": "#/$defs/SharedApiError"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "accepted",
+                  "redeemed"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "selected_offer_id": {
+                "$ref": "#/$defs/SharedId"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "selected_offer_id": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "accepted"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "decision": {
+                "$ref": "#/$defs/SharedAcceptDecisionResult"
+              },
+              "error": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "rejected"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "decision": {
+                "$ref": "#/$defs/SharedRejectDecisionResult"
+              },
+              "error": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "not": {
+                  "enum": [
+                    "accepted",
+                    "rejected"
+                  ]
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "decision": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "documents": {
+              "properties": {
+                "revision": {
+                  "const": 1
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "SharedAcceptDecisionResult": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "const": "accept"
+        },
+        "request_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "status": {
+          "const": "accepted"
+        },
+        "selected_offer_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/SharedTimestamp"
+        },
+        "selection_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "rejected_offer_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedId"
+          },
+          "uniqueItems": true,
+          "maxItems": 100
+        },
+        "feedback": {
+          "type": "string",
+          "maxLength": 2000
+        }
+      },
+      "required": [
+        "action",
+        "request_id",
+        "status",
+        "selected_offer_id",
+        "expires_at"
+      ],
+      "additionalProperties": false,
+      "dependentRequired": {
+        "selection_version": [
+          "rejected_offer_ids"
+        ],
+        "rejected_offer_ids": [
+          "selection_version"
+        ],
+        "feedback": [
+          "selection_version"
+        ]
+      }
+    },
+    "SharedRejectDecisionResult": {
+      "type": "object",
+      "properties": {
+        "action": {
+          "const": "reject"
+        },
+        "request_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "status": {
+          "const": "rejected"
+        },
+        "feedback": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "source_documents": {
+          "$ref": "#/$defs/SharedDocumentBundle"
+        },
+        "selection_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "rejected_offer_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedId"
+          },
+          "uniqueItems": true,
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "action",
+        "request_id",
+        "status",
+        "feedback",
+        "source_documents"
+      ],
+      "additionalProperties": false,
+      "dependentRequired": {
+        "selection_version": [
+          "rejected_offer_ids"
+        ],
+        "rejected_offer_ids": [
+          "selection_version"
+        ]
+      },
+      "anyOf": [
+        {
+          "properties": {
+            "feedback": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          }
+        },
+        {
+          "required": [
+            "selection_version",
+            "rejected_offer_ids"
+          ],
+          "properties": {
+            "rejected_offer_ids": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/SharedId"
+              },
+              "minItems": 1
+            },
+            "feedback": {
+              "type": "string",
+              "const": ""
+            }
+          }
+        }
+      ]
+    },
+    "SharedDecisionResult": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/SharedAcceptDecisionResult"
+        },
+        {
+          "$ref": "#/$defs/SharedRejectDecisionResult"
+        }
+      ]
+    },
+    "SharedRedemptionReceipt": {
+      "type": "object",
+      "properties": {
+        "redemption_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "request_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "offer_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "seller_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "status": {
+          "const": "redeemed"
+        },
+        "mode": {
+          "const": "virtual_market"
+        },
+        "total_price_twd": {
+          "$ref": "#/$defs/SharedMoneyTwd"
+        },
+        "redeemed_at": {
+          "$ref": "#/$defs/SharedTimestamp"
+        }
+      },
+      "required": [
+        "redemption_id",
+        "request_id",
+        "offer_id",
+        "seller_id",
+        "status",
+        "mode",
+        "total_price_twd",
+        "redeemed_at"
+      ],
+      "additionalProperties": false
+    },
+    "SharedErrorResponse": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "$ref": "#/$defs/SharedApiError"
+        }
+      },
+      "required": [
+        "error"
+      ],
+      "additionalProperties": false
+    },
+    "SharedRFQProductPreference": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "preference_id": {
+              "$ref": "#/$defs/SharedId"
+            },
+            "strength": {
+              "type": "string",
+              "enum": [
+                "required",
+                "preferred"
+              ]
+            },
+            "attribute": {
+              "type": "string",
+              "enum": [
+                "size_class",
+                "color",
+                "shape"
+              ]
+            },
+            "operator": {
+              "type": "string",
+              "enum": [
+                "in",
+                "not_in"
+              ]
+            },
+            "values": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "preference_id",
+            "strength",
+            "attribute",
+            "operator",
+            "values"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "preference_id": {
+              "$ref": "#/$defs/SharedId"
+            },
+            "strength": {
+              "type": "string",
+              "enum": [
+                "required",
+                "preferred"
+              ]
+            },
+            "attribute": {
+              "type": "string",
+              "enum": [
+                "length_mm",
+                "width_mm",
+                "height_mm"
+              ]
+            },
+            "operator": {
+              "const": "range"
+            },
+            "min": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "max": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "preference_id",
+            "strength",
+            "attribute",
+            "operator",
+            "min",
+            "max"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "SharedSellerRFQ": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "seller_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "round": {
+          "$ref": "#/$defs/SharedNegotiationRound"
+        },
+        "category": {
+          "const": "mouse"
+        },
+        "required_features": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "candidate_product_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedId"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "product_preferences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedRFQProductPreference"
+          }
+        },
+        "pending_checks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "availability",
+              "delivery"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "delivery_days_max": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "allowed_addon_categories": {
+          "type": "array",
+          "items": {
+            "const": "mouse_pad"
+          },
+          "uniqueItems": true,
+          "maxItems": 1
+        },
+        "target_total_twd": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "previous_offer_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedId"
+          },
+          "uniqueItems": true,
+          "maxItems": 2
+        },
+        "competitive_terms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedCompetitiveTerms"
+          },
+          "maxItems": 8
+        },
+        "proposal": {
+          "$ref": "#/$defs/SharedNegotiationProposal"
+        }
+      },
+      "required": [
+        "request_id",
+        "seller_id",
+        "round",
+        "category",
+        "required_features",
+        "candidate_product_ids",
+        "product_preferences",
+        "pending_checks",
+        "delivery_days_max",
+        "allowed_addon_categories",
+        "target_total_twd",
+        "previous_offer_ids"
+      ],
+      "additionalProperties": false,
+      "description": "Seller-local RFQ. Optional competitive_terms contain only Backend-validated, unexpired, de-identified offers from the previous round. No private budget, competitor IDs, transcripts, trust or campaign data."
+    },
+    "SharedSellerOfferDraft": {
+      "type": "object",
+      "description": "Untrusted Seller proposal. The Backend assigns offer_id and eligibility after validation.",
+      "properties": {
+        "draft_ref": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "variant": {
+          "type": "string",
+          "enum": [
+            "standalone",
+            "bundle"
+          ]
+        },
+        "baseline_draft_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SharedId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedOfferItem"
+          },
+          "minItems": 1,
+          "maxItems": 2
+        },
+        "primary_features": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "total_price_twd": {
+          "$ref": "#/$defs/SharedMoneyTwd"
+        },
+        "delivery_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "terms_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "optional_addons": {
+          "type": "boolean"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/SharedTimestamp"
+        },
+        "benefits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedSellerBenefit"
+          },
+          "maxItems": 5
+        }
+      },
+      "required": [
+        "draft_ref",
+        "variant",
+        "baseline_draft_ref",
+        "items",
+        "primary_features",
+        "total_price_twd",
+        "delivery_days",
+        "terms_id",
+        "optional_addons",
+        "expires_at"
+      ],
+      "additionalProperties": false
+    },
+    "SharedSellerNegotiationResult": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "seller_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "round": {
+          "$ref": "#/$defs/SharedNegotiationRound"
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "offered",
+            "refused",
+            "timeout",
+            "error"
+          ]
+        },
+        "is_final": {
+          "type": "boolean",
+          "description": "Seller explicitly ends this branch; valid only with an offered outcome."
+        },
+        "drafts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedSellerOfferDraft"
+          },
+          "maxItems": 2
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "withdrawn_offer_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedId"
+          },
+          "uniqueItems": true,
+          "maxItems": 2,
+          "description": "Optional explicit withdrawal of this Seller's own previously issued offers. Backend verifies ownership; invalid new drafts alone never withdraw old offers."
+        },
+        "proposal_response": {
+          "$ref": "#/$defs/SharedNegotiationProposalResponse"
+        }
+      },
+      "required": [
+        "request_id",
+        "seller_id",
+        "round",
+        "outcome",
+        "is_final",
+        "drafts",
+        "message"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "offered"
+              }
+            },
+            "required": [
+              "outcome"
+            ]
+          },
+          "then": {
+            "properties": {
+              "drafts": {
+                "minItems": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "drafts": {
+                "maxItems": 0
+              },
+              "is_final": {
+                "const": false
+              }
+            }
+          }
+        }
+      ]
+    },
+    "SharedSellerTrustEntry": {
+      "type": "object",
+      "properties": {
+        "seller_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "trust": {
+          "$ref": "#/$defs/SharedTrust"
+        }
+      },
+      "required": [
+        "seller_id",
+        "trust"
+      ],
+      "additionalProperties": false
+    },
+    "SharedEligibleOffer": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/SharedOffer"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "eligibility": {
+              "type": "object",
+              "properties": {
+                "status": {
+                  "const": "eligible"
+                },
+                "reason_codes": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/SharedEligibilityReasonCode"
+                  },
+                  "uniqueItems": true
+                }
+              },
+              "required": [
+                "status",
+                "reason_codes"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "eligibility"
+          ]
+        }
+      ]
+    },
+    "SharedEvaluatorInput": {
+      "type": "object",
+      "description": "Campaign and Sponsored data are intentionally absent.",
+      "properties": {
+        "request_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "evaluated_at": {
+          "$ref": "#/$defs/SharedTimestamp"
+        },
+        "intent": {
+          "$ref": "#/$defs/SharedNormalizedIntent"
+        },
+        "offers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedEligibleOffer"
+          },
+          "minItems": 1
+        },
+        "seller_trust": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedSellerTrustEntry"
+          }
+        }
+      },
+      "required": [
+        "request_id",
+        "evaluated_at",
+        "intent",
+        "offers",
+        "seller_trust"
+      ],
+      "additionalProperties": false
+    },
+    "SharedEvaluatorOutput": {
+      "type": "object",
+      "properties": {
+        "ranked_offers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedRankedOffer"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "ranked_offers"
+      ],
+      "additionalProperties": false
+    },
+    "SharedMarketplacePrice": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "enum": [
+            "TWD",
+            "EUR",
+            "USD"
+          ]
+        },
+        "includes_tax": {
+          "type": "string",
+          "enum": [
+            "yes",
+            "no",
+            "unknown"
+          ]
+        },
+        "includes_shipping": {
+          "type": "string",
+          "enum": [
+            "yes",
+            "no",
+            "unknown"
+          ]
+        }
+      },
+      "required": [
+        "amount",
+        "currency",
+        "includes_tax",
+        "includes_shipping"
+      ],
+      "additionalProperties": false
+    },
+    "SharedMarketplaceEvidence": {
+      "type": "object",
+      "properties": {
+        "source_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "marketplace": {
+          "type": "string",
+          "enum": [
+            "shopee_tw",
+            "amazon_ie",
+            "logitech_official"
+          ]
+        },
+        "source_type": {
+          "type": "string",
+          "enum": [
+            "marketplace_listing",
+            "marketplace_search_result",
+            "manufacturer_spec"
+          ]
+        },
+        "product_key": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "retrieved_at": {
+          "$ref": "#/$defs/SharedTimestamp"
+        },
+        "observed_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SharedTimestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "freshness": {
+          "type": "string",
+          "enum": [
+            "current",
+            "current_cached",
+            "stale_cached_reference"
+          ]
+        },
+        "availability": {
+          "type": "string",
+          "enum": [
+            "listed",
+            "in_stock",
+            "sold_out",
+            "unknown",
+            "not_applicable"
+          ]
+        },
+        "price": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SharedMarketplacePrice"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "facts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "source_id",
+        "marketplace",
+        "source_type",
+        "product_key",
+        "title",
+        "url",
+        "retrieved_at",
+        "observed_at",
+        "freshness",
+        "availability",
+        "price",
+        "facts",
+        "notes"
+      ],
+      "additionalProperties": false
+    },
+    "SharedMarketplaceSourceSnapshot": {
+      "type": "object",
+      "properties": {
+        "fixture_version": {
+          "type": "string",
+          "const": "0.2"
+        },
+        "snapshot_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "retrieved_at": {
+          "$ref": "#/$defs/SharedTimestamp"
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "usage_policy": {
+          "type": "object",
+          "properties": {
+            "live_checkout_allowed": {
+              "const": false
+            },
+            "price_guarantee": {
+              "const": false
+            },
+            "taiwan_demo_price_sources": {
+              "type": "array",
+              "items": {
+                "const": "shopee_tw"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "reference_only_sources": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "amazon_ie",
+                  "logitech_official"
+                ]
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "notes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "live_checkout_allowed",
+            "price_guarantee",
+            "taiwan_demo_price_sources",
+            "reference_only_sources",
+            "notes"
+          ],
+          "additionalProperties": false
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedMarketplaceEvidence"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "fixture_version",
+        "snapshot_id",
+        "retrieved_at",
+        "purpose",
+        "usage_policy",
+        "sources"
+      ],
+      "additionalProperties": false
+    },
+    "SharedCatalogProductFixture": {
+      "type": "object",
+      "properties": {
+        "product_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "category": {
+          "$ref": "#/$defs/SharedProductCategory"
+        },
+        "brand": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "attributes": {
+          "$ref": "#/$defs/SharedProductAttributes"
+        },
+        "source_price_twd": {
+          "$ref": "#/$defs/SharedMoneyTwd"
+        },
+        "list_price_twd": {
+          "$ref": "#/$defs/SharedMoneyTwd"
+        },
+        "floor_price_twd": {
+          "$ref": "#/$defs/SharedMoneyTwd"
+        },
+        "stock": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "delivery_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "terms_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedId"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "product_id",
+        "category",
+        "brand",
+        "model",
+        "name",
+        "features",
+        "attributes",
+        "source_price_twd",
+        "list_price_twd",
+        "floor_price_twd",
+        "stock",
+        "delivery_days",
+        "terms_id",
+        "source_ids"
+      ],
+      "additionalProperties": false
+    },
+    "SharedSellerFixtureStore": {
+      "type": "object",
+      "properties": {
+        "fixture_version": {
+          "type": "string",
+          "const": "0.3"
+        },
+        "generated_at": {
+          "$ref": "#/$defs/SharedTimestamp"
+        },
+        "source_snapshot_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "data_classification": {
+          "type": "object",
+          "properties": {
+            "public_snapshot_fields": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "synthetic_demo_fields": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1,
+              "uniqueItems": true
+            },
+            "notice": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "public_snapshot_fields",
+            "synthetic_demo_fields",
+            "notice"
+          ],
+          "additionalProperties": false
+        },
+        "terms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "terms_id": {
+                "$ref": "#/$defs/SharedId"
+              },
+              "warranty_months": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "return_days": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "payment_obligation": {
+                "const": "one_time"
+              }
+            },
+            "required": [
+              "terms_id",
+              "warranty_months",
+              "return_days",
+              "payment_obligation"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "sellers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "seller_id": {
+                "$ref": "#/$defs/SharedId"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "strategy": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "lowest_price_slow_delivery",
+                      "premium_fast_delivery",
+                      "value_bundle",
+                      "balanced_delivery",
+                      "firm_price"
+                    ]
+                  },
+                  "round_discounts_twd": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "minItems": 5,
+                    "maxItems": 5
+                  },
+                  "final_round": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/$defs/SharedNegotiationRound"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "bundle_mode": {
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "free_optional_mouse_pad"
+                    ]
+                  }
+                },
+                "required": [
+                  "type",
+                  "round_discounts_twd",
+                  "final_round",
+                  "bundle_mode"
+                ],
+                "additionalProperties": false
+              },
+              "trust": {
+                "$ref": "#/$defs/SharedTrust"
+              },
+              "products": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/SharedCatalogProductFixture"
+                },
+                "minItems": 1
+              }
+            },
+            "required": [
+              "seller_id",
+              "name",
+              "enabled",
+              "strategy",
+              "trust",
+              "products"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 5,
+          "maxItems": 5
+        },
+        "campaigns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "campaign_id": {
+                "$ref": "#/$defs/SharedId"
+              },
+              "seller_id": {
+                "$ref": "#/$defs/SharedId"
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "target_category": {
+                "$ref": "#/$defs/SharedProductCategory"
+              },
+              "bid_twd": {
+                "$ref": "#/$defs/SharedMoneyTwd"
+              },
+              "starts_at": {
+                "$ref": "#/$defs/SharedTimestamp"
+              },
+              "ends_at": {
+                "$ref": "#/$defs/SharedTimestamp"
+              }
+            },
+            "required": [
+              "campaign_id",
+              "seller_id",
+              "enabled",
+              "target_category",
+              "bid_twd",
+              "starts_at",
+              "ends_at"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "fixture_version",
+        "generated_at",
+        "source_snapshot_id",
+        "data_classification",
+        "terms",
+        "sellers",
+        "campaigns"
+      ],
+      "additionalProperties": false
+    },
+    "SharedDemoScenarioSuite": {
+      "type": "object",
+      "properties": {
+        "fixture_version": {
+          "type": "string",
+          "const": "0.3"
+        },
+        "catalog_fixture": {
+          "const": "sellers.json"
+        },
+        "source_snapshot": {
+          "const": "marketplace-source-snapshot.json"
+        },
+        "canonical_flow_fixture": {
+          "const": "happy-path.json"
+        },
+        "scenarios": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "scenario_id": {
+                "$ref": "#/$defs/SharedId"
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "intent": {
+                "type": "object",
+                "properties": {
+                  "max_total_twd": {
+                    "$ref": "#/$defs/SharedMoneyTwd"
+                  },
+                  "delivery_days_max": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "required_features": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                  },
+                  "preferences": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "price_first",
+                        "delivery_first",
+                        "trust_first",
+                        "after_sales_first"
+                      ]
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                  },
+                  "required_color": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "preferred_shape": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "bundle_mode": {
+                    "type": "string",
+                    "enum": [
+                      "disabled",
+                      "related_no_extra_cost",
+                      "related_with_cap"
+                    ]
+                  }
+                },
+                "required": [
+                  "max_total_twd",
+                  "delivery_days_max",
+                  "required_features",
+                  "preferences",
+                  "required_color",
+                  "preferred_shape",
+                  "bundle_mode"
+                ],
+                "additionalProperties": false
+              },
+              "runtime_faults": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              },
+              "expected": {
+                "type": "object",
+                "properties": {
+                  "request_status": {
+                    "$ref": "#/$defs/SharedStatus"
+                  },
+                  "seller_statuses": {
+                    "type": "object",
+                    "properties": {
+                      "seller_a": {
+                        "type": "string",
+                        "enum": [
+                          "offered",
+                          "refused",
+                          "timeout",
+                          "error",
+                          "no_match"
+                        ]
+                      },
+                      "seller_b": {
+                        "type": "string",
+                        "enum": [
+                          "offered",
+                          "refused",
+                          "timeout",
+                          "error",
+                          "no_match"
+                        ]
+                      },
+                      "seller_c": {
+                        "type": "string",
+                        "enum": [
+                          "offered",
+                          "refused",
+                          "timeout",
+                          "error",
+                          "no_match"
+                        ]
+                      },
+                      "seller_d": {
+                        "type": "string",
+                        "enum": [
+                          "offered",
+                          "refused",
+                          "timeout",
+                          "error",
+                          "no_match"
+                        ]
+                      },
+                      "seller_e": {
+                        "type": "string",
+                        "enum": [
+                          "offered",
+                          "refused",
+                          "timeout",
+                          "error",
+                          "no_match"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "seller_a",
+                      "seller_b",
+                      "seller_c",
+                      "seller_d",
+                      "seller_e"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "eligible_offer_ids": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/SharedId"
+                    },
+                    "uniqueItems": true
+                  },
+                  "recommended_offer_id": {
+                    "anyOf": [
+                      {
+                        "$ref": "#/$defs/SharedId"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "reason_codes": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/SharedEligibilityReasonCode"
+                    },
+                    "uniqueItems": true
+                  }
+                },
+                "required": [
+                  "request_status",
+                  "seller_statuses",
+                  "eligible_offer_ids",
+                  "recommended_offer_id",
+                  "reason_codes"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "scenario_id",
+              "title",
+              "intent",
+              "runtime_faults",
+              "expected"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "fixture_version",
+        "catalog_fixture",
+        "source_snapshot",
+        "canonical_flow_fixture",
+        "scenarios"
+      ],
+      "additionalProperties": false
+    },
+    "SharedCompetitiveTerms": {
+      "type": "object",
+      "properties": {
+        "comparison_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "primary_product": {
+          "type": "object",
+          "properties": {
+            "brand": {
+              "type": "string"
+            },
+            "model": {
+              "type": "string"
+            },
+            "features": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "attributes": {
+              "$ref": "#/$defs/SharedProductAttributes"
+            }
+          },
+          "required": [
+            "brand",
+            "model",
+            "features",
+            "attributes"
+          ],
+          "additionalProperties": false
+        },
+        "total_price_twd": {
+          "$ref": "#/$defs/SharedMoneyTwd"
+        },
+        "delivery_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "terms": {
+          "type": "object",
+          "properties": {
+            "warranty_months": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "return_days": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "payment_obligation": {
+              "const": "one_time"
+            }
+          },
+          "required": [
+            "warranty_months",
+            "return_days",
+            "payment_obligation"
+          ],
+          "additionalProperties": false
+        },
+        "expires_at": {
+          "$ref": "#/$defs/SharedTimestamp"
+        },
+        "variant": {
+          "enum": [
+            "standalone",
+            "bundle"
+          ]
+        },
+        "addon_categories": {
+          "type": "array",
+          "items": {
+            "const": "mouse_pad"
+          },
+          "maxItems": 1
+        },
+        "differences": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "comparison_key",
+        "primary_product",
+        "total_price_twd",
+        "delivery_days",
+        "terms",
+        "expires_at",
+        "variant",
+        "addon_categories",
+        "differences"
+      ],
+      "additionalProperties": false
+    },
+    "SharedCompetitiveOfferReference": {
+      "type": "object",
+      "properties": {
+        "seller_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "offer_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "comparison_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "primary_product": {
+          "type": "object",
+          "properties": {
+            "brand": {
+              "type": "string"
+            },
+            "model": {
+              "type": "string"
+            },
+            "features": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "attributes": {
+              "$ref": "#/$defs/SharedProductAttributes"
+            }
+          },
+          "required": [
+            "brand",
+            "model",
+            "features",
+            "attributes"
+          ],
+          "additionalProperties": false
+        },
+        "total_price_twd": {
+          "$ref": "#/$defs/SharedMoneyTwd"
+        },
+        "delivery_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "terms": {
+          "type": "object",
+          "properties": {
+            "warranty_months": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "return_days": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "payment_obligation": {
+              "const": "one_time"
+            }
+          },
+          "required": [
+            "warranty_months",
+            "return_days",
+            "payment_obligation"
+          ],
+          "additionalProperties": false
+        },
+        "expires_at": {
+          "$ref": "#/$defs/SharedTimestamp"
+        },
+        "variant": {
+          "enum": [
+            "standalone",
+            "bundle"
+          ]
+        },
+        "addon_categories": {
+          "type": "array",
+          "items": {
+            "const": "mouse_pad"
+          },
+          "maxItems": 1
+        }
+      },
+      "required": [
+        "seller_id",
+        "offer_id",
+        "comparison_key",
+        "primary_product",
+        "total_price_twd",
+        "delivery_days",
+        "terms",
+        "expires_at",
+        "variant",
+        "addon_categories"
+      ],
+      "additionalProperties": false
+    },
+    "SharedSharedNegotiationContext": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "context_revision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "completed_round": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "as_of": {
+          "$ref": "#/$defs/SharedTimestamp"
+        },
+        "offers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedCompetitiveOfferReference"
+          },
+          "maxItems": 10
+        }
+      },
+      "required": [
+        "request_id",
+        "context_revision",
+        "completed_round",
+        "as_of",
+        "offers"
+      ],
+      "additionalProperties": false
+    },
+    "SharedNegotiationOutput": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "status": {
+          "enum": [
+            "evaluating",
+            "needs_confirmation",
+            "no_match"
+          ]
+        },
+        "seller_agents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedSellerAgent"
+          },
+          "maxItems": 5
+        },
+        "offers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedOffer"
+          },
+          "maxItems": 10
+        },
+        "eligible_offer_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedId"
+          },
+          "uniqueItems": true,
+          "maxItems": 10
+        },
+        "confirmation_offer_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedId"
+          },
+          "uniqueItems": true,
+          "maxItems": 5
+        },
+        "completed_rounds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "usage": {
+          "type": "object",
+          "properties": {
+            "calls": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "reserved_tokens": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "actual_tokens": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "calls",
+            "reserved_tokens",
+            "actual_tokens"
+          ],
+          "additionalProperties": false
+        },
+        "stop_reason": {
+          "enum": [
+            null,
+            "global_deadline",
+            "call_budget",
+            "token_budget"
+          ]
+        }
+      },
+      "required": [
+        "request_id",
+        "status",
+        "seller_agents",
+        "offers",
+        "eligible_offer_ids",
+        "confirmation_offer_ids",
+        "completed_rounds",
+        "usage",
+        "stop_reason"
+      ],
+      "additionalProperties": false
+    },
+    "SharedSellerSalesProfile": {
+      "type": "object",
+      "properties": {
+        "seller_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "bundle_discount_twd": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "always_offer_bundle": {
+          "type": "boolean"
+        },
+        "addon_product_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SharedId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "gift_exchange_discount_twd": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000,
+          "description": "Request-wide maximum gift-to-cash concession; defaults to zero. Private Seller policy."
+        },
+        "persona_policy": {
+          "$ref": "#/$defs/SharedSellerPersonaPolicy"
+        },
+        "sku_policies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedSellerSkuPolicy"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "seller_id",
+        "label",
+        "description",
+        "bundle_discount_twd",
+        "always_offer_bundle",
+        "addon_product_id"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "addon_product_id": {
+                "type": "null"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "bundle_discount_twd": {
+                "const": 0
+              },
+              "always_offer_bundle": {
+                "const": false
+              },
+              "gift_exchange_discount_twd": {
+                "const": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "SharedNegotiationProposal": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "enum": [
+            "lower_price",
+            "add_gift",
+            "exchange_gift",
+            "compare",
+            "request_benefit"
+          ]
+        },
+        "variant": {
+          "enum": [
+            "standalone",
+            "bundle"
+          ]
+        },
+        "target_total_twd": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "reference_offer_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SharedId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "benefit_kind": {
+          "enum": [
+            null,
+            "delivery_guarantee",
+            "late_compensation",
+            "future_coupon",
+            "return_extension",
+            "warranty_extension",
+            "priority_support",
+            "exchange_guarantee"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "variant",
+        "target_total_twd",
+        "reference_offer_id"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "add_gift"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "variant": {
+                "const": "bundle"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "exchange_gift"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "variant": {
+                "const": "standalone"
+              },
+              "reference_offer_id": {
+                "$ref": "#/$defs/SharedId"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "request_benefit"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "benefit_kind"
+            ],
+            "properties": {
+              "benefit_kind": {
+                "enum": [
+                  "delivery_guarantee",
+                  "late_compensation",
+                  "future_coupon",
+                  "return_extension",
+                  "warranty_extension",
+                  "priority_support",
+                  "exchange_guarantee"
+                ]
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "benefit_kind": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "SharedNegotiationProposalResponse": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "accepted",
+            "countered",
+            "declined"
+          ]
+        },
+        "exchange_discount_twd": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        }
+      },
+      "required": [
+        "status",
+        "exchange_discount_twd"
+      ],
+      "additionalProperties": false
+    },
+    "SharedSellerBenefit": {
+      "type": "object",
+      "properties": {
+        "benefit_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "kind": {
+          "enum": [
+            "delivery_guarantee",
+            "late_compensation",
+            "future_coupon",
+            "return_extension",
+            "warranty_extension",
+            "priority_support",
+            "exchange_guarantee"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "amount_twd": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "duration_days": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1095
+        },
+        "minimum_spend_twd": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100000
+        },
+        "requires_membership": {
+          "type": "boolean"
+        },
+        "conditions": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "evidence_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "simulation": {
+          "const": true
+        }
+      },
+      "required": [
+        "benefit_id",
+        "kind",
+        "description",
+        "amount_twd",
+        "duration_days",
+        "minimum_spend_twd",
+        "requires_membership",
+        "conditions",
+        "evidence_id",
+        "simulation"
+      ],
+      "additionalProperties": false
+    },
+    "SharedSellerPersonaPolicy": {
+      "type": "object",
+      "properties": {
+        "persona": {
+          "enum": [
+            "price_optimizer",
+            "speed_seller",
+            "bundle_curator",
+            "loyalty_builder",
+            "margin_guardian"
+          ]
+        },
+        "objective": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "sku_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedId"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "price_mode": {
+          "enum": [
+            "stepped",
+            "protected",
+            "bundle"
+          ]
+        },
+        "base_price_twd": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "round_discounts_twd": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "minItems": 5,
+          "maxItems": 5
+        },
+        "final_round": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "quote_ttl_seconds": {
+          "type": "integer",
+          "minimum": 30,
+          "maximum": 600
+        },
+        "gift_from_round": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "benefit_schedule": {
+          "type": "array",
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "properties": {
+              "from_round": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5
+              },
+              "benefit": {
+                "$ref": "#/$defs/SharedSellerBenefit"
+              }
+            },
+            "required": [
+              "from_round",
+              "benefit"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "decision_mode": {
+          "enum": [
+            "scheduled",
+            "bounded"
+          ]
+        }
+      },
+      "required": [
+        "persona",
+        "objective",
+        "sku_ids",
+        "price_mode",
+        "base_price_twd",
+        "round_discounts_twd",
+        "final_round",
+        "quote_ttl_seconds",
+        "gift_from_round",
+        "benefit_schedule"
+      ],
+      "additionalProperties": false
+    },
+    "SharedSellerSkuPolicy": {
+      "type": "object",
+      "properties": {
+        "product_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "policy_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "opening_discount_cap_twd": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "max_discount_per_step_twd": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "max_total_discount_twd": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "max_concession_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "unit_cost_twd": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "shipping_cost_twd": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "min_margin_bps": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9999
+        },
+        "gift_cost_budget_twd": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "gift_exchange_discount_cap_twd": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "total_concession_budget_twd": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "voucher_budget_twd": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000
+        },
+        "inventory_pressure": {
+          "enum": [
+            "low",
+            "normal",
+            "high"
+          ]
+        },
+        "addon_costs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "product_id": {
+                "$ref": "#/$defs/SharedId"
+              },
+              "cost_twd": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 10000
+              }
+            },
+            "required": [
+              "product_id",
+              "cost_twd"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "benefit_costs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "benefit_id": {
+                "$ref": "#/$defs/SharedId"
+              },
+              "cost_twd": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 10000
+              }
+            },
+            "required": [
+              "benefit_id",
+              "cost_twd"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "product_id",
+        "policy_version",
+        "opening_discount_cap_twd",
+        "max_discount_per_step_twd",
+        "max_total_discount_twd",
+        "max_concession_count",
+        "unit_cost_twd",
+        "shipping_cost_twd",
+        "min_margin_bps",
+        "gift_cost_budget_twd",
+        "gift_exchange_discount_cap_twd",
+        "total_concession_budget_twd",
+        "voucher_budget_twd",
+        "inventory_pressure",
+        "addon_costs",
+        "benefit_costs"
+      ],
+      "additionalProperties": false
+    },
+    "SharedImprovementStatus": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "improvement_id": {
+              "$ref": "#/$defs/SharedId"
+            },
+            "request_id": {
+              "$ref": "#/$defs/SharedId"
+            },
+            "mode": {
+              "enum": [
+                "accepted_with_rejections",
+                "all_rejected"
+              ]
+            },
+            "status": {
+              "enum": [
+                "queued",
+                "running",
+                "ready",
+                "needs_clarification",
+                "failed"
+              ]
+            },
+            "error": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "result": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "intent_revision_id": {
+                      "$ref": "#/$defs/SharedId"
+                    },
+                    "intent_state": {
+                      "enum": [
+                        "ready",
+                        "draft"
+                      ]
+                    },
+                    "documents": {
+                      "type": "object",
+                      "properties": {
+                        "revision": {
+                          "type": "integer",
+                          "minimum": 2
+                        },
+                        "intent_md": {
+                          "type": "string",
+                          "maxLength": 20000
+                        },
+                        "preference_md": {
+                          "type": "string",
+                          "maxLength": 20000
+                        }
+                      },
+                      "required": [
+                        "revision",
+                        "intent_md",
+                        "preference_md"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "preference_updated": {
+                      "type": "boolean"
+                    },
+                    "questions": {
+                      "type": "array",
+                      "maxItems": 10,
+                      "items": {
+                        "type": "string",
+                        "maxLength": 20000
+                      }
+                    }
+                  },
+                  "required": [
+                    "intent_revision_id",
+                    "intent_state",
+                    "documents",
+                    "preference_updated",
+                    "questions"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          },
+          "required": [
+            "improvement_id",
+            "request_id",
+            "mode",
+            "status",
+            "error",
+            "result"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "AcpAddress": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "line_one": {
+          "type": "string"
+        },
+        "line_two": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "line_one",
+        "city",
+        "state",
+        "country",
+        "postal_code"
+      ]
+    },
+    "AcpAffiliateAttributionSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Context about where the attribution originated.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "url",
+            "platform",
+            "unknown"
+          ],
+          "description": "The type of attribution source."
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Canonical content URL when type is 'url'."
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "AcpAffiliateAttributionMetadata": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "boolean"
+          }
+        ]
+      },
+      "description": "Flat key/value map for additional non-sensitive context. Keys must be strings; values must be strings, numbers, or booleans. Arrays and nested objects are NOT permitted."
+    },
+    "AcpAffiliateAttribution": {
+      "type": "object",
+      "description": "Optional affiliate attribution data for crediting third-party publishers. Write-only: not returned in responses. Forward compatibility: Servers SHOULD ignore unknown fields to support future extensions (per RFC §8.2).",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "description": "Identifier for the attribution provider / affiliate network namespace (e.g., 'impact.com')."
+        },
+        "token": {
+          "type": "string",
+          "description": "Opaque provider-issued token for fraud-resistant validation. Treat as secret."
+        },
+        "publisher_id": {
+          "type": "string",
+          "description": "Provider-scoped affiliate/publisher identifier. Required if token is omitted."
+        },
+        "campaign_id": {
+          "type": "string",
+          "description": "Provider-scoped campaign identifier."
+        },
+        "creative_id": {
+          "type": "string",
+          "description": "Provider-scoped creative identifier."
+        },
+        "sub_id": {
+          "type": "string",
+          "description": "Provider-scoped sub-tracking identifier."
+        },
+        "source": {
+          "$ref": "#/$defs/AcpAffiliateAttributionSource"
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "RFC3339 timestamp when the attribution token was issued."
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "RFC3339 timestamp when the attribution token expires."
+        },
+        "metadata": {
+          "$ref": "#/$defs/AcpAffiliateAttributionMetadata"
+        },
+        "touchpoint": {
+          "type": "string",
+          "enum": [
+            "first",
+            "last"
+          ],
+          "description": "Attribution touchpoint type. Use 'first' when capturing at session creation, 'last' when capturing at completion. Enables multi-touch attribution models."
+        }
+      },
+      "required": [
+        "provider"
+      ],
+      "anyOf": [
+        {
+          "required": [
+            "token"
+          ]
+        },
+        {
+          "required": [
+            "publisher_id"
+          ]
+        }
+      ]
+    },
+    "AcpFulfillmentDetails": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "phone_number": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "address": {
+          "$ref": "#/$defs/AcpAddress"
+        }
+      }
+    },
+    "AcpBuyer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "first_name": {
+          "type": "string"
+        },
+        "last_name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "phone_number": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "first_name",
+        "last_name",
+        "email"
+      ]
+    },
+    "AcpItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "quantity": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "id",
+        "quantity"
+      ]
+    },
+    "AcpDisclosure": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "disclaimer"
+          ]
+        },
+        "content_type": {
+          "type": "string",
+          "enum": [
+            "plain",
+            "markdown"
+          ]
+        },
+        "content": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "content_type",
+        "content"
+      ]
+    },
+    "AcpCustomAttribute": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "display_name": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "display_name",
+        "value"
+      ]
+    },
+    "AcpMarketplaceSellerDetails": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "AcpPaymentMethod": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "card"
+          ]
+        },
+        "supported_card_networks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "amex",
+              "discover",
+              "mastercard",
+              "visa"
+            ]
+          }
+        }
+      },
+      "required": [
+        "type",
+        "supported_card_networks"
+      ]
+    },
+    "AcpPaymentProvider": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "type": "string",
+          "enum": [
+            "stripe"
+          ]
+        },
+        "supported_payment_methods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AcpPaymentMethod"
+          }
+        }
+      },
+      "required": [
+        "provider",
+        "supported_payment_methods"
+      ]
+    },
+    "AcpLineItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "item": {
+          "$ref": "#/$defs/AcpItem"
+        },
+        "base_amount": {
+          "type": "integer"
+        },
+        "discount": {
+          "type": "integer"
+        },
+        "subtotal": {
+          "type": "integer"
+        },
+        "tax": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "unit_amount": {
+          "type": "integer",
+          "description": "The unit price of the line item in the smallest currency unit (e.g., cents for USD)"
+        },
+        "disclosures": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AcpDisclosure"
+          }
+        },
+        "custom_attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AcpCustomAttribute"
+          }
+        },
+        "marketplace_seller_details": {
+          "$ref": "#/$defs/AcpMarketplaceSellerDetails"
+        }
+      },
+      "required": [
+        "id",
+        "item",
+        "base_amount",
+        "discount",
+        "subtotal",
+        "tax",
+        "total"
+      ]
+    },
+    "AcpTotal": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "items_base_amount",
+            "items_discount",
+            "subtotal",
+            "discount",
+            "fulfillment",
+            "tax",
+            "fee",
+            "total"
+          ]
+        },
+        "display_text": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "integer"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "display_text",
+        "amount"
+      ]
+    },
+    "AcpFulfillmentOptionShipping": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "shipping"
+        },
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "type": "string"
+        },
+        "carrier": {
+          "type": "string"
+        },
+        "earliest_delivery_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "latest_delivery_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "subtotal": {
+          "type": "integer"
+        },
+        "tax": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "title",
+        "total"
+      ]
+    },
+    "AcpFulfillmentOptionDigital": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "digital"
+        },
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "subtitle": {
+          "type": "string"
+        },
+        "subtotal": {
+          "type": "integer"
+        },
+        "tax": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "type",
+        "id",
+        "title",
+        "total"
+      ]
+    },
+    "AcpSelectedShippingFulfillmentOption": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "option_id": {
+          "type": "string"
+        },
+        "item_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "option_id",
+        "item_ids"
+      ]
+    },
+    "AcpSelectedDigitalFulfillmentOption": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "option_id": {
+          "type": "string"
+        },
+        "item_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "option_id",
+        "item_ids"
+      ]
+    },
+    "AcpSelectedFulfillmentOption": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "shipping",
+            "digital"
+          ]
+        },
+        "shipping": {
+          "$ref": "#/$defs/AcpSelectedShippingFulfillmentOption"
+        },
+        "digital": {
+          "$ref": "#/$defs/AcpSelectedDigitalFulfillmentOption"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "oneOf": [
+        {
+          "properties": {
+            "type": {
+              "const": "shipping"
+            }
+          },
+          "required": [
+            "shipping"
+          ]
+        },
+        {
+          "properties": {
+            "type": {
+              "const": "digital"
+            }
+          },
+          "required": [
+            "digital"
+          ]
+        }
+      ]
+    },
+    "AcpMessageInfo": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "info"
+        },
+        "param": {
+          "type": "string",
+          "description": "RFC 9535 JSONPath"
+        },
+        "content_type": {
+          "type": "string",
+          "enum": [
+            "plain",
+            "markdown"
+          ]
+        },
+        "content": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "content_type",
+        "content"
+      ]
+    },
+    "AcpMessageError": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "error"
+        },
+        "code": {
+          "type": "string",
+          "enum": [
+            "missing",
+            "invalid",
+            "out_of_stock",
+            "payment_declined",
+            "requires_sign_in",
+            "requires_3ds"
+          ]
+        },
+        "param": {
+          "type": "string",
+          "description": "RFC 9535 JSONPath"
+        },
+        "content_type": {
+          "type": "string",
+          "enum": [
+            "plain",
+            "markdown"
+          ]
+        },
+        "content": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "code",
+        "content_type",
+        "content"
+      ]
+    },
+    "AcpLink": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "terms_of_use",
+            "privacy_policy",
+            "return_policy"
+          ]
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "type",
+        "url"
+      ]
+    },
+    "AcpPaymentData": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "token": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string",
+          "enum": [
+            "stripe"
+          ]
+        },
+        "billing_address": {
+          "$ref": "#/$defs/AcpAddress"
+        }
+      },
+      "required": [
+        "token",
+        "provider"
+      ]
+    },
+    "AcpOrder": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "checkout_session_id": {
+          "type": "string"
+        },
+        "permalink_url": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "checkout_session_id",
+        "permalink_url"
+      ]
+    },
+    "AcpAuthenticationMetadata": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Seller-provided authentication metadata for 3DS flows.",
+      "required": [
+        "channel",
+        "acquirer_details",
+        "directory_server"
+      ],
+      "properties": {
+        "channel": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Details about the channel used for this 3DS Authentication.",
+          "required": [
+            "type",
+            "browser"
+          ],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "browser"
+              ],
+              "description": "Use 'browser' to indicate the transaction originated from a browser."
+            },
+            "browser": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Browser details collected server- or client-side.",
+              "properties": {
+                "accept_header": {
+                  "type": "string",
+                  "description": "The HTTP Accept header from the cardholder’s browser."
+                },
+                "ip_address": {
+                  "type": "string",
+                  "maxLength": 45,
+                  "description": "The IP address of the browser."
+                },
+                "javascript_enabled": {
+                  "type": "boolean",
+                  "description": "Whether the cardholder browser can execute JavaScript."
+                },
+                "language": {
+                  "type": "string",
+                  "maxLength": 35,
+                  "description": "An IETF BCP 47 language tag representing the browser language."
+                },
+                "user_agent": {
+                  "type": "string",
+                  "description": "The browser user agent string."
+                },
+                "color_depth": {
+                  "type": "integer",
+                  "description": "The screen color depth. Required if javascript_enabled is true."
+                },
+                "java_enabled": {
+                  "type": "boolean",
+                  "description": "Browser Java support. Required if javascript_enabled is true."
+                },
+                "screen_height": {
+                  "type": "integer",
+                  "description": "Screen height in pixels. Required if javascript_enabled is true."
+                },
+                "screen_width": {
+                  "type": "integer",
+                  "description": "Screen width in pixels. Required if javascript_enabled is true."
+                },
+                "timezone_offset": {
+                  "type": "integer",
+                  "description": "Time difference in minutes between UTC and the browser local time. Required if javascript_enabled is true."
+                }
+              },
+              "required": [
+                "accept_header",
+                "ip_address",
+                "javascript_enabled",
+                "language",
+                "user_agent"
+              ]
+            }
+          }
+        },
+        "acquirer_details": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Details about the acquirer used for this 3DS Authentication. This object MUST be present.",
+          "properties": {
+            "acquirer_bin": {
+              "type": "string",
+              "maxLength": 11,
+              "description": "The Acquirer BIN (directory-server specific)."
+            },
+            "acquirer_country": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 2,
+              "description": "Two-letter ISO 3166-1 alpha-2 country code."
+            },
+            "acquirer_merchant_id": {
+              "type": "string",
+              "maxLength": 35,
+              "description": "The Merchant ID assigned by the acquirer."
+            },
+            "merchant_name": {
+              "type": "string",
+              "maxLength": 40,
+              "description": "Merchant name assigned by the acquirer."
+            },
+            "requestor_id": {
+              "type": "string",
+              "maxLength": 35,
+              "description": "Requestor ID (if required by the directory server)."
+            }
+          },
+          "required": [
+            "acquirer_bin",
+            "acquirer_country",
+            "acquirer_merchant_id",
+            "merchant_name"
+          ]
+        },
+        "directory_server": {
+          "type": "string",
+          "enum": [
+            "american_express",
+            "mastercard",
+            "visa"
+          ],
+          "description": "The 3DS directory server used for this Authentication."
+        },
+        "flow_preference": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Contains additional details on the seller's preference for the 3DS authentication flow. Sellers MAY request a preference, but issuers ultimately decide the actual flow.",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "challenge",
+                "frictionless"
+              ],
+              "description": "Type of flow requested for this 3DS Authentication. 'challenge' requests a challenge flow; 'frictionless' requests a frictionless flow."
+            },
+            "challenge": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Details about the requested challenge flow.",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "mandated",
+                    "preferred"
+                  ],
+                  "description": "Subtype of challenge preference."
+                }
+              }
+            },
+            "frictionless": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Details about the requested frictionless flow.",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "low_risk"
+                  ],
+                  "description": "Subtype of frictionless preference."
+                }
+              }
+            }
+          },
+          "required": [
+            "type"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "channel": {
+                "properties": {
+                  "browser": {
+                    "properties": {
+                      "javascript_enabled": {
+                        "const": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "channel": {
+                "properties": {
+                  "browser": {
+                    "required": [
+                      "color_depth",
+                      "java_enabled",
+                      "screen_height",
+                      "screen_width",
+                      "timezone_offset"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "AcpAuthenticationResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Agent-provided authentication results returned to the seller for card-based 3D Secure.",
+      "properties": {
+        "outcome": {
+          "type": "string",
+          "description": "The outcome of this 3DS Authentication.",
+          "enum": [
+            "abandoned",
+            "attempt_acknowledged",
+            "authenticated",
+            "canceled",
+            "denied",
+            "informational",
+            "internal_error",
+            "not_supported",
+            "processing_error",
+            "rejected"
+          ],
+          "example": "authenticated"
+        },
+        "outcome_details": {
+          "type": "object",
+          "description": "Detailed authentication data. This field is required when the outcome is 'authenticated', 'informational', or 'attempt_acknowledged'.",
+          "additionalProperties": false,
+          "properties": {
+            "three_ds_cryptogram": {
+              "type": "string",
+              "description": "The 3DS cryptogram (authentication value / AAV/CAVV/AEVV). This value is 20 bytes, base64-encoded into a 28-character string.",
+              "example": "AbCdEfGhIjKlMnOpQrStUvWxY0="
+            },
+            "electronic_commerce_indicator": {
+              "type": "string",
+              "description": "Electronic Commerce Indicator (ECI) returned by the 3D Secure provider. Indicates the degree/type of authentication performed.",
+              "enum": [
+                "01",
+                "02",
+                "05",
+                "06",
+                "07"
+              ],
+              "example": "05"
+            },
+            "transaction_id": {
+              "type": "string",
+              "description": "Transaction identifier returned by the 3DS system:\n- For 3DS1: the XID\n- For 3DS2: the Directory Server Transaction ID (dsTransID)",
+              "example": "dsTransId_abc123"
+            },
+            "version": {
+              "type": "string",
+              "description": "The 3D Secure version used for this authentication (for example '1.0.2' or '2.2.0').",
+              "example": "2.2.0"
+            }
+          },
+          "required": [
+            "three_ds_cryptogram",
+            "electronic_commerce_indicator",
+            "transaction_id",
+            "version"
+          ]
+        }
+      },
+      "required": [
+        "outcome"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "outcome": {
+                "enum": [
+                  "authenticated",
+                  "informational",
+                  "attempt_acknowledged"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "outcome_details"
+            ]
+          }
+        }
+      ]
+    },
+    "AcpCheckoutSessionBase": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "buyer": {
+          "$ref": "#/$defs/AcpBuyer"
+        },
+        "payment_provider": {
+          "$ref": "#/$defs/AcpPaymentProvider"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "not_ready_for_payment",
+            "authentication_required",
+            "ready_for_payment",
+            "completed",
+            "canceled",
+            "in_progress"
+          ]
+        },
+        "currency": {
+          "type": "string"
+        },
+        "line_items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AcpLineItem"
+          }
+        },
+        "fulfillment_details": {
+          "$ref": "#/$defs/AcpFulfillmentDetails"
+        },
+        "fulfillment_options": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AcpFulfillmentOptionShipping"
+              },
+              {
+                "$ref": "#/$defs/AcpFulfillmentOptionDigital"
+              }
+            ]
+          }
+        },
+        "selected_fulfillment_options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AcpSelectedFulfillmentOption"
+          }
+        },
+        "totals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AcpTotal"
+          }
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/AcpMessageInfo"
+              },
+              {
+                "$ref": "#/$defs/AcpMessageError"
+              }
+            ]
+          }
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AcpLink"
+          }
+        },
+        "authentication_metadata": {
+          "$ref": "#/$defs/AcpAuthenticationMetadata"
+        },
+        "order": {
+          "$ref": "#/$defs/AcpOrder"
+        }
+      },
+      "required": [
+        "id",
+        "status",
+        "currency",
+        "line_items",
+        "totals",
+        "fulfillment_options",
+        "messages",
+        "links"
+      ]
+    },
+    "AcpCheckoutSession": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/AcpCheckoutSessionBase"
+        }
+      ]
+    },
+    "AcpCheckoutSessionWithOrder": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/AcpCheckoutSessionBase"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "order": {
+              "$ref": "#/$defs/AcpOrder"
+            }
+          },
+          "required": [
+            "order"
+          ]
+        }
+      ]
+    },
+    "AcpCheckoutSessionCreateRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "buyer": {
+          "$ref": "#/$defs/AcpBuyer"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AcpItem"
+          },
+          "minItems": 1
+        },
+        "fulfillment_details": {
+          "$ref": "#/$defs/AcpFulfillmentDetails"
+        },
+        "affiliate_attribution": {
+          "$ref": "#/$defs/AcpAffiliateAttribution"
+        }
+      },
+      "required": [
+        "items"
+      ]
+    },
+    "AcpCheckoutSessionUpdateRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "buyer": {
+          "$ref": "#/$defs/AcpBuyer"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AcpItem"
+          }
+        },
+        "fulfillment_details": {
+          "$ref": "#/$defs/AcpFulfillmentDetails"
+        },
+        "selected_fulfillment_options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AcpSelectedFulfillmentOption"
+          }
+        }
+      }
+    },
+    "AcpCheckoutSessionCompleteRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "buyer": {
+          "$ref": "#/$defs/AcpBuyer"
+        },
+        "payment_data": {
+          "$ref": "#/$defs/AcpPaymentData"
+        },
+        "authentication_result": {
+          "$ref": "#/$defs/AcpAuthenticationResult"
+        },
+        "affiliate_attribution": {
+          "$ref": "#/$defs/AcpAffiliateAttribution"
+        }
+      },
+      "required": [
+        "payment_data"
+      ]
+    },
+    "AcpIntentTrace": {
+      "type": "object",
+      "properties": {
+        "reason_code": {
+          "type": "string",
+          "description": "Reason for abandonment. This enum is extensible: servers SHOULD accept unrecognized values and treat them as 'other' (see RFC Section 7.2). Validators SHOULD be configured for lenient enum handling.",
+          "enum": [
+            "price_sensitivity",
+            "shipping_cost",
+            "shipping_speed",
+            "product_fit",
+            "trust_security",
+            "returns_policy",
+            "payment_options",
+            "comparison",
+            "timing_deferred",
+            "other"
+          ]
+        },
+        "trace_summary": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "A generated summary of the specific objection or negotiation gap."
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "string",
+              "number",
+              "boolean"
+            ]
+          }
+        }
+      },
+      "required": [
+        "reason_code"
+      ]
+    },
+    "AcpCancelSessionRequest": {
+      "type": "object",
+      "properties": {
+        "intent_trace": {
+          "$ref": "#/$defs/AcpIntentTrace"
+        }
+      }
+    },
+    "AcpError": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "invalid_request",
+            "request_not_idempotent",
+            "processing_error",
+            "service_unavailable"
+          ]
+        },
+        "code": {
+          "type": "string",
+          "description": "Implementation-defined error code"
+        },
+        "message": {
+          "type": "string"
+        },
+        "param": {
+          "type": "string",
+          "description": "RFC 9535 JSONPath (optional)"
+        }
+      },
+      "required": [
+        "type",
+        "code",
+        "message"
+      ]
+    },
+    "AcpEventRefund": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "store_credit",
+            "original_payment"
+          ]
+        },
+        "amount": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "type",
+        "amount"
+      ]
+    },
+    "AcpEventEventDataOrder": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "const": "order"
+        },
+        "checkout_session_id": {
+          "type": "string"
+        },
+        "permalink_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "created",
+            "manual_review",
+            "confirmed",
+            "canceled",
+            "shipped",
+            "fulfilled"
+          ]
+        },
+        "refunds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AcpEventRefund"
+          }
+        }
+      },
+      "required": [
+        "type",
+        "checkout_session_id",
+        "permalink_url",
+        "status",
+        "refunds"
+      ]
+    },
+    "AcpEventWebhookEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "order_create",
+            "order_update"
+          ]
+        },
+        "data": {
+          "$ref": "#/$defs/AcpEventEventDataOrder"
+        }
+      },
+      "required": [
+        "type",
+        "data"
+      ]
+    },
+    "AcpEventError": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "invalid_request",
+            "processing_error",
+            "service_unavailable"
+          ]
+        },
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "param": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "code",
+        "message"
+      ]
+    },
+    "Empty": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {},
+      "required": []
+    },
+    "Buyer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "phone_number": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "name",
+        "email"
+      ]
+    },
+    "Address": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "line_one": {
+          "type": "string"
+        },
+        "line_two": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "phone_number": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "name",
+        "line_one",
+        "city",
+        "state",
+        "country",
+        "postal_code"
+      ]
+    },
+    "CheckoutUpdate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "buyer": {
+          "$ref": "#/$defs/Buyer"
+        },
+        "fulfillment_address": {
+          "$ref": "#/$defs/Address"
+        },
+        "fulfillment_option_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [],
+      "minProperties": 1
+    },
+    "PurchaseComplete": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "confirmation_token": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      },
+      "required": [
+        "confirmation_token"
+      ]
+    },
+    "PurchaseError": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "message": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "fields"
+      ]
+    },
+    "PurchaseOrder": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "order_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "merchant_order_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "checkout_session_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "total_price_twd": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "payment_status": {
+          "const": "simulated_succeeded",
+          "type": "string"
+        }
+      },
+      "required": [
+        "order_id",
+        "merchant_order_id",
+        "checkout_session_id",
+        "created_at",
+        "total_price_twd",
+        "payment_status"
+      ]
+    },
+    "Checkout": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "currency": {
+          "const": "twd",
+          "type": "string"
+        },
+        "amount_minor": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_price_twd": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "line_items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AcpLineItem"
+          }
+        },
+        "buyer": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Buyer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fulfillment_address": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Address"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "fulfillment_options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AcpFulfillmentOptionShipping"
+          }
+        },
+        "fulfillment_option_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "terms": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "currency",
+        "amount_minor",
+        "total_price_twd",
+        "line_items",
+        "buyer",
+        "fulfillment_address",
+        "fulfillment_options",
+        "fulfillment_option_id",
+        "terms"
+      ]
+    },
+    "PurchaseView": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "purchase_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "request_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "offer_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "seller_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "mode": {
+          "const": "test",
+          "type": "string"
+        },
+        "payment_execution": {
+          "const": "simulated",
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "creating",
+            "needs_input",
+            "ready",
+            "submitting",
+            "reconciling",
+            "completed",
+            "canceled",
+            "expired",
+            "blocked"
+          ]
+        },
+        "checkout_session_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "checkout_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "offer": {
+          "$ref": "#/$defs/SharedOffer"
+        },
+        "checkout": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Checkout"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "order": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PurchaseOrder"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "error": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PurchaseError"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "allowed_actions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "update",
+              "complete",
+              "cancel",
+              "get"
+            ]
+          }
+        },
+        "confirmation_token": {
+          "type": "string"
+        },
+        "confirmation_expires_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "purchase_id",
+        "request_id",
+        "offer_id",
+        "seller_id",
+        "mode",
+        "payment_execution",
+        "status",
+        "checkout_session_id",
+        "checkout_revision",
+        "expires_at",
+        "offer",
+        "checkout",
+        "order",
+        "error",
+        "allowed_actions"
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "PurchaseView": {
+      "$ref": "#/$defs/PurchaseView"
+    },
+    "CheckoutUpdate": {
+      "$ref": "#/$defs/CheckoutUpdate"
+    },
+    "PurchaseComplete": {
+      "$ref": "#/$defs/PurchaseComplete"
+    }
+  },
+  "required": [
+    "PurchaseView",
+    "CheckoutUpdate",
+    "PurchaseComplete"
+  ]
+}
