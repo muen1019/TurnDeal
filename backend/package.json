@@ -13,6 +13,8 @@
     "pretest": "npm run generate:types",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:improver": "vitest run tests/improver.test.ts",
+    "demo:improver": "tsx scripts/demo-improver.ts",
     "dev": "tsx src/server.ts"
   },
   "dependencies": {

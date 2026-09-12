@@ -1,18 +1,24 @@
 schema: spec-driven
 context: |
   OfferMesh is a shopping-offer comparison and feedback-loop MVP.
-  UI/API applications are not implemented yet. Shared contracts, fixtures and a contract validator exist.
+  Result UI/API, SQLite-backed decisions and a deterministic mock result pipeline are implemented.
+  Node 24 backend/runtime integrates Formatter, discovery, negotiation and evaluation; legacy backend/src retains Node 20 Result compatibility.
+  Buyer Request Improver core, version storage and an explicit internal runtime adapter are implemented.
+  Automatic all-swiped rejection, public improvement API, global preference editor sync and child orchestration are not connected.
   Frontend: React + TypeScript + Vite in frontend/.
   Backend: Node.js + TypeScript + Express 5 + SQLite in backend/.
-  Required application runtime: Node.js >=20.19.0 <21; npm; commit lockfiles during implementation.
+  Runtime application and root DB tools use Node 24; legacy backend/frontend use Node.js >=20.19.0 <21.
   Confirmed interaction: swipe right immediately accepts one offer and ends the round on success.
   Swipe left only skips locally. Rejecting a round requires explicit feedback.
   Preserve backend offer IDs, prices, expiry and ranking. Accepting is not redeeming or paying.
   Result UI input examples and visual reference are in frontend/README.md.
-  contracts/a2a-commerce.v0.1.schema.json is the shared data source of truth.
+  contracts/a2a-commerce.v0.3.schema.json is the active shared data source of truth.
   backend/openapi.json describes HTTP operations and references shared types without duplicating them.
   GET returns RequestSnapshot. Frontend ResultAdapter derives its local ResultView.
-  Use existing three-seller/two-round fixtures; display Sponsored separately and support virtual redemption.
+  Use existing five-seller/up-to-five-round fixtures; display Sponsored separately.
+  Current Result APIs do not redeem, automatically rewrite documents or create child requests.
+  intent.md describes a particular purchase; preference.md represents the user's global preferences.
+  Proposed improvement behavior must be explicitly marked unimplemented and versioned before integration.
   AI failure must use a safe deterministic fallback that still validates all requirements.
   Define and validate specs in this change; do not claim that specification completion is implementation completion.
 rules:

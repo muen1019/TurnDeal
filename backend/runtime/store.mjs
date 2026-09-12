@@ -133,6 +133,13 @@ export class RuntimeStore {
   }
   decide(buyer,id,body){
     const s=this.snapshot(id,buyer);let result;
+    if(body.selection_version===1){
+      const ids=body.rejected_offer_ids,ranked=new Set(s.ranked_offers.map(o=>o.offer_id));
+      if(s.status!=='awaiting_user'||!Array.isArray(ids)||new Set(ids).size!==ids.length||ids.some(id=>!ranked.has(id))||
+        (body.action==='accept'&&ids.includes(body.offer_id))||
+        (body.action==='reject'&&(!ids.length||ids.length!==ranked.size)))fail(409,'state_conflict','拒絕紀錄與本輪可選方案不符。');
+      if(body.action==='reject'&&s.offers.some(o=>ids.includes(o.offer_id)&&Date.parse(o.expires_at)<=this.now()))fail(410,'offer_expired','方案已過期，請重新核對本輪結果。');
+    }
     if(body.action==='accept') {
       if(s.status!=='awaiting_user')fail(409,'state_conflict','本輪無法採用商品。');
       const offer=s.offers.find(o=>o.offer_id===body.offer_id);
@@ -150,6 +157,10 @@ export class RuntimeStore {
     } else {
       if(!['awaiting_user','no_match','needs_confirmation'].includes(s.status))fail(409,'state_conflict','本輪無法送出回饋。');
       result={action:'reject',request_id:id,status:'rejected',feedback:body.feedback,source_documents:s.documents};
+    }
+    if(body.selection_version===1){
+      result.selection_version=1;result.rejected_offer_ids=body.rejected_offer_ids;
+      if(body.action==='accept'&&body.feedback!==undefined)result.feedback=body.feedback;
     }
     assertContract(result.action==='accept'?'AcceptDecisionResult':'RejectDecisionResult',result);
     this.db.prepare('INSERT INTO decisions(decision_id,request_id,offer_id,action,created_at,result_json) VALUES(?,?,?,?,?,?)')
