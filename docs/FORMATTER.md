@@ -8,7 +8,7 @@
 
 文字 → 解析與驗證 → 合併使用者偏好 → SQLite Request／Formatter 快照 → Discovery → RFQ → 第一輪 Seller 函式。
 
-Seller 策略仍由 Negotiation owner 實作，Demo 明確使用測試替身。既有 NormalizedIntent／SellerRFQ 不破壞性改版，只在共用 v0.2 schema 新增 FormatterResult 定義。
+Seller 策略仍由 Negotiation owner 實作，Demo 明確使用測試替身。既有 NormalizedIntent／SellerRFQ 不破壞性改版，FormatterResult 已整合到現行共用 v0.3 schema；Result HTTP server 尚未接入此 service。
 
 ## 支援的輸入例子
 

@@ -1,0 +1,88 @@
+{
+  "fixture_version": "0.3",
+  "create_request": {
+    "http": {
+      "method": "POST",
+      "path": "/api/requests",
+      "headers": {
+        "Content-Type": "application/json",
+        "Idempotency-Key": "demo-create-001"
+      }
+    },
+    "body": {
+      "intent_md": "# 購買需求\n無線靜音滑鼠，含稅運 1000 元內，7 天內到貨。",
+      "preference_md": "# 偏好\n只接受黑色，偏好小尺寸及左右對稱。價格優先，可接受不加價且可拒絕的滑鼠墊。"
+    },
+    "expected_status_code": 202,
+    "response": {
+      "request_id": "req_demo_001",
+      "root_request_id": "req_demo_001",
+      "parent_request_id": null,
+      "status": "formatting",
+      "documents": {
+        "revision": 1,
+        "intent_md": "# 購買需求\n無線靜音滑鼠，含稅運 1000 元內，7 天內到貨。",
+        "preference_md": "# 偏好\n只接受黑色，偏好小尺寸及左右對稱。價格優先，可接受不加價且可拒絕的滑鼠墊。"
+      },
+      "intent": null,
+      "seller_agents": [],
+      "discovery_exclusions": [],
+      "sponsored_placement": null,
+      "offers": [],
+      "ranked_offers": [],
+      "confirmation_offer_ids": [],
+      "selected_offer_id": null,
+      "next_request_id": null,
+      "error": null,
+      "decision": null
+    }
+  },
+  "accept_decision": {
+    "http": {
+      "method": "POST",
+      "path": "/api/requests/req_demo_001/decisions",
+      "headers": {
+        "Content-Type": "application/json",
+        "Idempotency-Key": "demo-accept-001"
+      }
+    },
+    "body": {
+      "action": "accept",
+      "offer_id": "offer_a_r5"
+    },
+    "expected_status_code": 200,
+    "response": {
+      "action": "accept",
+      "request_id": "req_demo_001",
+      "status": "accepted",
+      "selected_offer_id": "offer_a_r5",
+      "expires_at": "2026-09-12T18:00:00+08:00"
+    }
+  },
+  "reject_decision_alternative": {
+    "http": {
+      "method": "POST",
+      "path": "/api/requests/req_demo_001/decisions",
+      "headers": {
+        "Content-Type": "application/json",
+        "Idempotency-Key": "demo-reject-001"
+      }
+    },
+    "body": {
+      "action": "reject",
+      "feedback": "不要滑鼠墊，預算改成含稅運 900 元，仍需七天內到貨。"
+    },
+    "expected_status_code": 200,
+    "response": {
+      "action": "reject",
+      "request_id": "req_demo_001",
+      "status": "rejected",
+      "feedback": "不要滑鼠墊，預算改成含稅運 900 元，仍需七天內到貨。",
+      "source_documents": {
+        "revision": 1,
+        "intent_md": "# 購買需求\n無線靜音滑鼠，含稅運 1000 元內，7 天內到貨。",
+        "preference_md": "# 偏好\n只接受黑色，偏好小尺寸及左右對稱。價格優先，可接受不加價且可拒絕的滑鼠墊。"
+      }
+    }
+  }
+}

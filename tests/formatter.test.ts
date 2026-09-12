@@ -4,10 +4,35 @@ import { readFileSync } from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
 import { formatIntent } from '../src/formatter/parser.ts';
 import { createFormatterService } from '../src/formatter/service.ts';
-import { initializeDatabase } from '../scripts/db.mjs';
+import { initializeDatabase, applyMigrations } from '../scripts/db.mjs';
 import { seedDiscovery } from '../scripts/discovery-db.mjs';
 import type { SellerHandler } from '../src/orchestrator/handoff.ts';
 const scenarios=JSON.parse(readFileSync(new URL('../contracts/fixtures/formatter-scenarios.json',import.meta.url),'utf8'));
+test('existing Formatter DB survives the later Result table rebuild with replay and immutability intact',()=>{
+  const db=new DatabaseSync(':memory:');
+  try {
+    for(const version of ['001_initial','002_discovery','002_five_seller_negotiation','003_orchestrator_handoff','004_formatter']) {
+      db.exec('PRAGMA foreign_keys=OFF');
+      db.exec(readFileSync(new URL(`../db/migrations/${version}.sql`,import.meta.url),'utf8'));
+      db.prepare('INSERT INTO schema_migrations VALUES (?,?)').run(version,'2026-09-12T02:00:00Z');
+    }
+    db.exec('PRAGMA foreign_keys=ON');
+    db.exec("INSERT INTO users VALUES ('user_demo_001','Demo','2026-09-12T02:00:00Z','2026-09-12T02:00:00Z')");
+    const service=createFormatterService({db,userId:'user_demo_001',timeoutMs:100,registrations:[]});
+    const input={intent_md:scenarios[0].intent_md,idempotency_key:'migration-replay'};
+    const original=service.submit(input);
+    const rows=db.prepare('SELECT * FROM formatter_runs').all();
+    const request=db.prepare('SELECT normalized_intent_json FROM requests WHERE request_id=?').get(original.request_id);
+    applyMigrations(db);applyMigrations(db);
+    assert.deepEqual(db.prepare('SELECT * FROM formatter_runs').all(),rows);
+    assert.deepEqual(db.prepare('SELECT normalized_intent_json FROM requests WHERE request_id=?').get(original.request_id),request);
+    assert.deepEqual(service.submit(input),original);
+    assert.throws(()=>db.prepare("UPDATE requests SET intent_md='changed' WHERE request_id=?").run(original.request_id),/immutable/);
+    assert.throws(()=>db.exec("UPDATE formatter_runs SET result_json='{}'"),/immutable/);
+    assert.deepEqual(db.prepare('PRAGMA foreign_key_check').all(),[]);
+    assert.equal(db.prepare('SELECT count(*) AS n FROM schema_migrations').get()?.n,7);
+  } finally {db.close();}
+});
 for(const s of scenarios) test(`Formatter: ${s.name}`,()=>{
   const r=formatIntent({intent_md:s.intent_md});assert.equal(r.status,s.status,JSON.stringify(r));
   if(r.status==='ready') {assert.equal(r.target_total_twd,s.target);assert.equal(r.normalized_intent?.max_total_twd,s.max);assert.equal(r.normalized_intent?.delivery_days_max,s.days);}
