@@ -366,7 +366,7 @@ function verifyLegacyMigration() {
     assert.deepEqual(JSON.parse(db.prepare("SELECT round_discounts_json FROM sellers").get().round_discounts_json), [30, 60, 60, 60, 60]);
     assert.equal(db.prepare("SELECT is_final FROM negotiation_rounds").get().is_final, 0);
     assert.equal(db.prepare("SELECT stop_reason FROM request_sellers").get().stop_reason, null);
-    assert.equal(getCount(db, "schema_migrations"), 4);
+    assert.equal(getCount(db, "schema_migrations"), 5);
     assert.equal(db.prepare("PRAGMA foreign_keys").get().foreign_keys, 1);
     assert.deepEqual(db.prepare("PRAGMA foreign_key_check").all(), []);
     assert.throws(() => db.exec("UPDATE offers SET total_price_twd = 1"), /offers are immutable/);
@@ -384,7 +384,7 @@ function verifyDatabase(db) {
   assert.deepEqual(db.prepare("PRAGMA foreign_key_check").all(), [], "foreign keys must be valid");
 
   const expectedCounts = {
-    schema_migrations: 4,
+    schema_migrations: 5,
     users: 1,
     marketplace_sources: 11,
     sellers: 5,
@@ -448,7 +448,7 @@ function verifyDatabase(db) {
     FROM sqlite_schema
     WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
   `).get().count);
-  assert.equal(tableCount, 22, "unexpected database table count");
+  assert.equal(tableCount, 23, "unexpected database table count");
 
   verifyNegotiationConstraints(db);
 
