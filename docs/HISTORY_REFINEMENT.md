@@ -1,5 +1,7 @@
 # 歷史側欄與拒絕後再篩選
 
+歷史文件：目前 UI 已改走 PR #3 versioned Improver，完整流程見 [TurnDeal workflow](TURNDEAL_WORKFLOW.md)。以下 legacy refinement 僅保留相容 API 與測試，不再由新版完整 UI 自動觸發。
+
 ## 本次功能
 
 - 手機：導覽按鈕展開左側抽屜，背景不可操作。可按遮罩、關閉、Escape，選擇對話後自動收合；支援鍵盤焦點循環與 reduced motion。

@@ -147,6 +147,10 @@ export type ImprovementStatus = null | {
     preference_updated: boolean;
     questions: string[];
   };
+  next_request_id: Id | null;
+  workflow_error: string | null;
+  can_clarify: boolean;
+  workflow_enabled: boolean;
 };
 
 export interface CommerceTypes {
@@ -220,6 +224,8 @@ export interface CommerceTypes {
   SellerPersonaPolicy: SellerPersonaPolicy;
   SellerSkuPolicy: SellerSkuPolicy;
   ImprovementStatus: ImprovementStatus;
+  ImprovementClarification: ImprovementClarification;
+  ImprovementClarificationResult: ImprovementClarificationResult;
 }
 export interface FormatterResult {
   parser_version: 'formatter-rules-v0.1' | 'formatter-llm-v0.1';
@@ -428,6 +434,14 @@ export interface ApiError {
   fields: string[];
 }
 export interface RequestSnapshot {
+  /**
+   * Backend-snapshotted public SKU display data; optional for historical snapshots. No private seller policies.
+   */
+  product_details?: {
+    product_id: Id;
+    name: string;
+    color: string | null;
+  }[];
   formatter?: FormatterSummary;
   model?: LlmModel;
   request_id: Id;
@@ -816,4 +830,13 @@ export interface SellerSkuPolicy {
     benefit_id: Id;
     cost_twd: number;
   }[];
+}
+export interface ImprovementClarification {
+  improvement_id: Id;
+  feedback: string;
+}
+export interface ImprovementClarificationResult {
+  request_id: Id;
+  improvement_id: Id;
+  status: 'queued';
 }

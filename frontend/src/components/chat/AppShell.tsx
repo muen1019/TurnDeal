@@ -58,12 +58,12 @@ export function AppShell({
   },[navigationOpen,mobile]);
   return (
     <div className="chat-app-shell" data-active-view={activeView} data-navigation-open={navigationOpen}>
-      <header className="chat-shell-header" aria-label="OfferMesh workspace" inert={mobile&&navigationOpen}>
+      <header className="chat-shell-header" aria-label="TurnDeal workspace" inert={mobile&&navigationOpen}>
         <div className="chat-brand">
           <span className="chat-brand-mark" aria-hidden="true">
             <MousePointer2 size={18} />
           </span>
-          <div className="brand-with-model"><span>OfferMesh</span>{modelPicker}</div>
+          <div className="brand-with-model"><span>TurnDeal</span>{modelPicker}</div>
         </div>
         <div className="chat-header-actions">
           <button ref={toggle} className="icon-button mobile-navigation-toggle" type="button" onClick={()=>setNavigationOpen(v=>!v)} aria-label="切換導覽" aria-controls="history-sidebar" aria-expanded={navigationOpen}><PanelLeft size={20}/></button>

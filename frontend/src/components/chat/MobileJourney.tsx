@@ -2,15 +2,16 @@ import {useEffect, useRef} from 'react';
 import {ArrowUpRight, Check, ShieldCheck, Sparkles} from 'lucide-react';
 import type {FormatterSummary} from '../../contract.generated';
 import type {AgentProgressStatus} from './AgentProgress';
+import '../../styles/deal-progress.css';
 
 const steps = ['讀懂需求', '尋找賣家', '幫你議價', '比較推薦'];
 export function mobileProgress(status?: AgentProgressStatus) {
   switch (status) {
-    case 'submitting': return {percent: 3, step: 0, text: '收到，正在送出你的願望。'};
-    case 'formatting': return {percent: 12, step: 0, text: '先了解你想買什麼、在意什麼。'};
-    case 'orchestrating': return {percent: 30, step: 1, text: '正在找符合條件的賣家。'};
-    case 'negotiating': return {percent: 60, step: 2, text: '幫你問問，價格還能不能更好。'};
-    case 'evaluating': return {percent: 88, step: 3, text: '不只比價格，也幫你看看值不值得。'};
+    case 'submitting': return {percent: 3, step: 0, text: '正在安全送出需求'};
+    case 'formatting': return {percent: 12, step: 0, text: '正在整理需求與偏好'};
+    case 'orchestrating': return {percent: 30, step: 1, text: '正在篩選符合條件的賣家'};
+    case 'negotiating': return {percent: 60, step: 2, text: '正在比較各賣家的議價回覆'};
+    case 'evaluating': return {percent: 88, step: 3, text: '正在驗證報價並整理推薦'};
     case 'awaiting_user': return {percent: 100, step: 4, text: '比較完成，來看看你的專屬推薦。'};
     default: return null;
   }
@@ -38,18 +39,18 @@ export function MobileJourney(p: Props) {
   const preview = import.meta.env.VITE_OFFERMESH_MOCK;
   const mode = p.formatter ? p.formatter.provider==='openai'?`LLM 已解析 · ${p.formatter.model??'OpenAI'}`:'離線規則解析 · 非 LLM 成功' : preview ? '互動預覽 · 不呼叫 AI' : import.meta.env.VITE_OFFERMESH_RUNTIME_MODE === 'live' ? '使用 AI 解析 · 失敗時會標示備援' : '離線 Demo · 不呼叫 AI';
   if (running || p.requestId || (p.busy && !p.ready)) {
-    return <section key="processing" className="mobile-journey mobile-processing mobile-screen-enter" aria-labelledby="journey-title">
+    return <section key="processing" className="mobile-journey mobile-processing deal-processing mobile-screen-enter" data-running={running&&!p.error} aria-labelledby="journey-title">
       <span className="mobile-mode">{mode}</span>
-      <div className="journey-orbit" aria-hidden="true"><span/><span/><div><Sparkles size={38}/></div></div>
-      <p className="mobile-eyebrow">YOUR BUYER AGENT</p>
-      <h1 id="journey-title">{p.ready ? '好選擇，已就位。' : running ? <>你慢慢挑，<br/>我先幫你比。</> : p.status==='failed'?'這次比價中斷了。':p.status==='no_match'?'還沒找到合適的。':'再確認一下需求。'}</h1>
+      <div className="deal-processing-mark" aria-hidden="true"><Sparkles size={25}/><i/></div>
+      <p className="mobile-eyebrow">TURNDEAL · WORKING FOR YOU</p>
+      <h1 id="journey-title">{p.ready ? '推薦已準備完成' : running ? '正在為你尋找好選擇' : p.status==='failed'?'這次比價中斷了':p.status==='no_match'?'目前沒有合適方案':'需要再確認需求'}</h1>
       <p className="journey-description" aria-live="polite">{p.error || progress?.text || '這輪已結束或需要補充條件，請開始新需求。'}</p>
       {progress && <div className="journey-progress">
         <div className="journey-progress-label"><span>{p.error ? '進度暫停更新' : '依處理階段估算'}</span><strong>{progress.percent}<small>%</small></strong></div>
-        <div className="journey-track" role="progressbar" aria-label="處理階段估算進度" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress.percent} aria-valuetext={`${progress.percent}%，階段估算，非剩餘時間`}><span style={{transform:`scaleX(${progress.percent / 100})`}}/></div>
+        <div className="journey-track" role="progressbar" aria-label="處理階段估算進度" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress.percent} aria-valuetext={`${progress.percent}%，階段估算，非剩餘時間`}><span style={{width:`${progress.percent}%`}}><i/></span></div>
         <ol className="journey-steps">{steps.map((label,i)=><li key={label} data-state={i<progress.step?'done':i===progress.step?'current':'next'}><span>{i<progress.step?<Check size={12}/>:i+1}</span>{label}</li>)}</ol>
       </div>}
-      {p.message && <blockquote className="journey-request"><span>這次的小心願</span>{p.message}</blockquote>}
+      {p.message && <blockquote className="journey-request"><span>本次需求</span>{p.message}</blockquote>}
       {p.ready && <button className="mobile-primary" onClick={p.onReady}>查看推薦 <ArrowUpRight size={20}/></button>}
       {p.error && <button className="button secondary" disabled={p.retrying} onClick={p.onRetry}>重新核對狀態</button>}
       {!running && !p.ready && !p.busy && <button className="mobile-primary" onClick={p.onNew}>開始新的購物需求</button>}

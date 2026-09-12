@@ -91,6 +91,10 @@ export async function evaluate({ db, requestId, buyerId, apiKey = '', model = 'g
         if (!root) throw new Error('request_ancestry_invalid');
       }
       const snapshot = check('RequestSnapshot', {
+        product_details: [...new Map(offers.flatMap(o=>o.items.map(i=>{
+          const p=source.catalog.sellers.find(s=>s.seller_id===o.seller_id)?.products.find(p=>p.product_id===i.product_id);
+          return [i.product_id,{product_id:i.product_id,name:p?.name??i.product_id,color:p?.attributes?.color??null}];
+        }))).values()],
         ...(request.llm_model?{model:request.llm_model}:{}),
         request_id: requestId, root_request_id: root.request_id, parent_request_id: request.parent_request_id, status,
         documents: { revision: request.revision, intent_md: request.intent_md, preference_md: request.preference_md }, intent: copy(intent),

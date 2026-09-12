@@ -11,5 +11,6 @@ export const apiPaths = {
   "updatePurchase": "/api/purchases/{purchase_id}/checkout",
   "completePurchase": "/api/purchases/{purchase_id}/complete",
   "cancelPurchase": "/api/purchases/{purchase_id}/cancel",
-  "getRequestImprovement": "/api/requests/{request_id}/improvement"
+  "getRequestImprovement": "/api/requests/{request_id}/improvement",
+  "clarifyImprovement": "/api/requests/{request_id}/improvement/clarifications"
 } as const;

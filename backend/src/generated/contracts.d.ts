@@ -227,6 +227,10 @@ export type ImprovementStatus = null | {
     preference_updated: boolean;
     questions: string[];
   };
+  next_request_id: Id | null;
+  workflow_error: string | null;
+  can_clarify: boolean;
+  workflow_enabled: boolean;
 };
 
 export interface A2ACommerceContracts {
@@ -300,6 +304,8 @@ export interface A2ACommerceContracts {
   SellerPersonaPolicy?: SellerPersonaPolicy;
   SellerSkuPolicy?: SellerSkuPolicy;
   ImprovementStatus?: ImprovementStatus;
+  ImprovementClarification?: ImprovementClarification;
+  ImprovementClarificationResult?: ImprovementClarificationResult;
 }
 /**
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
@@ -609,6 +615,14 @@ export interface ApiError {
  * via the `definition` "RequestSnapshot".
  */
 export interface RequestSnapshot {
+  /**
+   * Backend-snapshotted public SKU display data; optional for historical snapshots. No private seller policies.
+   */
+  product_details?: {
+    product_id: Id;
+    name: string;
+    color: string | null;
+  }[];
   formatter?: FormatterSummary;
   model?: LlmModel;
   request_id: Id;
@@ -1098,4 +1112,21 @@ export interface SellerSkuPolicy {
     benefit_id: Id;
     cost_twd: number;
   }[];
+}
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "ImprovementClarification".
+ */
+export interface ImprovementClarification {
+  improvement_id: Id;
+  feedback: string;
+}
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "ImprovementClarificationResult".
+ */
+export interface ImprovementClarificationResult {
+  request_id: Id;
+  improvement_id: Id;
+  status: "queued";
 }

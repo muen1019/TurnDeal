@@ -27,11 +27,60 @@
   "paths": {
     "/api/buyer-profile": {
       "description": "Local integrated runtime only (3201). Fixed demo buyer; no authentication or payment processing. Basic details never enter model inputs.",
-      "get": {"operationId": "getBuyerProfile", "responses": {"200": {"description": "Saved buyer profile or null.", "content": {"application/json": {"schema": {"$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/BuyerProfileResponse"}}}}}},
-      "post": {"operationId": "saveBuyerProfile", "parameters": [{"$ref": "#/components/parameters/IdempotencyKey"}], "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/BuyerProfile"}}}}, "responses": {
-        "200": {"description": "Persisted profile; same key and body replays unchanged.", "content": {"application/json": {"schema": {"$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/BuyerProfileResponse"}}}},
-        "400": {"$ref": "#/components/responses/BadRequest"}, "409": {"$ref": "#/components/responses/Conflict"}, "500": {"$ref": "#/components/responses/InternalError"}
-      }}
+      "get": {
+        "operationId": "getBuyerProfile",
+        "responses": {
+          "200": {
+            "description": "Saved buyer profile or null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/BuyerProfileResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "saveBuyerProfile",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/BuyerProfile"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Persisted profile; same key and body replays unchanged.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/BuyerProfileResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
     },
     "/api/requests": {
       "post": {
@@ -68,13 +117,21 @@
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
-          "404": {"$ref": "#/components/responses/NotFound"},
-          "422": {
-            "description": "Clarification answers, original documents or revision/length limit are invalid.",
-            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ErrorResponse"}}}
+          "404": {
+            "$ref": "#/components/responses/NotFound"
           },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "description": "Clarification answers, original documents or revision/length limit are invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
@@ -1168,6 +1225,65 @@
           },
           "404": {
             "description": "Request not found for this buyer."
+          }
+        }
+      }
+    },
+    "/api/requests/{request_id}/improvement/clarifications": {
+      "post": {
+        "operationId": "clarifyImprovement",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/ImprovementClarification"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "One immutable clarification job queued.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/ImprovementClarificationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Not found for this buyer"
+          },
+          "409": {
+            "description": "State or idempotency conflict"
+          },
+          "500": {
+            "description": "Uncertain outcome; retry original key"
           }
         }
       }

@@ -1,12 +1,13 @@
 import initSqlJs from 'sql.js';
-import {copyFileSync,existsSync,mkdirSync,readFileSync,renameSync,writeFileSync} from 'node:fs';
-import {dirname} from 'node:path';
+import {copyFileSync,existsSync,mkdirSync,readFileSync,readdirSync,renameSync,writeFileSync} from 'node:fs';
+import {dirname,resolve} from 'node:path';
 import {randomUUID,createHash} from 'node:crypto';
 import type {AcceptDecisionResult,DocumentBundle,RejectDecisionResult,RequestSnapshot} from './types.js';
 import {HttpError,notFound,offerExpired,stateConflict} from './httpError.js';
 import {runDemoPipeline,verifyTrustedOffer} from './mockResultProvider.js';
 import {assertValid,isValid} from './schema.js';
 import {migrateDatabase,seedCatalog} from './database.js';
+import {backendRoot} from './paths.js';
 import type {ImprovementStorage} from './improver/types.js';
 type Options={dbPath:string;now:()=>Date;autoProcess?:boolean;afterIdempotencyReserved?:(scope:{method:string;path:string;key:string})=>Promise<void>|void;beforeCommit?:()=>void};
 type Result<T=unknown>={status:number;body:T;scheduleRequestId?:string};
@@ -19,7 +20,7 @@ export class OfferStore {
   const SQL=await initSqlJs();const existing=options.dbPath!==':memory:'&&existsSync(options.dbPath);
   const db=existing?new SQL.Database(readFileSync(options.dbPath)):new SQL.Database();const store=new OfferStore(db,options);
   const legacy=db.exec("PRAGMA table_info(requests)")[0]?.values.some(row=>row[1]==='id');
-  const needsMigration=legacy || !db.exec("SELECT name FROM sqlite_master WHERE name='schema_migrations'").length || !db.exec("SELECT version FROM schema_migrations WHERE version='004_buyer_request_improver'").length;
+  const needsMigration=legacy || !db.exec("SELECT name FROM sqlite_master WHERE name='schema_migrations'").length || readdirSync(resolve(backendRoot,'../db/migrations')).filter(f=>/^\d+_.+\.sql$/.test(f)).some(f=>!db.exec('SELECT version FROM schema_migrations WHERE version=?',[f.slice(0,-4)]).length);
   if(existing && needsMigration)copyFileSync(options.dbPath,`${options.dbPath}.pre-v03-${Date.now()}.bak`);
   let saved:Record<string,Row[]>|null=null;
   if(legacy){saved=Object.fromEntries(['requests','offers','decisions','idempotency'].map(table=>[table,store.rows(`SELECT * FROM ${table}`)]));for(const table of ['requests','offers','decisions','idempotency'])db.run(`ALTER TABLE ${table} RENAME TO legacy_result_${table}`);}

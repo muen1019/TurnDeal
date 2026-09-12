@@ -21,7 +21,7 @@ export function AcceptedReceipt({snapshot, offer, receipt = null, pending = fals
     <section className="offer-ui accepted-receipt" aria-labelledby="accepted-title">
       <div className="accepted-receipt__header">
         <StatusPill tone={receipt ? 'success' : 'pending'}>{receipt ? '已建立模擬兌換' : '已採用'}</StatusPill>
-        <h2 id="accepted-title">{offerName(offer)}</h2>
+        <h2 id="accepted-title">{offerName(offer,snapshot)}</h2>
         <p>{seller?.name ?? '賣家'}</p>
       </div>
 
@@ -32,7 +32,7 @@ export function AcceptedReceipt({snapshot, offer, receipt = null, pending = fals
 
       <div className="offer-list">
         {offer.items.map((item) => (
-          <ItemRow key={`${item.product_id}:${item.role}`} item={item} />
+          <ItemRow key={`${item.product_id}:${item.role}`} item={item} snapshot={snapshot} />
         ))}
       </div>
 

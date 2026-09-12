@@ -6,4 +6,5 @@ import './styles/workspace.css';
 import './styles/mobile.css';
 import './styles/blue.css';
 import './styles/history.css';
+import './styles/deal-progress.css';
 createRoot(document.getElementById('root')!).render(<React.StrictMode><App/></React.StrictMode>);
