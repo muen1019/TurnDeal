@@ -3,6 +3,7 @@ import { check, copy, immutable } from './contracts.mjs';
 import { quotePolicy, bundlePrice, exchangeDiscount, proposalResponse } from './tradeoffs.mjs';
 import { validateBenefits, evidenceSupports, personaFinal } from './personas.mjs';
 import { economicallyValid, countWithDrafts } from './economics.mjs';
+import { eligiblePad } from './addons.mjs';
 
 export function matches(product, preference) {
   const value = product.attributes[preference.attribute];
@@ -27,10 +28,7 @@ export function validateDrafts({ result, rfq, intent, seller, terms, now, idFact
     if (result.outcome === 'offered') {
       const product = seller.products.find(p => p.product_id === base?.items[0]?.product_id && p.category === 'mouse');
       if (!product) throw new Error('proposal_product_missing');
-      const pad = seller.products.find(p => p.category === 'mouse_pad' && p.stock > 0);
-      const canBundle = seller.strategy.bundle_mode === 'free_optional_mouse_pad' && rfq.allowed_addon_categories.includes('mouse_pad') &&
-        Boolean(pad) && pad.delivery_days <= product.delivery_days && pad.terms_id === product.terms_id &&
-        (!seller.strategy.persona || rfq.round >= seller.strategy.persona.gift_from_round);
+      const canBundle = Boolean(eligiblePad(seller,product,rfq));
       const bound = quotePolicy({ seller, rfq, previous, history, now, product, canBundle });
       if (!bound.referenceMatches || base.total_price_twd < bound.minimum || base.total_price_twd > bound.maximum ||
         (bundle && (!canBundle || bundle.total_price_twd !== bundlePrice(bound, base.total_price_twd)))) throw new Error('proposal_policy_violation');

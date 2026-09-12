@@ -5,6 +5,7 @@ import { randomUUID, createHash } from 'node:crypto';
 import { initializeDatabase, applyMigrations } from '../../scripts/db.mjs';
 import { seedDiscovery } from '../../scripts/discovery-db.mjs';
 import { applySalesProfiles } from '../../scripts/lib/sales-profiles.mjs';
+import { populateNegotiationCatalog } from '../../scripts/lib/catalog-policies.mjs';
 import { createLlmFormatterService } from '../../src/formatter/llm-service.ts';
 import { createFormatterService } from '../../src/formatter/service.ts';
 import { NegotiationRepository } from '../../src/negotiation/repository.mjs';
@@ -36,6 +37,7 @@ export class RuntimeStore {
     } else {
       initializeDatabase(db);seedDiscovery(db);applySalesProfiles(db);
     }
+    populateNegotiationCatalog(db);
     this.repository=new NegotiationRepository(db);
     this.repository.recoverInterrupted();recoverInterruptedEvaluations(db);
     // Startup only: never silently repeat a paid call after a crash.

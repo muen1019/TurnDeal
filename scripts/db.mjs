@@ -452,7 +452,7 @@ function verifyDatabase(db) {
     FROM sqlite_schema
     WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
   `).get().count);
-  assert.equal(tableCount, 45, "database must include discovery, negotiation, evaluation, Improver and ACP purchase tables");
+  assert.equal(tableCount, 47, "database must include discovery, negotiation, evaluation, Improver, ACP purchase and catalog policy tables");
   for (const name of ['improver_jobs', 'improver_intent_revisions', 'improver_global_preferences']) {
     assert.ok(db.prepare("SELECT name FROM sqlite_schema WHERE type='table' AND name=?").get(name), `${name} must exist`);
   }
