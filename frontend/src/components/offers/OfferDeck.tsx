@@ -193,7 +193,7 @@ export function OfferDeck({
     };
   }, [resetGesture]);
 
-  const transform = reduceMotion ? 'translateX(0px)' : `translateX(${visualX}px)`;
+  const transform = reduceMotion || visualX === 0 ? 'translateX(0px)' : `translateX(${visualX}px) rotate(${Math.max(-9, Math.min(9, visualX / 24))}deg)`;
   const activeMeetsThreshold = Math.abs(visualDx) >= threshold && Math.abs(visualDx) > Math.abs(visualDy);
   const activeDirection = activeMeetsThreshold ? (visualDx > 0 && !acceptDisabled ? 'accept' : visualDx < 0 ? 'skip' : null) : null;
 
@@ -429,7 +429,11 @@ export function OfferDeck({
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerCancel}
-          onLostPointerCapture={handlePointerCancel}
+          onLostPointerCapture={(event) => {
+            // Touch initially captures the child under the finger. Transferring
+            // capture to this shell bubbles the child's lost event: not a cancel.
+            if (event.target === event.currentTarget) handlePointerCancel(event);
+          }}
           onClickCapture={handleCardClick}
           tabIndex={-1}
         >

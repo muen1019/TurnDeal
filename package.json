@@ -8,10 +8,11 @@
   },
   "scripts": {
     "dev": "node scripts/dev.mjs",
+    "dev:mobile": "node scripts/mobile-preview.mjs",
     "dev:secure": "powershell -NoProfile -File scripts/run-app-secure.ps1",
-    "test:runtime": "node --test tests/runtime.test.mjs",
+    "test:runtime": "node --test tests/runtime.test.mjs tests/buyer-profile.test.mjs tests/refinement.test.mjs",
     "test": "npm run test:contracts && npm run test:db && npm run test:orchestrator && npm run test:seller-policies && npm run test:unit && npm run test:negotiation && npm run test:evaluator && npm run test:formatter && npm run test:runtime",
-    "test:formatter": "node --test tests/formatter.test.ts tests/formatter-llm.test.ts tests/document-semantics.test.ts",
+    "test:formatter": "node --test tests/formatter.test.ts tests/formatter-llm.test.ts tests/document-semantics.test.ts tests/clarification.test.ts",
     "demo:formatter:llm": "node examples/formatter-llm.ts",
     "demo:formatter:secure": "powershell -NoProfile -File scripts/run-formatter-secure.ps1",
     "demo:formatter": "node examples/formatter.ts",

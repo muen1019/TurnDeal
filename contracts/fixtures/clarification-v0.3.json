@@ -1,0 +1,20 @@
+{
+  "summary": {
+    "provider": "openai",
+    "model": "gpt-4.1-mini",
+    "questions": [{
+      "question_id": "q_0",
+      "field": "budget",
+      "text": "含運最高預算是多少？",
+      "suggestions": [{"label": "NT$1,000 以內", "value": "含運最高預算1000元", "source": "example"}]
+    }]
+  },
+  "create_child": {
+    "intent_md": "買無線滑鼠，7天內到貨",
+    "preference_md": "偏好黑色",
+    "clarification": {
+      "parent_request_id": "req_clarify_parent",
+      "answers": [{"question_id": "q_0", "answer": "含運最高預算1000元"}]
+    }
+  }
+}

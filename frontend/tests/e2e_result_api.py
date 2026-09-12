@@ -12,7 +12,6 @@ with sync_playwright() as p:
     page.on('pageerror',lambda e:errors.append(str(e)))
     page.on('request',lambda r:posts.append({'url':r.url,'body':r.post_data_json}) if r.method=='POST' and '/api/' in r.url else None)
     page.goto(base+'/chat');page.wait_for_load_state('networkidle')
-    page.get_by_role('button',name='儲存設定',exact=True).click()
     def create():
         composer=page.get_by_placeholder(re.compile('輸入需求'))
         composer.fill('辦公用無線滑鼠，預算 900 元含稅運，7 天內到貨。')

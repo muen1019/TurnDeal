@@ -1,6 +1,8 @@
 # intent.md / preference.md 定義與分類
 
-狀態：2026-09-12 團隊開發基準。本文定義文件語意；「目前實作」與「待實作目標」分開列示。共用 API 欄位仍為 v0.3，不新增或改名。
+狀態：2026-09-12 團隊開發基準。本文定義文件語意；「目前實作」與「待實作目標」分開列示。共用 API 仍為 v0.3，新增設定與問答能力見下列補充。
+
+新增使用者設定：依 [BUYER_SETUP.md](BUYER_SETUP.md)，buyer_profiles 在 SQLite 保存基本資料與四項偏好權重／顏色。GET／POST /api/buyer-profile 是獨立明示更新，不是 Formatter 改寫 user_preferences。新 Request 凍結 ranking_weights；未指定 preference_md 時才以 profile 顏色建立本輪文字快照。自訂 preference_md 優先；姓名、地址、付款方式不進 intent、RFQ 或模型。以下「尚無長期偏好 UI」僅指 user_preferences 的一般讀寫／學習，不包括這個限定的 profile 設定。
 
 ## 1. 三層資料，不是三份互相覆寫的文件
 
@@ -56,7 +58,7 @@ API 的 `preference_md` 是這次提交的偏好文件**快照**，不等於修�
 | 合併後本輪條件 | requests.normalized_intent_json | 否；只供本輪執行 |
 | 解析輸入、採用的 DB 偏好快照與結果 | formatter_runs | 否；不可變稽核與冪等重播 |
 | 已存在的結構化長期偏好 | user_preferences | Formatter 只讀；目前無 UI 寫入接口 |
-| 拒絕回饋與原始文件 | decisions.result_json、RequestSnapshot.decision | 否；目前只保存回饋 |
+| 拒絕回饋與原始文件 | decisions.result_json、RequestSnapshot.decision | 否；可建立獨立追問子請求，不修改長期偏好 |
 | 逐卡左滑 | 前端該對話的 skipped 狀態 | 否；目前未逐筆寫入 feedback_events |
 
 API 省略 `preference_md` 與傳入空字串，目前均保存為空字串；Formatter 仍讀取使用者的 active user_preferences。**空字串不表示清除帳戶偏好**，也不表示不繼承 DB 偏好。明示非空 preference_md 也只依屬性覆寫本輪，並非完整取代 DB 偏好。
@@ -65,7 +67,11 @@ API 省略 `preference_md` 與傳入空字串，目前均保存為空字串；Fo
 
 ## 5. 目前流程與待辦
 
-已實作：前端已儲存的意圖模板＋「## 本次購買需求」＋本次輸入 → CreateRequest；preference_md 保持原文 → Formatter 讀取 DB 偏好、解析與合併 → NormalizedIntent → Discovery → Negotiation → Evaluator。
+已實作：直接輸入本次購買需求 → CreateRequest.intent_md → Formatter 讀取 DB 偏好、解析與合併 → NormalizedIntent → Discovery → Negotiation → Evaluator。不必先寫或儲存 intent.md。
+
+代理設定為選填，初始草稿與已儲存文字均為空。只有已儲存的意圖模板非空時，才以「模板＋兩個換行＋## 本次購買需求＋換行＋trim 後本次輸入」組合 intent_md；未設定或只有空白時直接使用 trim 後本次輸入。preference_md 原樣取已儲存偏好，未設定為空字串。未儲存的編輯不套用，也不阻擋送出。可只儲存偏好，或清空模板後儲存；既有分頁資料不自動刪除。
+
+API 的 intent_md 仍必須非空，保留文件長度、冪等與安全驗證。取消的是「先儲存模板」限制，不是 Formatter 的硬條件驗證；缺少最高預算或到貨期限仍需澄清。
 
 `intent.md` 編輯框目前是組成本輪意圖的可重用模板，並不是已生成的本輪最終文件。建議模板只填商品／用途，不填上次交易的金額和期限；這些寫在本次輸入。
 
@@ -75,7 +81,11 @@ API 省略 `preference_md` 與傳入空字串，目前均保存為空字串；Fo
 2. Buyer Agent 根據新輸入與長期偏好產生可閱讀的本輪 intent.md，且另外保留原始輸入與來源證據。
 3. 將每次左滑事件保存，詢問原因並區分「只限本輪」或「以後都這樣」；不喜歡一次不能推論討厭整個品牌／賣家。
 4. 經驗證的 Preference Updater 更新未來 Request 使用的長期軟偏好；明示「以後都偏好白色」才作為持久更新候選。舊 Request 和 Offer 不得改寫。
-5. 聯結 child request、文件 revision 與 preference revision 的獨立版本契約。
+5. 長期 preference revision 契約。Formatter 問答，以及拒絕後追問的 child request 與文件 revision 已支援，見 [CLARIFICATION_SPEC.md](CLARIFICATION_SPEC.md) 與 [HISTORY_REFINEMENT.md](HISTORY_REFINEMENT.md)。
+
+### Formatter 補充問答
+
+`needs_clarification` 可直接回答並繼續，包含依 preference_md／SQLite 商品偏好提供的快捷答案與手動輸入。已有偏好能決定的條件不再問；缺少選填顏色、尺寸不會單獨觸發追問。明確回答可解決 parent 的歧義；原 parent 與原 formatter_runs 保留，child 保存附加回答、parent ID、root ID 與遞增 revision。拒絕後也可先建立獨立追問子請求，回答後再跑完整比價；不修改長期偏好或原報價。
 
 ## 6. 分工與驗收
 

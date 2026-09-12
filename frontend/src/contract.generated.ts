@@ -1,5 +1,24 @@
 /* Generated from contracts/a2a-commerce.v0.3.schema.json. Run npm run generate:types; do not edit. */
 
+export type RankingWeights = RankingWeights1 & {
+  price: number;
+  delivery: number;
+  trust: number;
+  color: number;
+};
+export type RankingWeights1 =
+  | {
+      price?: number;
+    }
+  | {
+      delivery?: number;
+    }
+  | {
+      trust?: number;
+    }
+  | {
+      color?: number;
+    };
 export type MoneyTwd = number;
 export type ProductPreference = CategoricalProductPreference | RangeProductPreference;
 export type Id = string;
@@ -99,6 +118,9 @@ export interface CommerceTypes {
   CategoricalProductPreference: CategoricalProductPreference;
   RangeProductPreference: RangeProductPreference;
   ProductPreference: ProductPreference;
+  RankingWeights: RankingWeights;
+  BuyerProfile: BuyerProfile;
+  BuyerProfileResponse: BuyerProfileResponse;
   NormalizedIntent: NormalizedIntent;
   ProductAttributes: ProductAttributes;
   ProductMatch: ProductMatch;
@@ -115,6 +137,8 @@ export interface CommerceTypes {
   RankedOffer: RankedOffer;
   ApiError: ApiError;
   RequestSnapshot: RequestSnapshot;
+  FormatterSummary: FormatterSummary;
+  ClarificationQuestion: ClarificationQuestion;
   AcceptDecisionResult: AcceptDecisionResult;
   RejectDecisionResult: RejectDecisionResult;
   DecisionResult: DecisionResult;
@@ -149,6 +173,7 @@ export interface FormatterResult {
   warnings: string[];
 }
 export interface NormalizedIntent {
+  ranking_weights?: RankingWeights;
   category: 'mouse';
   max_total_twd: MoneyTwd;
   delivery_days_max: number;
@@ -186,6 +211,16 @@ export interface DocumentBundle {
  * intent_md describes this purchase and its temporary constraints/preferences. preference_md is a request-bound preference snapshot; omission/empty text does not clear active SQLite product preferences. Neither field updates the durable profile.
  */
 export interface CreateRequest {
+  refinement?: {
+    parent_request_id: Id;
+  };
+  clarification?: {
+    parent_request_id: Id;
+    answers: {
+      question_id: Id;
+      answer: string;
+    }[];
+  };
   intent_md: string;
   preference_md?: string;
 }
@@ -200,6 +235,16 @@ export interface RejectDecision {
 export interface RedeemRequest {
   request_id: Id;
   offer_id: Id;
+}
+export interface BuyerProfile {
+  name: string;
+  shipping_address: string;
+  payment_method: 'later' | 'card' | 'mobile' | 'cash_on_delivery';
+  weights: RankingWeights;
+  colors: ('black' | 'white' | 'blue' | 'red' | 'rose')[];
+}
+export interface BuyerProfileResponse {
+  profile: BuyerProfile | null;
 }
 export interface ProductAttributes {
   size_class: string | null;
@@ -306,9 +351,10 @@ export interface ApiError {
   fields: string[];
 }
 export interface RequestSnapshot {
+  formatter?: FormatterSummary;
   request_id: Id;
   root_request_id: Id;
-  parent_request_id: null;
+  parent_request_id: null | Id;
   status: Status;
   documents: DocumentBundle;
   intent: NormalizedIntent | null;
@@ -322,6 +368,21 @@ export interface RequestSnapshot {
   next_request_id: null;
   error: ApiError | null;
   decision: DecisionResult | null;
+}
+export interface FormatterSummary {
+  provider: 'openai' | 'rules';
+  model: string | null;
+  questions: ClarificationQuestion[];
+}
+export interface ClarificationQuestion {
+  question_id: Id;
+  field: 'budget' | 'delivery' | 'color' | 'size_class' | 'category' | 'other';
+  text: string;
+  suggestions: {
+    label: string;
+    value: string;
+    source: 'preference' | 'example';
+  }[];
 }
 export interface AcceptDecisionResult {
   action: 'accept';
@@ -427,6 +488,10 @@ export interface SellerTrustEntry {
  * Campaign and Sponsored data are intentionally absent.
  */
 export interface EvaluatorInput {
+  color_matches?: {
+    offer_id: Id;
+    score: 0 | 100;
+  }[];
   request_id: Id;
   evaluated_at: Timestamp;
   intent: NormalizedIntent;

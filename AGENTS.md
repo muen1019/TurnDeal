@@ -33,7 +33,7 @@ Backend persistence uses db/migrations including 003_result_decisions.sql. Publi
 - A recommendation never purchases an item. The user must accept an offer, then redeem the same immutable offer ID before expiry.
 - Revalidate expiry, inventory, ownership, price, delivery, items, and terms at acceptance and redemption.
 - Do not infer permission for a paid add-on. Missing bundle preference defaults to related add-ons at no extra cost only.
-- Request snapshots are immutable once published. A rejection saves the original feedback and source_documents; Buyer Agent rewriting and child creation are a future integration.
+- Request snapshots are immutable once published. A rejection saves original feedback/source_documents. Explicit refinement creates a separate questions child, then clarification answers create another child for re-filtering; see docs/HISTORY_REFINEMENT.md. Never rewrite the rejected parent or infer paid authorization.
 - SQLite is the source of truth for request-scoped and long-term preferences. Agent conversation memory is never authoritative.
 - POST endpoints require an idempotency key. Resource access is scoped to the authenticated buyer.
 

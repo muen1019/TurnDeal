@@ -18,7 +18,6 @@ export function ChatPanel({
   error,
   progressError,
   unsavedDefinitions,
-  savedDefinitionValid,
   onEditDefinitions,
 }: ChatPanelProps) {
   const threadRef = useRef<HTMLDivElement>(null);
@@ -31,7 +30,7 @@ export function ChatPanel({
   const trimmedDraft = draft.trim();
   const draftTooLong = Array.from(trimmedDraft).length > DRAFT_LIMIT;
   const canSend =
-    trimmedDraft.length > 0 && !draftTooLong && !sending && savedDefinitionValid;
+    trimmedDraft.length > 0 && !draftTooLong && !sending;
 
   const handleDraftChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     onDraft(event.target.value);
@@ -71,7 +70,7 @@ export function ChatPanel({
             <span aria-hidden="true">
               <Sparkles size={22} />
             </span>
-            <p>輸入預算、用途和不能妥協的條件，Buyer Agent 會用已儲存的設定整理成購物需求。</p>
+            <p>直接輸入想買的商品、預算與到貨期限即可開始，不必先填寫代理設定。</p>
           </div>
         ) : (
           messages.map((message) => (
@@ -171,7 +170,7 @@ export function ChatPanel({
 
       <div className="chat-composer-meta" id="chat-composer-state" aria-live="polite">
         <p id="chat-composer-help">
-          送出後，Buyer Agent 會使用目前已儲存的設定處理需求。
+          直接輸入需求即可送出；代理設定為選填，已儲存的設定會一併套用。
         </p>
         {unsavedDefinitions ? (
           <p className="chat-warning">
@@ -179,16 +178,6 @@ export function ChatPanel({
             {onEditDefinitions ? (
               <button type="button" onClick={onEditDefinitions}>
                 前往編輯
-              </button>
-            ) : null}
-          </p>
-        ) : null}
-        {!savedDefinitionValid ? (
-          <p className="chat-error">
-            需要先儲存有效的 intent.md 才能送出新需求。
-            {onEditDefinitions ? (
-              <button type="button" onClick={onEditDefinitions}>
-                開啟代理設定
               </button>
             ) : null}
           </p>

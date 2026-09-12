@@ -452,7 +452,7 @@ function verifyDatabase(db) {
     FROM sqlite_schema
     WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
   `).get().count);
-  assert.equal(tableCount, 27, "database must include discovery, negotiation and evaluation runtime tables");
+  assert.equal(tableCount, 28, "database must include buyer profiles, discovery, negotiation and evaluation runtime tables");
 
   verifyNegotiationConstraints(db);
 

@@ -16,9 +16,16 @@ export function createRuntimeApp({buyerId=()=> 'demo_buyer',autoProcess=true,...
   app.post('/api/requests',(req,res,next)=>{try{
     const body=validate('CreateRequest',req.body),buyer=buyerId(req);
     const result=store.idempotent(buyer,'POST','/api/requests',req.header('Idempotency-Key'),body,
-      ()=>store.create(buyer,{intent_md:body.intent_md,preference_md:body.preference_md??''}));
+      ()=>store.create(buyer,{intent_md:body.intent_md,preference_md:body.preference_md??''},body.clarification,body.refinement));
     res.status(result.status).json(result.body);
     if(result.scheduleRequestId&&autoProcess)setImmediate(()=>{void store.process(result.scheduleRequestId,buyer);});
+  }catch(e){next(e);}});
+  app.get('/api/buyer-profile',(req,res,next)=>{try{res.json({profile:store.buyerProfile(buyerId(req))});}catch(e){next(e);}});
+  app.post('/api/buyer-profile',(req,res,next)=>{try{
+    const body=validate('BuyerProfile',req.body),buyer=buyerId(req);
+    if(/(?:\d[ -]?){13,19}/.test(body.name+' '+body.shipping_address))throw new HttpError(400,'sensitive_payment_data','請勿輸入卡號或金融帳號；本頁只設定付款方式。');
+    const result=store.idempotent(buyer,'POST','/api/buyer-profile',req.header('Idempotency-Key'),body,()=>store.saveBuyerProfile(buyer,body));
+    res.status(result.status).json(result.body);
   }catch(e){next(e);}});
   app.get('/api/requests/:request_id',(req,res,next)=>{try{res.json(store.snapshot(req.params.request_id,buyerId(req)));}catch(e){next(e);}});
   app.post('/api/requests/:request_id/decisions',(req,res,next)=>{try{

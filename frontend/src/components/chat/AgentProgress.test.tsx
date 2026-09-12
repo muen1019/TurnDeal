@@ -29,7 +29,6 @@ function renderChat(overrides: Partial<ChatPanelProps> = {}) {
     onOpenOffers: vi.fn(),
     sending: true,
     unsavedDefinitions: false,
-    savedDefinitionValid: true,
     ...overrides,
   };
 

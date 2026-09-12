@@ -11,6 +11,36 @@ const input={intent_md:'辦公用無線滑鼠。\n\n## 本次購買需求\n滑�
 const configured={autoProcess:false,apiKey:'',buyerId:req=>req.headers['x-test-buyer']??'demo_buyer'};
 async function start(app,key='create',body=input){return (await request(app).post('/api/requests').set('Idempotency-Key',key).send(body).expect(202)).body;}
 
+test('clarification answers create an immutable child, preserve preferences, and replay without another run',async()=>{
+  const app=createRuntimeApp(configured),store=app.locals.store;
+  try {
+    const first=await start(app,'question',{intent_md:'買無線滑鼠',preference_md:'偏好黑色'});
+    await store.process(first.request_id,'demo_buyer');
+    const parent=store.snapshot(first.request_id,'demo_buyer');
+    assert.equal(parent.status,'needs_clarification');
+    assert.deepEqual(parent.formatter.questions.map(q=>q.field),['budget','delivery']);
+    assert.equal(parent.formatter.provider,'rules');
+    const preferences=store.db.prepare('SELECT * FROM user_preferences').all();
+    const body={intent_md:parent.documents.intent_md,preference_md:parent.documents.preference_md,clarification:{parent_request_id:parent.request_id,
+      answers:parent.formatter.questions.map(q=>({question_id:q.question_id,answer:q.field==='budget'?'1000':'7'}))}};
+    await request(app).post('/api/requests').set('Idempotency-Key','bad').send({...body,intent_md:'changed'}).expect(422);
+    await request(app).post('/api/requests').set('Idempotency-Key','foreign').set('x-test-buyer','someone-else').send(body).expect(404);
+    await request(app).post('/api/requests').set('Idempotency-Key','bad-ids').send({...body,clarification:{...body.clarification,answers:[body.clarification.answers[0],body.clarification.answers[0]]}}).expect(422);
+    const child=await start(app,'answer',body);
+    assert.equal(child.parent_request_id,parent.request_id);assert.equal(child.root_request_id,parent.request_id);assert.equal(child.documents.revision,2);
+    assert.equal((await start(app,'answer',body)).request_id,child.request_id);
+    await request(app).post('/api/requests').set('Idempotency-Key','duplicate').send(body).expect(409);
+    await store.process(child.request_id,'demo_buyer');
+    const final=store.snapshot(child.request_id,'demo_buyer');
+    assert.equal(final.status,'awaiting_user',JSON.stringify(final.error));assert.equal(final.formatter.provider,'rules');
+    assert.equal(final.intent.max_total_twd,1000);assert.equal(final.intent.delivery_days_max,7);
+    assert.ok(final.intent.product_preferences.some(p=>p.attribute==='color'&&p.values.includes('black')));
+    assert.deepEqual(store.snapshot(first.request_id,'demo_buyer'),parent);
+    assert.deepEqual(store.db.prepare('SELECT * FROM user_preferences').all(),preferences);
+    assert.equal(store.db.prepare('SELECT count(*) AS n FROM formatter_runs').get().n,2);
+  } finally {await store.close();}
+});
+
 test('HTTP -> existing Formatter request -> Discovery -> five sellers -> Evaluator -> immutable accept/replay',async()=>{
   const app=createRuntimeApp(configured),store=app.locals.store;
   try {

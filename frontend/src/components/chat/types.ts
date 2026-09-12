@@ -24,6 +24,8 @@ export interface AppShellProps {
   onSettings: () => void;
   onNewConversation: () => void;
   onSelectConversation: (requestId: string) => void;
+  onDeleteConversation?: (id: string) => void;
+  historyLocked?: boolean;
 }
 
 export type ChatMessageRole = "user" | "assistant" | "system";
@@ -66,7 +68,6 @@ export interface ChatPanelProps {
   error?: string;
   progressError?: string;
   unsavedDefinitions: boolean;
-  savedDefinitionValid: boolean;
   onEditDefinitions?: () => void;
 }
 

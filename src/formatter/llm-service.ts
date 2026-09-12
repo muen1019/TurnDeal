@@ -1,4 +1,4 @@
-import { createFormatterService } from './service.ts';
+import { createFormatterService, readSavedPreferences } from './service.ts';
 import type { SubmitText } from './service.ts';
 import { createLlmFormatter,mergeSaved } from './llm.ts';
 import { assertContract } from '../orchestrator/contract.ts';
@@ -10,7 +10,8 @@ export function createLlmFormatterService(options:Parameters<typeof createFormat
   const pending=new Map<string,{input:string;promise:ReturnType<typeof execute>}>();
   async function execute(args:SubmitText) {
     const input={intent_md:args.intent_md,preference_md:args.preference_md??''};
-    const result=await extract(input); // No SQLite transaction held over network await.
+    const saved=readSavedPreferences(options.db,options.userId);
+    const result=await extract(input,saved.preferences); // No SQLite transaction held over network await.
     return createFormatterService({...options,formatter:(_,saved)=>mergeSaved(result,saved)}).submit(args);
   }
   async function submit(args:SubmitText) {
