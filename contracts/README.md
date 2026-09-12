@@ -8,8 +8,11 @@
 | --- | --- |
 | `a2a-commerce.v0.1.schema.json` | 完整共用型別。root 驗證 `RequestSnapshot`，其他型別用 `#/$defs/<Type>` 引用 |
 | `openai/evaluator-output.schema.json` | 可直接放入 Responses API `text.format` 的 Evaluator Structured Outputs 格式 |
-| `fixtures/sellers.json` | 三家 Seller、Catalog、庫存、底價、信任與 Campaign 的固定資料 |
+| `fixtures/marketplace-source-snapshot.json` | Shopee、Amazon 與官方規格的公開來源快照，含幣別與新鮮度 |
+| `fixtures/MARKETPLACE_DATA.md` | 真實公開欄位、模擬商務欄位與更新來源的規則 |
+| `fixtures/sellers.json` | 三家 Seller、真實商品 Catalog、模擬庫存／底價／信任與 Campaign |
 | `fixtures/happy-path.json` | 三家 Seller 的兩輪議價、凍結快照與最終排序 |
+| `fixtures/demo-scenarios.json` | 價格／交期偏好、無結果、timeout、拒絕、過期與模型攻擊等 10 組情境 |
 | `fixtures/edge-cases.json` | 超預算、錯誤交期、過期、未授權加購與不存在 ID 的安全測試 |
 | `fixtures/api-examples.json` | 四個 HTTP endpoint 的 request、response 與 idempotency 範例 |
 
@@ -30,6 +33,7 @@
 - ID 是 1 到 128 字元的不透明字串。消費端不得解析 ID。
 - 時間是含 timezone 的 RFC 3339 字串。
 - 金額是正整數 TWD，已含稅與運費。
+- 公開 Marketplace 價格只是擷取當下的參考價，不等於 Seller 最終含稅運 Offer；來源與私有模擬欄位必須分開保存。
 - 所有 object 預設 `additionalProperties: false`。
 - `null` 與欄位省略不同。API response 依 schema 明確回傳 `null`。
 - `offer_id` 對商品、價格、交期、條款與有效期限的組合不可變。任何商務條件改變都產生新 ID。
@@ -46,4 +50,4 @@
 npm run test:contracts
 ```
 
-此命令不需要安裝第三方 package，會解析全部 JSON，檢查引用完整性、Seller 差異、兩輪議價、硬限制、Sponsored 隔離與 Evaluator 排序。
+此命令不需要安裝第三方 package，會解析全部 JSON，檢查 Marketplace 來源引用、Seller 差異、兩輪議價、情境覆蓋、硬限制、Sponsored 隔離與 Evaluator 排序。

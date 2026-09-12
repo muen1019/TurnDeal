@@ -1,0 +1,16 @@
+# Dependencies and local configuration
+node_modules/
+.env
+.env.*
+!.env.example
+
+# Local SQLite runtime files (rebuild with npm run db:init)
+data/*.sqlite
+data/*.sqlite-shm
+data/*.sqlite-wal
+data/*.db
+
+# Logs and editor state
+*.log
+.DS_Store
+.vscode/

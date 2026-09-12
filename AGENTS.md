@@ -8,7 +8,8 @@ These instructions apply to every change in this repository.
 2. Treat `contracts/a2a-commerce.v0.1.schema.json` as the shared data contract.
 3. Treat `contracts/openai/evaluator-output.schema.json` as the only allowed Structured Outputs shape for the Evaluator.
 4. Use the deterministic fixtures in `contracts/fixtures/` for integration work and demos.
-5. If implementation and contract disagree, update the contract through an explicit reviewed change before changing consumers.
+5. Treat `db/migrations/` as the authoritative persistent-state schema. Rebuild local SQLite data from migrations and fixtures; never commit runtime database files.
+6. If implementation and contract disagree, update the contract through an explicit reviewed change before changing consumers.
 
 ## Product invariants
 
@@ -23,6 +24,7 @@ These instructions apply to every change in this repository.
 - Revalidate expiry, inventory, ownership, price, delivery, items, and terms at acceptance and redemption.
 - Do not infer permission for a paid add-on. Missing bundle preference defaults to related add-ons at no extra cost only.
 - Request snapshots are immutable once published. A rejection with actionable feedback creates a child request and a new document revision.
+- SQLite is the source of truth for request-scoped and long-term preferences. Agent conversation memory is never authoritative.
 - POST endpoints require an idempotency key. Resource access is scoped to the authenticated buyer.
 
 ## Demo and quality bar

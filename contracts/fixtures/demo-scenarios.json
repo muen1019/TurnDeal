@@ -1,0 +1,218 @@
+{
+  "fixture_version": "0.2",
+  "catalog_fixture": "sellers.json",
+  "source_snapshot": "marketplace-source-snapshot.json",
+  "canonical_flow_fixture": "happy-path.json",
+  "scenarios": [
+    {
+      "scenario_id": "price_first_all_sellers",
+      "title": "價格優先，三家皆完成兩輪報價",
+      "intent": {
+        "max_total_twd": 1000,
+        "delivery_days_max": 7,
+        "required_features": ["wireless", "silent_click"],
+        "preferences": ["price_first"],
+        "required_color": "black",
+        "preferred_shape": "symmetrical",
+        "bundle_mode": "related_no_extra_cost"
+      },
+      "runtime_faults": [],
+      "expected": {
+        "request_status": "awaiting_user",
+        "seller_statuses": {"seller_a": "offered", "seller_b": "offered", "seller_c": "offered"},
+        "eligible_offer_ids": ["offer_a_r2", "offer_b_r2", "offer_c_standalone_r2", "offer_c_bundle_r2"],
+        "recommended_offer_id": "offer_a_r2",
+        "reason_codes": []
+      }
+    },
+    {
+      "scenario_id": "delivery_first_all_sellers",
+      "title": "交期優先，最快 Seller B 勝出",
+      "intent": {
+        "max_total_twd": 1000,
+        "delivery_days_max": 7,
+        "required_features": ["wireless", "silent_click"],
+        "preferences": ["delivery_first"],
+        "required_color": "black",
+        "preferred_shape": "symmetrical",
+        "bundle_mode": "related_no_extra_cost"
+      },
+      "runtime_faults": [],
+      "expected": {
+        "request_status": "awaiting_user",
+        "seller_statuses": {"seller_a": "offered", "seller_b": "offered", "seller_c": "offered"},
+        "eligible_offer_ids": ["offer_a_r2", "offer_b_r2", "offer_c_standalone_r2", "offer_c_bundle_r2"],
+        "recommended_offer_id": "offer_b_r2",
+        "reason_codes": []
+      }
+    },
+    {
+      "scenario_id": "bundle_disabled",
+      "title": "使用者禁止搭售，只保留單品方案",
+      "intent": {
+        "max_total_twd": 1000,
+        "delivery_days_max": 7,
+        "required_features": ["wireless", "silent_click"],
+        "preferences": ["price_first"],
+        "required_color": "black",
+        "preferred_shape": "symmetrical",
+        "bundle_mode": "disabled"
+      },
+      "runtime_faults": [],
+      "expected": {
+        "request_status": "awaiting_user",
+        "seller_statuses": {"seller_a": "offered", "seller_b": "offered", "seller_c": "offered"},
+        "eligible_offer_ids": ["offer_a_r2", "offer_b_r2", "offer_c_standalone_r2"],
+        "recommended_offer_id": "offer_a_r2",
+        "reason_codes": ["bundle_disabled"]
+      }
+    },
+    {
+      "scenario_id": "strict_budget_no_match",
+      "title": "預算低於所有最終報價",
+      "intent": {
+        "max_total_twd": 500,
+        "delivery_days_max": 7,
+        "required_features": ["wireless", "silent_click"],
+        "preferences": ["price_first"],
+        "required_color": "black",
+        "preferred_shape": "symmetrical",
+        "bundle_mode": "disabled"
+      },
+      "runtime_faults": [],
+      "expected": {
+        "request_status": "no_match",
+        "seller_statuses": {"seller_a": "offered", "seller_b": "offered", "seller_c": "offered"},
+        "eligible_offer_ids": [],
+        "recommended_offer_id": null,
+        "reason_codes": ["over_budget"]
+      }
+    },
+    {
+      "scenario_id": "one_day_delivery_only",
+      "title": "只接受一天到貨",
+      "intent": {
+        "max_total_twd": 1000,
+        "delivery_days_max": 1,
+        "required_features": ["wireless", "silent_click"],
+        "preferences": ["delivery_first"],
+        "required_color": "black",
+        "preferred_shape": "symmetrical",
+        "bundle_mode": "disabled"
+      },
+      "runtime_faults": [],
+      "expected": {
+        "request_status": "awaiting_user",
+        "seller_statuses": {"seller_a": "offered", "seller_b": "offered", "seller_c": "offered"},
+        "eligible_offer_ids": ["offer_b_r2"],
+        "recommended_offer_id": "offer_b_r2",
+        "reason_codes": ["delivery_too_late"]
+      }
+    },
+    {
+      "scenario_id": "required_symmetrical_shape",
+      "title": "左右對稱升級為硬限制",
+      "intent": {
+        "max_total_twd": 1000,
+        "delivery_days_max": 7,
+        "required_features": ["wireless", "silent_click"],
+        "preferences": ["price_first"],
+        "required_color": "black",
+        "preferred_shape": null,
+        "bundle_mode": "related_no_extra_cost"
+      },
+      "runtime_faults": ["shape_symmetrical_is_required"],
+      "expected": {
+        "request_status": "awaiting_user",
+        "seller_statuses": {"seller_a": "offered", "seller_b": "offered", "seller_c": "no_match"},
+        "eligible_offer_ids": ["offer_a_r2", "offer_b_r2"],
+        "recommended_offer_id": "offer_a_r2",
+        "reason_codes": ["missing_feature"]
+      }
+    },
+    {
+      "scenario_id": "seller_b_timeout",
+      "title": "最快 Seller timeout，其餘結果仍可發布",
+      "intent": {
+        "max_total_twd": 1000,
+        "delivery_days_max": 7,
+        "required_features": ["wireless", "silent_click"],
+        "preferences": ["price_first"],
+        "required_color": "black",
+        "preferred_shape": "symmetrical",
+        "bundle_mode": "related_no_extra_cost"
+      },
+      "runtime_faults": ["seller_b_timeout_both_rounds"],
+      "expected": {
+        "request_status": "awaiting_user",
+        "seller_statuses": {"seller_a": "offered", "seller_b": "timeout", "seller_c": "offered"},
+        "eligible_offer_ids": ["offer_a_r2", "offer_c_standalone_r2", "offer_c_bundle_r2"],
+        "recommended_offer_id": "offer_a_r2",
+        "reason_codes": []
+      }
+    },
+    {
+      "scenario_id": "seller_c_refuses_round_two",
+      "title": "Seller C 第二輪拒絕降價，保留第一輪報價",
+      "intent": {
+        "max_total_twd": 1000,
+        "delivery_days_max": 7,
+        "required_features": ["wireless", "silent_click"],
+        "preferences": ["price_first"],
+        "required_color": "black",
+        "preferred_shape": "symmetrical",
+        "bundle_mode": "related_no_extra_cost"
+      },
+      "runtime_faults": ["seller_c_round_two_refused"],
+      "expected": {
+        "request_status": "awaiting_user",
+        "seller_statuses": {"seller_a": "offered", "seller_b": "offered", "seller_c": "refused"},
+        "eligible_offer_ids": ["offer_a_r2", "offer_b_r2", "offer_c_r1"],
+        "recommended_offer_id": "offer_a_r2",
+        "reason_codes": []
+      }
+    },
+    {
+      "scenario_id": "expired_quotes",
+      "title": "所有 Quote 都已過期",
+      "intent": {
+        "max_total_twd": 1000,
+        "delivery_days_max": 7,
+        "required_features": ["wireless", "silent_click"],
+        "preferences": ["price_first"],
+        "required_color": "black",
+        "preferred_shape": "symmetrical",
+        "bundle_mode": "related_no_extra_cost"
+      },
+      "runtime_faults": ["clock_after_all_offer_expiry"],
+      "expected": {
+        "request_status": "no_match",
+        "seller_statuses": {"seller_a": "offered", "seller_b": "offered", "seller_c": "offered"},
+        "eligible_offer_ids": [],
+        "recommended_offer_id": null,
+        "reason_codes": ["expired"]
+      }
+    },
+    {
+      "scenario_id": "invalid_evaluator_offer_id",
+      "title": "模型回傳不存在的 Offer ID",
+      "intent": {
+        "max_total_twd": 1000,
+        "delivery_days_max": 7,
+        "required_features": ["wireless", "silent_click"],
+        "preferences": ["price_first"],
+        "required_color": "black",
+        "preferred_shape": "symmetrical",
+        "bundle_mode": "related_no_extra_cost"
+      },
+      "runtime_faults": ["evaluator_invents_offer_id"],
+      "expected": {
+        "request_status": "awaiting_user",
+        "seller_statuses": {"seller_a": "offered", "seller_b": "offered", "seller_c": "offered"},
+        "eligible_offer_ids": ["offer_a_r2", "offer_b_r2", "offer_c_standalone_r2", "offer_c_bundle_r2"],
+        "recommended_offer_id": "offer_a_r2",
+        "reason_codes": ["invalid_offer"]
+      }
+    }
+  ]
+}

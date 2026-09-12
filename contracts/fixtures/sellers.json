@@ -1,6 +1,12 @@
 {
-  "fixture_version": "0.1",
-  "generated_at": "2026-09-12T10:00:00+08:00",
+  "fixture_version": "0.2",
+  "generated_at": "2026-09-12T11:05:00+08:00",
+  "source_snapshot_id": "marketplace_snapshot_2026_09_12",
+  "data_classification": {
+    "public_snapshot_fields": ["brand", "model", "name", "features", "attributes", "source_price_twd", "source_ids"],
+    "synthetic_demo_fields": ["seller", "strategy", "trust", "list_price_twd", "floor_price_twd", "stock", "delivery_days", "terms", "campaigns"],
+    "notice": "Public product facts seed the demo; all private commercial behavior is synthetic and deterministic."
+  },
   "terms": [
     {
       "terms_id": "terms_standard_v1",
@@ -16,8 +22,8 @@
       "enabled": true,
       "strategy": {
         "type": "lowest_price_slow_delivery",
-        "round_1_discount_twd": 110,
-        "round_2_discount_twd": 170,
+        "round_1_discount_twd": 30,
+        "round_2_discount_twd": 60,
         "bundle_mode": "none"
       },
       "trust": {
@@ -31,21 +37,48 @@
         {
           "product_id": "mouse_a_black_small",
           "category": "mouse",
-          "name": "Aero Lite Wireless Mouse",
-          "features": ["wireless", "silent_click"],
+          "brand": "Logitech",
+          "model": "M240 Silent",
+          "name": "Logitech M240 Silent Bluetooth Mouse - Graphite",
+          "features": ["wireless", "bluetooth", "silent_click"],
           "attributes": {
             "size_class": "small",
             "color": "black",
             "shape": "symmetrical",
-            "length_mm": 105,
+            "length_mm": 99,
             "width_mm": 60,
-            "height_mm": 35
+            "height_mm": 39
           },
-          "list_price_twd": 890,
-          "floor_price_twd": 700,
+          "source_price_twd": 629,
+          "list_price_twd": 629,
+          "floor_price_twd": 540,
           "stock": 12,
           "delivery_days": 5,
-          "terms_id": "terms_standard_v1"
+          "terms_id": "terms_standard_v1",
+          "source_ids": ["src_shopee_tw_m240_graphite_20260912", "src_logitech_m240_specs"]
+        },
+        {
+          "product_id": "mouse_a_white_small",
+          "category": "mouse",
+          "brand": "Logitech",
+          "model": "M240 Silent",
+          "name": "Logitech M240 Silent Bluetooth Mouse - Pearl White",
+          "features": ["wireless", "bluetooth", "silent_click"],
+          "attributes": {
+            "size_class": "small",
+            "color": "white",
+            "shape": "symmetrical",
+            "length_mm": 99,
+            "width_mm": 60,
+            "height_mm": 39
+          },
+          "source_price_twd": 629,
+          "list_price_twd": 629,
+          "floor_price_twd": 540,
+          "stock": 4,
+          "delivery_days": 5,
+          "terms_id": "terms_standard_v1",
+          "source_ids": ["src_shopee_tw_m240_graphite_20260912", "src_logitech_m240_specs"]
         }
       ]
     },
@@ -55,8 +88,8 @@
       "enabled": true,
       "strategy": {
         "type": "premium_fast_delivery",
-        "round_1_discount_twd": 40,
-        "round_2_discount_twd": 90,
+        "round_1_discount_twd": 30,
+        "round_2_discount_twd": 70,
         "bundle_mode": "none"
       },
       "trust": {
@@ -70,21 +103,48 @@
         {
           "product_id": "mouse_b_black_small",
           "category": "mouse",
-          "name": "Swift One Wireless Mouse",
-          "features": ["wireless", "silent_click"],
+          "brand": "Logitech",
+          "model": "Pebble Mouse 2 M350s",
+          "name": "Logitech Pebble Mouse 2 M350s - Tonal Graphite",
+          "features": ["wireless", "bluetooth", "silent_click", "multi_device"],
           "attributes": {
             "size_class": "small",
             "color": "black",
             "shape": "symmetrical",
-            "length_mm": 106,
-            "width_mm": 61,
-            "height_mm": 36
+            "length_mm": 106.7,
+            "width_mm": 58.7,
+            "height_mm": 26.62
           },
-          "list_price_twd": 990,
-          "floor_price_twd": 850,
+          "source_price_twd": 799,
+          "list_price_twd": 799,
+          "floor_price_twd": 710,
           "stock": 30,
           "delivery_days": 1,
-          "terms_id": "terms_standard_v1"
+          "terms_id": "terms_standard_v1",
+          "source_ids": ["src_shopee_tw_m350s_graphite_20260912", "src_amazon_ie_m350s_graphite_cached", "src_logitech_m350s_specs"]
+        },
+        {
+          "product_id": "mouse_b_rose_small",
+          "category": "mouse",
+          "brand": "Logitech",
+          "model": "Pebble Mouse 2 M350s",
+          "name": "Logitech Pebble Mouse 2 M350s - Tonal Rose",
+          "features": ["wireless", "bluetooth", "silent_click", "multi_device"],
+          "attributes": {
+            "size_class": "small",
+            "color": "rose",
+            "shape": "symmetrical",
+            "length_mm": 106.7,
+            "width_mm": 58.7,
+            "height_mm": 26.62
+          },
+          "source_price_twd": 799,
+          "list_price_twd": 799,
+          "floor_price_twd": 710,
+          "stock": 0,
+          "delivery_days": 1,
+          "terms_id": "terms_standard_v1",
+          "source_ids": ["src_shopee_tw_m350s_graphite_20260912", "src_logitech_m350s_specs"]
         }
       ]
     },
@@ -94,8 +154,8 @@
       "enabled": true,
       "strategy": {
         "type": "value_bundle",
-        "round_1_discount_twd": 50,
-        "round_2_discount_twd": 90,
+        "round_1_discount_twd": 30,
+        "round_2_discount_twd": 70,
         "bundle_mode": "free_optional_mouse_pad"
       },
       "trust": {
@@ -109,40 +169,71 @@
         {
           "product_id": "mouse_c_black_small",
           "category": "mouse",
-          "name": "Comet Wireless Mouse",
-          "features": ["wireless", "silent_click"],
+          "brand": "Logitech",
+          "model": "M331 SilentPlus",
+          "name": "Logitech M331 SilentPlus Wireless Mouse - Black",
+          "features": ["wireless", "wireless_usb", "silent_click"],
           "attributes": {
             "size_class": "small",
             "color": "black",
-            "shape": "symmetrical",
-            "length_mm": 107,
-            "width_mm": 60,
-            "height_mm": 35
+            "shape": "asymmetrical_right",
+            "length_mm": 105.4,
+            "width_mm": 67.9,
+            "height_mm": 38.4
           },
-          "list_price_twd": 930,
-          "floor_price_twd": 760,
+          "source_price_twd": 699,
+          "list_price_twd": 699,
+          "floor_price_twd": 610,
           "stock": 18,
           "delivery_days": 3,
-          "terms_id": "terms_standard_v1"
+          "terms_id": "terms_standard_v1",
+          "source_ids": ["src_shopee_tw_m331_black_20260912", "src_logitech_m330_specs_for_m331"]
+        },
+        {
+          "product_id": "mouse_c_red_small",
+          "category": "mouse",
+          "brand": "Logitech",
+          "model": "M331 SilentPlus",
+          "name": "Logitech M331 SilentPlus Wireless Mouse - Red",
+          "features": ["wireless", "wireless_usb", "silent_click"],
+          "attributes": {
+            "size_class": "small",
+            "color": "red",
+            "shape": "asymmetrical_right",
+            "length_mm": 105.4,
+            "width_mm": 67.9,
+            "height_mm": 38.4
+          },
+          "source_price_twd": 699,
+          "list_price_twd": 699,
+          "floor_price_twd": 610,
+          "stock": 5,
+          "delivery_days": 3,
+          "terms_id": "terms_standard_v1",
+          "source_ids": ["src_shopee_tw_m331_black_20260912", "src_logitech_m330_specs_for_m331"]
         },
         {
           "product_id": "pad_c_black",
           "category": "mouse_pad",
-          "name": "Control Mini Mouse Pad",
-          "features": ["non_slip"],
+          "brand": "Logitech",
+          "model": "Mouse Pad Studio Series",
+          "name": "Logitech Mouse Pad Studio Series - Graphite",
+          "features": ["non_slip", "anti_fraying"],
           "attributes": {
             "size_class": "small",
             "color": "black",
             "shape": "rectangular",
-            "length_mm": 250,
-            "width_mm": 210,
-            "height_mm": 3
+            "length_mm": 230,
+            "width_mm": 200,
+            "height_mm": 2
           },
-          "list_price_twd": 180,
+          "source_price_twd": 199,
+          "list_price_twd": 199,
           "floor_price_twd": 80,
           "stock": 40,
           "delivery_days": 3,
-          "terms_id": "terms_standard_v1"
+          "terms_id": "terms_standard_v1",
+          "source_ids": ["src_shopee_tw_studio_mouse_pad_graphite_20260912", "src_logitech_studio_mouse_pad_specs"]
         }
       ]
     }
