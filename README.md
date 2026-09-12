@@ -54,6 +54,7 @@ OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commer
 
 ## 開發前必讀
 
+- [Seller 議價設定格式與填寫交接](docs/SELLER_NEGOTIATION_POLICY.md)：15 家／90 筆主商品待填模板；底價等私有設定由 Negotiation owner 填寫，尚未啟用。
 - [目標 System Design 與 repo 整合狀態](docs/SYSTEM_DESIGN.md)
 - [開發與驗收基準](docs/DEVELOPMENT_RULES.md)
 - [共用契約說明](contracts/README.md)
@@ -97,6 +98,10 @@ npm test
 目前專案使用 Node.js 內建 SQLite，需要 Node.js 24 以上，不需安裝第三方 package。
 
 ## SQLite
+
+新增 [前五賣家探索／評分 v0.2](docs/DISCOVERY_SCORING.md)：120 筆合成刊登、15 家模擬賣場，固定公式評分、不需 LLM。先執行 `npm run db:seed:discovery`，再以 `npm run demo:discovery` 查看 800 元滑鼠的五筆候選。
+
+Orchestrator 已有可呼叫的 [TypeScript 資料接口](src/orchestrator/README.md)，包含需求與偏好快照、商品、Seller、評分、Campaign。執行 `npm run demo:orchestrator` 可查看真實 SQLite 回傳資料；篩選排序與 RFQ 派發尚待實作。
 
 ```bash
 npm run db:init      # 第一次建立本機資料庫
@@ -198,6 +203,10 @@ npm test
 目前會檢查所有 JSON、共用 schema 邊界、三家 Seller 策略、兩輪議價、RFQ 隱私、正式 Offer 引用、硬限制、Sponsored 隔離、Evaluator ID 完整性與 API idempotency 範例。
 
 ## 黑客松期間新增內容
+
+目前新增了 SQLite-backed Orchestrator 讀取工具、15 家 Seller／120 筆合成刊登（90 滑鼠、30 滑鼠墊）、五個不同 Seller 的確定性排序與結果快照。目標價格選填，缺值時按有效指標重新分配權重，詳見 [評分標準](docs/DISCOVERY_SCORING.md)。不滿五個合格結果時可補標記替代方案，但違反硬限制者不能自動議價；不足五個可用賣家則明確回報。新增資料不是 120 筆真實爬取商品。
+
+新增 Seller 私有政策 schema、15 家待填模板、填寫說明及驗證測試；實際議價 handler、策略數值、私有政策 DB 接線、UI 與完整新流程仍待各 Owner 整合。既有三家測資保留作回歸案例。
 
 本 repository 為本次黑客松建立。第一版已完成共同開發規則、完整資料契約、OpenAI Structured Outputs 格式、三家 Seller 固定測資、兩輪議價範例、API 範例與無第三方相依的契約驗證器。
 

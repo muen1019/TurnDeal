@@ -30,6 +30,7 @@ These instructions apply to every change in this repository.
 ## Demo and quality bar
 
 - Keep the main path deterministic and runnable without the OpenAI API. AI failure must use a safe deterministic fallback.
+- Discovery v0.2 additionally supports 120 synthetic listings and selects five distinct Sellers by the documented weighted scoring policy in docs/DISCOVERY_SCORING.md. Preserve the three-Seller fixture as a separate regression scenario. Alternative cards violating requirements must be labelled and cannot automatically enter negotiation.
 - The same request must show three visibly different, reproducible Seller strategies over two rounds:
   - Seller A has the lowest price and slower delivery.
   - Seller B costs more and ships fastest.
