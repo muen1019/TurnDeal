@@ -103,9 +103,52 @@ export type EligibilityReasonCode =
   | "addon_not_optional";
 /**
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "RejectDecision".
+ */
+export type RejectDecision = RejectDecision1 & {
+  action: "reject";
+  feedback: string;
+  selection_version?: 1;
+  rejected_offer_ids?: Id[];
+};
+export type RejectDecision1 =
+  | {
+      feedback?: string;
+      [k: string]: unknown;
+    }
+  | {
+      rejected_offer_ids: Id[];
+      feedback?: "";
+      [k: string]: unknown;
+    };
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
  * via the `definition` "DecisionResult".
  */
 export type DecisionResult = AcceptDecisionResult | RejectDecisionResult;
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "RejectDecisionResult".
+ */
+export type RejectDecisionResult = RejectDecisionResult1 & {
+  action: "reject";
+  request_id: Id;
+  status: "rejected";
+  feedback: string;
+  source_documents: DocumentBundle;
+  selection_version?: 1;
+  rejected_offer_ids?: Id[];
+};
+export type RejectDecisionResult1 =
+  | {
+      feedback?: string;
+      [k: string]: unknown;
+    }
+  | {
+      rejected_offer_ids: Id[];
+      feedback?: "";
+      [k: string]: unknown;
+    };
 /**
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
  * via the `definition` "RFQProductPreference".
@@ -131,6 +174,28 @@ export type RFQProductPreference =
  * via the `definition` "EligibleOffer".
  */
 export type EligibleOffer = unknown;
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "ImprovementStatus".
+ */
+export type ImprovementStatus = null | {
+  improvement_id: Id;
+  request_id: Id;
+  mode: "accepted_with_rejections" | "all_rejected";
+  status: "queued" | "running" | "ready" | "needs_clarification" | "failed";
+  error: string | null;
+  result: null | {
+    intent_revision_id: Id;
+    intent_state: "ready" | "draft";
+    documents: {
+      revision: number;
+      intent_md: string;
+      preference_md: string;
+    };
+    preference_updated: boolean;
+    questions: string[];
+  };
+};
 
 export interface A2ACommerceContracts {
   FormatterResult?: FormatterResult;
@@ -191,6 +256,7 @@ export interface A2ACommerceContracts {
   SharedNegotiationContext?: SharedNegotiationContext;
   NegotiationOutput?: NegotiationOutput;
   SellerSalesProfile?: SellerSalesProfile;
+  ImprovementStatus?: ImprovementStatus;
 }
 /**
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
@@ -270,14 +336,9 @@ export interface CreateRequest {
 export interface AcceptDecision {
   action: "accept";
   offer_id: Id;
-}
-/**
- * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
- * via the `definition` "RejectDecision".
- */
-export interface RejectDecision {
-  action: "reject";
-  feedback: string;
+  selection_version?: 1;
+  rejected_offer_ids?: Id[];
+  feedback?: string;
 }
 /**
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
@@ -478,17 +539,9 @@ export interface AcceptDecisionResult {
   status: "accepted";
   selected_offer_id: Id;
   expires_at: Timestamp;
-}
-/**
- * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
- * via the `definition` "RejectDecisionResult".
- */
-export interface RejectDecisionResult {
-  action: "reject";
-  request_id: Id;
-  status: "rejected";
-  feedback: string;
-  source_documents: DocumentBundle;
+  selection_version?: 1;
+  rejected_offer_ids?: Id[];
+  feedback?: string;
 }
 /**
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema

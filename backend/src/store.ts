@@ -7,6 +7,7 @@ import {HttpError,notFound,offerExpired,stateConflict} from './httpError.js';
 import {runDemoPipeline,verifyTrustedOffer} from './mockResultProvider.js';
 import {assertValid,isValid} from './schema.js';
 import {migrateDatabase,seedCatalog} from './database.js';
+import type {ImprovementStorage} from './improver/types.js';
 type Options={dbPath:string;now:()=>Date;autoProcess?:boolean;afterIdempotencyReserved?:(scope:{method:string;path:string;key:string})=>Promise<void>|void;beforeCommit?:()=>void};
 type Result<T=unknown>={status:number;body:T;scheduleRequestId?:string};
 type Row=Record<string,string|number|null>;
@@ -18,7 +19,7 @@ export class OfferStore {
   const SQL=await initSqlJs();const existing=options.dbPath!==':memory:'&&existsSync(options.dbPath);
   const db=existing?new SQL.Database(readFileSync(options.dbPath)):new SQL.Database();const store=new OfferStore(db,options);
   const legacy=db.exec("PRAGMA table_info(requests)")[0]?.values.some(row=>row[1]==='id');
-  const needsMigration=legacy || !db.exec("SELECT name FROM sqlite_master WHERE name='schema_migrations'").length || !db.exec("SELECT version FROM schema_migrations WHERE version='003_result_decisions'").length;
+  const needsMigration=legacy || !db.exec("SELECT name FROM sqlite_master WHERE name='schema_migrations'").length || !db.exec("SELECT version FROM schema_migrations WHERE version='004_buyer_request_improver'").length;
   if(existing && needsMigration)copyFileSync(options.dbPath,`${options.dbPath}.pre-v03-${Date.now()}.bak`);
   let saved:Record<string,Row[]>|null=null;
   if(legacy){saved=Object.fromEntries(['requests','offers','decisions','idempotency'].map(table=>[table,store.rows(`SELECT * FROM ${table}`)]));for(const table of ['requests','offers','decisions','idempotency'])db.run(`ALTER TABLE ${table} RENAME TO legacy_result_${table}`);}
@@ -48,6 +49,12 @@ export class OfferStore {
   },false);return store;
  }
 
+ /** Backend-only integration port. Callbacks dereference the current connection after rollback. */
+ improvementStorage():ImprovementStorage {
+  return {rows:(sql,args)=>this.rows(sql,args),run:(sql,args)=>{this.db.run(sql,args);},
+    transaction:operation=>this.transaction(operation),snapshot:(id,buyer)=>this.snapshot(id,buyer),
+    ensureBuyer:buyer=>this.ensureBuyer(buyer),now:()=>this.options.now()};
+ }
  close(){this.closed=true;this.db.close();}
  private rows(sql:string,args:(string|number|null)[]=[]):Row[]{const stmt=this.db.prepare(sql);try{stmt.bind(args);const result:Row[]=[];while(stmt.step())result.push(stmt.getAsObject() as Row);return result;}finally{stmt.free();}}
  private transaction<T>(fn:()=>T,inject=true):T{

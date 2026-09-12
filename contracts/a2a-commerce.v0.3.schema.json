@@ -228,13 +228,40 @@
         },
         "offer_id": {
           "$ref": "#/$defs/Id"
+        },
+        "selection_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "rejected_offer_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Id"
+          },
+          "uniqueItems": true,
+          "maxItems": 100
+        },
+        "feedback": {
+          "type": "string",
+          "maxLength": 2000
         }
       },
       "required": [
         "action",
         "offer_id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "dependentRequired": {
+        "selection_version": [
+          "rejected_offer_ids"
+        ],
+        "rejected_offer_ids": [
+          "selection_version"
+        ],
+        "feedback": [
+          "selection_version"
+        ]
+      }
     },
     "RejectDecision": {
       "type": "object",
@@ -244,16 +271,64 @@
         },
         "feedback": {
           "type": "string",
-          "minLength": 1,
-          "maxLength": 2000,
-          "pattern": "\\S"
+          "maxLength": 2000
+        },
+        "selection_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "rejected_offer_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Id"
+          },
+          "uniqueItems": true,
+          "maxItems": 100
         }
       },
       "required": [
         "action",
         "feedback"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "dependentRequired": {
+        "selection_version": [
+          "rejected_offer_ids"
+        ],
+        "rejected_offer_ids": [
+          "selection_version"
+        ]
+      },
+      "anyOf": [
+        {
+          "properties": {
+            "feedback": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          }
+        },
+        {
+          "required": [
+            "selection_version",
+            "rejected_offer_ids"
+          ],
+          "properties": {
+            "rejected_offer_ids": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Id"
+              },
+              "minItems": 1
+            },
+            "feedback": {
+              "type": "string",
+              "const": ""
+            }
+          }
+        }
+      ]
     },
     "RedeemRequest": {
       "type": "object",
@@ -1648,6 +1723,22 @@
         },
         "expires_at": {
           "$ref": "#/$defs/Timestamp"
+        },
+        "selection_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "rejected_offer_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Id"
+          },
+          "uniqueItems": true,
+          "maxItems": 100
+        },
+        "feedback": {
+          "type": "string",
+          "maxLength": 2000
         }
       },
       "required": [
@@ -1657,7 +1748,18 @@
         "selected_offer_id",
         "expires_at"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "dependentRequired": {
+        "selection_version": [
+          "rejected_offer_ids"
+        ],
+        "rejected_offer_ids": [
+          "selection_version"
+        ],
+        "feedback": [
+          "selection_version"
+        ]
+      }
     },
     "RejectDecisionResult": {
       "type": "object",
@@ -1673,12 +1775,22 @@
         },
         "feedback": {
           "type": "string",
-          "minLength": 1,
-          "maxLength": 2000,
-          "pattern": "\\S"
+          "maxLength": 2000
         },
         "source_documents": {
           "$ref": "#/$defs/DocumentBundle"
+        },
+        "selection_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "rejected_offer_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Id"
+          },
+          "uniqueItems": true,
+          "maxItems": 100
         }
       },
       "required": [
@@ -1688,7 +1800,45 @@
         "feedback",
         "source_documents"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "dependentRequired": {
+        "selection_version": [
+          "rejected_offer_ids"
+        ],
+        "rejected_offer_ids": [
+          "selection_version"
+        ]
+      },
+      "anyOf": [
+        {
+          "properties": {
+            "feedback": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          }
+        },
+        {
+          "required": [
+            "selection_version",
+            "rejected_offer_ids"
+          ],
+          "properties": {
+            "rejected_offer_ids": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Id"
+              },
+              "minItems": 1
+            },
+            "feedback": {
+              "type": "string",
+              "const": ""
+            }
+          }
+        }
+      ]
     },
     "DecisionResult": {
       "oneOf": [
@@ -3347,6 +3497,117 @@
               }
             }
           }
+        }
+      ]
+    },
+    "ImprovementStatus": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "improvement_id": {
+              "$ref": "#/$defs/Id"
+            },
+            "request_id": {
+              "$ref": "#/$defs/Id"
+            },
+            "mode": {
+              "enum": [
+                "accepted_with_rejections",
+                "all_rejected"
+              ]
+            },
+            "status": {
+              "enum": [
+                "queued",
+                "running",
+                "ready",
+                "needs_clarification",
+                "failed"
+              ]
+            },
+            "error": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "result": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "intent_revision_id": {
+                      "$ref": "#/$defs/Id"
+                    },
+                    "intent_state": {
+                      "enum": [
+                        "ready",
+                        "draft"
+                      ]
+                    },
+                    "documents": {
+                      "type": "object",
+                      "properties": {
+                        "revision": {
+                          "type": "integer",
+                          "minimum": 2
+                        },
+                        "intent_md": {
+                          "type": "string",
+                          "maxLength": 20000
+                        },
+                        "preference_md": {
+                          "type": "string",
+                          "maxLength": 20000
+                        }
+                      },
+                      "required": [
+                        "revision",
+                        "intent_md",
+                        "preference_md"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "preference_updated": {
+                      "type": "boolean"
+                    },
+                    "questions": {
+                      "type": "array",
+                      "maxItems": 10,
+                      "items": {
+                        "type": "string",
+                        "maxLength": 20000
+                      }
+                    }
+                  },
+                  "required": [
+                    "intent_revision_id",
+                    "intent_state",
+                    "documents",
+                    "preference_updated",
+                    "questions"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          },
+          "required": [
+            "improvement_id",
+            "request_id",
+            "mode",
+            "status",
+            "error",
+            "result"
+          ],
+          "additionalProperties": false
         }
       ]
     }
