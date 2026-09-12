@@ -1,40 +1,16 @@
 import assert from 'node:assert/strict';
+import Ajv2020 from 'ajv/dist/2020.js';
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
 const read = name => JSON.parse(readFileSync(new URL(name, import.meta.url), 'utf8'));
 const schema = read('../contracts/seller-negotiation-policy.v0.1.schema.json');
 
-// Deliberately limited to the keywords used by this contract; not a general JSON Schema engine.
-function shape(value, rule, path = 'policy') {
-  if ('const' in rule) assert.deepEqual(value, rule.const, path);
-  if (rule.enum) assert.ok(rule.enum.includes(value), path);
-  if (rule.type) {
-    const types = [].concat(rule.type);
-    assert.ok(types.some(t => t === 'null' ? value === null : t === 'array' ? Array.isArray(value) :
-      t === 'integer' ? Number.isInteger(value) : t === 'object' ? value !== null && typeof value === 'object' && !Array.isArray(value) : typeof value === t), path);
-  }
-  if (value === null) return;
-  if (typeof value === 'number') {
-    if (rule.minimum !== undefined) assert.ok(value >= rule.minimum, path);
-    if (rule.maximum !== undefined) assert.ok(value <= rule.maximum, path);
-  }
-  if (rule.minLength !== undefined) assert.ok(value.length >= rule.minLength, path);
-  if (Array.isArray(value)) {
-    if (rule.minItems !== undefined) assert.ok(value.length >= rule.minItems, path);
-    if (rule.maxItems !== undefined) assert.ok(value.length <= rule.maxItems, path);
-    value.forEach((v, i) => shape(v, rule.items, `${path}[${i}]`));
-  } else if (rule.properties) {
-    for (const key of rule.required) assert.ok(Object.hasOwn(value, key), `${path}.${key} required`);
-    for (const key of Object.keys(value)) {
-      assert.ok(Object.hasOwn(rule.properties, key), `${path}.${key} unknown`);
-      shape(value[key], rule.properties[key], `${path}.${key}`);
-    }
-  }
-}
+const ajv = new Ajv2020({ allErrors: true, strict: true });
+const validateShape = ajv.compile(schema);
 
 export function validateSellerPolicies(policy, catalog) {
-  shape(policy, schema);
+  assert.ok(validateShape(policy), ajv.errorsText(validateShape.errors));
   assert.equal(policy.snapshot_id, catalog.snapshot_id, 'snapshot mismatch');
   const sellers = new Set(), listings = new Set();
   for (const seller of policy.sellers) {
@@ -52,8 +28,15 @@ export function validateSellerPolicies(policy, catalog) {
       if (!t) continue;
       assert.ok(item.price_includes_tax && item.shipping_twd !== null, 'known tax/shipping required');
       assert.ok(t.floor_item_price_twd <= item.item_price_twd, 'floor exceeds price');
-      assert.ok(t.round_discount_twd[1] >= t.round_discount_twd[0], 'discounts must be cumulative/nondecreasing');
-      assert.ok(t.round_discount_twd[1] <= item.item_price_twd - t.floor_item_price_twd, 'discount below floor');
+      assert.ok(t.round_discount_twd.every((v, i, a) => i === 0 || v >= a[i-1]), 'discounts must be cumulative/nondecreasing');
+      assert.ok(t.round_discount_twd[4] <= item.item_price_twd - t.floor_item_price_twd, 'discount below floor');
+      if (seller.settings) {
+        const finalRound = seller.settings.final_round;
+        assert.ok(t.round_discount_twd.slice(finalRound).every(v => v === t.round_discount_twd[finalRound-1]), 'discount after final must remain unchanged');
+        for (const start of [t.shipping.waive_from_round, t.delivery.expedite_from_round, t.addon?.from_round]) {
+          if (start != null) assert.ok(start <= finalRound, 'benefit starts after final');
+        }
+      }
       assert.ok(t.delivery.fastest_days <= item.delivery_days, 'invalid fastest delivery');
       if (t.delivery.expedite_from_round === null) {
         assert.equal(t.delivery.fastest_days, item.delivery_days);

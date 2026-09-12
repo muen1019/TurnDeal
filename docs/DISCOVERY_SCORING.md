@@ -64,7 +64,7 @@ const result = service.discover_candidates({
 
 排名完成後才從已入選且合格的 Seller 中選 Campaign，須啟用、類別相符、bid>0、starts_at<=now<ends_at。bid 高優先，同價按 campaign_id。Campaign 不參與任何分項、補位或 Seller 去重。
 
-SQLite migration 002 增加 discovery_catalogs 與 discovery_runs。前者存不可變的完整 JSON Catalog 快照，後者存 user_id、政策版本、query、完整結果與時間；可用 SQLite json_each 查詢 snapshot 內 listings，不與舊七筆 products 混用。這是第一版獨立資料集，可在後續升版拆成正規化 listing 表。
+SQLite migration `002_discovery` 增加 discovery_catalogs 與 discovery_runs；隊友的 `002_five_seller_negotiation` 是另一個獨立 migration，版本以完整檔名辨識，不是只取數字。前者存不可變的完整 JSON Catalog 快照，後者存 user_id、政策版本、query、完整結果與時間；可用 SQLite json_each 查詢 snapshot 內 listings，不與 canonical 的九筆 products 混用。這是第一版獨立資料集，可在後續升版拆成正規化 listing 表。
 
 `rankCandidates` 是無副作用的純函式；`discover_candidates` 讀取指定 SQLite 快照並新增稽核紀錄。run_id 每次不同，但排名相同。尚未串 UI、付款或議價。
 

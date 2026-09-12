@@ -1,6 +1,6 @@
 # Orchestrator 資料接口 v0.1
 
-供 Orchestrator 開發者直接 import 的 TypeScript service。沿用現行 v0.1 的偏好格式；不自動採用 System Design 尚未遷移的 explicit/behavioral 或 Shared Context 欄位。
+供 Orchestrator 開發者直接 import 的 TypeScript service。沿用現行 v0.2 的偏好格式；不自動採用 System Design 尚未遷移的 explicit/behavioral 或 Shared Context 欄位。
 
 ## 快速開始
 
@@ -49,7 +49,7 @@ const input = tools.load_discovery_input({ request_id, now });
 3. 依軟偏好、信任、評分等規則排序所有合格 Seller。
 4. Campaign 必須再與合格 Seller 交集，才可選 Sponsored；不可更改自然排序。
 5. 回傳 schema 的 `OrchestrationResult`；探索初始 status=pending、rounds=[]、final_offer_ids=[]。
-6. 後續另實作儲存探索結果及 build_seller_rfq；目前不提供占位函式假裝已完成。
+6. 新增的 discovery.ts 已提供獨立 Catalog 快照、搜尋排名與結果儲存，詳見 docs/DISCOVERY_SCORING.md；從 Request 轉成 DiscoveryQuery、轉回共用 OrchestrationResult 與 build_seller_rfq 仍待接線。
 
 ## 資料邊界與目前限制
 

@@ -1,12 +1,14 @@
 # Seller 私有議價格式 v0.1
 
-Tech Lead 定義格式，Negotiation owner 填值並實作 Seller handler。本次只新增契約、待填模板及驗證器，不啟用任何新賣家策略、不寫入 SQLite、不改舊版三家 Seller。現行仍是兩輪；SYSTEM_DESIGN 的十輪另行升版。
+Tech Lead 定義格式，Negotiation owner 填值並實作 Seller handler。本次只新增契約、待填模板及驗證器，不啟用任何新賣家策略、不寫入 SQLite。本私有政策 v0.1 對齊目前共用契約 v0.2：最多五輪，可提前 final；不取代 canonical 五家 Seller 的策略格式。
 
 ## 交接檔案
 
 - `contracts/seller-negotiation-policy.v0.1.schema.json`：JSON Schema，所有欄位必填，明確允許的 null 例外。
 - `contracts/fixtures/seller-negotiation-policies.template.json`：15 家 Seller、90 筆主商品的待填骨架；30 筆滑鼠墊透過 addon 引用。
 - `scripts/validate-seller-policies.mjs`：格式與跨欄位／Catalog 引用驗證。Schema 本身不涵蓋全部語意，必須一起驗證。
+
+格式驗證共用隊友已加入的 Ajv；先執行 npm ci 安裝 lockfile 相依套件。
 
 模板所有 seller 為 draft，settings 與 terms 為 null。請複製為自己的模擬策略檔，再填入數值。缺設定不可預設為零元、不可自動套用舊 Seller 的策略。ready 代表所列商品皆完成設定，仍需啟用的 Seller、庫存、需求檢查及已註冊 handler 才能議價。未列出的商品不可議價。
 
@@ -18,14 +20,15 @@ Tech Lead 定義格式，Negotiation owner 填值並實作 Seller handler。本�
 | data_origin | 固定 synthetic；公開 repo 只放模擬底價，真實商業機密不可提交 |
 | seller_id / status | 所屬賣家；draft 或 ready |
 | settings.strategy | price_first、delivery_first、bundle_first、balanced；風格標籤不能凌駕數值上限 |
-| settings.max_rounds | 固定 2；同一輪重試不得視為新一輪 |
-| settings.timeout_ms | 每次呼叫 1–3000 ms；Backend 另維持整體 8 秒 deadline |
+| settings.max_rounds | 固定 5；同一輪重試不得視為新一輪 |
+| settings.final_round | 1–5，該輪結果 is_final=true，之後不再派發；排程器也可因拒絕／逾時／失敗提前停止 |
+| settings.timeout_ms | Seller 建議每次呼叫上限 1–60000 ms；Backend 在 Request 啟動時凍結實際 round timeout、deadline 與預算，採較嚴上限。此範圍是格式安全界線，不是 SLA，不承諾舊版 8 秒跑完五輪 |
 | settings.quote_ttl_seconds | 報價有效秒數；Backend 以實際發行時間計算到期時間 |
 | settings.buyer_below_floor | counter_at_floor 回底價反提案；refuse 拒絕，不得洩漏底價欄位 |
 | settings.after_last_round | 固定 stop，不繼續讓價；既有未過期報價仍依原期限處理 |
 | listings[].listing_id | 主商品刊登 ID，不用跨賣家重複的 product_id |
 | terms.floor_item_price_twd | 含稅、不含運費的主商品最低售價；不能高於 Catalog 售價 |
-| terms.round_discount_twd | 長度 2，每輪相對 Catalog 售價的累計折扣，不是逐輪再相減 |
+| terms.round_discount_twd | 長度 5，每輪相對 Catalog 售價的累計折扣，不是逐輪再相減；final_round 之後填相同值，但不會真的呼叫 |
 | terms.shipping.waive_from_round | 第幾輪可免基本運費；null 表示不提供 |
 | terms.shipping.min_item_subtotal_twd | 折扣後主商品金額滿此值才可免運；0 代表無門檻 |
 | terms.delivery.fastest_days | 可承諾的最快到貨天數；不得慢於 Catalog 原交期 |
@@ -46,7 +49,8 @@ Tech Lead 定義格式，Negotiation owner 填值並實作 Seller handler。本�
 {
   "settings": {
     "strategy": "balanced",
-    "max_rounds": 2,
+    "max_rounds": 5,
+    "final_round": 2,
     "timeout_ms": 3000,
     "quote_ttl_seconds": 300,
     "buyer_below_floor": "counter_at_floor",
@@ -54,7 +58,7 @@ Tech Lead 定義格式，Negotiation owner 填值並實作 Seller handler。本�
   },
   "terms": {
     "floor_item_price_twd": 649,
-    "round_discount_twd": [20, 60],
+    "round_discount_twd": [20, 60, 60, 60, 60],
     "shipping": { "waive_from_round": 2, "min_item_subtotal_twd": 600 },
     "delivery": { "fastest_days": 1, "expedite_from_round": null, "expedite_fee_twd": 0 },
     "addon": {
@@ -87,4 +91,4 @@ node scripts/validate-seller-policies.mjs contracts/fixtures/your-policies.json
 npm test
 ```
 
-Negotiation owner 交付：已填的 synthetic 政策、僅限自身 seller_id 的讀取與 handler、可重播兩輪測試、拒絕／timeout／贈品授權案例。Tech Lead 再接私有儲存與 handler registry；目前不提供政策讀取給 Discovery，亦沒有自動載入模板的 runtime。這個新增契約不取代既有 RFQ／Offer schema。
+Negotiation owner 交付：已填的 synthetic 政策、僅限自身 seller_id 的讀取與 handler、可重播最多五輪及提前 final 測試、拒絕／timeout／贈品授權案例。Tech Lead 再接私有儲存與 handler registry；目前不提供政策讀取給 Discovery，亦沒有自動載入模板的 runtime。這個新增契約不取代既有 RFQ／Offer schema。

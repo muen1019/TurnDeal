@@ -70,7 +70,7 @@ test('additive SQLite seed is repeatable, persists runs and preserves old record
   try {
     initializeDatabase(db); seedDiscovery(db); seedDiscovery(db);
     assert.equal(db.prepare('SELECT count(*) n FROM discovery_catalogs').get()?.n,1);
-    assert.equal(db.prepare('SELECT count(*) n FROM offers').get()?.n,4);
+    assert.equal(db.prepare('SELECT count(*) n FROM offers').get()?.n,6);
     const service=createDiscoveryService({db,userId:'user_demo_001',registeredSellerIds:[]});
     const r=service.discover_candidates({query,snapshot_id:'discovery_demo_v02',now});
     const saved=db.prepare('SELECT result_json FROM discovery_runs WHERE run_id=?').get(r.run_id);

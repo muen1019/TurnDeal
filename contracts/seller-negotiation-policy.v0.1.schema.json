@@ -52,6 +52,7 @@
             "required": [
               "strategy",
               "max_rounds",
+                "final_round",
               "timeout_ms",
               "quote_ttl_seconds",
               "buyer_below_floor",
@@ -66,13 +67,14 @@
                   "balanced"
                 ]
               },
-              "max_rounds": {
-                "const": 2
+              "final_round": {"type":"integer","minimum":1,"maximum":5},
+                "max_rounds": {
+                "const": 5
               },
               "timeout_ms": {
                 "type": "integer",
                 "minimum": 1,
-                "maximum": 3000
+                "maximum": 60000
               },
               "quote_ttl_seconds": {
                 "type": "integer",
@@ -124,8 +126,8 @@
                     },
                     "round_discount_twd": {
                       "type": "array",
-                      "minItems": 2,
-                      "maxItems": 2,
+                      "minItems": 5,
+                      "maxItems": 5,
                       "items": {
                         "type": "integer",
                         "minimum": 0
@@ -145,7 +147,7 @@
                             "null"
                           ],
                           "minimum": 1,
-                          "maximum": 2
+                          "maximum": 5
                         },
                         "min_item_subtotal_twd": {
                           "type": "integer",
@@ -172,7 +174,7 @@
                             "null"
                           ],
                           "minimum": 1,
-                          "maximum": 2
+                          "maximum": 5
                         },
                         "expedite_fee_twd": {
                           "type": "integer",
@@ -211,7 +213,7 @@
                         "from_round": {
                           "type": "integer",
                           "minimum": 1,
-                          "maximum": 2
+                          "maximum": 5
                         },
                         "min_item_subtotal_twd": {
                           "type": "integer",
