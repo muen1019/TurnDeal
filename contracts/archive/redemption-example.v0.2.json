@@ -1,0 +1,25 @@
+{
+  "http": {
+    "method": "POST",
+    "path": "/api/redemptions",
+    "headers": {
+      "Content-Type": "application/json",
+      "Idempotency-Key": "demo-redeem-001"
+    }
+  },
+  "body": {
+    "request_id": "req_demo_001",
+    "offer_id": "offer_a_r5"
+  },
+  "expected_status_code": 201,
+  "response": {
+    "redemption_id": "red_demo_001",
+    "request_id": "req_demo_001",
+    "offer_id": "offer_a_r5",
+    "seller_id": "seller_a",
+    "status": "redeemed",
+    "mode": "virtual_market",
+    "total_price_twd": 549,
+    "redeemed_at": "2026-09-12T10:05:00+08:00"
+  }
+}

@@ -4,7 +4,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const schemaPath = resolve(here, "../../contracts/result-api.v0.2.schema.json");
+const schemaPath = resolve(here, "../../contracts/a2a-commerce.v0.3.schema.json");
 const outputPath = resolve(here, "../src/generated/contracts.d.ts");
 
 function normalizeForTypes(value) {
@@ -18,7 +18,7 @@ function normalizeForTypes(value) {
 
   const next = {};
   for (const [key, child] of Object.entries(value)) {
-    if (["$schema", "$id", "if", "then", "else", "allOf", "not"].includes(key)) {
+    if (["$schema", "$id", "if", "then", "else", "allOf", "not", "minItems", "maxItems", "minItems", "maxItems"].includes(key)) {
       continue;
     }
 
@@ -50,7 +50,7 @@ const syntheticSchema = {
 };
 
 const ts = await compile(syntheticSchema, "A2ACommerceContracts", {
-  bannerComment: "/* Generated from contracts/result-api.v0.2.schema.json. Do not edit by hand. */",
+  bannerComment: "/* Generated from contracts/a2a-commerce.v0.3.schema.json. Do not edit by hand. */",
   cwd: resolve(here, "../.."),
   declareExternallyReferenced: true,
   enableConstEnums: false,

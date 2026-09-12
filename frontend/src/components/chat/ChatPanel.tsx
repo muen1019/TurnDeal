@@ -1,5 +1,6 @@
 import { ArrowRight, Bot, Paperclip, Sparkles } from "lucide-react";
 import {useEffect, useRef, type ChangeEvent, type KeyboardEvent} from "react";
+import { AgentProgress } from "./AgentProgress";
 import type { ChatPanelProps } from "./types";
 
 const DRAFT_LIMIT = 2000;
@@ -7,6 +8,7 @@ const DRAFT_LIMIT = 2000;
 export function ChatPanel({
   messages,
   status,
+  progressStatus,
   teaser,
   draft,
   onDraft,
@@ -14,6 +16,7 @@ export function ChatPanel({
   onOpenOffers,
   sending,
   error,
+  progressError,
   unsavedDefinitions,
   savedDefinitionValid,
   onEditDefinitions,
@@ -21,9 +24,10 @@ export function ChatPanel({
   const threadRef = useRef<HTMLDivElement>(null);
   const followLatest = useRef(true);
   const lastMessage = messages.at(-1);
+  const progressErrorSignal = progressStatus ? (progressError ?? error) : undefined;
   useEffect(() => {
     if (followLatest.current && threadRef.current) threadRef.current.scrollTop = threadRef.current.scrollHeight;
-  }, [lastMessage?.id, lastMessage?.content, teaser?.requestId]);
+  }, [lastMessage?.id, lastMessage?.content, progressStatus, teaser?.requestId]);
   const trimmedDraft = draft.trim();
   const draftTooLong = Array.from(trimmedDraft).length > DRAFT_LIMIT;
   const canSend =
@@ -60,7 +64,8 @@ export function ChatPanel({
         </span>
       </div>
 
-      <div ref={threadRef} className="chat-thread" aria-live="polite" aria-relevant="additions text" onScroll={(event)=>{const el=event.currentTarget;followLatest.current=el.scrollHeight-el.scrollTop-el.clientHeight<32;}}>
+      <div ref={threadRef} className="chat-thread" onScroll={(event)=>{const el=event.currentTarget;followLatest.current=el.scrollHeight-el.scrollTop-el.clientHeight<32;}}>
+        <div className="chat-message-list" aria-live="polite" aria-relevant="additions text">
         {messages.length === 0 ? (
           <div className="chat-welcome">
             <span aria-hidden="true">
@@ -96,6 +101,9 @@ export function ChatPanel({
             </article>
           ))
         )}
+        </div>
+
+        {progressStatus ? <AgentProgress status={progressStatus} error={progressErrorSignal} /> : null}
 
         {teaser ? (
           <article className="chat-offer-teaser" aria-label="可查看優惠結果">

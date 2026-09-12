@@ -5,7 +5,7 @@
 ## ADDED Requirements
 
 ### Requirement: Display ranked offer cards
-The UI SHALL render validated result data in ascending rank order, with one complete offer per card, and SHALL preserve backend prices, item quantities, identifiers, reasons, tradeoffs and expiry.
+The UI SHALL render validated result data in ascending rank order, with one complete offer per card, and SHALL preserve backend prices, item quantities, reasons, tradeoffs and expiry. Backend identifiers remain in data for validation and callbacks but SHALL NOT be rendered as technical UI.
 
 #### Scenario: Adapt a shared snapshot
 - **WHEN** the API returns the shared RequestSnapshot
@@ -74,7 +74,7 @@ The UI SHALL poll processing states no faster than once per second with no overl
 
 #### Scenario: Rejected round returns a saved handoff
 - **WHEN** reject returns 200 with status=rejected, feedback and source_documents
-- **THEN** the UI stops decisions and polling, displays the saved feedback and original documents, and retains the request identity for recovery
+- **THEN** the UI stops decisions and polling, displays a user-facing saved feedback summary, hides source_documents from presentation, and retains the request identity for recovery
 - **AND** it neither creates nor follows a child, and displays 回饋已保存，Buyer Agent 尚未接入 when no external integration is connected
 
 #### Scenario: Offer expires before adoption
@@ -102,7 +102,7 @@ The UI SHALL expose seller status and both negotiation rounds from the shared sn
 
 #### Scenario: Three-seller demo
 - **WHEN** the shared happy-path fixture is displayed
-- **THEN** the user can inspect three distinct sellers and their two-round history while the offer deck follows the published fixture ranking and the history is explicitly labeled as simulated
+- **THEN** the user can inspect three distinct sellers and their up-to-five-round history while the offer deck follows the published fixture ranking and the history is explicitly labeled as simulated
 - **AND** Sponsored is rendered only from sponsored_placement and is absent when that field is null
 
 ### Requirement: Apply the reference visual system consistently
@@ -110,7 +110,7 @@ The UI SHALL use the exact semantic color, radius, spacing, typography and shado
 
 #### Scenario: Inspect the result view styling
 - **WHEN** an awaiting_user result is displayed
-- **THEN** the canvas is #F2EEE6, the shared shell is #E8F1F8, the primary card is #FFFFFF, supporting surfaces are #F5F8FC, and primary buttons use #252A28 with white text
+- **THEN** the body and shared shell form a full-bleed #E8F1F8 background, the primary card is #FFFFFF, supporting surfaces are #F5F8FC, and primary buttons use #252A28 with white text
 - **AND** panel, card, media and control radii are respectively 32px, 24px, 20px and 16px, with spacing and typography matching the token table
 - **AND** only raised surfaces use the shared 0 8px 24px rgba(37, 42, 40, 0.08) shadow without stacked decorative shadows
 
@@ -135,18 +135,18 @@ The UI SHALL share the Surface, Button, IconButton, StatusPill, StatusMessage, I
 - **AND** a trusted image, when present, fits within the reserved area without cropping the product, shifting action controls or inventing attributes
 
 ### Requirement: Preserve readable responsive layout and reachable controls
-The UI SHALL implement the viewport, content-flow and safe-area rules in design.md sections 8 and 10. It SHALL retain readable offer terms and equivalent controls when content grows or the viewport changes.
+The UI SHALL implement the full-bleed viewport, internal-scroll and safe-area rules in design.md sections 8 and 10. It SHALL retain readable offer terms and equivalent controls when content grows or the viewport changes without relying on body/document scrolling.
 
 #### Scenario: Review on phone and desktop widths
 - **WHEN** the result is rendered at 320px or 390px width
-- **THEN** it uses one column, 16px page margins, 16px card padding and no page-level horizontal overflow
-- **AND** at 768px the shell uses 24px margins, a 72px navigation rail and a maximum 480px single-column offer card
-- **AND** at 1440px it uses 32px shell margins, a 240px sidebar and a maximum 640px card with media and information in two columns
+- **THEN** it uses one column inside a 100vw by visualViewport/100dvh shell with zero page margins, 16px card padding and no page-level horizontal or vertical overflow
+- **AND** at 768px the shell remains full-bleed, uses a 72px navigation rail and a maximum 480px single-column offer card inside the internally scrolling main slot
+- **AND** at 1440px it remains full-bleed with a 240px sidebar and a maximum 640px card with media and information in two columns
 - **AND** mobile ordering is summary, seller overview, offer, actions, negotiation entry and Sponsored, with full item content available through details
 
 #### Scenario: Read enlarged text with an open software keyboard
 - **WHEN** text is enlarged to 200 percent or the feedback field opens the software keyboard
-- **THEN** text wraps without clipping and all details and controls remain reachable through normal vertical scrolling
+- **THEN** text wraps without clipping and all details and controls remain reachable through internal view scrolling rather than body/document scrolling
 - **AND** a sticky action region reserves its own height and safe-area space or falls back to normal flow if it would obscure content or focus
 - **AND** every action target is at least 44 by 44 CSS pixels, with standard buttons 48px high
 
@@ -280,7 +280,7 @@ The UI SHALL be accepted against the exact token and motion tables and the inter
 
 #### Scenario: Check real input modes and responsive presentation
 - **WHEN** the implemented UI is reviewed for acceptance
-- **THEN** evidence covers 320px, 390px, 768px and 1440px viewports, text enlargement to 200 percent, touch scrolling, keyboard focus and reduced-motion initial and runtime behavior
+- **THEN** evidence covers 320px, 390px, 768px and 1440px viewports, full-bleed shell bounds, absence of body x/y scroll, internal content scrolling, text enlargement to 200 percent, touch scrolling, keyboard focus and reduced-motion initial and runtime behavior
 - **AND** unavailable device checks are reported as unverified instead of treating specification validation as a visual or runtime pass
 
 ### Requirement: Keep the swipe workspace the same size as Chat
@@ -288,7 +288,7 @@ The UI SHALL render offers, feedback, details and accepted or rejected results i
 
 #### Scenario: Open desktop offers from Chat
 - **WHEN** the user activates 查看優惠 from a ready Chat at 1536 by 1024 CSS pixels
-- **THEN** the AppShell remains 1472px wide and 960px high at a 32px top margin with centered horizontal positioning, a 64px header and a 240px sidebar
+- **THEN** the AppShell remains 1536px wide and 1024px high with zero margin, border and radius, a 64px header and a 240px sidebar
 - **AND** the offers workspace uses the full main-content slot previously occupied by chat and editor without retaining a blank editor column or creating a phone-width outer frame
 - **AND** the card alone is centered at a maximum width of 640px, with its own responsive image and information columns
 
@@ -309,8 +309,8 @@ The UI SHALL limit the main card to product imagery, seller, combination name, t
 
 #### Scenario: Open and return from an immutable item list
 - **WHEN** the user clicks the card outside an interactive control, clicks its media, or activates 查看明細 without a recognized drag
-- **THEN** the main slot renders OfferDetails for the same request_id and offer_id, showing every item with its image or placeholder, trusted label or category/product_id, quantity and contract-provided role and terms
-- **AND** prices appear only where supplied; missing per-item prices display 以組合總價計 rather than dividing the total or inventing a discount
+- **THEN** the main slot renders OfferDetails for the selected offer, showing every item with its image or placeholder, trusted label or category, quantity, contract-provided role and natural-language terms without displaying IDs
+- **AND** prices appear only where supplied; missing per-item prices do not display a placeholder such as 未提供單品價格 and the UI does not divide the total or invent a discount
 - **AND** the total, recommendation reason, tradeoffs and complete expiry remain available with read-only quantities and the same adoption rules
 - **AND** returning restores the previous card, skip collection, scroll position and focus without an API mutation
 
@@ -323,3 +323,12 @@ The UI SHALL limit the main card to product imagery, seller, combination name, t
 - **WHEN** the offer expires or becomes accepted or rejected while its details are visible
 - **THEN** the details and deck share the authoritative eligibility and pending state, disabling invalid adoption immediately
 - **AND** returning to the deck cannot revive the old offer or reset its expiry
+
+
+### Requirement: Hide technical API data from result presentation
+The UI SHALL NOT render request_id, offer_id, product_id, terms_id, campaign_id, raw JSON, decision payloads or source_documents in offer, details, negotiation, accepted or rejected views. These fields SHALL remain available in the v0.3 contract for validation, persistence, callbacks and handoff.
+
+#### Scenario: Inspect offer result presentation
+- **WHEN** the user views the deck, details, negotiation history, accepted summary or rejected summary
+- **THEN** no technical identifiers, raw JSON, decision data or source_documents are present in the DOM as user-visible content
+- **AND** the UI still shows seller, round history, total price, delivery, expiry, item category, quantity, natural-language terms, recommendation reason, tradeoffs, Sponsored labels and saved feedback summary

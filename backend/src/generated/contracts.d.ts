@@ -1,5 +1,25 @@
-/* Generated from contracts/result-api.v0.2.schema.json. Do not edit by hand. */
+/* Generated from contracts/a2a-commerce.v0.3.schema.json. Do not edit by hand. */
 
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "NegotiationRound".
+ */
+export type NegotiationRound = number;
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "BranchStopReason".
+ */
+export type BranchStopReason =
+  | null
+  | "seller_final"
+  | "refused"
+  | "timeout"
+  | "error"
+  | "no_adjustment"
+  | "max_rounds"
+  | "global_deadline"
+  | "call_budget"
+  | "token_budget";
 /**
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
  * via the `definition` "Id".
@@ -60,27 +80,17 @@ export type EligibilityReasonCode =
 export type NegotiationPolicy =
   | {
       bundle_mode: "disabled";
-      /**
-       * @maxItems 0
-       */
-      allowed_addon_categories: [];
+      allowed_addon_categories: unknown[];
       max_addon_increment_twd: 0;
     }
   | {
       bundle_mode: "related_no_extra_cost";
-      /**
-       * @maxItems 1
-       */
-      allowed_addon_categories: [] | ["mouse_pad"];
+      allowed_addon_categories: "mouse_pad"[];
       max_addon_increment_twd: 0;
     }
   | {
       bundle_mode: "related_with_cap";
-      /**
-       * @minItems 1
-       * @maxItems 1
-       */
-      allowed_addon_categories: ["mouse_pad"];
+      allowed_addon_categories: "mouse_pad"[];
       max_addon_increment_twd: number;
     };
 /**
@@ -103,10 +113,7 @@ export type RFQProductPreference =
       strength: "required" | "preferred";
       attribute: "size_class" | "color" | "shape";
       operator: "in" | "not_in";
-      /**
-       * @minItems 1
-       */
-      values: [string, ...string[]];
+      values: string[];
     }
   | {
       preference_id: Id;
@@ -123,6 +130,8 @@ export type RFQProductPreference =
 export type EligibleOffer = unknown;
 
 export interface A2ACommerceContracts {
+  NegotiationRound?: NegotiationRound;
+  BranchStopReason?: BranchStopReason;
   Id?: Id;
   Timestamp?: Timestamp;
   MoneyTwd?: MoneyTwd;
@@ -167,6 +176,12 @@ export interface A2ACommerceContracts {
   EligibleOffer?: EligibleOffer;
   EvaluatorInput?: EvaluatorInput;
   EvaluatorOutput?: EvaluatorOutput;
+  MarketplacePrice?: MarketplacePrice;
+  MarketplaceEvidence?: MarketplaceEvidence;
+  MarketplaceSourceSnapshot?: MarketplaceSourceSnapshot;
+  CatalogProductFixture?: CatalogProductFixture;
+  SellerFixtureStore?: SellerFixtureStore;
+  DemoScenarioSuite?: DemoScenarioSuite;
 }
 /**
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
@@ -219,10 +234,7 @@ export interface CategoricalProductPreference {
   source_text: string;
   attribute: "size_class" | "color" | "shape";
   operator: "in" | "not_in";
-  /**
-   * @minItems 1
-   */
-  values: [string, ...string[]];
+  values: string[];
 }
 /**
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
@@ -245,10 +257,7 @@ export interface NormalizedIntent {
   category: "mouse";
   max_total_twd: MoneyTwd;
   delivery_days_max: number;
-  /**
-   * @minItems 1
-   */
-  required_features: [string, ...string[]];
+  required_features: string[];
   preferences: ("price_first" | "delivery_first" | "trust_first")[];
   product_preferences: ProductPreference[];
   negotiation_policy: NegotiationPolicy;
@@ -292,14 +301,17 @@ export interface Trust {
  * via the `definition` "SellerRound".
  */
 export interface SellerRound {
-  round: 1 | 2;
+  round: NegotiationRound;
   outcome: "offered" | "refused" | "timeout" | "error";
   /**
-   * @maxItems 2
+   * Seller explicitly ends this branch; valid only with an offered outcome.
    */
-  offer_ids: [] | [Id] | [Id, Id];
+  is_final: boolean;
+  offer_ids: Id[];
 }
 /**
+ * One Buyer branch for a selected Seller. Backend assigns stop_reason; null means active. IDs and round order require cross-object validation.
+ *
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
  * via the `definition` "SellerAgent".
  */
@@ -308,20 +320,12 @@ export interface SellerAgent {
   name: string;
   listing_rank: number;
   match_reason: string;
-  /**
-   * @minItems 1
-   */
-  candidate_products: [ProductMatch, ...ProductMatch[]];
+  candidate_products: ProductMatch[];
   trust: Trust;
   status: "pending" | "negotiating" | "offered" | "refused" | "timeout" | "error";
-  /**
-   * @maxItems 2
-   */
-  rounds: [] | [SellerRound] | [SellerRound, SellerRound];
-  /**
-   * @maxItems 2
-   */
-  final_offer_ids: [] | [Id] | [Id, Id];
+  rounds: SellerRound[];
+  stop_reason: BranchStopReason;
+  final_offer_ids: Id[];
 }
 /**
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
@@ -386,18 +390,11 @@ export interface Eligibility {
 export interface Offer {
   offer_id: Id;
   seller_id: Id;
-  round: 1 | 2;
+  round: NegotiationRound;
   variant: "standalone" | "bundle";
   baseline_offer_id: Id | null;
-  /**
-   * @minItems 1
-   * @maxItems 2
-   */
-  items: [OfferItem] | [OfferItem, OfferItem];
-  /**
-   * @minItems 1
-   */
-  primary_features: [string, ...string[]];
+  items: OfferItem[];
+  primary_features: string[];
   total_price_twd: MoneyTwd;
   delivery_days: number;
   terms_id: Id;
@@ -413,16 +410,7 @@ export interface RankedOffer {
   rank: number;
   offer_id: Id;
   reason: string;
-  /**
-   * @maxItems 5
-   */
-  tradeoffs:
-    | []
-    | [string]
-    | [string, string]
-    | [string, string, string]
-    | [string, string, string, string]
-    | [string, string, string, string, string];
+  tradeoffs: string[];
 }
 /**
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
@@ -505,28 +493,16 @@ export interface ErrorResponse {
 export interface SellerRFQ {
   request_id: Id;
   seller_id: Id;
-  round: 1 | 2;
+  round: NegotiationRound;
   category: "mouse";
-  /**
-   * @minItems 1
-   */
-  required_features: [string, ...string[]];
-  /**
-   * @minItems 1
-   */
-  candidate_product_ids: [Id, ...Id[]];
+  required_features: string[];
+  candidate_product_ids: Id[];
   product_preferences: RFQProductPreference[];
   pending_checks: ("availability" | "delivery")[];
   delivery_days_max: number;
-  /**
-   * @maxItems 1
-   */
-  allowed_addon_categories: [] | ["mouse_pad"];
+  allowed_addon_categories: "mouse_pad"[];
   target_total_twd: number | null;
-  /**
-   * @maxItems 2
-   */
-  previous_offer_ids: [] | [Id] | [Id, Id];
+  previous_offer_ids: Id[];
 }
 /**
  * Untrusted Seller proposal. The Backend assigns offer_id and eligibility after validation.
@@ -538,15 +514,8 @@ export interface SellerOfferDraft {
   draft_ref: Id;
   variant: "standalone" | "bundle";
   baseline_draft_ref: Id | null;
-  /**
-   * @minItems 1
-   * @maxItems 2
-   */
-  items: [OfferItem] | [OfferItem, OfferItem];
-  /**
-   * @minItems 1
-   */
-  primary_features: [string, ...string[]];
+  items: OfferItem[];
+  primary_features: string[];
   total_price_twd: MoneyTwd;
   delivery_days: number;
   terms_id: Id;
@@ -560,12 +529,13 @@ export interface SellerOfferDraft {
 export interface SellerNegotiationResult {
   request_id: Id;
   seller_id: Id;
-  round: 1 | 2;
+  round: NegotiationRound;
   outcome: "offered" | "refused" | "timeout" | "error";
   /**
-   * @maxItems 2
+   * Seller explicitly ends this branch; valid only with an offered outcome.
    */
-  drafts: [] | [SellerOfferDraft] | [SellerOfferDraft, SellerOfferDraft];
+  is_final: boolean;
+  drafts: SellerOfferDraft[];
   message: string;
 }
 /**
@@ -586,10 +556,7 @@ export interface EvaluatorInput {
   request_id: Id;
   evaluated_at: Timestamp;
   intent: NormalizedIntent;
-  /**
-   * @minItems 1
-   */
-  offers: [EligibleOffer, ...EligibleOffer[]];
+  offers: EligibleOffer[];
   seller_trust: SellerTrustEntry[];
 }
 /**
@@ -597,8 +564,152 @@ export interface EvaluatorInput {
  * via the `definition` "EvaluatorOutput".
  */
 export interface EvaluatorOutput {
-  /**
-   * @minItems 1
-   */
-  ranked_offers: [RankedOffer, ...RankedOffer[]];
+  ranked_offers: RankedOffer[];
+}
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "MarketplacePrice".
+ */
+export interface MarketplacePrice {
+  amount: number;
+  currency: "TWD" | "EUR" | "USD";
+  includes_tax: "yes" | "no" | "unknown";
+  includes_shipping: "yes" | "no" | "unknown";
+}
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "MarketplaceEvidence".
+ */
+export interface MarketplaceEvidence {
+  source_id: Id;
+  marketplace: "shopee_tw" | "amazon_ie" | "logitech_official";
+  source_type: "marketplace_listing" | "marketplace_search_result" | "manufacturer_spec";
+  product_key: Id;
+  title: string;
+  url: string;
+  retrieved_at: Timestamp;
+  observed_at: Timestamp | null;
+  freshness: "current" | "current_cached" | "stale_cached_reference";
+  availability: "listed" | "in_stock" | "sold_out" | "unknown" | "not_applicable";
+  price: MarketplacePrice | null;
+  facts: string[];
+  notes: string[];
+}
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "MarketplaceSourceSnapshot".
+ */
+export interface MarketplaceSourceSnapshot {
+  fixture_version: "0.2";
+  snapshot_id: Id;
+  retrieved_at: Timestamp;
+  purpose: string;
+  usage_policy: {
+    live_checkout_allowed: false;
+    price_guarantee: false;
+    taiwan_demo_price_sources: "shopee_tw"[];
+    reference_only_sources: ("amazon_ie" | "logitech_official")[];
+    notes: string[];
+  };
+  sources: MarketplaceEvidence[];
+}
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "CatalogProductFixture".
+ */
+export interface CatalogProductFixture {
+  product_id: Id;
+  category: ProductCategory;
+  brand: string;
+  model: string;
+  name: string;
+  features: string[];
+  attributes: ProductAttributes;
+  source_price_twd: MoneyTwd;
+  list_price_twd: MoneyTwd;
+  floor_price_twd: MoneyTwd;
+  stock: number;
+  delivery_days: number;
+  terms_id: Id;
+  source_ids: Id[];
+}
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "SellerFixtureStore".
+ */
+export interface SellerFixtureStore {
+  fixture_version: "0.3";
+  generated_at: Timestamp;
+  source_snapshot_id: Id;
+  data_classification: {
+    public_snapshot_fields: string[];
+    synthetic_demo_fields: string[];
+    notice: string;
+  };
+  terms: {
+    terms_id: Id;
+    warranty_months: number;
+    return_days: number;
+    payment_obligation: "one_time";
+  }[];
+  sellers: {
+    seller_id: Id;
+    name: string;
+    enabled: boolean;
+    strategy: {
+      type:
+        "lowest_price_slow_delivery" | "premium_fast_delivery" | "value_bundle" | "balanced_delivery" | "firm_price";
+      round_discounts_twd: number[];
+      final_round: NegotiationRound | null;
+      bundle_mode: "none" | "free_optional_mouse_pad";
+    };
+    trust: Trust;
+    products: CatalogProductFixture[];
+  }[];
+  campaigns: {
+    campaign_id: Id;
+    seller_id: Id;
+    enabled: boolean;
+    target_category: ProductCategory;
+    bid_twd: MoneyTwd;
+    starts_at: Timestamp;
+    ends_at: Timestamp;
+  }[];
+}
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "DemoScenarioSuite".
+ */
+export interface DemoScenarioSuite {
+  fixture_version: "0.3";
+  catalog_fixture: "sellers.json";
+  source_snapshot: "marketplace-source-snapshot.json";
+  canonical_flow_fixture: "happy-path.json";
+  scenarios: {
+    scenario_id: Id;
+    title: string;
+    intent: {
+      max_total_twd: MoneyTwd;
+      delivery_days_max: number;
+      required_features: string[];
+      preferences: ("price_first" | "delivery_first" | "trust_first")[];
+      required_color: string;
+      preferred_shape: string | null;
+      bundle_mode: "disabled" | "related_no_extra_cost" | "related_with_cap";
+    };
+    runtime_faults: string[];
+    expected: {
+      request_status: Status;
+      seller_statuses: {
+        seller_a: "offered" | "refused" | "timeout" | "error" | "no_match";
+        seller_b: "offered" | "refused" | "timeout" | "error" | "no_match";
+        seller_c: "offered" | "refused" | "timeout" | "error" | "no_match";
+        seller_d: "offered" | "refused" | "timeout" | "error" | "no_match";
+        seller_e: "offered" | "refused" | "timeout" | "error" | "no_match";
+      };
+      eligible_offer_ids: Id[];
+      recommended_offer_id: Id | null;
+      reason_codes: EligibilityReasonCode[];
+    };
+  }[];
 }

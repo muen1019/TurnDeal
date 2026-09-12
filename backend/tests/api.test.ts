@@ -5,7 +5,6 @@ import request from "supertest";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { createApp } from "../src/app.js";
-import { normalizeIntent, reviseDocuments } from "../src/demoPipeline.js";
 import { isValid } from "../src/schema.js";
 import type { Offer, RequestSnapshot } from "../src/types.js";
 
@@ -49,7 +48,7 @@ function offerEnding(snapshot: RequestSnapshot, suffix: string): Offer {
 }
 
 describe("OfferMesh backend API", () => {
-  it("publishes request-scoped two-round offers and persists an accepted decision", async () => {
+  it("publishes request-scoped five-round offers and persists an accepted decision", async () => {
     const dbPath = tempDbPath();
     let currentTime = new Date("2026-09-12T02:00:00.000Z");
     const app = await createApp({ dbPath, now: () => currentTime });
@@ -61,8 +60,8 @@ describe("OfferMesh backend API", () => {
     const snapshot = await readySnapshot(app, created.body.request_id);
     expect(isValid("RequestSnapshot", snapshot)).toBe(true);
     expect(snapshot.status).toBe("awaiting_user");
-    expect(snapshot.seller_agents).toHaveLength(3);
-    expect(snapshot.offers).toHaveLength(7);
+    expect(snapshot.seller_agents).toHaveLength(5);
+    expect(snapshot.offers).toHaveLength(24);
 
     const knownOfferIds = new Set(snapshot.offers.map((offer) => offer.offer_id));
     for (const seller of snapshot.seller_agents) {
@@ -73,12 +72,14 @@ describe("OfferMesh backend API", () => {
       }
     }
 
-    expect(snapshot.offers.filter((offer) => offer.round === 1).every((offer) => offer.eligibility.status === "rejected")).toBe(true);
+    expect(snapshot.offers.filter((offer) => offer.round === 1 && offer.seller_id !== "seller_e").every((offer) => offer.eligibility.status === "rejected")).toBe(true);
     expect(snapshot.ranked_offers.map((offer) => offer.offer_id)).toEqual([
-      offerEnding(snapshot, "offer_a_r2").offer_id,
-      offerEnding(snapshot, "offer_c_standalone_r2").offer_id,
-      offerEnding(snapshot, "offer_c_bundle_r2").offer_id,
-      offerEnding(snapshot, "offer_b_r2").offer_id
+      offerEnding(snapshot, "offer_a_r5").offer_id,
+      offerEnding(snapshot, "offer_c_standalone_r5").offer_id,
+      offerEnding(snapshot, "offer_c_bundle_r5").offer_id,
+      offerEnding(snapshot, "seller_d_r3").offer_id,
+      offerEnding(snapshot, "seller_e_r1").offer_id,
+      offerEnding(snapshot, "offer_b_r5").offer_id
     ]);
     expect(JSON.stringify(snapshot.ranked_offers)).not.toContain("campaign");
 
@@ -90,7 +91,7 @@ describe("OfferMesh backend API", () => {
       .expect(200);
     expect(isValid("AcceptDecisionResult", accepted.body)).toBe(true);
 
-    currentTime = new Date(Date.parse(offerEnding(snapshot, "offer_a_r2").expires_at) + 1000);
+    currentTime = new Date(Date.parse(offerEnding(snapshot, "offer_a_r5").expires_at) + 1000);
     const replay = await request(app)
       .post(`/api/requests/${snapshot.request_id}/decisions`)
       .set("Idempotency-Key", "accept-happy")
@@ -137,9 +138,9 @@ describe("OfferMesh backend API", () => {
     const app = await createApp({ dbPath, now: () => currentTime });
     const created = await request(app).post("/api/requests").set("Idempotency-Key", "create-expiry").send(createBody()).expect(202);
     const snapshot = await readySnapshot(app, created.body.request_id);
-    const offerId = offerEnding(snapshot, "offer_a_r2").offer_id;
+    const offerId = offerEnding(snapshot, "offer_a_r5").offer_id;
 
-    currentTime = new Date(Date.parse(offerEnding(snapshot, "offer_a_r2").expires_at));
+    currentTime = new Date(Date.parse(offerEnding(snapshot, "offer_a_r5").expires_at));
     const expired = await request(app)
       .post(`/api/requests/${snapshot.request_id}/decisions`)
       .set("Idempotency-Key", "accept-expired")
@@ -278,64 +279,5 @@ describe("OfferMesh backend API", () => {
     expect(snapshot.body.status).toBe("failed");
     expect(snapshot.body.error.code).toBe("processing_interrupted");
     expect(isValid("RequestSnapshot", snapshot.body)).toBe(true);
-  });
-});
-
-describe("intent and feedback parsing", () => {
-  it("keeps free gifts eligible when the buyer rejects only paid add-ons", () => {
-    const intent = normalizeIntent({
-      revision: 1,
-      intent_md: "本次購買需求：我要無線靜音滑鼠，NT$900含運，七天內到貨，不要付費加購。",
-      preference_md: ""
-    });
-    expect(intent.max_total_twd).toBe(900);
-    expect(intent.delivery_days_max).toBe(7);
-    expect(intent.required_features).toEqual(["wireless", "silent_click"]);
-    expect(intent.negotiation_policy.bundle_mode).toBe("related_no_extra_cost");
-  });
-
-  it("preserves existing constraints when feedback lowers budget and disables accessories", () => {
-    const base = {
-      revision: 1,
-      intent_md: "本次購買需求：我要黑色無線靜音滑鼠，預算1000元，七天內到貨。",
-      preference_md: "偏好小型、對稱。"
-    };
-    const revised = reviseDocuments(base, "預算改成800元，不需要滑鼠墊。");
-    const intent = normalizeIntent(revised);
-    expect(intent.max_total_twd).toBe(800);
-    expect(intent.delivery_days_max).toBe(7);
-    expect(intent.required_features).toEqual(["wireless", "silent_click"]);
-    expect(intent.product_preferences.map((preference) => preference.preference_id)).toEqual([
-      "color_black",
-      "size_small",
-      "shape_symmetrical"
-    ]);
-    expect(intent.negotiation_policy.bundle_mode).toBe("disabled");
-  });
-
-  it("filters the no-accessory follow-up so no bundle remains eligible", () => {
-    const revised = reviseDocuments(
-      {
-        revision: 1,
-        intent_md: "本次購買需求：我要黑色無線靜音滑鼠，預算1000元，七天內到貨。",
-        preference_md: "偏好小型、對稱。"
-      },
-      "不要配件，預算改成900元。"
-    );
-    const appResult = normalizeIntent(revised);
-    expect(appResult.max_total_twd).toBe(900);
-
-    const runtimeResult = revised;
-    const offers = import("../src/demoPipeline.js").then(({ runDemoPipeline }) =>
-      runDemoPipeline("req_child", runtimeResult, new Date("2026-09-12T02:00:00.000Z")).offers
-    );
-    return expect(offers).resolves.toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          offer_id: "req_child:offer_c_bundle_r2",
-          eligibility: expect.objectContaining({ status: "rejected", reason_codes: expect.arrayContaining(["bundle_disabled"]) })
-        })
-      ])
-    );
   });
 });

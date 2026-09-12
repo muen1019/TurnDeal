@@ -12,6 +12,7 @@ data/*.db
 data/backups/
 
 # Logs and editor state
+*.bak-*
 *.log
 .DS_Store
 .vscode/

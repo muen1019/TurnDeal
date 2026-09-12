@@ -2,16 +2,16 @@
 
 These instructions apply to every change in this repository.
 
-## Result demo compatibility boundary
+## Unified Result contract
 
-The Result backend/frontend currently use `contracts/result-api.v0.2.schema.json` and `contracts/fixtures/result-sellers.v0.2.json` (three sellers, two mock rounds). This separate contract retains accept/reject=200 and the original feedback/source_documents handoff without intent rewriting, child requests, redemption, or stock mutation. It is not the five-seller contract and must not overwrite or consume the full-product fixtures accidentally.
+Use contracts/a2a-commerce.v0.3.schema.json for all active producers and consumers. main's five-seller/five-round types and catalog are combined with local accept/reject=200 and original feedback/source_documents handoff. Contracts under contracts/archive are historical, never alternative live API inputs.
 
-The full-product contract remains `contracts/a2a-commerce.v0.2.schema.json` with the five-seller/five-round fixtures and `db/migrations/`. Result uses its own SQLite database in backend/data; the full-product persistence and Result persistence are not interchangeable. Root database scripts require Node 24; backend/frontend continue using Node 20.19.5. Run both contract validators and the applicable database/application tests when integrating them.
+Backend persistence uses db/migrations including 003_result_decisions.sql. Published snapshots and offers stay immutable; Result state and saved decisions are separate columns. Result automatically backs up and migrates its earlier SQLite layout without regenerating old prices. Root database scripts use Node 24; backend/frontend use Node 20.19.5.
 
 ## Source of truth
 
 1. Follow the Sea x OpenAI hackathon rules summarized in `docs/DEVELOPMENT_RULES.md`.
-2. Treat `contracts/a2a-commerce.v0.2.schema.json` as the shared data contract.
+2. Treat `contracts/a2a-commerce.v0.3.schema.json` as the shared data contract.
 3. Treat `contracts/openai/evaluator-output.schema.json` as the only allowed Structured Outputs shape for the Evaluator.
 4. Use the deterministic fixtures in `contracts/fixtures/` for integration work and demos.
 5. Treat `db/migrations/` as the authoritative persistent-state schema. Rebuild local SQLite data from migrations and fixtures; never commit runtime database files.
@@ -29,7 +29,7 @@ The full-product contract remains `contracts/a2a-commerce.v0.2.schema.json` with
 - A recommendation never purchases an item. The user must accept an offer, then redeem the same immutable offer ID before expiry.
 - Revalidate expiry, inventory, ownership, price, delivery, items, and terms at acceptance and redemption.
 - Do not infer permission for a paid add-on. Missing bundle preference defaults to related add-ons at no extra cost only.
-- Request snapshots are immutable once published. A rejection with actionable feedback creates a child request and a new document revision.
+- Request snapshots are immutable once published. A rejection saves the original feedback and source_documents; Buyer Agent rewriting and child creation are a future integration.
 - SQLite is the source of truth for request-scoped and long-term preferences. Agent conversation memory is never authoritative.
 - POST endpoints require an idempotency key. Resource access is scoped to the authenticated buyer.
 

@@ -7,7 +7,8 @@ artifacts=Path('test-results');artifacts.mkdir(exist_ok=True)
 with sync_playwright() as p:
     browser=p.chromium.launch(headless=True)
     page=browser.new_page(viewport={'width':1536,'height':1024})
-    errors=[];posts=[]
+    errors=[];posts=[];api_requests=[]
+    page.on('request',lambda r:api_requests.append({'method':r.method,'path':r.url.split(base)[-1]}) if '/api/' in r.url or '/__mock/' in r.url else None)
     page.on('pageerror',lambda e:errors.append(str(e)))
     page.on('request',lambda r:posts.append({'url':r.url,'body':r.post_data_json}) if r.method=='POST' and '/api/' in r.url else None)
     page.goto(base+'/chat');page.wait_for_load_state('networkidle')
@@ -26,7 +27,7 @@ with sync_playwright() as p:
         expect(page.get_by_role('heading',name='為你找到的優惠')).to_be_visible()
         request_id=re.search(r'/requests/([^/?]+)',page.url).group(1)
         snapshot=page.request.get(base+'/api/requests/'+request_id).json()
-        assert snapshot['status']=='awaiting_user' and len(snapshot['seller_agents'])==3
+        assert snapshot['status']=='awaiting_user' and len(snapshot['seller_agents'])==5
         return request_id,snapshot
     first_id,s=create()
     expect(page.get_by_role('button',name='立即採用',exact=True)).to_be_enabled()
@@ -60,6 +61,8 @@ with sync_playwright() as p:
     assert len([r for r in posts if r['body'].get('action')=='reject'])==1
     assert len([r for r in posts if r['url'].endswith('/api/requests')])==2
     assert all('/redemptions' not in r['url'] for r in posts)
+    assert all(re.fullmatch(r'/api/requests(?:/[^/?]+(?:/decisions)?)?',r['path']) for r in api_requests),api_requests
+    assert all((r['method']=='POST' and (r['path']=='/api/requests' or r['path'].endswith('/decisions'))) or (r['method']=='GET' and re.fullmatch(r'/api/requests/[^/?]+',r['path'])) for r in api_requests),api_requests
     page.screenshot(path=str(artifacts/'result-api-rejected.png'),full_page=True)
     page.set_viewport_size({'width':390,'height':844})
     expect(page.get_by_role('heading',name='回饋已保存',exact=True)).to_be_visible()
