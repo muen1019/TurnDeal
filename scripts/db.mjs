@@ -362,11 +362,11 @@ function verifyLegacyMigration() {
     const preserved = ["requests", "offers", "decisions", "redemptions"].map(table => [table, db.prepare(`SELECT * FROM ${table}`).all()]);
     applyMigrations(db);
     applyMigrations(db); // Applying already-recorded migrations must be a no-op.
-    for (const [table, rows] of preserved) assert.deepEqual(db.prepare(`SELECT * FROM ${table}`).all(), rows, `${table} must survive the v0.2 migration unchanged`);
+    for (const [table, rows] of preserved) assert.deepEqual(db.prepare(`SELECT ${Object.keys(rows[0]).join(",")} FROM ${table}`).all(), rows, `${table} must survive the v0.2 migration unchanged`);
     assert.deepEqual(JSON.parse(db.prepare("SELECT round_discounts_json FROM sellers").get().round_discounts_json), [30, 60, 60, 60, 60]);
     assert.equal(db.prepare("SELECT is_final FROM negotiation_rounds").get().is_final, 0);
     assert.equal(db.prepare("SELECT stop_reason FROM request_sellers").get().stop_reason, null);
-    assert.equal(getCount(db, "schema_migrations"), 4);
+    assert.equal(getCount(db, "schema_migrations"), 5);
     assert.equal(db.prepare("PRAGMA foreign_keys").get().foreign_keys, 1);
     assert.deepEqual(db.prepare("PRAGMA foreign_key_check").all(), []);
     assert.throws(() => db.exec("UPDATE offers SET total_price_twd = 1"), /offers are immutable/);
@@ -384,7 +384,7 @@ function verifyDatabase(db) {
   assert.deepEqual(db.prepare("PRAGMA foreign_key_check").all(), [], "foreign keys must be valid");
 
   const expectedCounts = {
-    schema_migrations: 4,
+    schema_migrations: 5,
     users: 1,
     marketplace_sources: 11,
     sellers: 5,

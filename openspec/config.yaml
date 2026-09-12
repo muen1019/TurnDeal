@@ -1,0 +1,30 @@
+schema: spec-driven
+context: |
+  OfferMesh is a shopping-offer comparison and feedback-loop MVP.
+  UI/API applications are not implemented yet. Shared contracts, fixtures and a contract validator exist.
+  Frontend: React + TypeScript + Vite in frontend/.
+  Backend: Node.js + TypeScript + Express 5 + SQLite in backend/.
+  Required application runtime: Node.js >=20.19.0 <21; npm; commit lockfiles during implementation.
+  Confirmed interaction: swipe right immediately accepts one offer and ends the round on success.
+  Swipe left only skips locally. Rejecting a round requires explicit feedback.
+  Preserve backend offer IDs, prices, expiry and ranking. Accepting is not redeeming or paying.
+  Result UI input examples and visual reference are in frontend/README.md.
+  contracts/a2a-commerce.v0.1.schema.json is the shared data source of truth.
+  backend/openapi.json describes HTTP operations and references shared types without duplicating them.
+  GET returns RequestSnapshot. Frontend ResultAdapter derives its local ResultView.
+  Use existing three-seller/two-round fixtures; display Sponsored separately and support virtual redemption.
+  AI failure must use a safe deterministic fallback that still validates all requirements.
+  Define and validate specs in this change; do not claim that specification completion is implementation completion.
+rules:
+  proposal:
+    - Write explanatory prose in Traditional Chinese; retain required OpenSpec section headings.
+    - Keep UI, API, and feedback-loop capabilities explicit and keep payment outside this change.
+  specs:
+    - Use SHALL or MUST and at least one WHEN/THEN scenario per requirement.
+    - Cover immediate acceptance, skipped cards, unknown submission outcomes, expiry, and feedback revision.
+  design:
+    - Preserve the Node.js 20 constraint and keep frontend and backend independently runnable.
+    - State mock-versus-live pipeline boundaries and atomic decision/idempotency behavior.
+  tasks:
+    - Group tasks into batches of at most 10 checkboxes, with verifiable completion criteria.
+    - Leave implementation tasks unchecked until actual implementation and validation are complete.

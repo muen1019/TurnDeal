@@ -1,0 +1,161 @@
+{
+  "fixture_version": "0.1",
+  "generated_at": "2026-09-12T10:00:00+08:00",
+  "terms": [
+    {
+      "terms_id": "terms_standard_v1",
+      "warranty_months": 12,
+      "return_days": 7,
+      "payment_obligation": "one_time"
+    }
+  ],
+  "sellers": [
+    {
+      "seller_id": "seller_a",
+      "name": "Budget Mouse Co.",
+      "enabled": true,
+      "strategy": {
+        "type": "lowest_price_slow_delivery",
+        "round_1_discount_twd": 110,
+        "round_2_discount_twd": 170,
+        "bundle_mode": "none"
+      },
+      "trust": {
+        "personal_band": "positive",
+        "personal_rating": 4.8,
+        "personal_count": 3,
+        "marketplace_rating": 4.6,
+        "marketplace_count": 128
+      },
+      "products": [
+        {
+          "product_id": "mouse_a_black_small",
+          "category": "mouse",
+          "name": "Aero Lite Wireless Mouse",
+          "features": ["wireless", "silent_click"],
+          "attributes": {
+            "size_class": "small",
+            "color": "black",
+            "shape": "symmetrical",
+            "length_mm": 105,
+            "width_mm": 60,
+            "height_mm": 35
+          },
+          "list_price_twd": 890,
+          "floor_price_twd": 700,
+          "stock": 12,
+          "delivery_days": 5,
+          "terms_id": "terms_standard_v1"
+        }
+      ]
+    },
+    {
+      "seller_id": "seller_b",
+      "name": "FlashShip Tech",
+      "enabled": true,
+      "strategy": {
+        "type": "premium_fast_delivery",
+        "round_1_discount_twd": 40,
+        "round_2_discount_twd": 90,
+        "bundle_mode": "none"
+      },
+      "trust": {
+        "personal_band": "neutral",
+        "personal_rating": null,
+        "personal_count": 0,
+        "marketplace_rating": 4.8,
+        "marketplace_count": 502
+      },
+      "products": [
+        {
+          "product_id": "mouse_b_black_small",
+          "category": "mouse",
+          "name": "Swift One Wireless Mouse",
+          "features": ["wireless", "silent_click"],
+          "attributes": {
+            "size_class": "small",
+            "color": "black",
+            "shape": "symmetrical",
+            "length_mm": 106,
+            "width_mm": 61,
+            "height_mm": 36
+          },
+          "list_price_twd": 990,
+          "floor_price_twd": 850,
+          "stock": 30,
+          "delivery_days": 1,
+          "terms_id": "terms_standard_v1"
+        }
+      ]
+    },
+    {
+      "seller_id": "seller_c",
+      "name": "Bundle Lab",
+      "enabled": true,
+      "strategy": {
+        "type": "value_bundle",
+        "round_1_discount_twd": 50,
+        "round_2_discount_twd": 90,
+        "bundle_mode": "free_optional_mouse_pad"
+      },
+      "trust": {
+        "personal_band": "negative",
+        "personal_rating": 2.5,
+        "personal_count": 2,
+        "marketplace_rating": 4.3,
+        "marketplace_count": 76
+      },
+      "products": [
+        {
+          "product_id": "mouse_c_black_small",
+          "category": "mouse",
+          "name": "Comet Wireless Mouse",
+          "features": ["wireless", "silent_click"],
+          "attributes": {
+            "size_class": "small",
+            "color": "black",
+            "shape": "symmetrical",
+            "length_mm": 107,
+            "width_mm": 60,
+            "height_mm": 35
+          },
+          "list_price_twd": 930,
+          "floor_price_twd": 760,
+          "stock": 18,
+          "delivery_days": 3,
+          "terms_id": "terms_standard_v1"
+        },
+        {
+          "product_id": "pad_c_black",
+          "category": "mouse_pad",
+          "name": "Control Mini Mouse Pad",
+          "features": ["non_slip"],
+          "attributes": {
+            "size_class": "small",
+            "color": "black",
+            "shape": "rectangular",
+            "length_mm": 250,
+            "width_mm": 210,
+            "height_mm": 3
+          },
+          "list_price_twd": 180,
+          "floor_price_twd": 80,
+          "stock": 40,
+          "delivery_days": 3,
+          "terms_id": "terms_standard_v1"
+        }
+      ]
+    }
+  ],
+  "campaigns": [
+    {
+      "campaign_id": "campaign_b_launch",
+      "seller_id": "seller_b",
+      "enabled": true,
+      "target_category": "mouse",
+      "bid_twd": 25,
+      "starts_at": "2026-09-12T09:00:00+08:00",
+      "ends_at": "2026-09-12T18:00:00+08:00"
+    }
+  ]
+}

@@ -110,7 +110,7 @@ for (const file of jsonFiles) {
 }
 console.log(`✓ parsed ${jsonFiles.length} contract JSON files`);
 
-const schema = await readJson("contracts/a2a-commerce.v0.2.schema.json");
+const schema = await readJson("contracts/a2a-commerce.v0.3.schema.json");
 const expectedDefs = [
   "CreateRequest",
   "DocumentBundle",
@@ -418,21 +418,22 @@ for (const attack of edge.evaluator_output_attacks) {
 console.log("✓ edge cases reject hard-constraint violations and invalid model-selected IDs");
 
 const api = await readJson("contracts/fixtures/api-examples.json");
+const redemption = await readJson("contracts/archive/redemption-example.v0.2.json");
 validateContract("CreateRequest", api.create_request.body);
 validateContract("AcceptDecision", api.accept_decision.body);
 validateContract("RejectDecision", api.reject_decision_alternative.body);
-validateContract("RedeemRequest", api.redeem.body);
+validateContract("RedeemRequest", redemption.body);
 validateContract("RequestSnapshot", api.create_request.response);
 validateContract("DecisionResult", api.accept_decision.response);
 validateContract("DecisionResult", api.reject_decision_alternative.response);
-validateContract("RedemptionReceipt", api.redeem.response);
-assert.equal(api.redeem.response.offer_id, api.accept_decision.body.offer_id);
-assert.equal(api.redeem.response.total_price_twd, snapshot.offers.find(o => o.offer_id === api.redeem.body.offer_id).total_price_twd, "Redemption receipt must retain the immutable accepted price");
-for (const example of [api.create_request, api.accept_decision, api.reject_decision_alternative, api.redeem]) {
+validateContract("RedemptionReceipt", redemption.response);
+assert.equal(redemption.response.offer_id, api.accept_decision.body.offer_id);
+assert.equal(redemption.response.total_price_twd, snapshot.offers.find(o => o.offer_id === redemption.body.offer_id).total_price_twd, "Redemption receipt must retain the immutable accepted price");
+for (const example of [api.create_request, api.accept_decision, api.reject_decision_alternative, redemption]) {
   assert.ok(example.http.headers["Idempotency-Key"], `${example.http.method} ${example.http.path} needs Idempotency-Key`);
 }
 assert.equal(api.get_request.http.headers["Idempotency-Key"], undefined, "GET must not require Idempotency-Key");
-assert.equal(api.redeem.body.total_price_twd, undefined, "redemption client must not submit a price");
-console.log("✓ API examples preserve idempotency and server-authoritative redemption pricing");
+assert.equal(redemption.body.total_price_twd, undefined, "redemption client must not submit a price");
+console.log("✓ Current API examples preserve idempotency; archived redemption retains immutable pricing");
 
 console.log("\nAll A2A Commerce contract checks passed.");

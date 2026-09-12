@@ -1,5 +1,11 @@
 # OfferMesh
 
+## 目前可執行：Result API v0.3
+
+目前前後端與 main 共用 `contracts/a2a-commerce.v0.3.schema.json`、五家／最多五輪商品資料與 db/migrations。accept/reject 保存及 Buyer Agent 原始回饋交接已整合。Root database tools 使用 Node 24，backend/frontend 使用 Node 20.19.5。
+
+backend/frontend 已支援 Chat intent → mock 商品組合 → 真實 accept/reject → SQLite 保存與 GET 恢復。reject 提供 feedback + 原始 source_documents 供 Buyer Agent 使用，不自動改寫、建立 child 或兌換。啟動見 [backend](backend/README.md) 與 [frontend](frontend/README.md)，驗證見 [Result 測試紀錄](docs/RESULT_TEST_REPORT.md)。以下產品主線是完整產品願景，不代表目前 Result 已串接真實 Agent 或兌換。
+
 > Many sellers. One best deal.
 
 OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commerce MVP。使用者描述商品、預算與交期後，Buyer Agent 會將需求正規化，同時向五家互相隔離的 Seller 議價，再由獨立 Evaluator 排序通過硬限制的方案。Sponsored 曝光與推薦完全分離，最後仍由使用者決定是否採用與兌換。
@@ -42,7 +48,7 @@ OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commer
 │  ├─ SYSTEM_DESIGN.md               目標系統設計、API 草案與契約遷移差異
 │  └─ REFERENCE.md                   設計原文的參考來源待補清單
 ├─ contracts/
-│  ├─ a2a-commerce.v0.2.schema.json  共用 JSON Schema
+│  ├─ a2a-commerce.v0.3.schema.json  共用 JSON Schema
 │  ├─ openai/                        Evaluator Structured Outputs schema
 │  └─ fixtures/                      Seller、成功流程、邊界與 API 測資
 ├─ db/
@@ -61,7 +67,7 @@ OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commer
 - [目標 System Design 與 repo 整合狀態](docs/SYSTEM_DESIGN.md)
 - [開發與驗收基準](docs/DEVELOPMENT_RULES.md)
 - [共用契約說明](contracts/README.md)
-- [JSON Schema](contracts/a2a-commerce.v0.2.schema.json)
+- [JSON Schema](contracts/a2a-commerce.v0.3.schema.json)
 - [Codex／專案共同規則](AGENTS.md)
 - [Evaluator Structured Outputs schema](contracts/openai/evaluator-output.schema.json)
 - [五家 Seller 測資](contracts/fixtures/sellers.json)
@@ -73,7 +79,7 @@ OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commer
 - [API request/response 範例](contracts/fixtures/api-examples.json)
 - [SQLite schema 與操作說明](db/README.md)
 
-`contracts/a2a-commerce.v0.2.schema.json` 是跨模組唯一資料契約。任何欄位改名、刪除、型別變更、enum 收窄或狀態語意改變，都必須先討論並升版，不能由單一模組自行修改。
+`contracts/a2a-commerce.v0.3.schema.json` 是跨模組唯一資料契約。任何欄位改名、刪除、型別變更、enum 收窄或狀態語意改變，都必須先討論並升版，不能由單一模組自行修改。
 
 `docs/SYSTEM_DESIGN.md` 已整併 HackMD 的新版目標設計，涵蓋五家 Seller 各派一個 Buyer Agent、最多五輪同步議價、Buyer Shared Context、逐張 Swipe 決策及長期偏好更新。v0.2 已遷移五家 Seller、五輪上限、明確 final／停止原因，以及相關 fixtures、驗證器與 SQLite。Shared Context、逐張 Swipe 與長期偏好等仍待契約升版；完整 Backend pipeline 與同步排程器尚未實作，差異列在設計文件開頭。
 
@@ -221,4 +227,39 @@ v0.2 已完成五家 Seller／最多五輪的契約、19 次議價交換與 6 �
 
 ## 既有專案與 OSS
 
-目前沒有沿用既有個人專案或第三方程式碼。後續加入 OSS 時，請在本節補上名稱、版本、授權與來源連結。
+應用使用 React、Vite、Express、sql.js 等 OSS，版本固定於 frontend/backend 的 package-lock.json；規格使用 [OpenSpec 1.13.0](https://github.com/Fission-AI/OpenSpec)（MIT）初始化與驗證。
+
+## UI／API OpenSpec 定義
+
+已建立 [define-offer-result-ui-api](openspec/changes/define-offer-result-ui-api/proposal.md) change，含能力規格、[技術設計](openspec/changes/define-offer-result-ui-api/design.md) 與 [分批任務](openspec/changes/define-offer-result-ui-api/tasks.md)。Result API 與 React 串接已實作，細部視覺及真機驗收仍依任務表追蹤。
+
+- [frontend/](frontend/README.md)：React＋TypeScript＋Vite，Node.js `>=20.19.0 <21`；右滑立即採用、左滑略過、最多五輪狀態與 Sponsored 展示。
+- [backend/](backend/README.md)：Node.js 20＋TypeScript＋Express 5＋SQLite；三個 Result HTTP 操作、mock 組合及冪等 accept/reject。
+- [OpenAPI 3.1](backend/openapi.json)：引用共用 v0.3 schema，GET 回傳包含 decision 的 RequestSnapshot。
+
+### Frontend opt-in mock API
+
+前端預設仍把 `/api` proxy 到 `OFFERMESH_API_ORIGIN`，未設定時使用 `http://127.0.0.1:3201`。需要只跑 browser demo、不啟動 backend 時，可開啟 Vite dev mock：
+
+```bash
+cd frontend
+OFFERMESH_DEV_MOCK=1 npm run dev -- --port 5174
+```
+
+mock mode 只在 `OFFERMESH_DEV_MOCK=1` 時攔截 Vite dev server 的 `/api`，正常模式與 production build 不截流。UI 仍觀測既有 `RequestSnapshot.status` 並沿用目前 1 秒 GET polling；shared v0.3 schema 不新增 progress/stage 欄位。mock mode 另外提供 [dev-only sidecar progress API](frontend/AGENT_PROGRESS.md) 給 UI 顯示「模擬進度」；正常 backend 沒有該 sidecar 時可回 404，UI 只顯示可觀測的 RequestSnapshot status fallback。成功 mock 使用 `contracts/fixtures/happy-path.json` 與 active v0.3 schema，固定示範條件為「無線靜音滑鼠、預算 NT$1,000、7 天內送達」；POST `/api/requests` 先回 202 `formatting` 並忠實保留原始 request documents，約 10 秒後 GET `/api/requests/{request_id}` 轉為 `awaiting_user`，offers、normalized intent 與 ranking 來自 canonical fixture。邊界驗證可設定：
+
+```bash
+OFFERMESH_DEV_MOCK=1 OFFERMESH_DEV_MOCK_SCENARIO=failed npm run dev -- --port 5174
+OFFERMESH_DEV_MOCK=1 OFFERMESH_DEV_MOCK_SCENARIO=needs_clarification npm run dev -- --port 5174
+OFFERMESH_DEV_MOCK=1 OFFERMESH_DEV_MOCK_SCENARIO=needs_confirmation npm run dev -- --port 5174
+OFFERMESH_DEV_MOCK=1 OFFERMESH_DEV_MOCK_SCENARIO=no_match npm run dev -- --port 5174
+```
+
+在 repository 根目錄可執行規格檢查：
+
+```bash
+npx --yes @fission-ai/openspec@1.13.0 status --change define-offer-result-ui-api
+npx --yes @fission-ai/openspec@1.13.0 validate define-offer-result-ui-api --strict
+```
+
+change 維持未封存，尚待任務表中的完整視覺與裝置驗收。根目錄契約測試驗證統一 v0.3 共用契約與 Result fixtures。
