@@ -1,4 +1,4 @@
-# sea-hackathon
+# sea-hackathon-OfferMesh
 
 Sea × OpenAI Regional Codex Hackathon Taiwan 專案協作倉庫。
 
