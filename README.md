@@ -36,7 +36,9 @@ OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commer
 .
 ├─ AGENTS.md                         Codex 與開發者必須遵守的專案規則
 ├─ docs/
-│  └─ DEVELOPMENT_RULES.md           黑客松標準、MVP 範圍與驗收條件
+│  ├─ DEVELOPMENT_RULES.md           現行 v0.1 黑客松標準與驗收條件
+│  ├─ SYSTEM_DESIGN.md               目標系統設計、API 草案與契約遷移差異
+│  └─ REFERENCE.md                   設計原文的參考來源待補清單
 ├─ contracts/
 │  ├─ a2a-commerce.v0.1.schema.json  共用 JSON Schema
 │  ├─ openai/                        Evaluator Structured Outputs schema
@@ -48,6 +50,7 @@ OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commer
 
 ## 開發前必讀
 
+- [目標 System Design 與 repo 整合狀態](docs/SYSTEM_DESIGN.md)
 - [開發與驗收基準](docs/DEVELOPMENT_RULES.md)
 - [共用契約說明](contracts/README.md)
 - [JSON Schema](contracts/a2a-commerce.v0.1.schema.json)
@@ -59,6 +62,8 @@ OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commer
 - [API request/response 範例](contracts/fixtures/api-examples.json)
 
 `contracts/a2a-commerce.v0.1.schema.json` 是跨模組唯一資料契約。任何欄位改名、刪除、型別變更、enum 收窄或狀態語意改變，都必須先討論並升版，不能由單一模組自行修改。
+
+`docs/SYSTEM_DESIGN.md` 已整併 HackMD 的新版目標設計，涵蓋最多十輪同步議價、Buyer Shared Context、逐張 Swipe 決策及長期偏好更新。現行 schema、fixtures 與下方 Demo 驗收仍為 v0.1；新版 payload 尚未實作，契約及 fallback 差異列在設計文件開頭。本次文件匯入不表示這些新行為已可執行。
 
 ## 團隊分工與交付
 
@@ -177,6 +182,8 @@ npm test
 ## 黑客松期間新增內容
 
 本 repository 為本次黑客松建立。第一版已完成共同開發規則、完整資料契約、OpenAI Structured Outputs 格式、三家 Seller 固定測資、兩輪議價範例、API 範例與無第三方相依的契約驗證器。
+
+已另整併新版目標 System Design 與契約遷移差異；十輪議價、共享 context、Swipe session 及偏好學習仍是設計規格，未列為已完成功能。
 
 後續每個 PR 都要更新本節或 PR 說明，讓評審可以辨識黑客松期間完成的工作。
 
