@@ -76,7 +76,6 @@ export function OfferDetails({snapshot, offer, ranking, pending = false, expired
             此總價包含稅與運送。請在 {formatDateTime(offer.expires_at)} 前採用；
             採用後仍會在兌換前重新確認庫存、到期時間與配送條件。
           </p>
-          <p>此方案來自第 {offer.round} 輪議價，預計 {offer.delivery_days} 天送達。</p>
         </section>
       </div>
 
