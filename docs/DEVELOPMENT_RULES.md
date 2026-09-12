@@ -1,4 +1,6 @@
-# 開發與驗收基準 v0.2
+# 開發與驗收基準 v0.3
+
+目前前後端與完整產品資料使用 a2a-commerce.v0.3.schema.json。五家／最多五輪 mock 已接入 Result API；reject=200/rejected 保存原始 feedback/source_documents，不改寫、不建立 child。Buyer Agent 改寫、兌換與完整模型 pipeline 仍是後續整合。
 
 本文件將主辦方簡報、產品提案與團隊分工整理成可執行的工程規則。後續開發與驗收均以此文件及 `contracts/` 為準。
 
@@ -48,7 +50,7 @@
 
 `formatting -> orchestrating -> negotiating -> evaluating -> awaiting_user -> accepted -> redeemed`
 
-其他終止或分支狀態為 `needs_clarification`、`needs_confirmation`、`no_match`、`failed` 與 `superseded`。
+其他終止或分支狀態為 `needs_clarification`、`needs_confirmation`、`no_match`、`failed` 與 `rejected`。
 
 HTTP API 固定為：
 
