@@ -366,7 +366,7 @@ function verifyLegacyMigration() {
     assert.deepEqual(JSON.parse(db.prepare("SELECT round_discounts_json FROM sellers").get().round_discounts_json), [30, 60, 60, 60, 60]);
     assert.equal(db.prepare("SELECT is_final FROM negotiation_rounds").get().is_final, 0);
     assert.equal(db.prepare("SELECT stop_reason FROM request_sellers").get().stop_reason, null);
-    assert.equal(getCount(db, "schema_migrations"), 3);
+    assert.equal(getCount(db, "schema_migrations"), 4);
     assert.equal(db.prepare("PRAGMA foreign_keys").get().foreign_keys, 1);
     assert.deepEqual(db.prepare("PRAGMA foreign_key_check").all(), []);
     assert.throws(() => db.exec("UPDATE offers SET total_price_twd = 1"), /offers are immutable/);
@@ -384,7 +384,7 @@ function verifyDatabase(db) {
   assert.deepEqual(db.prepare("PRAGMA foreign_key_check").all(), [], "foreign keys must be valid");
 
   const expectedCounts = {
-    schema_migrations: 3,
+    schema_migrations: 4,
     users: 1,
     marketplace_sources: 11,
     sellers: 5,
@@ -448,7 +448,7 @@ function verifyDatabase(db) {
     FROM sqlite_schema
     WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
   `).get().count);
-  assert.equal(tableCount, 21, "unexpected database table count");
+  assert.equal(tableCount, 22, "unexpected database table count");
 
   verifyNegotiationConstraints(db);
 
@@ -471,6 +471,23 @@ function main() {
   const isMemory = args.has("--memory");
   const isCheck = args.has("--check");
   const force = args.has("--force");
+
+  if (args.has("--migrate")) {
+    assert.ok(existsSync(databasePath), "database missing; run npm run db:init");
+    const backups = path.join(dataDirectory, "backups");
+    mkdirSync(backups, { recursive: true });
+    const backup = path.join(backups, `offermesh-${new Date().toISOString().replace(/[:.]/g, "-")}.sqlite`);
+    const db = new DatabaseSync(databasePath);
+    try {
+      db.prepare("VACUUM INTO ?").run(backup);
+      applyMigrations(db);
+      assert.equal(db.prepare("PRAGMA integrity_check").get().integrity_check, "ok");
+      assert.deepEqual(db.prepare("PRAGMA foreign_key_check").all(), []);
+      console.log(`Backup: ${backup}`);
+      console.log("Migrations applied; existing rows preserved (fixtures are not reseeded).");
+    } finally { db.close(); }
+    return;
+  }
 
   if (isMemory) {
     verifyLegacyMigration();

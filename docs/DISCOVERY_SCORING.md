@@ -1,6 +1,6 @@
 # Orchestrator 前段探索與評分 v0.2
 
-狀態：已實作 TypeScript service、固定測資、SQLite 快照與執行紀錄。政策版本 `discovery-score-v0.3`。不需要 LLM；輸入為已解析條件，自然語言解析仍交给 Formatter。
+狀態：已實作 TypeScript service、固定測資、SQLite 快照與執行紀錄。政策版本 `discovery-score-v0.4`。不需要 LLM；輸入為已解析條件，自然語言解析仍交给 Formatter。
 
 v0.3 將 target_total_twd 改為選填；未提供時價格分數與權重為 0，price_difference_twd=null，其他有效項目按原比例重新分配。可只傳 `{ category: 'mouse' }`。明確提供的 max_total_twd 仍是獨立硬限制，不自動當成目標價。若提供價格，須為正整數；null、0、負數及字串均拒絕。歷史執行紀錄保留原政策版本，不重新計算。
 
@@ -61,6 +61,8 @@ const result = service.discover_candidates({
 排序用未四捨五入的總分；輸出總分保留四位小數。固定先驗、ID 平手規則、指定時間與快照確保同輸入可重現。這是探索排名，不是談完後 Evaluator 的最終推薦。
 
 ## 廣告與稽核
+
+v0.4 加入 product_preferences 完整運算：required 的 in / not_in / range 不符或資料缺失列為硬限制違反；preferred 命中數加入偏好分子、條件數加入分母。每條偏好等權，多選 values 是同一條偏好，不重複加分。上面的基本權重表適用未傳 priorities：price_first / delivery_first / trust_first 各將價格／交期／賣家市場評分的有效基礎權重乘 2，最後全部正規化；沒有目標價時價格權重仍為 0。歷史 discovery_run 維持原 policy_version，不重新計分。
 
 排名完成後才從已入選且合格的 Seller 中選 Campaign，須啟用、類別相符、bid>0、starts_at<=now<ends_at。bid 高優先，同價按 campaign_id。Campaign 不參與任何分項、補位或 Seller 去重。
 

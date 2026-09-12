@@ -1,5 +1,7 @@
 # Orchestrator 資料接口 v0.1
 
+新增的前段整合入口為 `handoff.ts`：需求與偏好 → Discovery → RFQ → 真正 Seller handler 第一輪呼叫。完整交接與範例見 [ORCHESTRATOR_HANDOFF.md](../../docs/ORCHESTRATOR_HANDOFF.md)，可用 `npm run demo:handoff` 不依賴前端測試。
+
 供 Orchestrator 開發者直接 import 的 TypeScript service。沿用現行 v0.2 的偏好格式；不自動採用 System Design 尚未遷移的 explicit/behavioral 或 Shared Context 欄位。
 
 ## 快速開始
@@ -49,7 +51,7 @@ const input = tools.load_discovery_input({ request_id, now });
 3. 依軟偏好、信任、評分等規則排序所有合格 Seller。
 4. Campaign 必須再與合格 Seller 交集，才可選 Sponsored；不可更改自然排序。
 5. 回傳 schema 的 `OrchestrationResult`；探索初始 status=pending、rounds=[]、final_offer_ids=[]。
-6. 新增的 discovery.ts 已提供獨立 Catalog 快照、搜尋排名與結果儲存，詳見 docs/DISCOVERY_SCORING.md；從 Request 轉成 DiscoveryQuery、轉回共用 OrchestrationResult 與 build_seller_rfq 仍待接線。
+6. handoff.ts 已接上 Request → DiscoveryQuery → OrchestrationResult / SellerRFQ 與第一輪 handler dispatch；後續議價策略、多輪排程及完整 Offer 驗證仍由後半段接續。
 
 ## 資料邊界與目前限制
 
