@@ -26,6 +26,8 @@ export interface AppShellProps {
   onSelectConversation: (requestId: string) => void;
   onDeleteConversation?: (id: string) => void;
   historyLocked?: boolean;
+  onClearHistory?: () => void;
+  modelPicker?: React.ReactNode;
 }
 
 export type ChatMessageRole = "user" | "assistant" | "system";

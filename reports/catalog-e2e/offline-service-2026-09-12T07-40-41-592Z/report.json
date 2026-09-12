@@ -1,0 +1,1435 @@
+{
+  "mode": "offline",
+  "documents": {
+    "intent_md": "買一個無線滑鼠，預算1500元含稅運，7天內到貨。",
+    "preference_md": "售後優先，可接受免費滑鼠墊，不接受付費加購。"
+  },
+  "started_at": "2026-09-12T07:40:41.592Z",
+  "duration_seconds": 0.625,
+  "coverage": {
+    "sellers": 20,
+    "sku_policies": 129,
+    "discovery_listings": 120
+  },
+  "checks": [
+    {
+      "label": "HTTP 完整流程達到待選方案",
+      "passed": true
+    },
+    {
+      "label": "自然選出五個賣家與五個可選方案",
+      "passed": true
+    },
+    {
+      "label": "全部正式報價遵守底價、成本、贈品與權益預算",
+      "passed": true
+    },
+    {
+      "label": "排名只包含完整且合格的 Offer 集合",
+      "passed": true
+    },
+    {
+      "label": "回應沒有私有政策、成本或底價",
+      "passed": true
+    },
+    {
+      "label": "重送請求與流程重播不新增協商或改寫 Offer",
+      "passed": true
+    }
+  ],
+  "formatter": {
+    "result_json": "{\"parser_version\":\"formatter-rules-v0.1\",\"status\":\"ready\",\"normalized_intent\":{\"category\":\"mouse\",\"max_total_twd\":1500,\"delivery_days_max\":7,\"required_features\":[\"wireless\"],\"preferences\":[\"after_sales_first\"],\"product_preferences\":[],\"negotiation_policy\":{\"bundle_mode\":\"related_no_extra_cost\",\"allowed_addon_categories\":[\"mouse_pad\"],\"max_addon_increment_twd\":0}},\"target_total_twd\":null,\"questions\":[],\"warnings\":[]}"
+  },
+  "evaluator": {
+    "provider": "deterministic_fallback",
+    "fallback_reason": "model_unconfigured",
+    "usage": {
+      "calls": 0,
+      "reserved_tokens": 0,
+      "actual_tokens": 0
+    }
+  },
+  "ranked": [
+    {
+      "rank": 1,
+      "offer_id": "offer_e4845bec-b687-48e1-a370-c2663e13b3a1",
+      "reason": "依已登錄售後條件優先排序；含稅運 NT$689，3 天到貨。",
+      "tradeoffs": [
+        "比本次最低價高 NT$230。",
+        "比最快方案晚 2 天。"
+      ],
+      "seller_id": "discovery_seller_10",
+      "round": 3,
+      "variant": "standalone",
+      "items": [
+        {
+          "product_id": "sku_listing_073",
+          "category": "mouse",
+          "role": "primary",
+          "quantity": 1
+        }
+      ],
+      "primary_features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "total_price_twd": 689,
+      "delivery_days": 3,
+      "terms_id": "terms_standard_v1",
+      "optional_addons": false,
+      "expires_at": "2026-09-12T07:50:42.138Z",
+      "benefits": [
+        {
+          "benefit_id": "discovery_seller_10_warranty_extension_v1",
+          "kind": "warranty_extension",
+          "description": "保固延長至 730 天",
+          "amount_twd": 0,
+          "duration_days": 730,
+          "minimum_spend_twd": 0,
+          "requires_membership": false,
+          "conditions": "自到貨起，非人為損壞；模擬維修流程受理，不包含耗材；僅於本地模擬履約，不是真實商家承諾。",
+          "evidence_id": "sim_discovery_seller_10_warranty_extension_v1",
+          "simulation": true
+        },
+        {
+          "benefit_id": "discovery_seller_10_priority_support_v1",
+          "kind": "priority_support",
+          "description": "優先客服，一天內回覆",
+          "amount_twd": 0,
+          "duration_days": 1,
+          "minimum_spend_twd": 0,
+          "requires_membership": false,
+          "conditions": "模擬客服入口提交後一天內回覆；回覆時間不等於修復時間；僅於本地模擬履約，不是真實商家承諾。",
+          "evidence_id": "sim_discovery_seller_10_priority_support_v1",
+          "simulation": true
+        },
+        {
+          "benefit_id": "discovery_seller_10_exchange_guarantee_v1",
+          "kind": "exchange_guarantee",
+          "description": "30 天內瑕疵換貨",
+          "amount_twd": 0,
+          "duration_days": 30,
+          "minimum_spend_twd": 0,
+          "requires_membership": false,
+          "conditions": "到貨後 30 天內驗證非人為瑕疵，以已登錄換貨庫存履約；不自動承諾現金退款；僅於本地模擬履約，不是真實商家承諾。",
+          "evidence_id": "sim_discovery_seller_10_exchange_guarantee_v1",
+          "simulation": true
+        }
+      ],
+      "baseline_offer_id": null,
+      "eligibility": {
+        "status": "eligible",
+        "reason_codes": []
+      },
+      "persona": "margin_guardian"
+    },
+    {
+      "rank": 2,
+      "offer_id": "offer_c7cd7af6-967a-40f9-9bf0-b8c8b0b9b6a2",
+      "reason": "依已登錄售後條件優先排序；含稅運 NT$899，4 天到貨。",
+      "tradeoffs": [
+        "比本次最低價高 NT$440。",
+        "比最快方案晚 3 天。"
+      ],
+      "seller_id": "seller_e",
+      "round": 3,
+      "variant": "standalone",
+      "items": [
+        {
+          "product_id": "mouse_e_black_small",
+          "category": "mouse",
+          "role": "primary",
+          "quantity": 1
+        }
+      ],
+      "primary_features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "total_price_twd": 899,
+      "delivery_days": 4,
+      "terms_id": "terms_standard_v1",
+      "optional_addons": false,
+      "expires_at": "2026-09-12T07:50:42.143Z",
+      "benefits": [
+        {
+          "benefit_id": "seller_e_warranty_extension_v1",
+          "kind": "warranty_extension",
+          "description": "保固延長至 730 天",
+          "amount_twd": 0,
+          "duration_days": 730,
+          "minimum_spend_twd": 0,
+          "requires_membership": false,
+          "conditions": "自到貨起，非人為損壞；模擬維修流程受理，不包含耗材；僅於本地模擬履約，不是真實商家承諾。",
+          "evidence_id": "sim_seller_e_warranty_extension_v1",
+          "simulation": true
+        },
+        {
+          "benefit_id": "seller_e_priority_support_v1",
+          "kind": "priority_support",
+          "description": "優先客服，一天內回覆",
+          "amount_twd": 0,
+          "duration_days": 1,
+          "minimum_spend_twd": 0,
+          "requires_membership": false,
+          "conditions": "模擬客服入口提交後一天內回覆；回覆時間不等於修復時間；僅於本地模擬履約，不是真實商家承諾。",
+          "evidence_id": "sim_seller_e_priority_support_v1",
+          "simulation": true
+        },
+        {
+          "benefit_id": "seller_e_exchange_guarantee_v1",
+          "kind": "exchange_guarantee",
+          "description": "30 天內瑕疵換貨",
+          "amount_twd": 0,
+          "duration_days": 30,
+          "minimum_spend_twd": 0,
+          "requires_membership": false,
+          "conditions": "到貨後 30 天內驗證非人為瑕疵，以已登錄換貨庫存履約；不自動承諾現金退款；僅於本地模擬履約，不是真實商家承諾。",
+          "evidence_id": "sim_seller_e_exchange_guarantee_v1",
+          "simulation": true
+        }
+      ],
+      "baseline_offer_id": null,
+      "eligibility": {
+        "status": "eligible",
+        "reason_codes": []
+      },
+      "persona": "margin_guardian"
+    },
+    {
+      "rank": 3,
+      "offer_id": "offer_264a684d-2f99-4e0d-9053-c82bdb7a295c",
+      "reason": "依已登錄售後條件優先排序；含稅運 NT$719，5 天到貨。",
+      "tradeoffs": [
+        "比本次最低價高 NT$260。",
+        "比最快方案晚 4 天。"
+      ],
+      "seller_id": "discovery_seller_05",
+      "round": 3,
+      "variant": "standalone",
+      "items": [
+        {
+          "product_id": "sku_listing_033",
+          "category": "mouse",
+          "role": "primary",
+          "quantity": 1
+        }
+      ],
+      "primary_features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "total_price_twd": 719,
+      "delivery_days": 5,
+      "terms_id": "terms_standard_v1",
+      "optional_addons": false,
+      "expires_at": "2026-09-12T07:50:42.147Z",
+      "benefits": [
+        {
+          "benefit_id": "discovery_seller_05_warranty_extension_v1",
+          "kind": "warranty_extension",
+          "description": "保固延長至 730 天",
+          "amount_twd": 0,
+          "duration_days": 730,
+          "minimum_spend_twd": 0,
+          "requires_membership": false,
+          "conditions": "自到貨起，非人為損壞；模擬維修流程受理，不包含耗材；僅於本地模擬履約，不是真實商家承諾。",
+          "evidence_id": "sim_discovery_seller_05_warranty_extension_v1",
+          "simulation": true
+        },
+        {
+          "benefit_id": "discovery_seller_05_priority_support_v1",
+          "kind": "priority_support",
+          "description": "優先客服，一天內回覆",
+          "amount_twd": 0,
+          "duration_days": 1,
+          "minimum_spend_twd": 0,
+          "requires_membership": false,
+          "conditions": "模擬客服入口提交後一天內回覆；回覆時間不等於修復時間；僅於本地模擬履約，不是真實商家承諾。",
+          "evidence_id": "sim_discovery_seller_05_priority_support_v1",
+          "simulation": true
+        },
+        {
+          "benefit_id": "discovery_seller_05_exchange_guarantee_v1",
+          "kind": "exchange_guarantee",
+          "description": "30 天內瑕疵換貨",
+          "amount_twd": 0,
+          "duration_days": 30,
+          "minimum_spend_twd": 0,
+          "requires_membership": false,
+          "conditions": "到貨後 30 天內驗證非人為瑕疵，以已登錄換貨庫存履約；不自動承諾現金退款；僅於本地模擬履約，不是真實商家承諾。",
+          "evidence_id": "sim_discovery_seller_05_exchange_guarantee_v1",
+          "simulation": true
+        }
+      ],
+      "baseline_offer_id": null,
+      "eligibility": {
+        "status": "eligible",
+        "reason_codes": []
+      },
+      "persona": "margin_guardian"
+    },
+    {
+      "rank": 4,
+      "offer_id": "offer_cafaf9aa-aa9a-4654-b2c4-637be0312014",
+      "reason": "依已登錄售後條件優先排序；含稅運 NT$799，1 天到貨。",
+      "tradeoffs": [
+        "比本次最低價高 NT$340。"
+      ],
+      "seller_id": "seller_b",
+      "round": 3,
+      "variant": "standalone",
+      "items": [
+        {
+          "product_id": "mouse_b_black_small",
+          "category": "mouse",
+          "role": "primary",
+          "quantity": 1
+        }
+      ],
+      "primary_features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "total_price_twd": 799,
+      "delivery_days": 1,
+      "terms_id": "terms_standard_v1",
+      "optional_addons": false,
+      "expires_at": "2026-09-12T07:50:42.150Z",
+      "benefits": [
+        {
+          "benefit_id": "seller_b_delivery_guarantee_v1",
+          "kind": "delivery_guarantee",
+          "description": "一天到貨承諾",
+          "amount_twd": 0,
+          "duration_days": 1,
+          "minimum_spend_twd": 0,
+          "requires_membership": false,
+          "conditions": "模擬標準配送區；付款完成後起算，一天內到貨；僅於本地模擬履約，不是真實商家承諾。",
+          "evidence_id": "sim_seller_b_delivery_guarantee_v1",
+          "simulation": true
+        },
+        {
+          "benefit_id": "seller_b_late_compensation_v1",
+          "kind": "late_compensation",
+          "description": "晚到補償 NT$50",
+          "amount_twd": 50,
+          "duration_days": 7,
+          "minimum_spend_twd": 0,
+          "requires_membership": false,
+          "conditions": "超過承諾交期到貨後 7 天內憑模擬物流紀錄申請一次補償；本次售價不變；僅於本地模擬履約，不是真實商家承諾。",
+          "evidence_id": "sim_seller_b_late_compensation_v1",
+          "simulation": true
+        }
+      ],
+      "baseline_offer_id": null,
+      "eligibility": {
+        "status": "eligible",
+        "reason_codes": []
+      },
+      "persona": "speed_seller"
+    },
+    {
+      "rank": 5,
+      "offer_id": "offer_09d36407-7ae3-45bc-93ae-05ca96ce83bd",
+      "reason": "依已登錄售後條件優先排序；含稅運 NT$459，1 天到貨。",
+      "tradeoffs": [],
+      "seller_id": "discovery_seller_08",
+      "round": 3,
+      "variant": "standalone",
+      "items": [
+        {
+          "product_id": "sku_listing_057",
+          "category": "mouse",
+          "role": "primary",
+          "quantity": 1
+        }
+      ],
+      "primary_features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "total_price_twd": 459,
+      "delivery_days": 1,
+      "terms_id": "terms_standard_v1",
+      "optional_addons": false,
+      "expires_at": "2026-09-12T07:50:42.153Z",
+      "benefits": [],
+      "baseline_offer_id": null,
+      "eligibility": {
+        "status": "eligible",
+        "reason_codes": []
+      },
+      "persona": "bundle_curator"
+    }
+  ],
+  "rounds": [
+    {
+      "seller_id": "discovery_seller_10",
+      "round": 1,
+      "buyer_provider": "deterministic",
+      "seller_provider": "deterministic",
+      "buyer": "請比較滑鼠單買與含滑鼠墊的價格。",
+      "seller": "無法同意這項條件，仍可提供以下方案。單買 NT$689（3 天到貨）。另含：保固延長至 730 天（須符合各權益條件；未來優惠不抵本次價格）。",
+      "seller_model_message": "NT$689 including tax and shipping; delivery in 3 days.",
+      "quotes": [
+        {
+          "draft_ref": "standalone_r1",
+          "variant": "standalone",
+          "baseline_draft_ref": null,
+          "items": [
+            {
+              "product_id": "sku_listing_073",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 689,
+          "delivery_days": 3,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T07:50:41.977Z",
+          "benefits": [
+            {
+              "benefit_id": "discovery_seller_10_warranty_extension_v1",
+              "kind": "warranty_extension",
+              "description": "保固延長至 730 天",
+              "amount_twd": 0,
+              "duration_days": 730,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "自到貨起，非人為損壞；模擬維修流程受理，不包含耗材；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_discovery_seller_10_warranty_extension_v1",
+              "simulation": true
+            }
+          ]
+        }
+      ],
+      "fallbacks": [
+        {
+          "role": "buyer",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        },
+        {
+          "role": "seller",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        }
+      ]
+    },
+    {
+      "seller_id": "seller_e",
+      "round": 1,
+      "buyer_provider": "deterministic",
+      "seller_provider": "deterministic",
+      "buyer": "請再優惠一點（滑鼠單買）。",
+      "seller": "可以滿足這次條件。單買 NT$899（4 天到貨）。另含：保固延長至 730 天（須符合各權益條件；未來優惠不抵本次價格）。",
+      "seller_model_message": "NT$899 including tax and shipping; delivery in 4 days.",
+      "quotes": [
+        {
+          "draft_ref": "standalone_r1",
+          "variant": "standalone",
+          "baseline_draft_ref": null,
+          "items": [
+            {
+              "product_id": "mouse_e_black_small",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 899,
+          "delivery_days": 4,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T07:50:41.984Z",
+          "benefits": [
+            {
+              "benefit_id": "seller_e_warranty_extension_v1",
+              "kind": "warranty_extension",
+              "description": "保固延長至 730 天",
+              "amount_twd": 0,
+              "duration_days": 730,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "自到貨起，非人為損壞；模擬維修流程受理，不包含耗材；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_e_warranty_extension_v1",
+              "simulation": true
+            }
+          ]
+        }
+      ],
+      "fallbacks": [
+        {
+          "role": "buyer",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        },
+        {
+          "role": "seller",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_05",
+      "round": 1,
+      "buyer_provider": "deterministic",
+      "seller_provider": "deterministic",
+      "buyer": "請比較滑鼠單買與含滑鼠墊的價格。",
+      "seller": "無法同意這項條件，仍可提供以下方案。單買 NT$719（5 天到貨）。另含：保固延長至 730 天（須符合各權益條件；未來優惠不抵本次價格）。",
+      "seller_model_message": "NT$719 including tax and shipping; delivery in 5 days.",
+      "quotes": [
+        {
+          "draft_ref": "standalone_r1",
+          "variant": "standalone",
+          "baseline_draft_ref": null,
+          "items": [
+            {
+              "product_id": "sku_listing_033",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 719,
+          "delivery_days": 5,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T07:50:41.987Z",
+          "benefits": [
+            {
+              "benefit_id": "discovery_seller_05_warranty_extension_v1",
+              "kind": "warranty_extension",
+              "description": "保固延長至 730 天",
+              "amount_twd": 0,
+              "duration_days": 730,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "自到貨起，非人為損壞；模擬維修流程受理，不包含耗材；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_discovery_seller_05_warranty_extension_v1",
+              "simulation": true
+            }
+          ]
+        }
+      ],
+      "fallbacks": [
+        {
+          "role": "buyer",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        },
+        {
+          "role": "seller",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        }
+      ]
+    },
+    {
+      "seller_id": "seller_b",
+      "round": 1,
+      "buyer_provider": "deterministic",
+      "seller_provider": "deterministic",
+      "buyer": "請再優惠一點（滑鼠單買）。",
+      "seller": "可以滿足這次條件。單買 NT$799（1 天到貨）。",
+      "seller_model_message": "NT$799 including tax and shipping; delivery in 1 days.",
+      "quotes": [
+        {
+          "draft_ref": "standalone_r1",
+          "variant": "standalone",
+          "baseline_draft_ref": null,
+          "items": [
+            {
+              "product_id": "mouse_b_black_small",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click",
+            "multi_device"
+          ],
+          "total_price_twd": 799,
+          "delivery_days": 1,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T07:50:41.996Z",
+          "benefits": []
+        }
+      ],
+      "fallbacks": [
+        {
+          "role": "buyer",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        },
+        {
+          "role": "seller",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_08",
+      "round": 1,
+      "buyer_provider": "deterministic",
+      "seller_provider": "deterministic",
+      "buyer": "請比較滑鼠單買與含滑鼠墊的價格。",
+      "seller": "無法同意這項條件，仍可提供以下方案。單買 NT$509（1 天到貨）。",
+      "seller_model_message": "NT$509 including tax and shipping; delivery in 1 days.",
+      "quotes": [
+        {
+          "draft_ref": "standalone_r1",
+          "variant": "standalone",
+          "baseline_draft_ref": null,
+          "items": [
+            {
+              "product_id": "sku_listing_057",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 509,
+          "delivery_days": 1,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T07:50:42.014Z",
+          "benefits": []
+        }
+      ],
+      "fallbacks": [
+        {
+          "role": "buyer",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        },
+        {
+          "role": "seller",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_10",
+      "round": 2,
+      "buyer_provider": "deterministic",
+      "seller_provider": "deterministic",
+      "buyer": "可以提供優先客服嗎。",
+      "seller": "可以滿足這次條件。單買 NT$689（3 天到貨）。另含：保固延長至 730 天、優先客服，一天內回覆（須符合各權益條件；未來優惠不抵本次價格）。",
+      "seller_model_message": "NT$689 including tax and shipping; delivery in 3 days.",
+      "quotes": [
+        {
+          "draft_ref": "standalone_r2",
+          "variant": "standalone",
+          "baseline_draft_ref": null,
+          "items": [
+            {
+              "product_id": "sku_listing_073",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 689,
+          "delivery_days": 3,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T07:50:42.095Z",
+          "benefits": [
+            {
+              "benefit_id": "discovery_seller_10_warranty_extension_v1",
+              "kind": "warranty_extension",
+              "description": "保固延長至 730 天",
+              "amount_twd": 0,
+              "duration_days": 730,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "自到貨起，非人為損壞；模擬維修流程受理，不包含耗材；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_discovery_seller_10_warranty_extension_v1",
+              "simulation": true
+            },
+            {
+              "benefit_id": "discovery_seller_10_priority_support_v1",
+              "kind": "priority_support",
+              "description": "優先客服，一天內回覆",
+              "amount_twd": 0,
+              "duration_days": 1,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "模擬客服入口提交後一天內回覆；回覆時間不等於修復時間；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_discovery_seller_10_priority_support_v1",
+              "simulation": true
+            }
+          ]
+        }
+      ],
+      "fallbacks": [
+        {
+          "role": "buyer",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        },
+        {
+          "role": "seller",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        }
+      ]
+    },
+    {
+      "seller_id": "seller_e",
+      "round": 2,
+      "buyer_provider": "deterministic",
+      "seller_provider": "deterministic",
+      "buyer": "可以提供優先客服嗎。",
+      "seller": "可以滿足這次條件。單買 NT$899（4 天到貨）。另含：保固延長至 730 天、優先客服，一天內回覆（須符合各權益條件；未來優惠不抵本次價格）。",
+      "seller_model_message": "NT$899 including tax and shipping; delivery in 4 days.",
+      "quotes": [
+        {
+          "draft_ref": "standalone_r2",
+          "variant": "standalone",
+          "baseline_draft_ref": null,
+          "items": [
+            {
+              "product_id": "mouse_e_black_small",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 899,
+          "delivery_days": 4,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T07:50:42.100Z",
+          "benefits": [
+            {
+              "benefit_id": "seller_e_warranty_extension_v1",
+              "kind": "warranty_extension",
+              "description": "保固延長至 730 天",
+              "amount_twd": 0,
+              "duration_days": 730,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "自到貨起，非人為損壞；模擬維修流程受理，不包含耗材；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_e_warranty_extension_v1",
+              "simulation": true
+            },
+            {
+              "benefit_id": "seller_e_priority_support_v1",
+              "kind": "priority_support",
+              "description": "優先客服，一天內回覆",
+              "amount_twd": 0,
+              "duration_days": 1,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "模擬客服入口提交後一天內回覆；回覆時間不等於修復時間；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_e_priority_support_v1",
+              "simulation": true
+            }
+          ]
+        }
+      ],
+      "fallbacks": [
+        {
+          "role": "buyer",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        },
+        {
+          "role": "seller",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_05",
+      "round": 2,
+      "buyer_provider": "deterministic",
+      "seller_provider": "deterministic",
+      "buyer": "可以提供優先客服嗎。",
+      "seller": "可以滿足這次條件。單買 NT$719（5 天到貨）。另含：保固延長至 730 天、優先客服，一天內回覆（須符合各權益條件；未來優惠不抵本次價格）。",
+      "seller_model_message": "NT$719 including tax and shipping; delivery in 5 days.",
+      "quotes": [
+        {
+          "draft_ref": "standalone_r2",
+          "variant": "standalone",
+          "baseline_draft_ref": null,
+          "items": [
+            {
+              "product_id": "sku_listing_033",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 719,
+          "delivery_days": 5,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T07:50:42.103Z",
+          "benefits": [
+            {
+              "benefit_id": "discovery_seller_05_warranty_extension_v1",
+              "kind": "warranty_extension",
+              "description": "保固延長至 730 天",
+              "amount_twd": 0,
+              "duration_days": 730,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "自到貨起，非人為損壞；模擬維修流程受理，不包含耗材；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_discovery_seller_05_warranty_extension_v1",
+              "simulation": true
+            },
+            {
+              "benefit_id": "discovery_seller_05_priority_support_v1",
+              "kind": "priority_support",
+              "description": "優先客服，一天內回覆",
+              "amount_twd": 0,
+              "duration_days": 1,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "模擬客服入口提交後一天內回覆；回覆時間不等於修復時間；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_discovery_seller_05_priority_support_v1",
+              "simulation": true
+            }
+          ]
+        }
+      ],
+      "fallbacks": [
+        {
+          "role": "buyer",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        },
+        {
+          "role": "seller",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        }
+      ]
+    },
+    {
+      "seller_id": "seller_b",
+      "round": 2,
+      "buyer_provider": "deterministic",
+      "seller_provider": "deterministic",
+      "buyer": "可以提供到貨承諾嗎。",
+      "seller": "可以滿足這次條件。單買 NT$799（1 天到貨）。另含：一天到貨承諾（須符合各權益條件；未來優惠不抵本次價格）。",
+      "seller_model_message": "NT$799 including tax and shipping; delivery in 1 days.",
+      "quotes": [
+        {
+          "draft_ref": "standalone_r2",
+          "variant": "standalone",
+          "baseline_draft_ref": null,
+          "items": [
+            {
+              "product_id": "mouse_b_black_small",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click",
+            "multi_device"
+          ],
+          "total_price_twd": 799,
+          "delivery_days": 1,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T07:50:42.107Z",
+          "benefits": [
+            {
+              "benefit_id": "seller_b_delivery_guarantee_v1",
+              "kind": "delivery_guarantee",
+              "description": "一天到貨承諾",
+              "amount_twd": 0,
+              "duration_days": 1,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "模擬標準配送區；付款完成後起算，一天內到貨；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_b_delivery_guarantee_v1",
+              "simulation": true
+            }
+          ]
+        }
+      ],
+      "fallbacks": [
+        {
+          "role": "buyer",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        },
+        {
+          "role": "seller",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_08",
+      "round": 2,
+      "buyer_provider": "deterministic",
+      "seller_provider": "deterministic",
+      "buyer": "能否同價加送一張滑鼠墊，希望總價不超過 NT$509。",
+      "seller": "可以滿足這次條件。單買 NT$499（1 天到貨）；含滑鼠墊 NT$499（1 天到貨）。",
+      "seller_model_message": "NT$499 including tax and shipping; delivery in 1 days.",
+      "quotes": [
+        {
+          "draft_ref": "standalone_r2",
+          "variant": "standalone",
+          "baseline_draft_ref": null,
+          "items": [
+            {
+              "product_id": "sku_listing_057",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 499,
+          "delivery_days": 1,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T07:50:42.114Z",
+          "benefits": []
+        },
+        {
+          "draft_ref": "bundle_r2",
+          "variant": "bundle",
+          "baseline_draft_ref": "standalone_r2",
+          "items": [
+            {
+              "product_id": "sku_listing_057",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            },
+            {
+              "product_id": "sku_listing_064",
+              "category": "mouse_pad",
+              "role": "addon",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 499,
+          "delivery_days": 1,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": true,
+          "expires_at": "2026-09-12T07:50:42.114Z",
+          "benefits": []
+        }
+      ],
+      "fallbacks": [
+        {
+          "role": "buyer",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        },
+        {
+          "role": "seller",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_10",
+      "round": 3,
+      "buyer_provider": "deterministic",
+      "seller_provider": "deterministic",
+      "buyer": "可以提供瑕疵換貨保障嗎。",
+      "seller": "可以滿足這次條件。單買 NT$689（3 天到貨）。另含：保固延長至 730 天、優先客服，一天內回覆、30 天內瑕疵換貨（須符合各權益條件；未來優惠不抵本次價格）。這是最終報價。",
+      "seller_model_message": "NT$689 including tax and shipping; delivery in 3 days.",
+      "quotes": [
+        {
+          "draft_ref": "standalone_r3",
+          "variant": "standalone",
+          "baseline_draft_ref": null,
+          "items": [
+            {
+              "product_id": "sku_listing_073",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 689,
+          "delivery_days": 3,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T07:50:42.138Z",
+          "benefits": [
+            {
+              "benefit_id": "discovery_seller_10_warranty_extension_v1",
+              "kind": "warranty_extension",
+              "description": "保固延長至 730 天",
+              "amount_twd": 0,
+              "duration_days": 730,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "自到貨起，非人為損壞；模擬維修流程受理，不包含耗材；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_discovery_seller_10_warranty_extension_v1",
+              "simulation": true
+            },
+            {
+              "benefit_id": "discovery_seller_10_priority_support_v1",
+              "kind": "priority_support",
+              "description": "優先客服，一天內回覆",
+              "amount_twd": 0,
+              "duration_days": 1,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "模擬客服入口提交後一天內回覆；回覆時間不等於修復時間；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_discovery_seller_10_priority_support_v1",
+              "simulation": true
+            },
+            {
+              "benefit_id": "discovery_seller_10_exchange_guarantee_v1",
+              "kind": "exchange_guarantee",
+              "description": "30 天內瑕疵換貨",
+              "amount_twd": 0,
+              "duration_days": 30,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "到貨後 30 天內驗證非人為瑕疵，以已登錄換貨庫存履約；不自動承諾現金退款；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_discovery_seller_10_exchange_guarantee_v1",
+              "simulation": true
+            }
+          ]
+        }
+      ],
+      "fallbacks": [
+        {
+          "role": "buyer",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        },
+        {
+          "role": "seller",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        }
+      ]
+    },
+    {
+      "seller_id": "seller_e",
+      "round": 3,
+      "buyer_provider": "deterministic",
+      "seller_provider": "deterministic",
+      "buyer": "可以提供瑕疵換貨保障嗎。",
+      "seller": "可以滿足這次條件。單買 NT$899（4 天到貨）。另含：保固延長至 730 天、優先客服，一天內回覆、30 天內瑕疵換貨（須符合各權益條件；未來優惠不抵本次價格）。這是最終報價。",
+      "seller_model_message": "NT$899 including tax and shipping; delivery in 4 days.",
+      "quotes": [
+        {
+          "draft_ref": "standalone_r3",
+          "variant": "standalone",
+          "baseline_draft_ref": null,
+          "items": [
+            {
+              "product_id": "mouse_e_black_small",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 899,
+          "delivery_days": 4,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T07:50:42.143Z",
+          "benefits": [
+            {
+              "benefit_id": "seller_e_warranty_extension_v1",
+              "kind": "warranty_extension",
+              "description": "保固延長至 730 天",
+              "amount_twd": 0,
+              "duration_days": 730,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "自到貨起，非人為損壞；模擬維修流程受理，不包含耗材；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_e_warranty_extension_v1",
+              "simulation": true
+            },
+            {
+              "benefit_id": "seller_e_priority_support_v1",
+              "kind": "priority_support",
+              "description": "優先客服，一天內回覆",
+              "amount_twd": 0,
+              "duration_days": 1,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "模擬客服入口提交後一天內回覆；回覆時間不等於修復時間；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_e_priority_support_v1",
+              "simulation": true
+            },
+            {
+              "benefit_id": "seller_e_exchange_guarantee_v1",
+              "kind": "exchange_guarantee",
+              "description": "30 天內瑕疵換貨",
+              "amount_twd": 0,
+              "duration_days": 30,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "到貨後 30 天內驗證非人為瑕疵，以已登錄換貨庫存履約；不自動承諾現金退款；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_e_exchange_guarantee_v1",
+              "simulation": true
+            }
+          ]
+        }
+      ],
+      "fallbacks": [
+        {
+          "role": "buyer",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        },
+        {
+          "role": "seller",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_05",
+      "round": 3,
+      "buyer_provider": "deterministic",
+      "seller_provider": "deterministic",
+      "buyer": "可以提供瑕疵換貨保障嗎。",
+      "seller": "可以滿足這次條件。單買 NT$719（5 天到貨）。另含：保固延長至 730 天、優先客服，一天內回覆、30 天內瑕疵換貨（須符合各權益條件；未來優惠不抵本次價格）。這是最終報價。",
+      "seller_model_message": "NT$719 including tax and shipping; delivery in 5 days.",
+      "quotes": [
+        {
+          "draft_ref": "standalone_r3",
+          "variant": "standalone",
+          "baseline_draft_ref": null,
+          "items": [
+            {
+              "product_id": "sku_listing_033",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 719,
+          "delivery_days": 5,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T07:50:42.147Z",
+          "benefits": [
+            {
+              "benefit_id": "discovery_seller_05_warranty_extension_v1",
+              "kind": "warranty_extension",
+              "description": "保固延長至 730 天",
+              "amount_twd": 0,
+              "duration_days": 730,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "自到貨起，非人為損壞；模擬維修流程受理，不包含耗材；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_discovery_seller_05_warranty_extension_v1",
+              "simulation": true
+            },
+            {
+              "benefit_id": "discovery_seller_05_priority_support_v1",
+              "kind": "priority_support",
+              "description": "優先客服，一天內回覆",
+              "amount_twd": 0,
+              "duration_days": 1,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "模擬客服入口提交後一天內回覆；回覆時間不等於修復時間；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_discovery_seller_05_priority_support_v1",
+              "simulation": true
+            },
+            {
+              "benefit_id": "discovery_seller_05_exchange_guarantee_v1",
+              "kind": "exchange_guarantee",
+              "description": "30 天內瑕疵換貨",
+              "amount_twd": 0,
+              "duration_days": 30,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "到貨後 30 天內驗證非人為瑕疵，以已登錄換貨庫存履約；不自動承諾現金退款；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_discovery_seller_05_exchange_guarantee_v1",
+              "simulation": true
+            }
+          ]
+        }
+      ],
+      "fallbacks": [
+        {
+          "role": "buyer",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        },
+        {
+          "role": "seller",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        }
+      ]
+    },
+    {
+      "seller_id": "seller_b",
+      "round": 3,
+      "buyer_provider": "deterministic",
+      "seller_provider": "deterministic",
+      "buyer": "可以提供晚到補償嗎。",
+      "seller": "可以滿足這次條件。單買 NT$799（1 天到貨）。另含：一天到貨承諾、晚到補償 NT$50（須符合各權益條件；未來優惠不抵本次價格）。這是最終報價。",
+      "seller_model_message": "NT$799 including tax and shipping; delivery in 1 days.",
+      "quotes": [
+        {
+          "draft_ref": "standalone_r3",
+          "variant": "standalone",
+          "baseline_draft_ref": null,
+          "items": [
+            {
+              "product_id": "mouse_b_black_small",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click",
+            "multi_device"
+          ],
+          "total_price_twd": 799,
+          "delivery_days": 1,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T07:50:42.150Z",
+          "benefits": [
+            {
+              "benefit_id": "seller_b_delivery_guarantee_v1",
+              "kind": "delivery_guarantee",
+              "description": "一天到貨承諾",
+              "amount_twd": 0,
+              "duration_days": 1,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "模擬標準配送區；付款完成後起算，一天內到貨；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_b_delivery_guarantee_v1",
+              "simulation": true
+            },
+            {
+              "benefit_id": "seller_b_late_compensation_v1",
+              "kind": "late_compensation",
+              "description": "晚到補償 NT$50",
+              "amount_twd": 50,
+              "duration_days": 7,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "超過承諾交期到貨後 7 天內憑模擬物流紀錄申請一次補償；本次售價不變；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_b_late_compensation_v1",
+              "simulation": true
+            }
+          ]
+        }
+      ],
+      "fallbacks": [
+        {
+          "role": "buyer",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        },
+        {
+          "role": "seller",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_08",
+      "round": 3,
+      "buyer_provider": "deterministic",
+      "seller_provider": "deterministic",
+      "buyer": "如果取消滑鼠墊，可以換成額外折扣嗎，希望總價不超過 NT$469。",
+      "seller": "可以滿足這次條件。單買 NT$459（1 天到貨）；含滑鼠墊 NT$489（1 天到貨）。本輪取消贈品額外折讓 NT$30。這是最終報價。",
+      "seller_model_message": "NT$459 including tax and shipping; delivery in 1 days.",
+      "quotes": [
+        {
+          "draft_ref": "standalone_r3",
+          "variant": "standalone",
+          "baseline_draft_ref": null,
+          "items": [
+            {
+              "product_id": "sku_listing_057",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 459,
+          "delivery_days": 1,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T07:50:42.153Z",
+          "benefits": []
+        },
+        {
+          "draft_ref": "bundle_r3",
+          "variant": "bundle",
+          "baseline_draft_ref": "standalone_r3",
+          "items": [
+            {
+              "product_id": "sku_listing_057",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            },
+            {
+              "product_id": "sku_listing_064",
+              "category": "mouse_pad",
+              "role": "addon",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 489,
+          "delivery_days": 1,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": true,
+          "expires_at": "2026-09-12T07:50:42.153Z",
+          "benefits": []
+        }
+      ],
+      "fallbacks": [
+        {
+          "role": "buyer",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        },
+        {
+          "role": "seller",
+          "status": "fallback",
+          "reason": "model_unavailable_or_invalid",
+          "prompt_version": "negotiation-3"
+        }
+      ]
+    }
+  ]
+}

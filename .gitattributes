@@ -1,0 +1,3 @@
+
+# Preserve pinned ACP source hashes across Windows checkouts.
+contracts/acp/* text eol=lf

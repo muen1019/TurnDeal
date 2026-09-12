@@ -106,7 +106,8 @@ test('refusal, malformed output and spoofed identity isolate the branch and pres
   const { run } = setup(t);
   const result = await run({ sellerFactory: sellerOverride((response, args, seller) => {
     if (args.rfq.round !== 2) return response;
-    if (seller.seller_id === 'seller_a') response.result = { ...response.result, outcome: 'refused', is_final: false, drafts: [] };
+    if (seller.seller_id === 'seller_a') response.result = { ...response.result, outcome: 'refused', is_final: false, drafts: [],
+      proposal_response: { status: 'declined', exchange_discount_twd: 0 } };
     if (seller.seller_id === 'seller_b') response.result.drafts[0].eligible = true;
     if (seller.seller_id === 'seller_c') response.result.seller_id = 'seller_a';
     return response;
@@ -122,7 +123,8 @@ test('invalid new prices do not evict valid prior offers or enter shared context
     return response;
   }) });
   assert.equal(result.offers.find(o => o.seller_id === 'seller_a').round, 1);
-  assert.ok(repository.history(input.requestId, input.buyerId).at(-1).offers.some(o => o.eligibility.status === 'rejected'));
+  assert.equal(result.seller_agents.find(s => s.seller_id === 'seller_a').stop_reason, 'error');
+  assert.ok(repository.history(input.requestId, input.buyerId).at(-1).traces.some(t => t.seller_id === 'seller_a' && t.result?.outcome === 'error'));
   assert.ok(repository.history(input.requestId, input.buyerId).every(s => s.context.offers.every(o => o.total_price_twd > 1)));
 });
 
@@ -140,7 +142,13 @@ test('hard budgets, required attributes, stock and missing bundle permission are
 
 test('paid add-on needs confirmation and never becomes a competitive offer', async t => {
   const { run, repository, input } = setup(t);
-  const result = await run({ sellerFactory: sellerOverride(response => {
+  // Legacy RFQ adapters still permit ordinary paid quotes for consent validation;
+  // conditional exchange proposals have separate, stricter policy checks.
+  const result = await run({ buyerFactory: (id, gateway) => ({ negotiate: async args => {
+    const answer = await new BuyerAgent(id, gateway).negotiate(args);
+    if (answer.rfq) delete answer.rfq.proposal;
+    return answer;
+  } }), sellerFactory: sellerOverride(response => {
     const bundle = response.result.drafts.find(d => d.variant === 'bundle');
     if (bundle) bundle.total_price_twd += 100;
     return response;
@@ -183,7 +191,8 @@ test('explicit withdrawal removes own offers, never a competitor offer', async t
   const { run } = setup(t);
   const result = await run({ sellerFactory: sellerOverride((response, args, seller) => {
     if (seller.seller_id === 'seller_a' && args.rfq.round === 2) response.result = { ...response.result,
-      outcome: 'refused', is_final: false, drafts: [], withdrawn_offer_ids: args.previous.map(o => o.offer_id) };
+      outcome: 'refused', is_final: false, drafts: [], withdrawn_offer_ids: args.previous.map(o => o.offer_id),
+      proposal_response: { status: 'declined', exchange_discount_twd: 0 } };
     return response;
   }) });
   assert.ok(result.offers.every(o => o.seller_id !== 'seller_a'));

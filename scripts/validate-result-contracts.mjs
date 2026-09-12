@@ -25,11 +25,11 @@ for(const [name,item] of Object.entries(examples)){
  valid(create?'RequestSnapshot':'DecisionResult',item.response);
  assert.equal(item.expected_status_code,create?202:200);
 }
-assert.deepEqual(Object.keys(openapi.paths).sort(),['/api/buyer-profile','/api/requests','/api/requests/{request_id}','/api/requests/{request_id}/decisions']);
+assert.deepEqual(Object.keys(openapi.paths).filter(p=>!p.includes('purchase')&&!p.endsWith('/improvement')).sort(),['/api/buyer-profile','/api/requests','/api/requests/{request_id}','/api/requests/{request_id}/decisions']);
 assert.deepEqual(Object.keys(openapi.paths['/api/requests/{request_id}/decisions'].post.responses).sort(),['200','400','404','409','410','500']);
 function refs(value){if(!value||typeof value!=='object')return;for(const [key,v] of Object.entries(value)){
  if(key==='$ref'){
-  if(v.startsWith('../contracts/')){assert.ok(v.startsWith('../contracts/a2a-commerce.v0.3.schema.json#/$defs/'));assert.ok(schema.$defs[v.split('/').at(-1)]);}
+  if(v.startsWith('../contracts/')){if(!v.startsWith('../contracts/purchase.v1.schema.json#/$defs/')){assert.ok(v.startsWith('../contracts/a2a-commerce.v0.3.schema.json#/$defs/'));assert.ok(schema.$defs[v.split('/').at(-1)]);}}
   else if(v.startsWith('#/')){let node=openapi;for(const part of v.slice(2).split('/'))node=node?.[part];assert.ok(node,`Unresolved ${v}`);}
  }else refs(v);
 }}

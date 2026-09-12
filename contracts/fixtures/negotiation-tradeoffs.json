@@ -1,0 +1,10 @@
+{
+  "fixture_version": "0.3",
+  "proposals": [
+    { "kind": "add_gift", "variant": "bundle", "target_total_twd": 659, "reference_offer_id": "own_standalone_r1", "benefit_kind": null },
+    { "kind": "exchange_gift", "variant": "standalone", "target_total_twd": 600, "reference_offer_id": "own_bundle_r2", "benefit_kind": null },
+    { "kind": "request_benefit", "variant": "standalone", "target_total_twd": null, "reference_offer_id": "own_standalone_r2", "benefit_kind": "return_extension" }
+  ],
+  "counteroffer": { "status": "countered", "exchange_discount_twd": 30 },
+  "notice": "Synthetic contract examples. Runtime verifies reference ownership, eligibility, expiry, SKU, exact quoted terms and request-wide concession allowance."
+}

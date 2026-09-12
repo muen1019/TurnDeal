@@ -1,0 +1,23 @@
+{
+  "repository": "https://github.com/agentic-commerce-protocol/agentic-commerce-protocol",
+  "commit": "7fdd78df677a94dce04c770644b0fbbb1401272b",
+  "version": "2025-12-12",
+  "files": {
+    "checkout.schema.json": {
+      "path": "spec/2025-12-12/json-schema/schema.agentic_checkout.json",
+      "sha256": "7de8a1d0e7237a541cee51946e82b10dc3d3935d7ff39a0e5f1c58f09e68b47e"
+    },
+    "checkout.openapi.yaml": {
+      "path": "spec/2025-12-12/openapi/openapi.agentic_checkout.yaml",
+      "sha256": "2e988128433b9132ab956b137b72beb0b37b5a2113f15b8bb8775fe3a9c8a54c"
+    },
+    "webhook.openapi.yaml": {
+      "path": "spec/2025-12-12/openapi/openapi.agentic_checkout_webhook.yaml",
+      "sha256": "1da58e5fdad04cccf4066261c836a82a0ddd5ed9041134bb9f920719f6db669c"
+    },
+    "LICENSE": {
+      "path": "LICENSE",
+      "sha256": "4458503dd48e88c4e0b945fb252a08b93c40ec757309b8ffa7c594dfa1e35104"
+    }
+  }
+}

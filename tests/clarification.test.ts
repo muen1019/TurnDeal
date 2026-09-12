@@ -5,6 +5,11 @@ import {createLlmFormatter} from '../src/formatter/llm.ts';
 import {assertContract} from '../src/orchestrator/contract.ts';
 import type {FormatResult} from '../src/formatter/parser.ts';
 const result:FormatResult={parser_version:'formatter-rules-v0.1',status:'needs_clarification',normalized_intent:null,target_total_twd:null,questions:['顏色要選哪個？'],warnings:[]};
+test('budget confirmation and amount questions collapse into one actionable amount question',()=>{
+ const summary=formatterSummary({...result,target_total_twd:1000,questions:['1000元是包含運費的最高可接受金額嗎？','你提到1000元，含運最多可接受多少元？']},'');
+ assert.equal(summary.questions.length,1);assert.equal(summary.questions[0].field,'budget');
+ assert.match(summary.questions[0].text,/請輸入金額/);assert.doesNotMatch(summary.questions[0].text,/金額嗎/);
+});
 test('quick answers prioritize preference values and exclude negative choices; examples never auto-authorize',()=>{
   const summary=formatterSummary(result,'喜歡藍色或紅色或白色，不要紅色');
   assertContract('FormatterSummary',summary);

@@ -1,4 +1,4 @@
-import { act, renderHook, waitFor } from "@testing-library/react";
+import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
 import { createElement, StrictMode, type ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import apiExamples from "../../../contracts/fixtures/result-api-v0.3.json";
@@ -18,11 +18,25 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  cleanup();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
 
 describe("useWorkspace pending recovery", () => {
+  it('clears every local draft, preserves settings and blocks clearing processing requests',()=>{
+    const {result}=renderHook(()=>useWorkspace());
+    act(()=>result.current.patch(result.current.active.id,{draft:'private draft'}));
+    act(()=>result.current.newConversation());
+    const definitions=result.current.workspace.definitions;
+    act(()=>result.current.clearHistory());
+    expect(result.current.workspace.conversations).toHaveLength(1);
+    expect(result.current.workspace.definitions).toEqual(definitions);
+    expect(sessionStorage.getItem(storageKey)).not.toContain('private draft');
+    act(()=>result.current.patch(result.current.active.id,{snapshot:validateSnapshot(createResponse)}));
+    const frozen=result.current.workspace;
+    act(()=>result.current.clearHistory());expect(result.current.workspace).toBe(frozen);
+  });
   it('deletes one local conversation, preserves others, and replaces the last with a fresh draft',()=>{
     const {result}=renderHook(()=>useWorkspace());
     const first=result.current.active.id;

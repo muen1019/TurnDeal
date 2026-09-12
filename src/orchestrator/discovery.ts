@@ -4,6 +4,10 @@ import type { ProductPreference } from './data-tools.ts';
 import { matchesPreference, validatePreferences } from './preferences.ts';
 import {assertContract} from './contract.ts';
 import type {RankingWeights} from './weighted.ts';
+import { serviceScore, includedServices } from './service-score.mjs';
+
+export type PublicService = { benefit_id:string; kind:string; duration_days:number; conditions:string;
+  evidence_id:string; simulation:boolean; commitment:'included'|'negotiable'; valid_until:string|null };
 
 export type DiscoveryQuery = {
   ranking_weights?: RankingWeights;
@@ -11,7 +15,7 @@ export type DiscoveryQuery = {
   required_features?: string[]; required_attributes?: Record<string, string>;
   preferred_attributes?: Record<string, string>; delivery_days_max?: number;
   product_preferences?: ProductPreference[];
-  priorities?: ('price_first' | 'delivery_first' | 'trust_first')[];
+  priorities?: ('price_first' | 'delivery_first' | 'trust_first' | 'after_sales_first')[];
 };
 export type Listing = {
   listing_id: string; product_id: string; seller_id: string; name: string; category: string;
@@ -19,16 +23,17 @@ export type Listing = {
   shipping_twd: number | null; price_includes_tax: boolean;
   rating: number | null; rating_count: number; stock: number; delivery_days: number;
   source_ids: string[]; data_origin: string; synthetic_fields: string[];
+  public_services?: PublicService[];
 };
 export type Catalog = {
   snapshot_id: string; source_snapshot_id: string;
   sellers: { seller_id: string; name: string; platform: string; rating: number | null;
-    rating_count: number; enabled: boolean; data_origin: string }[];
+    rating_count: number; enabled: boolean; data_origin: string; persona?: string|null }[];
   listings: Listing[];
   campaigns: { campaign_id: string; seller_id: string; category: string; bid_twd: number;
     enabled: boolean; starts_at: string; ends_at: string }[];
 };
-export const POLICY_VERSION = 'discovery-score-v0.4';
+export const POLICY_VERSION = 'discovery-score-v0.5';
 const clamp = (v: number) => Math.max(0, Math.min(100, v));
 // Fixed prior rather than a changing catalog average keeps scores stable across unrelated additions.
 export const ratingScore = (rating: number | null, count: number) =>
@@ -39,7 +44,7 @@ function validate(q: DiscoveryQuery, now: string) {
   if (!q || q.category !== 'mouse')
     throw new Error('invalid_argument: category=mouse required');
   if (q.product_preferences !== undefined) validatePreferences(q.product_preferences);
-  if (q.priorities !== undefined && (!Array.isArray(q.priorities) || q.priorities.some(p => !['price_first','delivery_first','trust_first'].includes(p)) || new Set(q.priorities).size !== q.priorities.length))
+  if (q.priorities !== undefined && (!Array.isArray(q.priorities) || q.priorities.some(p => !['price_first','delivery_first','trust_first','after_sales_first'].includes(p)) || new Set(q.priorities).size !== q.priorities.length))
     throw new Error('invalid_argument: priorities');
   for (const key of ['target_total_twd', 'max_total_twd', 'delivery_days_max'] as const)
     if (q[key] !== undefined && (!Number.isInteger(q[key]) || q[key]! <= 0)) throw new Error(`invalid_argument: ${key}`);
@@ -65,8 +70,10 @@ export function rankCandidates(catalog: Catalog, query: DiscoveryQuery, now: str
   const preferenceCount = preferred.length + soft.length;
   const custom=query.ranking_weights&&!query.priorities?.length?query.ranking_weights:null;
   const colors=soft.filter(p=>p.attribute==='color');
-  const base = custom?{price:custom.price,delivery:custom.delivery,seller_rating:custom.trust,product_rating:0,preference:colors.length?custom.color:0}:{ price: query.target_total_twd === undefined ? 0 : .45,
-    preference: preferenceCount ? .25 : 0, product_rating: .15, seller_rating: .10, delivery: .05 };
+  const lowestPrice = query.priorities?.includes('price_first');
+  const base = custom?{price:custom.price,delivery:custom.delivery,seller_rating:custom.trust,product_rating:0,preference:colors.length?custom.color:0,after_sales:0}:{ price: query.target_total_twd === undefined && !lowestPrice ? 0 : .45,
+    preference: preferenceCount ? .25 : 0, product_rating: .15, seller_rating: .10, delivery: .05,
+    after_sales: query.priorities?.includes('after_sales_first') ? .60 : 0 };
   // Named trade priorities double their active weight before normalization.
   if (query.priorities?.includes('price_first')) base.price *= 2;
   if (query.priorities?.includes('delivery_first')) base.delivery *= 2;
@@ -92,11 +99,12 @@ export function rankCandidates(catalog: Catalog, query: DiscoveryQuery, now: str
     if (query.max_total_twd !== undefined && (total === null || total > query.max_total_twd)) violations.push('budget_unconfirmed');
     const matchCount = preferred.filter(([k,v]) => listing.attributes[k] === v).length + soft.filter(p => matchesPreference(listing.attributes, p)).length;
     const scores = {
-      price: total === null || query.target_total_twd === undefined ? 0 : clamp(100 * (1 - Math.abs(total - query.target_total_twd) / query.target_total_twd)),
+      price: total === null ? 0 : lowestPrice ? 100000/(1000+total) : query.target_total_twd === undefined ? 0 : clamp(100 * (1 - Math.abs(total - query.target_total_twd) / query.target_total_twd)),
       preference: preferenceCount ? 100 * matchCount / preferenceCount : 0,
       product_rating: ratingScore(listing.rating, listing.rating_count),
       seller_rating: ratingScore(seller.rating, seller.rating_count),
       delivery: clamp(100 * (8 - listing.delivery_days) / 7),
+      after_sales: serviceScore(includedServices(listing.public_services,now)),
     };
     if(custom){
       if(query.target_total_twd===undefined)scores.price=total===null||!query.max_total_twd?0:clamp(100*(1-total/query.max_total_twd));
@@ -110,8 +118,8 @@ export function rankCandidates(catalog: Catalog, query: DiscoveryQuery, now: str
       negotiation_ready: !violations.length && total !== null && registeredSellerIds.includes(seller.seller_id),
       pending_checks: total === null ? ['total_price_unknown'] : [],
       price_difference_twd: total === null || query.target_total_twd === undefined ? null : total - query.target_total_twd,
-      selection_reasons: [`偏好命中 ${matchCount}/${preferenceCount}`, total === null ? '含稅運總價待確認' : `含稅運 ${total} 元`,
-        custom?'套用已儲存偏好權重':query.target_total_twd === undefined ? '未設定目標價格，價格不參與評分' : `目標 ${query.target_total_twd} 元`],
+      selection_reasons: [...(query.priorities?.includes('after_sales_first') ? [includedServices(listing.public_services,now).length ? `已登錄售後條件分數 ${scores.after_sales.toFixed(2)}` : '售後資料未知，未推定服務能力'] : []), `偏好命中 ${matchCount}/${preferenceCount}`, total === null ? '含稅運總價待確認' : `含稅運 ${total} 元`,
+        custom ? '套用已儲存偏好權重' : lowestPrice ? '明確偏好低價：含稅運越低，價格分數越高' : query.target_total_twd === undefined ? '未設定目標價格，價格不參與評分' : `目標 ${query.target_total_twd} 元`],
     }];
   });
   // Hard-constraint compliant candidates always precede explicitly labelled alternatives.

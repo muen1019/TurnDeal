@@ -1,11 +1,400 @@
 {
-  "fixture_version": "0.2",
-  "description": "User-approved E2E showcase preferences, separate from the canonical historical demo. All commercial preferences are synthetic.",
+  "fixture_version": "0.3",
+  "description": "Five economic personas; all private commercial data and fulfillment capabilities are simulated.",
   "profiles": [
-    { "seller_id": "seller_a", "label": "願意讓價", "description": "逐輪降價，優先匹配競爭價格，配送較慢。", "bundle_discount_twd": 0, "always_offer_bundle": false, "addon_product_id": null },
-    { "seller_id": "seller_b", "label": "快速配送", "description": "以一天到貨為優勢，保留較高售價。", "bundle_discount_twd": 0, "always_offer_bundle": false, "addon_product_id": null },
-    { "seller_id": "seller_c", "label": "免費送周邊", "description": "提供單買與同價贈送滑鼠墊，贈品可拒絕。", "bundle_discount_twd": 0, "always_offer_bundle": true, "addon_product_id": "pad_c_black" },
-    { "seller_id": "seller_d", "label": "組合更便宜", "description": "滑鼠加滑鼠墊比同輪單買便宜 NT$30，配件可拒絕。", "bundle_discount_twd": 30, "always_offer_bundle": true, "addon_product_id": "pad_c_black" },
-    { "seller_id": "seller_e", "label": "固定價格", "description": "維持 NT$679，不跟價，第一輪報最終價。", "bundle_discount_twd": 0, "always_offer_bundle": false, "addon_product_id": null }
+    {
+      "seller_id": "seller_a",
+      "label": "清庫型 Price Optimizer",
+      "description": "加速指定黑色 SKU 周轉；每輪小幅讓價，報價 120 秒有效。",
+      "bundle_discount_twd": 0,
+      "always_offer_bundle": false,
+      "addon_product_id": null,
+      "gift_exchange_discount_twd": 0,
+      "persona_policy": {
+        "persona": "price_optimizer",
+        "objective": "加速指定黑色 SKU 周轉；每輪小幅讓價，報價 120 秒有效。",
+        "sku_ids": [
+          "mouse_a_black_small"
+        ],
+        "price_mode": "stepped",
+        "base_price_twd": 629,
+        "round_discounts_twd": [
+          20,
+          35,
+          50,
+          65,
+          80
+        ],
+        "final_round": 5,
+        "quote_ttl_seconds": 120,
+        "gift_from_round": 1,
+        "benefit_schedule": [],
+        "decision_mode": "bounded"
+      },
+      "sku_policies": [
+        {
+          "product_id": "mouse_a_black_small",
+          "policy_version": "sku-policy-v1",
+          "opening_discount_cap_twd": 20,
+          "max_discount_per_step_twd": 20,
+          "max_total_discount_twd": 80,
+          "max_concession_count": 5,
+          "unit_cost_twd": 350,
+          "shipping_cost_twd": 40,
+          "min_margin_bps": 1500,
+          "gift_cost_budget_twd": 0,
+          "gift_exchange_discount_cap_twd": 0,
+          "total_concession_budget_twd": 100,
+          "voucher_budget_twd": 0,
+          "inventory_pressure": "high",
+          "addon_costs": [],
+          "benefit_costs": []
+        }
+      ]
+    },
+    {
+      "seller_id": "seller_b",
+      "label": "履約型 Speed Seller",
+      "description": "維持物流溢價，以已登錄的一天到貨承諾及晚到補償換取成交。",
+      "bundle_discount_twd": 0,
+      "always_offer_bundle": false,
+      "addon_product_id": null,
+      "gift_exchange_discount_twd": 0,
+      "persona_policy": {
+        "persona": "speed_seller",
+        "objective": "維持物流溢價，以已登錄的一天到貨承諾及晚到補償換取成交。",
+        "sku_ids": [
+          "mouse_b_black_small"
+        ],
+        "price_mode": "protected",
+        "base_price_twd": 799,
+        "round_discounts_twd": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "final_round": 3,
+        "quote_ttl_seconds": 600,
+        "gift_from_round": 1,
+        "benefit_schedule": [
+          {
+            "from_round": 2,
+            "benefit": {
+              "benefit_id": "seller_b_delivery_guarantee_v1",
+              "kind": "delivery_guarantee",
+              "description": "一天到貨承諾",
+              "amount_twd": 0,
+              "duration_days": 1,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "模擬標準配送區；付款完成後起算，一天內到貨；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_b_delivery_guarantee_v1",
+              "simulation": true
+            }
+          },
+          {
+            "from_round": 3,
+            "benefit": {
+              "benefit_id": "seller_b_late_compensation_v1",
+              "kind": "late_compensation",
+              "description": "晚到補償 NT$50",
+              "amount_twd": 50,
+              "duration_days": 7,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "超過承諾交期到貨後 7 天內憑模擬物流紀錄申請一次補償；本次售價不變；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_b_late_compensation_v1",
+              "simulation": true
+            }
+          }
+        ],
+        "decision_mode": "bounded"
+      },
+      "sku_policies": [
+        {
+          "product_id": "mouse_b_black_small",
+          "policy_version": "sku-policy-v1",
+          "opening_discount_cap_twd": 0,
+          "max_discount_per_step_twd": 0,
+          "max_total_discount_twd": 0,
+          "max_concession_count": 3,
+          "unit_cost_twd": 400,
+          "shipping_cost_twd": 40,
+          "min_margin_bps": 1500,
+          "gift_cost_budget_twd": 0,
+          "gift_exchange_discount_cap_twd": 0,
+          "total_concession_budget_twd": 150,
+          "voucher_budget_twd": 0,
+          "inventory_pressure": "normal",
+          "addon_costs": [],
+          "benefit_costs": [
+            {
+              "benefit_id": "seller_b_delivery_guarantee_v1",
+              "cost_twd": 10
+            },
+            {
+              "benefit_id": "seller_b_late_compensation_v1",
+              "cost_twd": 50
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seller_id": "seller_c",
+      "label": "組合型 Bundle Curator",
+      "description": "第二輪可加贈相關滑鼠墊；放棄贈品最多額外折讓 30 元，不默認付費加購。",
+      "bundle_discount_twd": 0,
+      "always_offer_bundle": true,
+      "addon_product_id": "pad_c_black",
+      "gift_exchange_discount_twd": 30,
+      "persona_policy": {
+        "persona": "bundle_curator",
+        "objective": "第二輪可加贈相關滑鼠墊；放棄贈品最多額外折讓 30 元，不默認付費加購。",
+        "sku_ids": [
+          "mouse_c_black_small"
+        ],
+        "price_mode": "bundle",
+        "base_price_twd": 699,
+        "round_discounts_twd": [
+          30,
+          40,
+          50,
+          60,
+          60
+        ],
+        "final_round": 4,
+        "quote_ttl_seconds": 600,
+        "gift_from_round": 2,
+        "benefit_schedule": [],
+        "decision_mode": "bounded"
+      },
+      "sku_policies": [
+        {
+          "product_id": "mouse_c_black_small",
+          "policy_version": "sku-policy-v1",
+          "opening_discount_cap_twd": 30,
+          "max_discount_per_step_twd": 10,
+          "max_total_discount_twd": 90,
+          "max_concession_count": 3,
+          "unit_cost_twd": 400,
+          "shipping_cost_twd": 40,
+          "min_margin_bps": 1500,
+          "gift_cost_budget_twd": 35,
+          "gift_exchange_discount_cap_twd": 30,
+          "total_concession_budget_twd": 100,
+          "voucher_budget_twd": 0,
+          "inventory_pressure": "normal",
+          "addon_costs": [
+            {
+              "product_id": "pad_c_black",
+              "cost_twd": 35
+            }
+          ],
+          "benefit_costs": []
+        }
+      ]
+    },
+    {
+      "seller_id": "seller_d",
+      "label": "關係型 Loyalty Builder",
+      "description": "維持本次售價，提供下次券與較長退貨期，未來券不折抵本次总價。",
+      "bundle_discount_twd": 0,
+      "always_offer_bundle": false,
+      "addon_product_id": null,
+      "gift_exchange_discount_twd": 0,
+      "persona_policy": {
+        "persona": "loyalty_builder",
+        "objective": "維持本次售價，提供下次券與較長退貨期，未來券不折抵本次总價。",
+        "sku_ids": [
+          "mouse_d_black_small"
+        ],
+        "price_mode": "protected",
+        "base_price_twd": 709,
+        "round_discounts_twd": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "final_round": 3,
+        "quote_ttl_seconds": 600,
+        "gift_from_round": 1,
+        "benefit_schedule": [
+          {
+            "from_round": 2,
+            "benefit": {
+              "benefit_id": "seller_d_future_coupon_v1",
+              "kind": "future_coupon",
+              "description": "下次購物券 NT$50",
+              "amount_twd": 50,
+              "duration_days": 30,
+              "minimum_spend_twd": 1000,
+              "requires_membership": true,
+              "conditions": "需成為會員；本次模擬兌換後發券，30 天內下次單筆滿 NT$1000 可用一次，不可折現或折抵本次；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_d_future_coupon_v1",
+              "simulation": true
+            }
+          },
+          {
+            "from_round": 3,
+            "benefit": {
+              "benefit_id": "seller_d_return_extension_v1",
+              "kind": "return_extension",
+              "description": "退貨期延長至 30 天",
+              "amount_twd": 0,
+              "duration_days": 30,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "到貨後 30 天內，保留完整配件與包裝且無人為損壞；以模擬退貨流程申請；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_d_return_extension_v1",
+              "simulation": true
+            }
+          }
+        ],
+        "decision_mode": "bounded"
+      },
+      "sku_policies": [
+        {
+          "product_id": "mouse_d_black_small",
+          "policy_version": "sku-policy-v1",
+          "opening_discount_cap_twd": 0,
+          "max_discount_per_step_twd": 0,
+          "max_total_discount_twd": 0,
+          "max_concession_count": 3,
+          "unit_cost_twd": 400,
+          "shipping_cost_twd": 40,
+          "min_margin_bps": 1500,
+          "gift_cost_budget_twd": 0,
+          "gift_exchange_discount_cap_twd": 0,
+          "total_concession_budget_twd": 150,
+          "voucher_budget_twd": 50,
+          "inventory_pressure": "normal",
+          "addon_costs": [],
+          "benefit_costs": [
+            {
+              "benefit_id": "seller_d_future_coupon_v1",
+              "cost_twd": 50
+            },
+            {
+              "benefit_id": "seller_d_return_extension_v1",
+              "cost_twd": 10
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "seller_id": "seller_e",
+      "label": "服務型 Margin Guardian",
+      "description": "維持毛利，以已登錄保固、優先客服及換貨承諾提供售後保障。",
+      "bundle_discount_twd": 0,
+      "always_offer_bundle": false,
+      "addon_product_id": null,
+      "gift_exchange_discount_twd": 0,
+      "persona_policy": {
+        "persona": "margin_guardian",
+        "objective": "維持毛利，以已登錄保固、優先客服及換貨承諾提供售後保障。",
+        "sku_ids": [
+          "mouse_e_black_small"
+        ],
+        "price_mode": "protected",
+        "base_price_twd": 899,
+        "round_discounts_twd": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "final_round": 3,
+        "quote_ttl_seconds": 600,
+        "gift_from_round": 1,
+        "benefit_schedule": [
+          {
+            "from_round": 1,
+            "benefit": {
+              "benefit_id": "seller_e_warranty_extension_v1",
+              "kind": "warranty_extension",
+              "description": "保固延長至 730 天",
+              "amount_twd": 0,
+              "duration_days": 730,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "自到貨起，非人為損壞；模擬維修流程受理，不包含耗材；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_e_warranty_extension_v1",
+              "simulation": true
+            }
+          },
+          {
+            "from_round": 2,
+            "benefit": {
+              "benefit_id": "seller_e_priority_support_v1",
+              "kind": "priority_support",
+              "description": "優先客服，一天內回覆",
+              "amount_twd": 0,
+              "duration_days": 1,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "模擬客服入口提交後一天內回覆；回覆時間不等於修復時間；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_e_priority_support_v1",
+              "simulation": true
+            }
+          },
+          {
+            "from_round": 3,
+            "benefit": {
+              "benefit_id": "seller_e_exchange_guarantee_v1",
+              "kind": "exchange_guarantee",
+              "description": "30 天內瑕疵換貨",
+              "amount_twd": 0,
+              "duration_days": 30,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "到貨後 30 天內驗證非人為瑕疵，以已登錄換貨庫存履約；不自動承諾現金退款；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_e_exchange_guarantee_v1",
+              "simulation": true
+            }
+          }
+        ],
+        "decision_mode": "bounded"
+      },
+      "sku_policies": [
+        {
+          "product_id": "mouse_e_black_small",
+          "policy_version": "sku-policy-v1",
+          "opening_discount_cap_twd": 0,
+          "max_discount_per_step_twd": 0,
+          "max_total_discount_twd": 0,
+          "max_concession_count": 3,
+          "unit_cost_twd": 400,
+          "shipping_cost_twd": 40,
+          "min_margin_bps": 1500,
+          "gift_cost_budget_twd": 0,
+          "gift_exchange_discount_cap_twd": 0,
+          "total_concession_budget_twd": 150,
+          "voucher_budget_twd": 0,
+          "inventory_pressure": "normal",
+          "addon_costs": [],
+          "benefit_costs": [
+            {
+              "benefit_id": "seller_e_warranty_extension_v1",
+              "cost_twd": 10
+            },
+            {
+              "benefit_id": "seller_e_priority_support_v1",
+              "cost_twd": 10
+            },
+            {
+              "benefit_id": "seller_e_exchange_guarantee_v1",
+              "cost_twd": 10
+            }
+          ]
+        }
+      ]
+    }
   ]
 }

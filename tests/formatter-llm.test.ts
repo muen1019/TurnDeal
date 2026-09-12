@@ -61,7 +61,7 @@ test('Structured Outputs strict object fields, privacy options, and result mappi
   let calls=0;
   const request:typeof fetch=async(url,init)=>{
     calls++;assert.equal(url,'https://api.openai.com/v1/responses');assert.equal(init?.redirect,'error');
-    const body=JSON.parse(String(init?.body));assert.equal(body.store,false);assert.equal(body.model,'gpt-4.1');
+    const body=JSON.parse(String(init?.body));assert.equal(body.store,false);assert.equal(body.model,'gpt-5.6-sol');assert.deepEqual(body.reasoning,{effort:'none'});
     assert.equal(body.max_output_tokens,2400);assert.equal(body.text.format.strict,true);
     assert.ok(!String(init?.body).includes('fake-unit-test-key'));
     return reply(data);

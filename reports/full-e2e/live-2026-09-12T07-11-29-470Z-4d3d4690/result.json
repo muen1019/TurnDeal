@@ -1,0 +1,2269 @@
+{
+  "mode": "live",
+  "model": "gpt-4.1-mini-2025-04-14",
+  "started_at": "2026-09-12T07:11:29.470Z",
+  "duration_seconds": 25.77,
+  "limits": {
+    "round_timeout_ms": 30000,
+    "global_deadline_ms": 150000,
+    "model_timeout_ms": 12000,
+    "max_calls": 50,
+    "max_tokens": 400000,
+    "max_output_tokens": 1200,
+    "offer_ttl_ms": 600000
+  },
+  "request_id": "req_58b874ad-3daf-457b-a68c-0b3a7ed3a8cd",
+  "preferences": [
+    "after_sales_first"
+  ],
+  "status": "awaiting_user",
+  "offer_count": 6,
+  "usage": {
+    "calls": 34,
+    "reserved_tokens": 325677,
+    "actual_tokens": 59110
+  },
+  "providers": {
+    "openai": 34,
+    "deterministic": 0
+  },
+  "fallbacks": [],
+  "pipeline": {
+    "stages": [
+      "Text / deterministic Formatter / SQLite Request",
+      "Upstream handoff.prepare / Discovery",
+      "Five-round manager / registered Sellers",
+      "Backend validation",
+      "Evaluator",
+      "SQLite snapshot / replay"
+    ],
+    "handoff_id": "928fe6bb-6359-42b0-ab58-631a895a684e",
+    "discovery_run_id": "2d9ccf2b-a41e-4315-81af-acb52a3efbb7",
+    "policy_version": "discovery-score-v0.5",
+    "selected_seller_ids": [
+      "seller_e",
+      "seller_b",
+      "seller_d",
+      "seller_c",
+      "seller_a"
+    ]
+  },
+  "negotiation_duration_seconds": 22.12,
+  "evaluation_duration_seconds": 3.56,
+  "evaluation": {
+    "request_id": "req_58b874ad-3daf-457b-a68c-0b3a7ed3a8cd",
+    "status": "awaiting_user",
+    "provider": "openai",
+    "model": "gpt-4.1-2025-04-14",
+    "fallback_reason": null,
+    "usage": {
+      "calls": 1,
+      "reserved_tokens": 15006,
+      "actual_tokens": 3197
+    },
+    "evaluated_at": "2026-09-12T07:11:55.341Z",
+    "snapshot": {
+      "request_id": "req_58b874ad-3daf-457b-a68c-0b3a7ed3a8cd",
+      "root_request_id": "req_58b874ad-3daf-457b-a68c-0b3a7ed3a8cd",
+      "parent_request_id": null,
+      "status": "awaiting_user",
+      "documents": {
+        "revision": 1,
+        "intent_md": "我想買無線靜音滑鼠，預算1000元，7天內到貨，必須黑色，必須小尺寸，售後優先",
+        "preference_md": ""
+      },
+      "intent": {
+        "category": "mouse",
+        "max_total_twd": 1000,
+        "delivery_days_max": 7,
+        "required_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "preferences": [
+          "after_sales_first"
+        ],
+        "product_preferences": [
+          {
+            "preference_id": "intent_1",
+            "strength": "required",
+            "attribute": "color",
+            "operator": "in",
+            "values": [
+              "black"
+            ],
+            "source_text": "必須黑色"
+          },
+          {
+            "preference_id": "intent_2",
+            "strength": "required",
+            "attribute": "size_class",
+            "operator": "in",
+            "values": [
+              "small"
+            ],
+            "source_text": "必須小尺寸"
+          }
+        ],
+        "negotiation_policy": {
+          "bundle_mode": "related_no_extra_cost",
+          "allowed_addon_categories": [
+            "mouse_pad"
+          ],
+          "max_addon_increment_twd": 0
+        }
+      },
+      "seller_agents": [
+        {
+          "seller_id": "seller_e",
+          "name": "ClearPrice Store",
+          "listing_rank": 1,
+          "match_reason": "已登錄售後條件分數 50.00；偏好命中 0/0；含稅運 899 元；未設定目標價格，價格不參與評分",
+          "candidate_products": [
+            {
+              "product_id": "mouse_e_black_small",
+              "attributes": {
+                "size_class": "small",
+                "color": "black",
+                "shape": "symmetrical",
+                "length_mm": 99,
+                "width_mm": 60,
+                "height_mm": 39
+              },
+              "matched_preference_ids": [
+                "intent_1",
+                "intent_2"
+              ],
+              "unmatched_preference_ids": [],
+              "pending_checks": []
+            }
+          ],
+          "trust": {
+            "personal_band": "neutral",
+            "personal_rating": null,
+            "personal_count": 0,
+            "marketplace_rating": 4.4,
+            "marketplace_count": 50
+          },
+          "status": "offered",
+          "rounds": [
+            {
+              "round": 1,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_2271fb3e-034f-44d1-afa6-d5327270fdb1"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 2,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_92afbb9d-23ab-4960-9c51-218c463587cd"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 3,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_dc65a552-66b4-4684-ae75-88504bd8dc4f"
+              ],
+              "is_final": true
+            }
+          ],
+          "stop_reason": "seller_final",
+          "final_offer_ids": [
+            "offer_dc65a552-66b4-4684-ae75-88504bd8dc4f"
+          ]
+        },
+        {
+          "seller_id": "seller_b",
+          "name": "FlashShip Tech",
+          "listing_rank": 2,
+          "match_reason": "售後資料未知，未推定服務能力；偏好命中 0/0；含稅運 799 元；未設定目標價格，價格不參與評分",
+          "candidate_products": [
+            {
+              "product_id": "mouse_b_black_small",
+              "attributes": {
+                "size_class": "small",
+                "color": "black",
+                "shape": "symmetrical",
+                "length_mm": 106.7,
+                "width_mm": 58.7,
+                "height_mm": 26.62
+              },
+              "matched_preference_ids": [
+                "intent_1",
+                "intent_2"
+              ],
+              "unmatched_preference_ids": [],
+              "pending_checks": []
+            }
+          ],
+          "trust": {
+            "personal_band": "neutral",
+            "personal_rating": null,
+            "personal_count": 0,
+            "marketplace_rating": 4.8,
+            "marketplace_count": 502
+          },
+          "status": "offered",
+          "rounds": [
+            {
+              "round": 1,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_f8f05fa1-6b41-4b57-b7ed-4e448ddde1d3"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 2,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_3641f877-e432-4a29-9117-fa5b8f6e6a4f"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 3,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_bc99d275-2fd3-4408-9901-0def0be585cf"
+              ],
+              "is_final": true
+            }
+          ],
+          "stop_reason": "seller_final",
+          "final_offer_ids": [
+            "offer_bc99d275-2fd3-4408-9901-0def0be585cf"
+          ]
+        },
+        {
+          "seller_id": "seller_d",
+          "name": "SteadyShip Market",
+          "listing_rank": 3,
+          "match_reason": "售後資料未知，未推定服務能力；偏好命中 0/0；含稅運 709 元；未設定目標價格，價格不參與評分",
+          "candidate_products": [
+            {
+              "product_id": "mouse_d_black_small",
+              "attributes": {
+                "size_class": "small",
+                "color": "black",
+                "shape": "symmetrical",
+                "length_mm": 99,
+                "width_mm": 60,
+                "height_mm": 39
+              },
+              "matched_preference_ids": [
+                "intent_1",
+                "intent_2"
+              ],
+              "unmatched_preference_ids": [],
+              "pending_checks": []
+            }
+          ],
+          "trust": {
+            "personal_band": "neutral",
+            "personal_rating": null,
+            "personal_count": 0,
+            "marketplace_rating": 4.5,
+            "marketplace_count": 50
+          },
+          "status": "offered",
+          "rounds": [
+            {
+              "round": 1,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_f434e6ad-83a9-46a8-8014-0558a6262d10"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 2,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_cb5a50ce-88a2-47cf-8946-3de565f5c142"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 3,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_baa89c01-c100-4681-ab8f-ced32488520f"
+              ],
+              "is_final": true
+            }
+          ],
+          "stop_reason": "seller_final",
+          "final_offer_ids": [
+            "offer_baa89c01-c100-4681-ab8f-ced32488520f"
+          ]
+        },
+        {
+          "seller_id": "seller_c",
+          "name": "Bundle Lab",
+          "listing_rank": 4,
+          "match_reason": "售後資料未知，未推定服務能力；偏好命中 0/0；含稅運 699 元；未設定目標價格，價格不參與評分",
+          "candidate_products": [
+            {
+              "product_id": "mouse_c_black_small",
+              "attributes": {
+                "size_class": "small",
+                "color": "black",
+                "shape": "asymmetrical_right",
+                "length_mm": 105.4,
+                "width_mm": 67.9,
+                "height_mm": 38.4
+              },
+              "matched_preference_ids": [
+                "intent_1",
+                "intent_2"
+              ],
+              "unmatched_preference_ids": [],
+              "pending_checks": []
+            }
+          ],
+          "trust": {
+            "personal_band": "neutral",
+            "personal_rating": null,
+            "personal_count": 0,
+            "marketplace_rating": 4.3,
+            "marketplace_count": 76
+          },
+          "status": "offered",
+          "rounds": [
+            {
+              "round": 1,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_b1fb722e-dc4e-4f4f-9c48-3274aa9f3c08"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 2,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_42fe9d0b-be32-440a-9980-3e37ef1b6e87",
+                "offer_863208f4-6b0c-4542-8e01-0cd420cf5c48"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 3,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_b4a463ff-4e9b-4121-9fc4-ab697673e90a",
+                "offer_9ec675dd-143c-48e3-97eb-fca8f26e9192"
+              ],
+              "is_final": true
+            }
+          ],
+          "stop_reason": "seller_final",
+          "final_offer_ids": [
+            "offer_b4a463ff-4e9b-4121-9fc4-ab697673e90a",
+            "offer_9ec675dd-143c-48e3-97eb-fca8f26e9192"
+          ]
+        },
+        {
+          "seller_id": "seller_a",
+          "name": "Budget Mouse Co.",
+          "listing_rank": 5,
+          "match_reason": "售後資料未知，未推定服務能力；偏好命中 0/0；含稅運 629 元；未設定目標價格，價格不參與評分",
+          "candidate_products": [
+            {
+              "product_id": "mouse_a_black_small",
+              "attributes": {
+                "size_class": "small",
+                "color": "black",
+                "shape": "symmetrical",
+                "length_mm": 99,
+                "width_mm": 60,
+                "height_mm": 39
+              },
+              "matched_preference_ids": [
+                "intent_1",
+                "intent_2"
+              ],
+              "unmatched_preference_ids": [],
+              "pending_checks": []
+            }
+          ],
+          "trust": {
+            "personal_band": "neutral",
+            "personal_rating": null,
+            "personal_count": 0,
+            "marketplace_rating": 4.6,
+            "marketplace_count": 128
+          },
+          "status": "offered",
+          "rounds": [
+            {
+              "round": 1,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_cef215b7-b93f-4178-b372-c2dc300736f0"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 2,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_c8edc0c8-5e7c-459c-9491-c922f9831866"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 3,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_649707d1-4a3c-44cf-a32b-e684f7eb2c3a"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 4,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_f6ab76de-ff7e-4bdd-8e36-d6b2b8d610c2"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 5,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_7e61ed32-1f0a-4cff-9ae0-6eb85473452b"
+              ],
+              "is_final": true
+            }
+          ],
+          "stop_reason": "seller_final",
+          "final_offer_ids": [
+            "offer_7e61ed32-1f0a-4cff-9ae0-6eb85473452b"
+          ]
+        }
+      ],
+      "discovery_exclusions": [],
+      "sponsored_placement": {
+        "seller_id": "seller_b",
+        "campaign_id": "campaign_b_launch",
+        "label": "Sponsored"
+      },
+      "offers": [
+        {
+          "offer_id": "offer_dc65a552-66b4-4684-ae75-88504bd8dc4f",
+          "seller_id": "seller_e",
+          "round": 3,
+          "variant": "standalone",
+          "items": [
+            {
+              "product_id": "mouse_e_black_small",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 899,
+          "delivery_days": 4,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T07:21:38.184Z",
+          "benefits": [
+            {
+              "benefit_id": "seller_e_warranty_extension_v1",
+              "kind": "warranty_extension",
+              "description": "保固延長至 730 天",
+              "amount_twd": 0,
+              "duration_days": 730,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "自到貨起，非人為損壞；模擬維修流程受理，不包含耗材；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_e_warranty_extension_v1",
+              "simulation": true
+            },
+            {
+              "benefit_id": "seller_e_priority_support_v1",
+              "kind": "priority_support",
+              "description": "優先客服，一天內回覆",
+              "amount_twd": 0,
+              "duration_days": 1,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "模擬客服入口提交後一天內回覆；回覆時間不等於修復時間；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_e_priority_support_v1",
+              "simulation": true
+            },
+            {
+              "benefit_id": "seller_e_exchange_guarantee_v1",
+              "kind": "exchange_guarantee",
+              "description": "30 天內瑕疵換貨",
+              "amount_twd": 0,
+              "duration_days": 30,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "到貨後 30 天內驗證非人為瑕疵，以已登錄換貨庫存履約；不自動承諾現金退款；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_e_exchange_guarantee_v1",
+              "simulation": true
+            }
+          ],
+          "baseline_offer_id": null,
+          "eligibility": {
+            "status": "eligible",
+            "reason_codes": []
+          }
+        },
+        {
+          "offer_id": "offer_bc99d275-2fd3-4408-9901-0def0be585cf",
+          "seller_id": "seller_b",
+          "round": 3,
+          "variant": "standalone",
+          "items": [
+            {
+              "product_id": "mouse_b_black_small",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click",
+            "multi_device"
+          ],
+          "total_price_twd": 799,
+          "delivery_days": 1,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T07:21:38.048Z",
+          "benefits": [
+            {
+              "benefit_id": "seller_b_delivery_guarantee_v1",
+              "kind": "delivery_guarantee",
+              "description": "一天到貨承諾",
+              "amount_twd": 0,
+              "duration_days": 1,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "模擬標準配送區；付款完成後起算，一天內到貨；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_b_delivery_guarantee_v1",
+              "simulation": true
+            },
+            {
+              "benefit_id": "seller_b_late_compensation_v1",
+              "kind": "late_compensation",
+              "description": "晚到補償 NT$50",
+              "amount_twd": 50,
+              "duration_days": 7,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "超過承諾交期到貨後 7 天內憑模擬物流紀錄申請一次補償；本次售價不變；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_b_late_compensation_v1",
+              "simulation": true
+            }
+          ],
+          "baseline_offer_id": null,
+          "eligibility": {
+            "status": "eligible",
+            "reason_codes": []
+          }
+        },
+        {
+          "offer_id": "offer_baa89c01-c100-4681-ab8f-ced32488520f",
+          "seller_id": "seller_d",
+          "round": 3,
+          "variant": "standalone",
+          "items": [
+            {
+              "product_id": "mouse_d_black_small",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 709,
+          "delivery_days": 2,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T07:21:38.189Z",
+          "benefits": [
+            {
+              "benefit_id": "seller_d_future_coupon_v1",
+              "kind": "future_coupon",
+              "description": "下次購物券 NT$50",
+              "amount_twd": 50,
+              "duration_days": 30,
+              "minimum_spend_twd": 1000,
+              "requires_membership": true,
+              "conditions": "需成為會員；本次模擬兌換後發券，30 天內下次單筆滿 NT$1000 可用一次，不可折現或折抵本次；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_d_future_coupon_v1",
+              "simulation": true
+            },
+            {
+              "benefit_id": "seller_d_return_extension_v1",
+              "kind": "return_extension",
+              "description": "退貨期延長至 30 天",
+              "amount_twd": 0,
+              "duration_days": 30,
+              "minimum_spend_twd": 0,
+              "requires_membership": false,
+              "conditions": "到貨後 30 天內，保留完整配件與包裝且無人為損壞；以模擬退貨流程申請；僅於本地模擬履約，不是真實商家承諾。",
+              "evidence_id": "sim_seller_d_return_extension_v1",
+              "simulation": true
+            }
+          ],
+          "baseline_offer_id": null,
+          "eligibility": {
+            "status": "eligible",
+            "reason_codes": []
+          }
+        },
+        {
+          "offer_id": "offer_b4a463ff-4e9b-4121-9fc4-ab697673e90a",
+          "seller_id": "seller_c",
+          "round": 3,
+          "variant": "standalone",
+          "items": [
+            {
+              "product_id": "mouse_c_black_small",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "wireless_usb",
+            "silent_click"
+          ],
+          "total_price_twd": 629,
+          "delivery_days": 3,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T07:21:38.225Z",
+          "benefits": [],
+          "baseline_offer_id": null,
+          "eligibility": {
+            "status": "eligible",
+            "reason_codes": []
+          }
+        },
+        {
+          "offer_id": "offer_7e61ed32-1f0a-4cff-9ae0-6eb85473452b",
+          "seller_id": "seller_a",
+          "round": 5,
+          "variant": "standalone",
+          "items": [
+            {
+              "product_id": "mouse_a_black_small",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 559,
+          "delivery_days": 5,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T07:13:50.460Z",
+          "benefits": [],
+          "baseline_offer_id": null,
+          "eligibility": {
+            "status": "eligible",
+            "reason_codes": []
+          }
+        },
+        {
+          "offer_id": "offer_9ec675dd-143c-48e3-97eb-fca8f26e9192",
+          "seller_id": "seller_c",
+          "round": 3,
+          "variant": "bundle",
+          "items": [
+            {
+              "product_id": "mouse_c_black_small",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            },
+            {
+              "product_id": "pad_c_black",
+              "category": "mouse_pad",
+              "role": "addon",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "wireless_usb",
+            "silent_click"
+          ],
+          "total_price_twd": 649,
+          "delivery_days": 3,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": true,
+          "expires_at": "2026-09-12T07:21:38.225Z",
+          "benefits": [],
+          "baseline_offer_id": "offer_b4a463ff-4e9b-4121-9fc4-ab697673e90a",
+          "eligibility": {
+            "status": "needs_confirmation",
+            "reason_codes": [
+              "addon_consent_required"
+            ]
+          }
+        }
+      ],
+      "ranked_offers": [
+        {
+          "rank": 1,
+          "offer_id": "offer_dc65a552-66b4-4684-ae75-88504bd8dc4f",
+          "reason": "此排序依註冊售後服務條件排列，offer_dc65a552-66b4-4684-ae75-88504bd8dc4f符合最高註冊分，且價格為NT$899，配送需4天。",
+          "tradeoffs": [
+            "比最低價貴NT$340",
+            "比最快交期慢3天"
+          ]
+        },
+        {
+          "rank": 2,
+          "offer_id": "offer_baa89c01-c100-4681-ab8f-ced32488520f",
+          "reason": "依註冊售後服務排序，offer_baa89c01-c100-4681-ab8f-ced32488520f次高，價格NT$709，2天到貨。",
+          "tradeoffs": [
+            "比最低價貴NT$150",
+            "比最快交期慢1天"
+          ]
+        },
+        {
+          "rank": 3,
+          "offer_id": "offer_bc99d275-2fd3-4408-9901-0def0be585cf",
+          "reason": "售後註冊分第三，價格NT$799，交貨最快為1天。",
+          "tradeoffs": [
+            "比最低價貴NT$240"
+          ]
+        },
+        {
+          "rank": 4,
+          "offer_id": "offer_b4a463ff-4e9b-4121-9fc4-ab697673e90a",
+          "reason": "依註冊售後條件排序，offer_b4a463ff-4e9b-4121-9fc4-ab697673e90a無註冊售後，加總排序於此。價格NT$629，3天交貨。",
+          "tradeoffs": [
+            "比最低價貴NT$70",
+            "比最快交期慢2天"
+          ]
+        },
+        {
+          "rank": 5,
+          "offer_id": "offer_7e61ed32-1f0a-4cff-9ae0-6eb85473452b",
+          "reason": "依註冊售後條件排序，offer_7e61ed32-1f0a-4cff-9ae0-6eb85473452b無註冊售後，且價格NT$559，配送需5天。",
+          "tradeoffs": [
+            "價格最低",
+            "比最快交期慢4天"
+          ]
+        }
+      ],
+      "confirmation_offer_ids": [
+        "offer_9ec675dd-143c-48e3-97eb-fca8f26e9192"
+      ],
+      "selected_offer_id": null,
+      "next_request_id": null,
+      "decision": null,
+      "error": null
+    },
+    "solutions": [
+      {
+        "seller_id": "seller_e",
+        "rank": 1,
+        "recommended_offer_id": "offer_dc65a552-66b4-4684-ae75-88504bd8dc4f",
+        "offer_rank": 1,
+        "reason": "此排序依註冊售後服務條件排列，offer_dc65a552-66b4-4684-ae75-88504bd8dc4f符合最高註冊分，且價格為NT$899，配送需4天。",
+        "tradeoffs": [
+          "比最低價貴NT$340",
+          "比最快交期慢3天"
+        ],
+        "alternative_offer_ids": []
+      },
+      {
+        "seller_id": "seller_d",
+        "rank": 2,
+        "recommended_offer_id": "offer_baa89c01-c100-4681-ab8f-ced32488520f",
+        "offer_rank": 2,
+        "reason": "依註冊售後服務排序，offer_baa89c01-c100-4681-ab8f-ced32488520f次高，價格NT$709，2天到貨。",
+        "tradeoffs": [
+          "比最低價貴NT$150",
+          "比最快交期慢1天"
+        ],
+        "alternative_offer_ids": []
+      },
+      {
+        "seller_id": "seller_b",
+        "rank": 3,
+        "recommended_offer_id": "offer_bc99d275-2fd3-4408-9901-0def0be585cf",
+        "offer_rank": 3,
+        "reason": "售後註冊分第三，價格NT$799，交貨最快為1天。",
+        "tradeoffs": [
+          "比最低價貴NT$240"
+        ],
+        "alternative_offer_ids": []
+      },
+      {
+        "seller_id": "seller_c",
+        "rank": 4,
+        "recommended_offer_id": "offer_b4a463ff-4e9b-4121-9fc4-ab697673e90a",
+        "offer_rank": 4,
+        "reason": "依註冊售後條件排序，offer_b4a463ff-4e9b-4121-9fc4-ab697673e90a無註冊售後，加總排序於此。價格NT$629，3天交貨。",
+        "tradeoffs": [
+          "比最低價貴NT$70",
+          "比最快交期慢2天"
+        ],
+        "alternative_offer_ids": []
+      },
+      {
+        "seller_id": "seller_a",
+        "rank": 5,
+        "recommended_offer_id": "offer_7e61ed32-1f0a-4cff-9ae0-6eb85473452b",
+        "offer_rank": 5,
+        "reason": "依註冊售後條件排序，offer_7e61ed32-1f0a-4cff-9ae0-6eb85473452b無註冊售後，且價格NT$559，配送需5天。",
+        "tradeoffs": [
+          "價格最低",
+          "比最快交期慢4天"
+        ],
+        "alternative_offer_ids": []
+      }
+    ]
+  },
+  "passed": true,
+  "checks": [
+    {
+      "name": "文字需求經 Formatter 轉換並保留價格／售後優先權",
+      "passed": true
+    },
+    {
+      "name": "遠端 handoff.prepare 實際選出五家，計畫與 Discovery 已保存並可重播",
+      "passed": true
+    },
+    {
+      "name": "輸出契約與五家分支狀態正確",
+      "passed": true
+    },
+    {
+      "name": "五家皆有合格方案，未授權的組合另行保留",
+      "passed": true
+    },
+    {
+      "name": "每輪只使用上一個已提交 context",
+      "passed": true
+    },
+    {
+      "name": "RFQ 無競爭者 ID／私有資料，所有競爭條件有真實來源",
+      "passed": true
+    },
+    {
+      "name": "最終報價符合金額、期限、庫存、SKU、數量與交期硬限制",
+      "passed": true
+    },
+    {
+      "name": "A 有讓價，B 保持最快配送",
+      "passed": true
+    },
+    {
+      "name": "C 曾提供免費滑鼠墊；折現後的加價方案不冒充免費",
+      "passed": true
+    },
+    {
+      "name": "Discovery 公開條件匹配，不公開成本或靠 Persona 標籤加分",
+      "passed": true
+    },
+    {
+      "name": "B／D／E 保護售價，分別提供物流、回購與售後權益",
+      "passed": true
+    },
+    {
+      "name": "每筆權益來自可用且有模擬履約證據的 Catalog；未來券不抵本次價格",
+      "passed": true
+    },
+    {
+      "name": "條件交換有實際對應回覆，取消贈品折讓累計不超過 NT$30",
+      "passed": true
+    },
+    {
+      "name": "最終 Offer ID 唯一，Evaluator ID 集合完整",
+      "passed": true
+    },
+    {
+      "name": "Buyer 與 Seller 均實際成功使用真實模型",
+      "passed": true
+    },
+    {
+      "name": "執行未超過固定模型呼叫與 token 預留上限",
+      "passed": true
+    },
+    {
+      "name": "SQLite Offer 不可變且完整持久化",
+      "passed": true
+    },
+    {
+      "name": "Evaluator 排完全部合格 ID，產生五個賣家方案並符合指定偏好",
+      "passed": true
+    },
+    {
+      "name": "Evaluator 實際採用真實模型排序",
+      "passed": true
+    },
+    {
+      "name": "Evaluator 發布快照不可修改，Sponsored 未改變推薦",
+      "passed": true
+    },
+    {
+      "name": "關閉／重開 SQLite 後重播同一結果，不再付模型費用",
+      "passed": true
+    },
+    {
+      "name": "其他買家無法讀取執行結果",
+      "passed": true
+    },
+    {
+      "name": "Evaluator 關閉／重開 SQLite 後保持相同排名與原因",
+      "passed": true
+    }
+  ],
+  "solutions": [
+    {
+      "seller_id": "seller_e",
+      "label": "服務型 Margin Guardian",
+      "description": "維持毛利，以已登錄保固、優先客服及換貨承諾提供售後保障。",
+      "standalone": {
+        "offer_id": "offer_dc65a552-66b4-4684-ae75-88504bd8dc4f",
+        "seller_id": "seller_e",
+        "round": 3,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_e_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click"
+        ],
+        "total_price_twd": 899,
+        "delivery_days": 4,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T07:21:38.184Z",
+        "benefits": [
+          {
+            "benefit_id": "seller_e_warranty_extension_v1",
+            "kind": "warranty_extension",
+            "description": "保固延長至 730 天",
+            "amount_twd": 0,
+            "duration_days": 730,
+            "minimum_spend_twd": 0,
+            "requires_membership": false,
+            "conditions": "自到貨起，非人為損壞；模擬維修流程受理，不包含耗材；僅於本地模擬履約，不是真實商家承諾。",
+            "evidence_id": "sim_seller_e_warranty_extension_v1",
+            "simulation": true
+          },
+          {
+            "benefit_id": "seller_e_priority_support_v1",
+            "kind": "priority_support",
+            "description": "優先客服，一天內回覆",
+            "amount_twd": 0,
+            "duration_days": 1,
+            "minimum_spend_twd": 0,
+            "requires_membership": false,
+            "conditions": "模擬客服入口提交後一天內回覆；回覆時間不等於修復時間；僅於本地模擬履約，不是真實商家承諾。",
+            "evidence_id": "sim_seller_e_priority_support_v1",
+            "simulation": true
+          },
+          {
+            "benefit_id": "seller_e_exchange_guarantee_v1",
+            "kind": "exchange_guarantee",
+            "description": "30 天內瑕疵換貨",
+            "amount_twd": 0,
+            "duration_days": 30,
+            "minimum_spend_twd": 0,
+            "requires_membership": false,
+            "conditions": "到貨後 30 天內驗證非人為瑕疵，以已登錄換貨庫存履約；不自動承諾現金退款；僅於本地模擬履約，不是真實商家承諾。",
+            "evidence_id": "sim_seller_e_exchange_guarantee_v1",
+            "simulation": true
+          }
+        ],
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      "bundle": null,
+      "sponsored": false,
+      "stop_reason": "seller_final",
+      "rounds": [
+        {
+          "round": 1,
+          "target_total_twd": null,
+          "proposal": {
+            "kind": "request_benefit",
+            "target_total_twd": null,
+            "reference_offer_id": null,
+            "benefit_kind": "warranty_extension",
+            "variant": "standalone"
+          },
+          "buyer_message": "可以提供延長保固嗎。",
+          "seller_message": "可以滿足這次條件。單買 NT$899（4 天到貨）。另含：保固延長至 730 天（須符合各權益條件；未來優惠不抵本次價格）。",
+          "proposal_response": {
+            "status": "accepted",
+            "exchange_discount_twd": 0
+          },
+          "outcome": "offered",
+          "buyer_provider": "openai",
+          "seller_provider": "openai",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 899,
+              "eligibility": {
+                "status": "eligible",
+                "reason_codes": []
+              },
+              "benefits": [
+                {
+                  "benefit_id": "seller_e_warranty_extension_v1",
+                  "kind": "warranty_extension",
+                  "description": "保固延長至 730 天",
+                  "amount_twd": 0,
+                  "duration_days": 730,
+                  "minimum_spend_twd": 0,
+                  "requires_membership": false,
+                  "conditions": "自到貨起，非人為損壞；模擬維修流程受理，不包含耗材；僅於本地模擬履約，不是真實商家承諾。",
+                  "evidence_id": "sim_seller_e_warranty_extension_v1",
+                  "simulation": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "target_total_twd": 799,
+          "proposal": {
+            "kind": "request_benefit",
+            "target_total_twd": 899,
+            "reference_offer_id": "offer_2271fb3e-034f-44d1-afa6-d5327270fdb1",
+            "benefit_kind": "priority_support",
+            "variant": "standalone"
+          },
+          "buyer_message": "可以提供優先客服嗎，希望總價不超過 NT$899。",
+          "seller_message": "可以滿足這次條件。單買 NT$899（4 天到貨）。另含：保固延長至 730 天、優先客服，一天內回覆（須符合各權益條件；未來優惠不抵本次價格）。",
+          "proposal_response": {
+            "status": "accepted",
+            "exchange_discount_twd": 0
+          },
+          "outcome": "offered",
+          "buyer_provider": "openai",
+          "seller_provider": "openai",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 899,
+              "eligibility": {
+                "status": "eligible",
+                "reason_codes": []
+              },
+              "benefits": [
+                {
+                  "benefit_id": "seller_e_warranty_extension_v1",
+                  "kind": "warranty_extension",
+                  "description": "保固延長至 730 天",
+                  "amount_twd": 0,
+                  "duration_days": 730,
+                  "minimum_spend_twd": 0,
+                  "requires_membership": false,
+                  "conditions": "自到貨起，非人為損壞；模擬維修流程受理，不包含耗材；僅於本地模擬履約，不是真實商家承諾。",
+                  "evidence_id": "sim_seller_e_warranty_extension_v1",
+                  "simulation": true
+                },
+                {
+                  "benefit_id": "seller_e_priority_support_v1",
+                  "kind": "priority_support",
+                  "description": "優先客服，一天內回覆",
+                  "amount_twd": 0,
+                  "duration_days": 1,
+                  "minimum_spend_twd": 0,
+                  "requires_membership": false,
+                  "conditions": "模擬客服入口提交後一天內回覆；回覆時間不等於修復時間；僅於本地模擬履約，不是真實商家承諾。",
+                  "evidence_id": "sim_seller_e_priority_support_v1",
+                  "simulation": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "round": 3,
+          "target_total_twd": null,
+          "proposal": {
+            "kind": "request_benefit",
+            "target_total_twd": 899,
+            "reference_offer_id": "offer_92afbb9d-23ab-4960-9c51-218c463587cd",
+            "benefit_kind": "exchange_guarantee",
+            "variant": "standalone"
+          },
+          "buyer_message": "可以提供瑕疵換貨保障嗎，希望總價不超過 NT$899。",
+          "seller_message": "可以滿足這次條件。單買 NT$899（4 天到貨）。另含：保固延長至 730 天、優先客服，一天內回覆、30 天內瑕疵換貨（須符合各權益條件；未來優惠不抵本次價格）。這是最終報價。",
+          "proposal_response": {
+            "status": "accepted",
+            "exchange_discount_twd": 0
+          },
+          "outcome": "offered",
+          "buyer_provider": "openai",
+          "seller_provider": "openai",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 899,
+              "eligibility": {
+                "status": "eligible",
+                "reason_codes": []
+              },
+              "benefits": [
+                {
+                  "benefit_id": "seller_e_warranty_extension_v1",
+                  "kind": "warranty_extension",
+                  "description": "保固延長至 730 天",
+                  "amount_twd": 0,
+                  "duration_days": 730,
+                  "minimum_spend_twd": 0,
+                  "requires_membership": false,
+                  "conditions": "自到貨起，非人為損壞；模擬維修流程受理，不包含耗材；僅於本地模擬履約，不是真實商家承諾。",
+                  "evidence_id": "sim_seller_e_warranty_extension_v1",
+                  "simulation": true
+                },
+                {
+                  "benefit_id": "seller_e_priority_support_v1",
+                  "kind": "priority_support",
+                  "description": "優先客服，一天內回覆",
+                  "amount_twd": 0,
+                  "duration_days": 1,
+                  "minimum_spend_twd": 0,
+                  "requires_membership": false,
+                  "conditions": "模擬客服入口提交後一天內回覆；回覆時間不等於修復時間；僅於本地模擬履約，不是真實商家承諾。",
+                  "evidence_id": "sim_seller_e_priority_support_v1",
+                  "simulation": true
+                },
+                {
+                  "benefit_id": "seller_e_exchange_guarantee_v1",
+                  "kind": "exchange_guarantee",
+                  "description": "30 天內瑕疵換貨",
+                  "amount_twd": 0,
+                  "duration_days": 30,
+                  "minimum_spend_twd": 0,
+                  "requires_membership": false,
+                  "conditions": "到貨後 30 天內驗證非人為瑕疵，以已登錄換貨庫存履約；不自動承諾現金退款；僅於本地模擬履約，不是真實商家承諾。",
+                  "evidence_id": "sim_seller_e_exchange_guarantee_v1",
+                  "simulation": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "ranking": {
+        "seller_id": "seller_e",
+        "rank": 1,
+        "recommended_offer_id": "offer_dc65a552-66b4-4684-ae75-88504bd8dc4f",
+        "offer_rank": 1,
+        "reason": "此排序依註冊售後服務條件排列，offer_dc65a552-66b4-4684-ae75-88504bd8dc4f符合最高註冊分，且價格為NT$899，配送需4天。",
+        "tradeoffs": [
+          "比最低價貴NT$340",
+          "比最快交期慢3天"
+        ],
+        "alternative_offer_ids": []
+      },
+      "recommended": {
+        "offer_id": "offer_dc65a552-66b4-4684-ae75-88504bd8dc4f",
+        "seller_id": "seller_e",
+        "round": 3,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_e_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click"
+        ],
+        "total_price_twd": 899,
+        "delivery_days": 4,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T07:21:38.184Z",
+        "benefits": [
+          {
+            "benefit_id": "seller_e_warranty_extension_v1",
+            "kind": "warranty_extension",
+            "description": "保固延長至 730 天",
+            "amount_twd": 0,
+            "duration_days": 730,
+            "minimum_spend_twd": 0,
+            "requires_membership": false,
+            "conditions": "自到貨起，非人為損壞；模擬維修流程受理，不包含耗材；僅於本地模擬履約，不是真實商家承諾。",
+            "evidence_id": "sim_seller_e_warranty_extension_v1",
+            "simulation": true
+          },
+          {
+            "benefit_id": "seller_e_priority_support_v1",
+            "kind": "priority_support",
+            "description": "優先客服，一天內回覆",
+            "amount_twd": 0,
+            "duration_days": 1,
+            "minimum_spend_twd": 0,
+            "requires_membership": false,
+            "conditions": "模擬客服入口提交後一天內回覆；回覆時間不等於修復時間；僅於本地模擬履約，不是真實商家承諾。",
+            "evidence_id": "sim_seller_e_priority_support_v1",
+            "simulation": true
+          },
+          {
+            "benefit_id": "seller_e_exchange_guarantee_v1",
+            "kind": "exchange_guarantee",
+            "description": "30 天內瑕疵換貨",
+            "amount_twd": 0,
+            "duration_days": 30,
+            "minimum_spend_twd": 0,
+            "requires_membership": false,
+            "conditions": "到貨後 30 天內驗證非人為瑕疵，以已登錄換貨庫存履約；不自動承諾現金退款；僅於本地模擬履約，不是真實商家承諾。",
+            "evidence_id": "sim_seller_e_exchange_guarantee_v1",
+            "simulation": true
+          }
+        ],
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      }
+    },
+    {
+      "seller_id": "seller_d",
+      "label": "關係型 Loyalty Builder",
+      "description": "維持本次售價，提供下次券與較長退貨期，未來券不折抵本次总價。",
+      "standalone": {
+        "offer_id": "offer_baa89c01-c100-4681-ab8f-ced32488520f",
+        "seller_id": "seller_d",
+        "round": 3,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_d_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click"
+        ],
+        "total_price_twd": 709,
+        "delivery_days": 2,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T07:21:38.189Z",
+        "benefits": [
+          {
+            "benefit_id": "seller_d_future_coupon_v1",
+            "kind": "future_coupon",
+            "description": "下次購物券 NT$50",
+            "amount_twd": 50,
+            "duration_days": 30,
+            "minimum_spend_twd": 1000,
+            "requires_membership": true,
+            "conditions": "需成為會員；本次模擬兌換後發券，30 天內下次單筆滿 NT$1000 可用一次，不可折現或折抵本次；僅於本地模擬履約，不是真實商家承諾。",
+            "evidence_id": "sim_seller_d_future_coupon_v1",
+            "simulation": true
+          },
+          {
+            "benefit_id": "seller_d_return_extension_v1",
+            "kind": "return_extension",
+            "description": "退貨期延長至 30 天",
+            "amount_twd": 0,
+            "duration_days": 30,
+            "minimum_spend_twd": 0,
+            "requires_membership": false,
+            "conditions": "到貨後 30 天內，保留完整配件與包裝且無人為損壞；以模擬退貨流程申請；僅於本地模擬履約，不是真實商家承諾。",
+            "evidence_id": "sim_seller_d_return_extension_v1",
+            "simulation": true
+          }
+        ],
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      "bundle": null,
+      "sponsored": false,
+      "stop_reason": "seller_final",
+      "rounds": [
+        {
+          "round": 1,
+          "target_total_twd": null,
+          "proposal": {
+            "kind": "request_benefit",
+            "target_total_twd": null,
+            "reference_offer_id": null,
+            "benefit_kind": "return_extension",
+            "variant": "standalone"
+          },
+          "buyer_message": "可以提供較長退貨期嗎。",
+          "seller_message": "無法同意這項條件，仍可提供以下方案。單買 NT$709（2 天到貨）。",
+          "proposal_response": {
+            "status": "declined",
+            "exchange_discount_twd": 0
+          },
+          "outcome": "offered",
+          "buyer_provider": "openai",
+          "seller_provider": "openai",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 709,
+              "eligibility": {
+                "status": "eligible",
+                "reason_codes": []
+              },
+              "benefits": []
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "target_total_twd": 609,
+          "proposal": {
+            "kind": "request_benefit",
+            "target_total_twd": null,
+            "reference_offer_id": "offer_f434e6ad-83a9-46a8-8014-0558a6262d10",
+            "benefit_kind": "future_coupon",
+            "variant": "standalone"
+          },
+          "buyer_message": "可以提供下次購物券嗎。",
+          "seller_message": "可以滿足這次條件。單買 NT$709（2 天到貨）。另含：下次購物券 NT$50（須符合各權益條件；未來優惠不抵本次價格）。",
+          "proposal_response": {
+            "status": "accepted",
+            "exchange_discount_twd": 0
+          },
+          "outcome": "offered",
+          "buyer_provider": "openai",
+          "seller_provider": "openai",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 709,
+              "eligibility": {
+                "status": "eligible",
+                "reason_codes": []
+              },
+              "benefits": [
+                {
+                  "benefit_id": "seller_d_future_coupon_v1",
+                  "kind": "future_coupon",
+                  "description": "下次購物券 NT$50",
+                  "amount_twd": 50,
+                  "duration_days": 30,
+                  "minimum_spend_twd": 1000,
+                  "requires_membership": true,
+                  "conditions": "需成為會員；本次模擬兌換後發券，30 天內下次單筆滿 NT$1000 可用一次，不可折現或折抵本次；僅於本地模擬履約，不是真實商家承諾。",
+                  "evidence_id": "sim_seller_d_future_coupon_v1",
+                  "simulation": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "round": 3,
+          "target_total_twd": null,
+          "proposal": {
+            "kind": "lower_price",
+            "target_total_twd": 650,
+            "reference_offer_id": "offer_cb5a50ce-88a2-47cf-8946-3de565f5c142",
+            "benefit_kind": null,
+            "variant": "standalone"
+          },
+          "buyer_message": "請再優惠一點（滑鼠單買），希望總價不超過 NT$650。",
+          "seller_message": "目標價無法達成，提供以下還價。單買 NT$709（2 天到貨）。另含：下次購物券 NT$50、退貨期延長至 30 天（須符合各權益條件；未來優惠不抵本次價格）。這是最終報價。",
+          "proposal_response": {
+            "status": "countered",
+            "exchange_discount_twd": 0
+          },
+          "outcome": "offered",
+          "buyer_provider": "openai",
+          "seller_provider": "openai",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 709,
+              "eligibility": {
+                "status": "eligible",
+                "reason_codes": []
+              },
+              "benefits": [
+                {
+                  "benefit_id": "seller_d_future_coupon_v1",
+                  "kind": "future_coupon",
+                  "description": "下次購物券 NT$50",
+                  "amount_twd": 50,
+                  "duration_days": 30,
+                  "minimum_spend_twd": 1000,
+                  "requires_membership": true,
+                  "conditions": "需成為會員；本次模擬兌換後發券，30 天內下次單筆滿 NT$1000 可用一次，不可折現或折抵本次；僅於本地模擬履約，不是真實商家承諾。",
+                  "evidence_id": "sim_seller_d_future_coupon_v1",
+                  "simulation": true
+                },
+                {
+                  "benefit_id": "seller_d_return_extension_v1",
+                  "kind": "return_extension",
+                  "description": "退貨期延長至 30 天",
+                  "amount_twd": 0,
+                  "duration_days": 30,
+                  "minimum_spend_twd": 0,
+                  "requires_membership": false,
+                  "conditions": "到貨後 30 天內，保留完整配件與包裝且無人為損壞；以模擬退貨流程申請；僅於本地模擬履約，不是真實商家承諾。",
+                  "evidence_id": "sim_seller_d_return_extension_v1",
+                  "simulation": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "ranking": {
+        "seller_id": "seller_d",
+        "rank": 2,
+        "recommended_offer_id": "offer_baa89c01-c100-4681-ab8f-ced32488520f",
+        "offer_rank": 2,
+        "reason": "依註冊售後服務排序，offer_baa89c01-c100-4681-ab8f-ced32488520f次高，價格NT$709，2天到貨。",
+        "tradeoffs": [
+          "比最低價貴NT$150",
+          "比最快交期慢1天"
+        ],
+        "alternative_offer_ids": []
+      },
+      "recommended": {
+        "offer_id": "offer_baa89c01-c100-4681-ab8f-ced32488520f",
+        "seller_id": "seller_d",
+        "round": 3,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_d_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click"
+        ],
+        "total_price_twd": 709,
+        "delivery_days": 2,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T07:21:38.189Z",
+        "benefits": [
+          {
+            "benefit_id": "seller_d_future_coupon_v1",
+            "kind": "future_coupon",
+            "description": "下次購物券 NT$50",
+            "amount_twd": 50,
+            "duration_days": 30,
+            "minimum_spend_twd": 1000,
+            "requires_membership": true,
+            "conditions": "需成為會員；本次模擬兌換後發券，30 天內下次單筆滿 NT$1000 可用一次，不可折現或折抵本次；僅於本地模擬履約，不是真實商家承諾。",
+            "evidence_id": "sim_seller_d_future_coupon_v1",
+            "simulation": true
+          },
+          {
+            "benefit_id": "seller_d_return_extension_v1",
+            "kind": "return_extension",
+            "description": "退貨期延長至 30 天",
+            "amount_twd": 0,
+            "duration_days": 30,
+            "minimum_spend_twd": 0,
+            "requires_membership": false,
+            "conditions": "到貨後 30 天內，保留完整配件與包裝且無人為損壞；以模擬退貨流程申請；僅於本地模擬履約，不是真實商家承諾。",
+            "evidence_id": "sim_seller_d_return_extension_v1",
+            "simulation": true
+          }
+        ],
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      }
+    },
+    {
+      "seller_id": "seller_b",
+      "label": "履約型 Speed Seller",
+      "description": "維持物流溢價，以已登錄的一天到貨承諾及晚到補償換取成交。",
+      "standalone": {
+        "offer_id": "offer_bc99d275-2fd3-4408-9901-0def0be585cf",
+        "seller_id": "seller_b",
+        "round": 3,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_b_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click",
+          "multi_device"
+        ],
+        "total_price_twd": 799,
+        "delivery_days": 1,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T07:21:38.048Z",
+        "benefits": [
+          {
+            "benefit_id": "seller_b_delivery_guarantee_v1",
+            "kind": "delivery_guarantee",
+            "description": "一天到貨承諾",
+            "amount_twd": 0,
+            "duration_days": 1,
+            "minimum_spend_twd": 0,
+            "requires_membership": false,
+            "conditions": "模擬標準配送區；付款完成後起算，一天內到貨；僅於本地模擬履約，不是真實商家承諾。",
+            "evidence_id": "sim_seller_b_delivery_guarantee_v1",
+            "simulation": true
+          },
+          {
+            "benefit_id": "seller_b_late_compensation_v1",
+            "kind": "late_compensation",
+            "description": "晚到補償 NT$50",
+            "amount_twd": 50,
+            "duration_days": 7,
+            "minimum_spend_twd": 0,
+            "requires_membership": false,
+            "conditions": "超過承諾交期到貨後 7 天內憑模擬物流紀錄申請一次補償；本次售價不變；僅於本地模擬履約，不是真實商家承諾。",
+            "evidence_id": "sim_seller_b_late_compensation_v1",
+            "simulation": true
+          }
+        ],
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      "bundle": null,
+      "sponsored": true,
+      "stop_reason": "seller_final",
+      "rounds": [
+        {
+          "round": 1,
+          "target_total_twd": null,
+          "proposal": {
+            "kind": "request_benefit",
+            "target_total_twd": null,
+            "reference_offer_id": null,
+            "benefit_kind": "delivery_guarantee",
+            "variant": "standalone"
+          },
+          "buyer_message": "可以提供到貨承諾嗎。",
+          "seller_message": "無法同意這項條件，仍可提供以下方案。單買 NT$799（1 天到貨）。",
+          "proposal_response": {
+            "status": "declined",
+            "exchange_discount_twd": 0
+          },
+          "outcome": "offered",
+          "buyer_provider": "openai",
+          "seller_provider": "openai",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 799,
+              "eligibility": {
+                "status": "eligible",
+                "reason_codes": []
+              },
+              "benefits": []
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "target_total_twd": 609,
+          "proposal": {
+            "kind": "request_benefit",
+            "target_total_twd": 799,
+            "reference_offer_id": "offer_f8f05fa1-6b41-4b57-b7ed-4e448ddde1d3",
+            "benefit_kind": "late_compensation",
+            "variant": "standalone"
+          },
+          "buyer_message": "可以提供晚到補償嗎，希望總價不超過 NT$799。",
+          "seller_message": "無法同意這項條件，仍可提供以下方案。單買 NT$799（1 天到貨）。另含：一天到貨承諾（須符合各權益條件；未來優惠不抵本次價格）。",
+          "proposal_response": {
+            "status": "declined",
+            "exchange_discount_twd": 0
+          },
+          "outcome": "offered",
+          "buyer_provider": "openai",
+          "seller_provider": "openai",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 799,
+              "eligibility": {
+                "status": "eligible",
+                "reason_codes": []
+              },
+              "benefits": [
+                {
+                  "benefit_id": "seller_b_delivery_guarantee_v1",
+                  "kind": "delivery_guarantee",
+                  "description": "一天到貨承諾",
+                  "amount_twd": 0,
+                  "duration_days": 1,
+                  "minimum_spend_twd": 0,
+                  "requires_membership": false,
+                  "conditions": "模擬標準配送區；付款完成後起算，一天內到貨；僅於本地模擬履約，不是真實商家承諾。",
+                  "evidence_id": "sim_seller_b_delivery_guarantee_v1",
+                  "simulation": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "round": 3,
+          "target_total_twd": null,
+          "proposal": {
+            "kind": "lower_price",
+            "target_total_twd": 750,
+            "reference_offer_id": "offer_3641f877-e432-4a29-9117-fa5b8f6e6a4f",
+            "benefit_kind": null,
+            "variant": "standalone"
+          },
+          "buyer_message": "請再優惠一點（滑鼠單買），希望總價不超過 NT$750。",
+          "seller_message": "目標價無法達成，提供以下還價。單買 NT$799（1 天到貨）。另含：一天到貨承諾、晚到補償 NT$50（須符合各權益條件；未來優惠不抵本次價格）。這是最終報價。",
+          "proposal_response": {
+            "status": "countered",
+            "exchange_discount_twd": 0
+          },
+          "outcome": "offered",
+          "buyer_provider": "openai",
+          "seller_provider": "openai",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 799,
+              "eligibility": {
+                "status": "eligible",
+                "reason_codes": []
+              },
+              "benefits": [
+                {
+                  "benefit_id": "seller_b_delivery_guarantee_v1",
+                  "kind": "delivery_guarantee",
+                  "description": "一天到貨承諾",
+                  "amount_twd": 0,
+                  "duration_days": 1,
+                  "minimum_spend_twd": 0,
+                  "requires_membership": false,
+                  "conditions": "模擬標準配送區；付款完成後起算，一天內到貨；僅於本地模擬履約，不是真實商家承諾。",
+                  "evidence_id": "sim_seller_b_delivery_guarantee_v1",
+                  "simulation": true
+                },
+                {
+                  "benefit_id": "seller_b_late_compensation_v1",
+                  "kind": "late_compensation",
+                  "description": "晚到補償 NT$50",
+                  "amount_twd": 50,
+                  "duration_days": 7,
+                  "minimum_spend_twd": 0,
+                  "requires_membership": false,
+                  "conditions": "超過承諾交期到貨後 7 天內憑模擬物流紀錄申請一次補償；本次售價不變；僅於本地模擬履約，不是真實商家承諾。",
+                  "evidence_id": "sim_seller_b_late_compensation_v1",
+                  "simulation": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "ranking": {
+        "seller_id": "seller_b",
+        "rank": 3,
+        "recommended_offer_id": "offer_bc99d275-2fd3-4408-9901-0def0be585cf",
+        "offer_rank": 3,
+        "reason": "售後註冊分第三，價格NT$799，交貨最快為1天。",
+        "tradeoffs": [
+          "比最低價貴NT$240"
+        ],
+        "alternative_offer_ids": []
+      },
+      "recommended": {
+        "offer_id": "offer_bc99d275-2fd3-4408-9901-0def0be585cf",
+        "seller_id": "seller_b",
+        "round": 3,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_b_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click",
+          "multi_device"
+        ],
+        "total_price_twd": 799,
+        "delivery_days": 1,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T07:21:38.048Z",
+        "benefits": [
+          {
+            "benefit_id": "seller_b_delivery_guarantee_v1",
+            "kind": "delivery_guarantee",
+            "description": "一天到貨承諾",
+            "amount_twd": 0,
+            "duration_days": 1,
+            "minimum_spend_twd": 0,
+            "requires_membership": false,
+            "conditions": "模擬標準配送區；付款完成後起算，一天內到貨；僅於本地模擬履約，不是真實商家承諾。",
+            "evidence_id": "sim_seller_b_delivery_guarantee_v1",
+            "simulation": true
+          },
+          {
+            "benefit_id": "seller_b_late_compensation_v1",
+            "kind": "late_compensation",
+            "description": "晚到補償 NT$50",
+            "amount_twd": 50,
+            "duration_days": 7,
+            "minimum_spend_twd": 0,
+            "requires_membership": false,
+            "conditions": "超過承諾交期到貨後 7 天內憑模擬物流紀錄申請一次補償；本次售價不變；僅於本地模擬履約，不是真實商家承諾。",
+            "evidence_id": "sim_seller_b_late_compensation_v1",
+            "simulation": true
+          }
+        ],
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      }
+    },
+    {
+      "seller_id": "seller_c",
+      "label": "組合型 Bundle Curator",
+      "description": "第二輪可加贈相關滑鼠墊；放棄贈品最多額外折讓 30 元，不默認付費加購。",
+      "standalone": {
+        "offer_id": "offer_b4a463ff-4e9b-4121-9fc4-ab697673e90a",
+        "seller_id": "seller_c",
+        "round": 3,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_c_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "wireless_usb",
+          "silent_click"
+        ],
+        "total_price_twd": 629,
+        "delivery_days": 3,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T07:21:38.225Z",
+        "benefits": [],
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      "bundle": {
+        "offer_id": "offer_9ec675dd-143c-48e3-97eb-fca8f26e9192",
+        "seller_id": "seller_c",
+        "round": 3,
+        "variant": "bundle",
+        "items": [
+          {
+            "product_id": "mouse_c_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          },
+          {
+            "product_id": "pad_c_black",
+            "category": "mouse_pad",
+            "role": "addon",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "wireless_usb",
+          "silent_click"
+        ],
+        "total_price_twd": 649,
+        "delivery_days": 3,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": true,
+        "expires_at": "2026-09-12T07:21:38.225Z",
+        "benefits": [],
+        "baseline_offer_id": "offer_b4a463ff-4e9b-4121-9fc4-ab697673e90a",
+        "eligibility": {
+          "status": "needs_confirmation",
+          "reason_codes": [
+            "addon_consent_required"
+          ]
+        }
+      },
+      "sponsored": false,
+      "stop_reason": "seller_final",
+      "rounds": [
+        {
+          "round": 1,
+          "target_total_twd": null,
+          "proposal": {
+            "kind": "lower_price",
+            "target_total_twd": null,
+            "reference_offer_id": null,
+            "benefit_kind": null,
+            "variant": "standalone"
+          },
+          "buyer_message": "請再優惠一點（滑鼠單買）。",
+          "seller_message": "可以滿足這次條件。單買 NT$669（3 天到貨）。",
+          "proposal_response": {
+            "status": "accepted",
+            "exchange_discount_twd": 0
+          },
+          "outcome": "offered",
+          "buyer_provider": "openai",
+          "seller_provider": "openai",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 669,
+              "eligibility": {
+                "status": "eligible",
+                "reason_codes": []
+              },
+              "benefits": []
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "target_total_twd": 609,
+          "proposal": {
+            "kind": "lower_price",
+            "target_total_twd": 609,
+            "reference_offer_id": "offer_b1fb722e-dc4e-4f4f-9c48-3274aa9f3c08",
+            "benefit_kind": null,
+            "variant": "standalone"
+          },
+          "buyer_message": "請再優惠一點（滑鼠單買），希望總價不超過 NT$609。",
+          "seller_message": "目標價無法達成，提供以下還價。單買 NT$659（3 天到貨）；含滑鼠墊 NT$659（3 天到貨）。",
+          "proposal_response": {
+            "status": "countered",
+            "exchange_discount_twd": 0
+          },
+          "outcome": "offered",
+          "buyer_provider": "openai",
+          "seller_provider": "openai",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 659,
+              "eligibility": {
+                "status": "eligible",
+                "reason_codes": []
+              },
+              "benefits": []
+            },
+            {
+              "variant": "bundle",
+              "total_price_twd": 659,
+              "eligibility": {
+                "status": "eligible",
+                "reason_codes": []
+              },
+              "benefits": []
+            }
+          ]
+        },
+        {
+          "round": 3,
+          "target_total_twd": 599,
+          "proposal": {
+            "kind": "exchange_gift",
+            "target_total_twd": null,
+            "reference_offer_id": "offer_863208f4-6b0c-4542-8e01-0cd420cf5c48",
+            "benefit_kind": null,
+            "variant": "standalone"
+          },
+          "buyer_message": "如果取消滑鼠墊，可以換成額外折扣嗎。",
+          "seller_message": "可以滿足這次條件。單買 NT$629（3 天到貨）；含滑鼠墊 NT$649（3 天到貨）。本輪取消贈品額外折讓 NT$20。這是最終報價。",
+          "proposal_response": {
+            "status": "accepted",
+            "exchange_discount_twd": 20
+          },
+          "outcome": "offered",
+          "buyer_provider": "openai",
+          "seller_provider": "openai",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 629,
+              "eligibility": {
+                "status": "eligible",
+                "reason_codes": []
+              },
+              "benefits": []
+            },
+            {
+              "variant": "bundle",
+              "total_price_twd": 649,
+              "eligibility": {
+                "status": "needs_confirmation",
+                "reason_codes": [
+                  "addon_consent_required"
+                ]
+              },
+              "benefits": []
+            }
+          ]
+        }
+      ],
+      "ranking": {
+        "seller_id": "seller_c",
+        "rank": 4,
+        "recommended_offer_id": "offer_b4a463ff-4e9b-4121-9fc4-ab697673e90a",
+        "offer_rank": 4,
+        "reason": "依註冊售後條件排序，offer_b4a463ff-4e9b-4121-9fc4-ab697673e90a無註冊售後，加總排序於此。價格NT$629，3天交貨。",
+        "tradeoffs": [
+          "比最低價貴NT$70",
+          "比最快交期慢2天"
+        ],
+        "alternative_offer_ids": []
+      },
+      "recommended": {
+        "offer_id": "offer_b4a463ff-4e9b-4121-9fc4-ab697673e90a",
+        "seller_id": "seller_c",
+        "round": 3,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_c_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "wireless_usb",
+          "silent_click"
+        ],
+        "total_price_twd": 629,
+        "delivery_days": 3,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T07:21:38.225Z",
+        "benefits": [],
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      }
+    },
+    {
+      "seller_id": "seller_a",
+      "label": "清庫型 Price Optimizer",
+      "description": "加速指定黑色 SKU 周轉；每輪小幅讓價，報價 120 秒有效。",
+      "standalone": {
+        "offer_id": "offer_7e61ed32-1f0a-4cff-9ae0-6eb85473452b",
+        "seller_id": "seller_a",
+        "round": 5,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_a_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click"
+        ],
+        "total_price_twd": 559,
+        "delivery_days": 5,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T07:13:50.460Z",
+        "benefits": [],
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      "bundle": null,
+      "sponsored": false,
+      "stop_reason": "seller_final",
+      "rounds": [
+        {
+          "round": 1,
+          "target_total_twd": null,
+          "proposal": {
+            "kind": "lower_price",
+            "target_total_twd": null,
+            "reference_offer_id": null,
+            "benefit_kind": null,
+            "variant": "standalone"
+          },
+          "buyer_message": "請再優惠一點（滑鼠單買）。",
+          "seller_message": "可以滿足這次條件。單買 NT$609（5 天到貨）。",
+          "proposal_response": {
+            "status": "accepted",
+            "exchange_discount_twd": 0
+          },
+          "outcome": "offered",
+          "buyer_provider": "openai",
+          "seller_provider": "openai",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 609,
+              "eligibility": {
+                "status": "eligible",
+                "reason_codes": []
+              },
+              "benefits": []
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "target_total_twd": null,
+          "proposal": {
+            "kind": "lower_price",
+            "target_total_twd": 580,
+            "reference_offer_id": "offer_cef215b7-b93f-4178-b372-c2dc300736f0",
+            "benefit_kind": null,
+            "variant": "standalone"
+          },
+          "buyer_message": "請再優惠一點（滑鼠單買），希望總價不超過 NT$580。",
+          "seller_message": "目標價無法達成，提供以下還價。單買 NT$599（5 天到貨）。",
+          "proposal_response": {
+            "status": "countered",
+            "exchange_discount_twd": 0
+          },
+          "outcome": "offered",
+          "buyer_provider": "openai",
+          "seller_provider": "openai",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 599,
+              "eligibility": {
+                "status": "eligible",
+                "reason_codes": []
+              },
+              "benefits": []
+            }
+          ]
+        },
+        {
+          "round": 3,
+          "target_total_twd": null,
+          "proposal": {
+            "kind": "lower_price",
+            "target_total_twd": 589,
+            "reference_offer_id": "offer_c8edc0c8-5e7c-459c-9491-c922f9831866",
+            "benefit_kind": null,
+            "variant": "standalone"
+          },
+          "buyer_message": "請再優惠一點（滑鼠單買），希望總價不超過 NT$589。",
+          "seller_message": "可以滿足這次條件。單買 NT$589（5 天到貨）。",
+          "proposal_response": {
+            "status": "accepted",
+            "exchange_discount_twd": 0
+          },
+          "outcome": "offered",
+          "buyer_provider": "openai",
+          "seller_provider": "openai",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 589,
+              "eligibility": {
+                "status": "eligible",
+                "reason_codes": []
+              },
+              "benefits": []
+            }
+          ]
+        },
+        {
+          "round": 4,
+          "target_total_twd": null,
+          "proposal": {
+            "kind": "lower_price",
+            "target_total_twd": 585,
+            "reference_offer_id": "offer_649707d1-4a3c-44cf-a32b-e684f7eb2c3a",
+            "benefit_kind": null,
+            "variant": "standalone"
+          },
+          "buyer_message": "請再優惠一點（滑鼠單買），希望總價不超過 NT$585。",
+          "seller_message": "可以滿足這次條件。單買 NT$579（5 天到貨）。",
+          "proposal_response": {
+            "status": "accepted",
+            "exchange_discount_twd": 0
+          },
+          "outcome": "offered",
+          "buyer_provider": "openai",
+          "seller_provider": "openai",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 579,
+              "eligibility": {
+                "status": "eligible",
+                "reason_codes": []
+              },
+              "benefits": []
+            }
+          ]
+        },
+        {
+          "round": 5,
+          "target_total_twd": null,
+          "proposal": {
+            "kind": "lower_price",
+            "target_total_twd": 575,
+            "reference_offer_id": "offer_f6ab76de-ff7e-4bdd-8e36-d6b2b8d610c2",
+            "benefit_kind": null,
+            "variant": "standalone"
+          },
+          "buyer_message": "請再優惠一點（滑鼠單買），希望總價不超過 NT$575。",
+          "seller_message": "可以滿足這次條件。單買 NT$559（5 天到貨）。這是最終報價。",
+          "proposal_response": {
+            "status": "accepted",
+            "exchange_discount_twd": 0
+          },
+          "outcome": "offered",
+          "buyer_provider": "openai",
+          "seller_provider": "openai",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 559,
+              "eligibility": {
+                "status": "eligible",
+                "reason_codes": []
+              },
+              "benefits": []
+            }
+          ]
+        }
+      ],
+      "ranking": {
+        "seller_id": "seller_a",
+        "rank": 5,
+        "recommended_offer_id": "offer_7e61ed32-1f0a-4cff-9ae0-6eb85473452b",
+        "offer_rank": 5,
+        "reason": "依註冊售後條件排序，offer_7e61ed32-1f0a-4cff-9ae0-6eb85473452b無註冊售後，且價格NT$559，配送需5天。",
+        "tradeoffs": [
+          "價格最低",
+          "比最快交期慢4天"
+        ],
+        "alternative_offer_ids": []
+      },
+      "recommended": {
+        "offer_id": "offer_7e61ed32-1f0a-4cff-9ae0-6eb85473452b",
+        "seller_id": "seller_a",
+        "round": 5,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_a_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click"
+        ],
+        "total_price_twd": 559,
+        "delivery_days": 5,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T07:13:50.460Z",
+        "benefits": [],
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      }
+    }
+  ]
+}

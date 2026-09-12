@@ -13,11 +13,13 @@ import {MobileJourney} from './components/chat/MobileJourney';
 import {ClarificationPanel} from './components/chat/ClarificationPanel';
 import {BuyerSetup} from './components/chat/BuyerSetup';
 import {useBuyerProfile} from './state/useBuyerProfile';
+import {ModelPicker,initialModel} from './components/chat/ModelPicker';
 
 const stateCopy:Record<string,string>={formatting:'正在整理你的需求與購買限制。',orchestrating:'正在尋找符合需求的賣家。',negotiating:'各賣家正在獨立議價，完成後會一起比較。',evaluating:'正在根據預算、交期與偏好整理推薦。',needs_clarification:'需要更明確的需求才能繼續。',needs_confirmation:'有配件需要額外授權，尚未開放採用。',no_match:'目前沒有符合所有條件的方案。',failed:'這次比價未完成，請查看原因後重新開始。',accepted:'本輪已採用一個方案，決策已保存。',rejected:'你的回饋已保存。可開始新對話，繼續尋找合適的優惠。'};
 
 export default function App(){
- const s=useWorkspace();const c=s.active;const snapshot=c.snapshot;const d=s.workspace.definitions;
+ const [model,setModel]=useState(initialModel);
+ const s=useWorkspace({model});const c=s.active;const snapshot=c.snapshot;const d=s.workspace.definitions;
  const buyer=useBuyerProfile();const [advancedSettings,setAdvancedSettings]=useState(false);
  const agentProgress=useAgentProgress(c.requestId,snapshot?.status);
  const [tab,setTab]=useState<DefinitionTab>('intent');
@@ -37,7 +39,7 @@ export default function App(){
  const canFeedback=!!snapshot&&['awaiting_user','no_match','needs_confirmation'].includes(snapshot.status);
  const messages:ChatMessage[]=[];
  if(snapshot?.formatter)messages.push({id:'formatter-source-'+snapshot.request_id,role:'system',content:snapshot.formatter.provider==='openai'?`LLM 已解析 · ${snapshot.formatter.model??'OpenAI'}`:'離線規則解析 · 非 LLM 成功'});
- if(import.meta.env.VITE_OFFERMESH_RUNTIME_MODE)messages.push({id:'runtime-mode',role:'system',content:import.meta.env.VITE_OFFERMESH_RUNTIME_MODE==='live'?'完整服務已接線 · 模型失敗時會使用安全規則 · A–E 虛擬賣家，無實際付款。':'完整離線流程 · 規則 Formatter → 搜尋 → 五家策略議價 → 獨立排序 · 未呼叫 LLM，無實際付款。'});
+ if(import.meta.env.VITE_OFFERMESH_RUNTIME_MODE)messages.push({id:'runtime-mode',role:'system',content:import.meta.env.VITE_OFFERMESH_RUNTIME_MODE==='live'?'完整服務已接線 · 模型失敗時會使用安全規則 · 20 家虛擬賣家候選，無實際付款。':'完整離線流程 · 規則 Formatter → 搜尋 → 五家策略議價 → 獨立排序 · 未呼叫 LLM，無實際付款。'});
  if(c.message)messages.push({id:'user-'+c.id,role:'user',content:c.message});
  if(c.historyMissing)messages.push({id:'missing-history',role:'system',content:'本分頁沒有原對話紀錄。以下顯示已發布的需求與結果。'});
  if(snapshot?.intent)messages.push({id:'intent-'+snapshot.request_id,role:'assistant',content:'我會依照以下條件，比較符合需求的優惠。',chips:['無線滑鼠','NT$'+snapshot.intent.max_total_twd.toLocaleString('zh-TW')+' 以內',snapshot.intent.delivery_days_max+' 天內送達']});
@@ -72,7 +74,7 @@ export default function App(){
  const freshHome=s.view==='chat'&&!pending&&(!c.requestId||!new URLSearchParams(location.search).has('request_id'));
  if(freshHome&&buyer.loading)content=<div className="setup-loading" role="status">正在準備你的購物空間…</div>;
  else if((freshHome&&!buyer.profile)||(s.view==='settings'&&!advancedSettings))content=<div className="setup-container"><BuyerSetup key={buyer.profile?'saved':'new'} initial={buyer.profile} busy={buyer.busy} error={buyer.error} uncertain={buyer.uncertain} onSave={async value=>{const saved=await buyer.save(value);if(saved){if(!buyer.profile)s.newConversation();else go('chat');}return saved;}} onCancel={buyer.profile?()=>go('chat'):undefined} onRetry={()=>{void buyer.retry().then(ok=>{if(ok){if(!buyer.profile)s.newConversation();else go('chat');}});}} onReload={()=>void buyer.load()}/>{buyer.profile&&<button className="setup-advanced" onClick={()=>{setAdvancedSettings(true);go('settings');}}>進階文字偏好設定</button>}</div>;
- return <div ref={mainRef} data-keyboard={s.source==='keyboard'}><AppShell activeView={s.view==='settings'?'definitions':s.view==='history'?'offers':s.view} recentRequests={s.workspace.conversations.map(item=>({id:item.id,title:item.title,isActive:item.id===c.id,subtitle:item.snapshot?stateCopy[item.snapshot.status]??'等待選擇':'尚未送出'}))} onChat={()=>go('chat')} onSettings={()=>{setAdvancedSettings(false);go('settings');}} onNewConversation={s.newConversation} onSelectConversation={s.selectConversation} onDeleteConversation={s.deleteConversation} historyLocked={pending||processing(snapshot?.status)}>{content}</AppShell></div>;
+ return <div ref={mainRef} data-keyboard={s.source==='keyboard'}><AppShell activeView={s.view==='settings'?'definitions':s.view==='history'?'offers':s.view} recentRequests={s.workspace.conversations.map(item=>({id:item.id,title:item.title,isActive:item.id===c.id,subtitle:item.snapshot?stateCopy[item.snapshot.status]??'等待選擇':'尚未送出'}))} onChat={()=>go('chat')} onSettings={()=>{setAdvancedSettings(false);go('settings');}} onNewConversation={s.newConversation} onSelectConversation={s.selectConversation} onDeleteConversation={s.deleteConversation} onClearHistory={s.clearHistory} modelPicker={<ModelPicker value={model} onChange={value=>{setModel(value);try{sessionStorage.setItem("offermesh.model",value);}catch{}}}/>} historyLocked={pending||s.workspace.conversations.some(item=>processing(item.snapshot?.status))}>{content}</AppShell></div>;
 }
 function Status({title,text,action}:{title:string;text:string;action?:ReactNode}){return <section className="status-panel"><span className="status-icon"><MessageCircle size={26}/></span><h2>{title}</h2><p>{text}</p><div className="actions">{action}</div><p className="app-demo">Demo · 使用可重現的虛擬市場，不會產生真實付款</p></section>;}
 function Sponsored({snapshot}:{snapshot:RequestSnapshot}){const placement=snapshot.sponsored_placement!;const seller=snapshot.seller_agents.find(s=>s.seller_id===placement.seller_id);return <aside className="sponsored-placement" aria-label="Sponsored"><span>Sponsored</span><p>{seller?.name??'贊助商家'} <small>展示資訊，與推薦排名分開</small></p><Check size={14} aria-hidden="true"/></aside>;}

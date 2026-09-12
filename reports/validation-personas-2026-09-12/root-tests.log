@@ -1,0 +1,215 @@
+
+> offermesh@0.3.0 test
+> npm run test:contracts && npm run test:db && npm run test:orchestrator && npm run test:seller-policies && npm run test:unit && npm run test:negotiation && npm run test:evaluator && npm run test:formatter
+
+
+> offermesh@0.3.0 test:contracts
+> node scripts/validate-contracts.mjs && node scripts/validate-result-contracts.mjs
+
+✓ parsed 23 contract JSON files
+✓ shared context fixture proves previous-round provenance and de-identified competitive terms
+✓ shared schema exposes every integration boundary
+✓ Evaluator Structured Outputs schema is strict-compatible
+✓ marketplace snapshot separates current Taiwan prices from stale reference data
+✓ Seller catalog has sourced products plus deterministic synthetic strategies
+✓ demo matrix covers preferences, no-match, timeout, refusal, expiry and model attacks
+✓ happy path proves five-Seller negotiation capped at five rounds with early finals and safe independent ranking
+✓ rejects sixth Seller/round, duplicate branches and dispatch after final/failure; allows smaller lists and bounded early stops
+✓ edge cases reject hard-constraint violations and invalid model-selected IDs
+✓ Current API examples preserve idempotency; archived redemption retains immutable pricing
+
+All A2A Commerce contract checks passed.
+Unified Result v0.3: schema, lifecycle, examples and all OpenAPI references passed.
+
+> offermesh@0.3.0 test:db
+> node scripts/db.mjs --memory
+
+✓ v0.1 migration preserves quotes, bundle references, accepted/redemption records and immutable snapshots
+✓ in-memory database initialized and verified
+✓ integrity_check: ok
+✓ foreign_key_check: clean
+✓ tables: 29
+✓ seeded: 11 sources, 5 Sellers, 9 products
+✓ canonical flow: 1 request, 19 rounds, 6 offers, 1 evaluation
+✓ immutable Offer trigger: active
+✓ five-Seller/five-round limits and discount schedule constraints: active
+
+> offermesh@0.3.0 test:orchestrator
+> node --test tests/orchestrator-data.test.ts tests/discovery.test.ts tests/handoff.test.ts
+
+✔ optional target price: renormalized weights and price-independent ranking (18.0933ms)
+✔ 120 listings: stable five distinct available sellers, independent of ads and input order (2.9261ms)
+✔ price is soft; alternatives fill five without treating violated requirements as qualified (2.8722ms)
+✔ shipping affects score, missing totals are explicit and scores add up (2.2614ms)
+✔ additive SQLite seed is repeatable, persists runs and preserves old records (25.5011ms)
+✔ request snapshot -> preferences -> ranking -> private RFQ -> registered functions, replay-safe (103.6169ms)
+✔ full preferences preserve not_in, multi-value, required ranges and private max vs optional target (18.3812ms)
+✔ missing or wrong-snapshot handlers never dispatch, and hard-limit alternatives stay display-only (19.6136ms)
+✔ timeout, malformed response, isolation and concurrent dispatch protection (40.9018ms)
+✔ Orchestrator input resolves seeded data without Seller private policy (29.342ms)
+✔ Request ownership, unpublished intent and long-term preference changes (24.5777ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 398.626
+
+> offermesh@0.3.0 test:seller-policies
+> node scripts/validate-seller-policies.mjs && node --test tests/seller-policies.test.mjs
+
+Seller policy validation passed (0 ready; draft is NOT negotiation-ready).
+✔ draft template covers all 15 sellers and 90 primary listings without enabling policies (2.3743ms)
+✔ documented ready example validates (0.2628ms)
+✔ invalid and incomplete policies are rejected (2.2321ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 140.578
+
+> offermesh@0.3.0 test:unit
+> node --test tests/agents.unit.test.mjs tests/validation.unit.test.mjs tests/model.unit.test.mjs tests/tradeoffs.test.mjs tests/personas.test.mjs
+
+✔ Seller fallback follows all five independent private policies (98.9365ms)
+✔ Seller clamps aggressive targets to its floor and never raises its previous price (1.3786ms)
+✔ firm-price policy constrains the real model as well as fallback (1.3663ms)
+✔ Seller rejects foreign branch RFQs and refuses zero-stock products (2.5597ms)
+✔ free gift requires permission, inventory, matching terms and no slower delivery (3.5438ms)
+✔ Seller model cannot select a foreign SKU, go below floor or create unauthorized gifts (2.3199ms)
+✔ Seller final schedule is enforced even when model wants to continue (1.4457ms)
+✔ configured bundle discount reserves the floor and emits a cheaper optional solution (0.8207ms)
+✔ Buyer first-round RFQ omits budget and original preference text (9.5407ms)
+✔ Buyer target comes from an unexpired competitor standalone; bundles never become standalone targets (19.6847ms)
+✔ Buyer cannot invent a target index or stop before any offer (4.2664ms)
+✔ cost limits and parent cancellation propagate instead of falling back (1.5884ms)
+✔ gateway sends strict Responses JSON schema without storing keys in audit (1.7457ms)
+✔ no key and zero budgets make no HTTP request (0.575ms)
+✔ refusals, truncated output, malformed JSON and HTTP failure never become a decision (0.5729ms)
+✔ parallel reservation cannot overspend the call limit and timeout retains reservation (5.2852ms)
+✔ already-aborted work never calls the API (0.7771ms)
+✔ five economic personas negotiate distinct concessions and stopping schedules (246.3403ms)
+✔ unregistered coupon or cash-equivalent future coupon cannot be selected by the model (16.8066ms)
+✔ lost benefit inventory or modified evidence excludes a quote before evaluation (143.8376ms)
+✔ logistics claims need matching capability and cannot promise faster than stocked delivery (14.9051ms)
+✔ clearance applies to designated SKU only, enforces small markdowns and short expiry (14.1442ms)
+✔ Backend rejects invented service terms even when the offer amount is valid (14.5249ms)
+✔ a buyer can exchange a validated gift for up to 30 TWD; the dearer bundle requires consent (99.7546ms)
+✔ Backend rejects a Seller adapter that falsely claims an accepted gift exchange (1.0742ms)
+✔ Buyer can make its own conditional bid without inventing a competitor quote (3.9087ms)
+✔ Buyer can explicitly ask for a registered return extension instead of a price cut (0.8018ms)
+✔ gift exchange cannot be stacked; explicit paid-addon consent changes eligibility only (1.3547ms)
+✔ gift exchange refuses foreign or expired references and cannot breach the product floor (1.057ms)
+✔ no gift inventory or no cash-exchange policy declines the condition while preserving a quote (0.9468ms)
+✔ Buyer cannot stop after the opening quote before trying a useful counterproposal (1.4505ms)
+✔ categorical and range matching requires an actual known attribute (0.7033ms)
+✔ hard constraints reject actual bad proposals, independent of Seller claims (68.7373ms)
+✔ duplicate references, duplicate variants, excess quantity and invented authority fail closed (0.5898ms)
+✔ same-price gifts and cheaper bundles are eligible; paid add-ons require explicit cap (0.8912ms)
+✔ bundle cannot remove return terms, slow delivery or force the gift (0.6064ms)
+✔ new baseline invalidates previous bundle, rejected replacements preserve valid history (0.846ms)
+✔ pruned expired offers cannot revive when clock or inventory changes (0.4521ms)
+✔ context publishes whole real eligible offers and strips competitor identity in RFQs (8.1833ms)
+ℹ tests 39
+ℹ suites 0
+ℹ pass 39
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 676.4994
+
+> offermesh@0.3.0 test:negotiation
+> node --test tests/negotiation.test.mjs
+
+✔ five independent pairs share prior-round validated context, finish early, and freeze six offers (193.8095ms)
+✔ offline runs reproduce prices, history, IDs and stopping (107.1772ms)
+✔ accepts fewer/zero sellers and rejects duplicates or foreign candidates (60.6699ms)
+✔ timed-out branch preserves last offer; late responses cannot alter barrier history (150.7367ms)
+✔ refusal, malformed output and spoofed identity isolate the branch and preserve valid offers (33.0349ms)
+✔ invalid new prices do not evict valid prior offers or enter shared context (48.7069ms)
+✔ hard budgets, required attributes, stock and missing bundle permission are enforced (129.936ms)
+✔ paid add-on needs confirmation and never becomes a competitive offer (49.4852ms)
+✔ a replaced standalone invalidates its old bundle; invalid replacement does not (46.0152ms)
+✔ expired offers are removed before freeze (45.1125ms)
+✔ stock lost during negotiation is excluded before sharing and final freeze (47.8724ms)
+✔ explicit withdrawal removes own offers, never a competitor offer (86.6114ms)
+✔ global deadline and Buyer time are bounded (35.1948ms)
+✔ real Responses adapter sends both roles, with no cross-seller private data, and records provenance (62.4115ms)
+✔ API errors, invalid structured decisions and requests ignoring abort all use bounded fallback (282.8521ms)
+✔ call/token limits stop dispatch without extra model calls (57.9681ms)
+✔ ownership, completed replay, immutable persistence and interrupted restart (61.3424ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1671.2219
+
+> offermesh@0.3.0 test:evaluator
+> node --test tests/evaluator.test.mjs
+
+✔ deterministic ranking honors price, delivery and trust preferences without losing offers (49.4573ms)
+✔ unknown, duplicate, missing IDs, rank gaps, blank reasons and reversed preference are rejected (0.8135ms)
+✔ Evaluator projection excludes ads/private fields and checks unique trust provenance (1.88ms)
+✔ explanations cannot round money or falsely claim fastest delivery (0.4533ms)
+✔ Responses sends the exact approved output schema and independent prompt (2.2491ms)
+✔ invalid model ordering and unavailable/timeout/truncated/refused outputs use bounded fallback (28.9792ms)
+✔ runtime ranks five eligible persona offers and excludes the paid bundle; no automatic acceptance (138.1488ms)
+✔ stock or terms lost before evaluation is excluded and zero eligible offers skip inference (70.4162ms)
+✔ expiry during inference invalidates the complete set before publication (68.4172ms)
+✔ one seller loses inventory during inference; remaining set and explanations are rebuilt (63.4017ms)
+✔ inventory replenishment cannot revive a quote excluded before evaluation (63.9141ms)
+✔ changed fulfillment terms invalidate quotes even if the terms ID stays the same (59.6976ms)
+✔ concurrent evaluation cannot issue a second paid call (65.1812ms)
+✔ startup recovery marks interrupted evaluation failed without repeating inference (56.1847ms)
+✔ hard budgets, quantities, unrelated/paid bundles and terms are independently rechecked (56.8185ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 878.4126
+
+> offermesh@0.3.0 test:formatter
+> node --test tests/formatter.test.ts tests/formatter-llm.test.ts
+
+✔ the real demo wording with Chinese numbers and narrowly quoted budget evidence maps correctly (81.9005ms)
+✔ safe diagnostics distinguish auth, quota, rate, schema, timeout, and never echo error content (21.1087ms)
+✔ strict API failure is not saved as a successful fallback; same key can retry after fixing access (19.4716ms)
+✔ Structured Outputs strict object fields, privacy options, and result mapping (0.6349ms)
+✔ malformed, HTTP error, refusal, truncation, hallucinated values and timeout fall back without leaking provider errors (27.6983ms)
+✔ async service uses persisted result, no repeat provider call, concurrent local dedup, no credential persistence (21.8872ms)
+✔ existing Formatter DB survives the later Result table rebuild with replay and immutability intact (89.7802ms)
+✔ Formatter: 完整需求 (0.5582ms)
+✔ Formatter: 沒有目標價 (0.2219ms)
+✔ Formatter: 多選與排除 (0.252ms)
+✔ Formatter: 只有目標價 (0.1794ms)
+✔ Formatter: 未知品牌不可丟棄 (0.1564ms)
+✔ Formatter: 有線不在MVP (0.183ms)
+✔ Formatter: 同欄位矛盾 (0.2482ms)
+✔ Formatter: 多個上限 (0.2106ms)
+✔ Formatter: 負數 (0.2183ms)
+✔ Formatter: 零目標 (0.2045ms)
+✔ Formatter: 不擅自授權付費配件 (0.154ms)
+✔ Formatter: 條件語句不當成承諾 (0.1014ms)
+✔ Formatter: 提示注入 (0.0964ms)
+✔ 中文偏好、優先順序、配件與文件優先權 (0.5299ms)
+✔ 文字 -> 使用者偏好快照 -> DB Request -> 搜尋 -> RFQ -> 呼叫；重播與所有權隔離 (47.5271ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 419.5149

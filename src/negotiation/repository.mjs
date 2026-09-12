@@ -1,4 +1,5 @@
 import { copy } from './contracts.mjs';
+import { check } from './contracts.mjs';
 
 export class NegotiationRepository {
   constructor(db) { this.db = db; this.db.exec('PRAGMA busy_timeout = 1000'); }
@@ -20,10 +21,21 @@ export class NegotiationRepository {
         product_id: p.product_id, category: p.category, brand: p.brand, model: p.model, name: p.name,
         features: JSON.parse(p.features_json), attributes: JSON.parse(p.attributes_json), list_price_twd: p.list_price_twd,
         floor_price_twd: p.floor_price_twd, stock: p.stock, delivery_days: p.delivery_days, terms_id: p.terms_id,
+        negotiation_policy: (() => {
+          const row = this.db.prepare('SELECT policy_json FROM seller_sku_policies WHERE seller_id=? AND product_id=?').get(id,p.product_id);
+          return row ? check('SellerSkuPolicy', JSON.parse(row.policy_json)) : null;
+        })(),
       }));
-      return { seller_id: row.seller_id, enabled: Boolean(row.enabled), products,
+      const personaRow = this.db.prepare('SELECT policy_json FROM seller_persona_policies WHERE seller_id=?').get(id);
+      const persona = personaRow ? check('SellerPersonaPolicy', JSON.parse(personaRow.policy_json)) : null;
+      const benefits = this.db.prepare('SELECT * FROM seller_benefit_catalog WHERE seller_id=?').all(id).map(b => ({
+        definition: check('SellerBenefit', JSON.parse(b.definition_json)), evidence: JSON.parse(b.evidence_json),
+        enabled: Boolean(b.enabled), available_units: b.available_units,
+      }));
+      return { seller_id: row.seller_id, enabled: Boolean(row.enabled), products, benefits,
         strategy: { type: row.strategy_type, round_discounts_twd: JSON.parse(row.round_discounts_json), final_round: row.final_round, bundle_mode: row.bundle_mode,
-          bundle_discount_twd: row.bundle_discount_twd, always_offer_bundle: Boolean(row.always_offer_bundle) } };
+          bundle_discount_twd: row.bundle_discount_twd, always_offer_bundle: Boolean(row.always_offer_bundle),
+          gift_exchange_discount_twd: row.gift_exchange_discount_twd, ...(persona ? { persona } : {}) } };
     });
     return { sellers, terms: this.db.prepare('SELECT * FROM terms ORDER BY terms_id').all().map(copy) };
   }

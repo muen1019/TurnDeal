@@ -36,9 +36,10 @@ export function parseText(input: string, prefix: string): Parsed {
     take(/不要(?:任何)?(?:贈品|配件|加購|滑鼠墊)/g,()=>{result.bundleDisabled=true;result.bundleMentioned=true;});
     take(/只接受免費(?:贈品|配件|滑鼠墊)/g,()=>{result.bundleMentioned=true;});
     take(/可接受免費(?:贈品|配件|滑鼠墊)|不接受付費加購/g,()=>{result.bundleMentioned=true;});
-    take(/價格優先|便宜優先/g,()=>result.priorities.push('price_first'));
+    take(/價格優先|便宜優先|越便宜越好|偏好價格低|偏好低價/g,()=>result.priorities.push('price_first'));
     take(/交期優先|快速到貨優先/g,()=>result.priorities.push('delivery_first'));
     take(/評分優先|信任優先/g,()=>result.priorities.push('trust_first'));
+    take(/偏好售後好|售後優先|售後好|保固優先|重視售後/g,()=>result.priorities.push('after_sales_first'));
     for(const [attribute, mapping] of [['color',colors],['size_class',sizes],['shape',shapes]] as const) {
       const names=Object.keys(mapping).sort((a,b)=>b.length-a.length).join('|');
       const regex=new RegExp(`(只接受|必須|一定要|不要|排除|偏好|喜歡)?\\s*((?:${names})(?:\\s*或\\s*(?:${names}))*)`,'g');

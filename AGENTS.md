@@ -4,7 +4,7 @@ These instructions apply to every change in this repository.
 
 ## Unified Result contract
 
-Integrated full application: root npm run dev starts backend/runtime with Node 24 / node:sqlite and the existing frontend, using one data/app.sqlite. backend/src remains the legacy Node 20 mock Result server for compatibility tests. See docs/RUN_FULL_APP.md. Live API keys must never enter the frontend child environment. Status now includes orchestrating, negotiating and evaluating; keep every consumer and generated type aligned. Only configured canonical A-E sellers negotiate; discovery_seller_* policies remain inactive.
+Integrated full application: root npm run dev starts backend/runtime with Node 24 / node:sqlite and the existing frontend, using one data/app.sqlite. backend/src remains the legacy Node 20 mock Result server for compatibility tests. See docs/RUN_FULL_APP.md. Live API keys must never enter the frontend child environment. Status now includes orchestrating, negotiating and evaluating; keep every consumer and generated type aligned. Configured canonical A-E and 15 discovery_seller_* sellers have persisted Personas and SKU policies. Use the versioned catalog-negotiation-policies.json seed and explicit listing-to-SKU bindings; the historical draft policy template remains inactive. Never assign Personas by selection rank or overwrite existing stock/prices on startup.
 
 Use contracts/a2a-commerce.v0.3.schema.json for all active producers and consumers. main's five-seller/five-round types and catalog are combined with local accept/reject=200 and original feedback/source_documents handoff. Contracts under contracts/archive are historical, never alternative live API inputs.
 

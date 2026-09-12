@@ -14,3 +14,12 @@ it('locks history deletion during uncertain submissions',()=>{
  render(<AppShell {...props()} historyLocked/>);
  expect(screen.getByRole('button',{name:'刪除對話：滑鼠'})).toBeDisabled();
 });
+it('clear all requires confirmation, supports cancel and locks while busy',()=>{
+ const clear=vi.fn();const {rerender}=render(<AppShell {...props()} onClearHistory={clear}/>);
+ fireEvent.click(screen.getByRole('button',{name:'清除全部歷史紀錄'}));
+ fireEvent.click(screen.getByRole('button',{name:'取消'}));expect(clear).not.toHaveBeenCalled();
+ fireEvent.click(screen.getByRole('button',{name:'清除全部歷史紀錄'}));
+ fireEvent.click(screen.getByRole('button',{name:'確認清除全部'}));expect(clear).toHaveBeenCalledTimes(1);
+ rerender(<AppShell {...props()} onClearHistory={clear} historyLocked/>);
+ expect(screen.getByRole('button',{name:'清除全部歷史紀錄'})).toBeDisabled();
+});

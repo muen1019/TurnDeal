@@ -4,6 +4,8 @@
 
 新增使用者設定：依 [BUYER_SETUP.md](BUYER_SETUP.md)，buyer_profiles 在 SQLite 保存基本資料與四項偏好權重／顏色。GET／POST /api/buyer-profile 是獨立明示更新，不是 Formatter 改寫 user_preferences。新 Request 凍結 ranking_weights；未指定 preference_md 時才以 profile 顏色建立本輪文字快照。自訂 preference_md 優先；姓名、地址、付款方式不進 intent、RFQ 或模型。以下「尚無長期偏好 UI」僅指 user_preferences 的一般讀寫／學習，不包括這個限定的 profile 設定。
 
+更新：Buyer Request Improver 已接上整合版 Result API 的 selection_version: 1 決策與前端進度，见 [BUYER_REQUEST_IMPROVER.md](BUYER_REQUEST_IMPROVER.md)。只有明確長期表述可更新 improver_global_preferences；既有 user_preferences 的 Formatter 讀取及 sessionStorage 編輯器尚未與該版本庫同步。
+
 ## 1. 三層資料，不是三份互相覆寫的文件
 
 | 層級 | 定義 | 生命週期 | 範例 |

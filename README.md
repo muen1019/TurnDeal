@@ -1,6 +1,16 @@
 # OfferMesh
 
-文件定義正本：[intent.md / preference.md 定義與分類](docs/INTENT_PREFERENCE_SPEC.md)。preference 是長期偏好的可讀表示，intent 是本輪購買目標／限制／例外；目前 API preference_md 是本輪快照，不是更新長期偏好的命令。前端儲存僅限分頁，長期偏好更新尚未實作。
+最新整合：[模型選擇、歷史清除與資料庫同步](docs/MODEL_HISTORY_SYNC.md)。畫面左上可選新需求模型，預設 GPT-5.6 Sol；側欄支援單筆／全部清除本分頁歷史，保留 SQLite 稽核與個人設定。
+
+文件定義正本：[intent.md / preference.md 定義與分類](docs/INTENT_PREFERENCE_SPEC.md)。preference 是長期偏好的可讀表示，intent 是本輪購買目標／限制／例外；目前 API preference_md 是本輪快照，不是更新長期偏好的命令。前端儲存僅限分頁；Improver 已有內部偏好版本寫入，前端帳戶偏好同步尚未接入。
+
+## Buyer Request Improver
+
+已實作 Context Builder、LLM Revision Engine、語意驗證、SQLite 工作／文件版本與恢復。每次改善保存新版 intent；全域 preference 僅依明確長期表述提出並驗證 patch。既有 v0.3 reject 回應與原始快照保持不變。
+
+`npm run test:improver` 執行核心與 Node 24 runtime 內部整合測試；`npm run demo:improver` 執行離線合成案例。明示執行 `npm run demo:improver:live` 才使用 `.env` 的 `API_KEY` 呼叫模型，模型名稱由 `IMPROVER_MODEL` 控制（預設 gpt-5.6-sol；Runtime 使用本輪 UI 模型選擇）。詳見 [使用方式與接線邊界](docs/BUYER_REQUEST_IMPROVER.md) 及 [驗證紀錄](docs/IMPROVER_TEST_REPORT.md)。
+
+整合版 runtime 已接上 selection_version: 1：API 接受採用時一併提供的拒絕紀錄，或完整拒絕集合，並排入改善工作。這套 versioned Improver 尚未由目前 UI 啟用。UI 使用 legacy reject → 問題子請求 → 回答 → 重新篩選，見 [拒絕後問答流程](docs/HISTORY_REFINEMENT.md)。兩套流程不重複觸發；只憑滑動不更新全域偏好。
 
 ## 完整前後端入口（最新）
 
@@ -76,10 +86,10 @@ OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commer
 
 ## 開發前必讀
 
-- [LLM Formatter 與安全 key 設定](docs/FORMATTER_LLM.md)：預設 gpt-4.1-mini、Structured Outputs；`npm run demo:formatter:secure` 在 Windows 隱藏輸入 key，測試不使用真實 key。
+- [LLM Formatter 與安全 key 設定](docs/FORMATTER_LLM.md)：預設 gpt-5.6-sol、Structured Outputs；`npm run demo:formatter:secure` 在 Windows 隱藏輸入 key，測試不使用真實 key。
 - [Formatter：中文文字到現有流程](docs/FORMATTER.md)：離線規則解析、需求澄清、使用者偏好快照、Request 儲存與 Orchestrator 接線；`npm run demo:formatter` 可跑完整文字入口示範（Seller 為測試替身）。
 - [Orchestrator 前段與 Seller 函式交接](docs/ORCHESTRATOR_HANDOFF.md)：已可執行需求快照 → 搜尋 → RFQ → 第一輪函式呼叫；`npm run demo:handoff` 使用記憶體 DB 與明確標示的測試替身。
-- [Seller 議價設定格式與填寫交接](docs/SELLER_NEGOTIATION_POLICY.md)：15 家／90 筆主商品待填模板；底價等私有設定由 Negotiation owner 填寫，尚未啟用。
+- [完整 Catalog 談判政策](docs/CATALOG_NEGOTIATION_POLICIES.md)：15 家／120 筆 Discovery 商品已配置，與原本五家合計 20 家／129 個 SKU 政策；底價與成本僅供 Seller/Backend 使用。舊 [待填模板](docs/SELLER_NEGOTIATION_POLICY.md) 保留為歷史格式。
 - [目標 System Design 與 repo 整合狀態](docs/SYSTEM_DESIGN.md)
 - [開發與驗收基準](docs/DEVELOPMENT_RULES.md)
 - [共用契約說明](contracts/README.md)
@@ -287,3 +297,14 @@ npx --yes @fission-ai/openspec@1.13.0 validate define-offer-result-ui-api --stri
 ```
 
 change 維持未封存，尚待任務表中的完整視覺與裝置驗收。根目錄契約測試驗證統一 v0.3 共用契約與 Result fixtures。
+
+
+## Hackathon 新增：經濟 Persona 與條件交換
+
+五家 Seller 由 Catalog、私有政策與協商狀態控制，支援加贈滑鼠墊、取消贈品換折扣、回購券、物流與售後權益。權益使用 SQLite 登錄的模擬履約證據，未來券不折抵本次價格。`npm run test:e2e:full` 可產生含逐輪決策對話與五個推薦方案的 HTML 報告；真實模型使用 `npm run test:e2e:full:live`。設計、限制與測試說明見 [SELLER_PERSONAS.md](docs/SELLER_PERSONAS.md)。
+
+本次進一步將 Persona 預先綁定賣家，新增 SKU 成本／讓步政策，真實模型在 Backend 的合法範圍內選價。公開售後條件可用於 Discovery 匹配及 Evaluator 排序，Persona 名稱與私有底價不參與排名。使用 `node scripts/e2e-negotiation.mjs --live --evaluate --after-sales` 可查看售後優先的五方案報告；預設為價格優先。實作與尚未支援的通用規則見 [SELLER_POLICY_IMPLEMENTATION.md](docs/SELLER_POLICY_IMPLEMENTATION.md)。
+
+## ACP 測試購買
+
+整合 runtime 已支援購買 API → ACP HTTP 測試商家 → 模擬付款 → 持久化訂單。前端接線不在本提交內。採用不自動下單，須另提交明確確認；不會實際扣款或出貨。操作、六個 API payload 與正式付款邊界見 [ACP 購買說明](docs/ACP_PURCHASE.md)，實跑證據見 [驗證報告](docs/ACP_PURCHASE_TEST_REPORT.md)。
