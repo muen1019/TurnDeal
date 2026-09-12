@@ -35,6 +35,9 @@ export type Timestamp = string;
 export type ProductCategory = 'mouse' | 'mouse_pad';
 export type Status =
   | 'formatting'
+  | 'orchestrating'
+  | 'negotiating'
+  | 'evaluating'
   | 'awaiting_user'
   | 'needs_clarification'
   | 'needs_confirmation'
@@ -176,11 +179,17 @@ export interface RangeProductPreference {
   min: number | null;
   max: number | null;
 }
+/**
+ * Immutable request-scoped original text, not generated Markdown or a durable preference update. See docs/INTENT_PREFERENCE_SPEC.md.
+ */
 export interface DocumentBundle {
   revision: number;
   intent_md: string;
   preference_md: string;
 }
+/**
+ * intent_md describes this purchase and its temporary constraints/preferences. preference_md is a request-bound preference snapshot; omission/empty text does not clear active SQLite product preferences. Neither field updates the durable profile.
+ */
 export interface CreateRequest {
   intent_md: string;
   preference_md?: string;

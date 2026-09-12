@@ -155,7 +155,7 @@ function isTerminalSnapshot(status?: SnapshotProgressStatus): boolean {
 }
 
 function fallbackStage(status?: SnapshotProgressStatus): RequestProgressStage | undefined {
-  if (status === "formatting") return "formatting";
+  if (status === "formatting" || status === "orchestrating" || status === "negotiating" || status === "evaluating") return status;
   return terminalSnapshotStage(status);
 }
 

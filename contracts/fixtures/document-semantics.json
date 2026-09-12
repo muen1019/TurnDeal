@@ -1,0 +1,13 @@
+{
+  "purpose": "Executable current document-scope cases; formatting never updates durable preferences.",
+  "saved_color": "black",
+  "cases": [
+    {"id":"round_override","intent_md":"買白色滑鼠，最高1000元，7天內到貨","preference_md":"偏好黑色","expected":{"status":"ready","color":"white","max":1000,"target":null}},
+    {"id":"provided_snapshot","intent_md":"買滑鼠，最高1000元，7天內到貨","preference_md":"偏好白色","expected":{"status":"ready","color":"white","max":1000,"target":null}},
+    {"id":"omitted_inherits","intent_md":"買滑鼠，最高1000元，7天內到貨","expected":{"status":"ready","color":"black","max":1000,"target":null}},
+    {"id":"empty_does_not_clear","intent_md":"買滑鼠，最高1000元，7天內到貨","preference_md":"","expected":{"status":"ready","color":"black","max":1000,"target":null}},
+    {"id":"target_not_priority","intent_md":"買800元左右的滑鼠，最高1000元，7天內到貨","preference_md":"偏好小尺寸","expected":{"status":"ready","color":"black","max":1000,"target":800,"priorities":[],"size":"small"}},
+    {"id":"same_source_conflict","intent_md":"買滑鼠，最高1000元，7天內到貨，只接受白色，只接受黑色","preference_md":"","expected":{"status":"needs_clarification"}},
+    {"id":"missing_hard_budget","intent_md":"買800元左右的滑鼠，7天內到貨","preference_md":"價格優先","expected":{"status":"needs_clarification"}}
+  ]
+}
