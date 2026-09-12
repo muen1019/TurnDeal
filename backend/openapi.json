@@ -181,6 +181,996 @@
           }
         }
       }
+    },
+    "/api/requests/{request_id}/purchases": {
+      "post": {
+        "operationId": "createPurchase",
+        "tags": [
+          "Purchases"
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../contracts/purchase.v1.schema.json#/$defs/Empty"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Purchase state (test only)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseView"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Purchase state (test only)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseView"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Purchase state (test only)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/requests/{request_id}/purchase": {
+      "get": {
+        "operationId": "getRequestPurchase",
+        "tags": [
+          "Purchases"
+        ],
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Purchase state (test only)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseView"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/purchases/{purchase_id}": {
+      "get": {
+        "operationId": "getPurchase",
+        "tags": [
+          "Purchases"
+        ],
+        "parameters": [
+          {
+            "name": "purchase_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Purchase state (test only)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseView"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/purchases/{purchase_id}/checkout": {
+      "post": {
+        "operationId": "updatePurchase",
+        "tags": [
+          "Purchases"
+        ],
+        "parameters": [
+          {
+            "name": "purchase_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../contracts/purchase.v1.schema.json#/$defs/CheckoutUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Purchase state (test only)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseView"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Purchase state (test only)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseView"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Purchase state (test only)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/purchases/{purchase_id}/complete": {
+      "post": {
+        "operationId": "completePurchase",
+        "tags": [
+          "Purchases"
+        ],
+        "parameters": [
+          {
+            "name": "purchase_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseComplete"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Purchase state (test only)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseView"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Purchase state (test only)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseView"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Purchase state (test only)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/purchases/{purchase_id}/cancel": {
+      "post": {
+        "operationId": "cancelPurchase",
+        "tags": [
+          "Purchases"
+        ],
+        "parameters": [
+          {
+            "name": "purchase_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../contracts/purchase.v1.schema.json#/$defs/Empty"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Purchase state (test only)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseView"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Purchase state (test only)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseView"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "Purchase state (test only)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "410": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Purchase error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "$ref": "../contracts/purchase.v1.schema.json#/$defs/PurchaseError"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/requests/{request_id}/improvement": {
+      "get": {
+        "operationId": "getRequestImprovement",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Buyer-scoped improvement status; null when no job exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/ImprovementStatus"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Request not found for this buyer."
+          }
+        }
+      }
     }
   },
   "components": {

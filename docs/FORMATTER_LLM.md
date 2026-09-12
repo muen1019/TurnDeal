@@ -2,7 +2,7 @@
 
 ## 預設模型與費用
 
-選用 `gpt-4.1-mini`，任務是短文字需求抽取，不需要大型推理模型。官方價格為每百萬 input tokens US$0.40、output tokens US$1.60；例如 2,000 input + 1,000 output 約 US$0.0024／次，實際依 token 數與帳戶計價。來源：[模型與價格](https://developers.openai.com/api/docs/models/gpt-4.1-mini)。查閱日期 2026-09-12；這不是品質評測或固定費用保證。
+目前預設 `gpt-5.6-sol`，以 `reasoning.effort: none` 處理結構化需求抽取；UI 可改用 GPT-4.1 或 GPT-4.1 Mini。Sol 並非最低費用選項，請依官方計價與實際 token 用量控制成本：[模型與價格](https://developers.openai.com/api/docs/models/gpt-5.6-sol)。完整設定優先權、Runtime 共用模型及驗證範圍见 [MODEL_HISTORY_SYNC.md](MODEL_HISTORY_SYNC.md)。
 
 Responses API 使用 `text.format` 的 strict JSON Schema，詳見 [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs)。模型負責抽取，Backend 再驗證，不直接相信模型自行宣告成功。
 

@@ -11,6 +11,23 @@ const input={intent_md:'辦公用無線滑鼠。\n\n## 本次購買需求\n滑�
 const configured={autoProcess:false,apiKey:'',buyerId:req=>req.headers['x-test-buyer']??'demo_buyer'};
 async function start(app,key='create',body=input){return (await request(app).post('/api/requests').set('Idempotency-Key',key).send(body).expect(202)).body;}
 
+test('model allowlist, immutable per-request selection and child inheritance',async()=>{
+ const app=createRuntimeApp(configured),store=app.locals.store;
+ try{
+  await request(app).post('/api/requests').set('Idempotency-Key','unknown-model').send({...input,model:'arbitrary-model'}).expect(400);
+  const first=await start(app,'chosen',{intent_md:'買無線滑鼠',model:'gpt-4.1-mini'});
+  assert.equal(first.model,'gpt-4.1-mini');assert.equal(store.modelFor(first.request_id),'gpt-4.1-mini');
+  await request(app).post('/api/requests').set('Idempotency-Key','chosen').send({intent_md:'買無線滑鼠',model:'gpt-5.6-sol'}).expect(409);
+  await store.process(first.request_id,'demo_buyer');const parent=store.snapshot(first.request_id,'demo_buyer');
+  const body={intent_md:parent.documents.intent_md,preference_md:parent.documents.preference_md,clarification:{parent_request_id:parent.request_id,answers:parent.formatter.questions.map(q=>({question_id:q.question_id,answer:q.field==='budget'?'1000':'7'}))}};
+  await request(app).post('/api/requests').set('Idempotency-Key','switch-child').send({...body,model:'gpt-5.6-sol'}).expect(422);
+  const child=await start(app,'inherit',body);assert.equal(child.model,'gpt-4.1-mini');
+  await store.process(child.request_id,'demo_buyer');
+  assert.equal(store.snapshot(child.request_id,'demo_buyer').model,'gpt-4.1-mini');
+  assert.equal(JSON.parse(store.db.prepare('SELECT published_snapshot_json FROM requests WHERE request_id=?').get(child.request_id).published_snapshot_json).model,'gpt-4.1-mini');
+ }finally{await store.close();}
+});
+
 test('clarification answers create an immutable child, preserve preferences, and replay without another run',async()=>{
   const app=createRuntimeApp(configured),store=app.locals.store;
   try {

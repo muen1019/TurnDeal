@@ -91,6 +91,7 @@ export async function evaluate({ db, requestId, buyerId, apiKey = '', model = 'g
         if (!root) throw new Error('request_ancestry_invalid');
       }
       const snapshot = check('RequestSnapshot', {
+        ...(request.llm_model?{model:request.llm_model}:{}),
         request_id: requestId, root_request_id: root.request_id, parent_request_id: request.parent_request_id, status,
         documents: { revision: request.revision, intent_md: request.intent_md, preference_md: request.preference_md }, intent: copy(intent),
         seller_agents: negotiation.seller_agents.map(s => ({ ...copy(s), final_offer_ids: s.final_offer_ids.filter(id => offers.some(o => o.offer_id === id)) })),

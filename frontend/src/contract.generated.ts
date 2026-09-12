@@ -80,7 +80,39 @@ export type EligibilityReasonCode =
   | 'bundle_disabled'
   | 'terms_changed'
   | 'addon_not_optional';
+export type LlmModel = 'gpt-5.6-sol' | 'gpt-4.1' | 'gpt-4.1-mini';
+export type RejectDecision = RejectDecision1 & {
+  action: 'reject';
+  feedback: string;
+  selection_version?: 1;
+  rejected_offer_ids?: Id[];
+};
+export type RejectDecision1 =
+  | {
+      feedback?: string;
+    }
+  | {
+      rejected_offer_ids: Id[];
+      feedback?: '';
+    };
 export type DecisionResult = AcceptDecisionResult | RejectDecisionResult;
+export type RejectDecisionResult = RejectDecisionResult1 & {
+  action: 'reject';
+  request_id: Id;
+  status: 'rejected';
+  feedback: string;
+  source_documents: DocumentBundle;
+  selection_version?: 1;
+  rejected_offer_ids?: Id[];
+};
+export type RejectDecisionResult1 =
+  | {
+      feedback?: string;
+    }
+  | {
+      rejected_offer_ids: Id[];
+      feedback?: '';
+    };
 export type RFQProductPreference =
   | {
       preference_id: Id;
@@ -98,6 +130,24 @@ export type RFQProductPreference =
       max: number | null;
     };
 export type EligibleOffer = unknown;
+export type ImprovementStatus = null | {
+  improvement_id: Id;
+  request_id: Id;
+  mode: 'accepted_with_rejections' | 'all_rejected';
+  status: 'queued' | 'running' | 'ready' | 'needs_clarification' | 'failed';
+  error: string | null;
+  result: null | {
+    intent_revision_id: Id;
+    intent_state: 'ready' | 'draft';
+    documents: {
+      revision: number;
+      intent_md: string;
+      preference_md: string;
+    };
+    preference_updated: boolean;
+    questions: string[];
+  };
+};
 
 export interface CommerceTypes {
   FormatterResult: FormatterResult;
@@ -110,6 +160,7 @@ export interface CommerceTypes {
   Status: Status;
   EligibilityReasonCode: EligibilityReasonCode;
   DocumentBundle: DocumentBundle;
+  LlmModel: LlmModel;
   CreateRequest: CreateRequest;
   AcceptDecision: AcceptDecision;
   RejectDecision: RejectDecision;
@@ -163,6 +214,12 @@ export interface CommerceTypes {
   SharedNegotiationContext: SharedNegotiationContext;
   NegotiationOutput: NegotiationOutput;
   SellerSalesProfile: SellerSalesProfile;
+  NegotiationProposal: NegotiationProposal;
+  NegotiationProposalResponse: NegotiationProposalResponse;
+  SellerBenefit: SellerBenefit;
+  SellerPersonaPolicy: SellerPersonaPolicy;
+  SellerSkuPolicy: SellerSkuPolicy;
+  ImprovementStatus: ImprovementStatus;
 }
 export interface FormatterResult {
   parser_version: 'formatter-rules-v0.1' | 'formatter-llm-v0.1';
@@ -178,7 +235,7 @@ export interface NormalizedIntent {
   max_total_twd: MoneyTwd;
   delivery_days_max: number;
   required_features: string[];
-  preferences: ('price_first' | 'delivery_first' | 'trust_first')[];
+  preferences: ('price_first' | 'delivery_first' | 'trust_first' | 'after_sales_first')[];
   product_preferences: ProductPreference[];
   negotiation_policy: NegotiationPolicy;
 }
@@ -211,6 +268,7 @@ export interface DocumentBundle {
  * intent_md describes this purchase and its temporary constraints/preferences. preference_md is a request-bound preference snapshot; omission/empty text does not clear active SQLite product preferences. Neither field updates the durable profile.
  */
 export interface CreateRequest {
+  model?: LlmModel;
   refinement?: {
     parent_request_id: Id;
   };
@@ -227,10 +285,9 @@ export interface CreateRequest {
 export interface AcceptDecision {
   action: 'accept';
   offer_id: Id;
-}
-export interface RejectDecision {
-  action: 'reject';
-  feedback: string;
+  selection_version?: 1;
+  rejected_offer_ids?: Id[];
+  feedback?: string;
 }
 export interface RedeemRequest {
   request_id: Id;
@@ -338,6 +395,26 @@ export interface Offer {
   optional_addons: boolean;
   expires_at: Timestamp;
   eligibility: Eligibility;
+  benefits?: SellerBenefit[];
+}
+export interface SellerBenefit {
+  benefit_id: Id;
+  kind:
+    | 'delivery_guarantee'
+    | 'late_compensation'
+    | 'future_coupon'
+    | 'return_extension'
+    | 'warranty_extension'
+    | 'priority_support'
+    | 'exchange_guarantee';
+  description: string;
+  amount_twd: number;
+  duration_days: number;
+  minimum_spend_twd: number;
+  requires_membership: boolean;
+  conditions: string;
+  evidence_id: Id;
+  simulation: true;
 }
 export interface RankedOffer {
   rank: number;
@@ -352,6 +429,7 @@ export interface ApiError {
 }
 export interface RequestSnapshot {
   formatter?: FormatterSummary;
+  model?: LlmModel;
   request_id: Id;
   root_request_id: Id;
   parent_request_id: null | Id;
@@ -390,13 +468,9 @@ export interface AcceptDecisionResult {
   status: 'accepted';
   selected_offer_id: Id;
   expires_at: Timestamp;
-}
-export interface RejectDecisionResult {
-  action: 'reject';
-  request_id: Id;
-  status: 'rejected';
-  feedback: string;
-  source_documents: DocumentBundle;
+  selection_version?: 1;
+  rejected_offer_ids?: Id[];
+  feedback?: string;
 }
 export interface RedemptionReceipt {
   redemption_id: Id;
@@ -428,6 +502,7 @@ export interface SellerRFQ {
   target_total_twd: number | null;
   previous_offer_ids: Id[];
   competitive_terms?: CompetitiveTerms[];
+  proposal?: NegotiationProposal;
 }
 export interface CompetitiveTerms {
   comparison_key: string;
@@ -449,6 +524,21 @@ export interface CompetitiveTerms {
   addon_categories: 'mouse_pad'[];
   differences: string[];
 }
+export interface NegotiationProposal {
+  kind: 'lower_price' | 'add_gift' | 'exchange_gift' | 'compare' | 'request_benefit';
+  variant: 'standalone' | 'bundle';
+  target_total_twd: number | null;
+  reference_offer_id: Id | null;
+  benefit_kind?:
+    | null
+    | 'delivery_guarantee'
+    | 'late_compensation'
+    | 'future_coupon'
+    | 'return_extension'
+    | 'warranty_extension'
+    | 'priority_support'
+    | 'exchange_guarantee';
+}
 /**
  * Untrusted Seller proposal. The Backend assigns offer_id and eligibility after validation.
  */
@@ -463,6 +553,7 @@ export interface SellerOfferDraft {
   terms_id: Id;
   optional_addons: boolean;
   expires_at: Timestamp;
+  benefits?: SellerBenefit[];
 }
 export interface SellerNegotiationResult {
   request_id: Id;
@@ -479,6 +570,11 @@ export interface SellerNegotiationResult {
    * Optional explicit withdrawal of this Seller's own previously issued offers. Backend verifies ownership; invalid new drafts alone never withdraw old offers.
    */
   withdrawn_offer_ids?: Id[];
+  proposal_response?: NegotiationProposalResponse;
+}
+export interface NegotiationProposalResponse {
+  status: 'accepted' | 'countered' | 'declined';
+  exchange_discount_twd: number;
 }
 export interface SellerTrustEntry {
   seller_id: Id;
@@ -603,7 +699,7 @@ export interface DemoScenarioSuite {
       max_total_twd: MoneyTwd;
       delivery_days_max: number;
       required_features: string[];
-      preferences: ('price_first' | 'delivery_first' | 'trust_first')[];
+      preferences: ('price_first' | 'delivery_first' | 'trust_first' | 'after_sales_first')[];
       required_color: string;
       preferred_shape: string | null;
       bundle_mode: 'disabled' | 'related_no_extra_cost' | 'related_with_cap';
@@ -674,4 +770,50 @@ export interface SellerSalesProfile {
   bundle_discount_twd: number;
   always_offer_bundle: boolean;
   addon_product_id: Id | null;
+  /**
+   * Request-wide maximum gift-to-cash concession; defaults to zero. Private Seller policy.
+   */
+  gift_exchange_discount_twd?: number;
+  persona_policy?: SellerPersonaPolicy;
+  sku_policies?: SellerSkuPolicy[];
+}
+export interface SellerPersonaPolicy {
+  persona: 'price_optimizer' | 'speed_seller' | 'bundle_curator' | 'loyalty_builder' | 'margin_guardian';
+  objective: string;
+  sku_ids: Id[];
+  price_mode: 'stepped' | 'protected' | 'bundle';
+  base_price_twd: number;
+  round_discounts_twd: number[];
+  final_round: number;
+  quote_ttl_seconds: number;
+  gift_from_round: number;
+  benefit_schedule: {
+    from_round: number;
+    benefit: SellerBenefit;
+  }[];
+  decision_mode?: 'scheduled' | 'bounded';
+}
+export interface SellerSkuPolicy {
+  product_id: Id;
+  policy_version: string;
+  opening_discount_cap_twd: number;
+  max_discount_per_step_twd: number;
+  max_total_discount_twd: number;
+  max_concession_count: number;
+  unit_cost_twd: number;
+  shipping_cost_twd: number;
+  min_margin_bps: number;
+  gift_cost_budget_twd: number;
+  gift_exchange_discount_cap_twd: number;
+  total_concession_budget_twd: number;
+  voucher_budget_twd: number;
+  inventory_pressure: 'low' | 'normal' | 'high';
+  addon_costs: {
+    product_id: Id;
+    cost_twd: number;
+  }[];
+  benefit_costs: {
+    benefit_id: Id;
+    cost_twd: number;
+  }[];
 }

@@ -1,8 +1,18 @@
 import { objectSchema } from './contracts.mjs';
+import {modelParameters} from '../models/config.mjs';
 
 export const buyerOutput = objectSchema({
   action: { type: 'string', enum: ['negotiate', 'stop'] },
   target_option_index: { type: 'integer' },
+});
+export const buyerTradeoffOutput = objectSchema({
+  ...buyerOutput.properties,
+  proposal: { anyOf: [{ type: 'null' }, objectSchema({
+    kind: { type: 'string', enum: ['lower_price', 'add_gift', 'exchange_gift', 'compare', 'request_benefit'] },
+    target_total_twd: { type: ['integer', 'null'] },
+    reference_offer_id: { type: ['string', 'null'] },
+    benefit_kind: { type: ['string', 'null'], enum: [null, 'delivery_guarantee', 'late_compensation', 'future_coupon', 'return_extension', 'warranty_extension', 'priority_support', 'exchange_guarantee'] },
+  })] },
 });
 export const sellerOutput = objectSchema({
   outcome: { type: 'string', enum: ['offered', 'refused'] },
@@ -11,6 +21,10 @@ export const sellerOutput = objectSchema({
   include_bundle: { type: 'boolean' },
   is_final: { type: 'boolean' },
   message: { type: 'string' },
+});
+export const sellerPersonaOutput = objectSchema({
+  ...sellerOutput.properties,
+  benefit_ids: { type: 'array', items: { type: 'string' } },
 });
 
 export class LimitReached extends Error {
@@ -32,7 +46,7 @@ export class ModelGateway {
   async decide({ role, input, schema, format, instructions, signal, audit, promptVersion = 'negotiation-1' }) {
     signal.throwIfAborted();
     if (!this.apiKey.trim()) throw new Error('model_unconfigured');
-    const body = { model: this.model, store: false, instructions,
+    const body = { model: this.model, ...modelParameters(this.model), store: false, instructions,
       input: [{ role: 'user', content: JSON.stringify(input) }],
       max_output_tokens: this.maxOutputTokens,
       text: { format: format ?? { type: 'json_schema', name: `${role}_decision`, strict: true, schema } } };

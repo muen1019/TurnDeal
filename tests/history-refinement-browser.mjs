@@ -18,6 +18,8 @@ const out='frontend/test-results/history-refinement';mkdirSync(out,{recursive:tr
 try{
  await page.goto('http://127.0.0.1:5173/chat');await page.getByRole('textbox',{name:/名稱/}).fill('UI Test');
  await page.getByRole('button',{name:/下一步/}).click();await page.getByRole('button',{name:/儲存並開始/}).click();
+ assert.equal(await page.getByRole('combobox',{name:'新需求使用的模型'}).inputValue(),'gpt-5.6-sol');
+ await page.getByRole('combobox',{name:'新需求使用的模型'}).selectOption('gpt-4.1-mini');
  await page.getByRole('textbox',{name:'輸入購物需求'}).fill('1000元滑鼠');await page.getByRole('button',{name:'送出需求'}).click();
  await page.getByRole('heading',{name:'再確認一下',exact:true}).waitFor();
  assert.equal(await page.locator('.clarification-question').count(),2);
@@ -26,6 +28,7 @@ try{
  await page.getByRole('button',{name:'繼續',exact:true}).click();await page.getByRole('heading',{name:'為你找到的優惠'}).waitFor();
  const before=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('offermesh:demo-buyer:workspace:v1')).conversations[0].requestId);
  const parent=app.locals.store.snapshot(before,'demo_buyer');
+ assert.equal(parent.model,'gpt-4.1-mini');
  // Use the accessible skip control for each card; pointer swipe is covered by mobile-browser.
  for(let i=0;i<parent.ranked_offers.length;i++)await page.getByRole('button',{name:/略過.*方案|略過此方案|略過/}).first().click();
  await page.getByRole('textbox',{name:'回饋內容'}).fill('太貴，希望價格優先');await page.getByRole('button',{name:'送出回饋',exact:true}).click();
@@ -48,7 +51,11 @@ try{
  await page.getByRole('button',{name:'刪除對話：1000元滑鼠',exact:true}).click();await page.getByRole('button',{name:'確認刪除',exact:true}).click();
  assert.equal(await page.getByRole('button',{name:'刪除對話：1000元滑鼠',exact:true}).count(),0);
  assert.equal(app.locals.store.snapshot(after,'demo_buyer').status,'awaiting_user');
- await page.getByRole('button',{name:'關閉歷史紀錄'}).click();await page.reload();
+ await page.getByRole('button',{name:'清除全部歷史紀錄'}).click();await page.getByRole('button',{name:'取消',exact:true}).click();
+ await page.getByRole('button',{name:'清除全部歷史紀錄'}).click();await page.getByRole('button',{name:'確認清除全部',exact:true}).click();await page.reload();
+ assert.equal(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('offermesh:demo-buyer:workspace:v1')).conversations.length),1);
+ assert.equal(await page.getByRole('combobox',{name:'新需求使用的模型'}).inputValue(),'gpt-4.1-mini');
+ assert.equal(app.locals.store.snapshot(after,'demo_buyer').status,'awaiting_user');
  for(const width of [320,430,1440]){await page.setViewportSize({width,height:844});await page.waitForTimeout(200);assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));}
  assert.deepEqual(errors,[]);console.log(JSON.stringify({passed:true,paidCalls:0,flow:'price clarification → offers → reject → questions → reload → refined offers → drawer → delete history'}));
 }catch(error){console.log('UI', (await page.locator('body').innerText()).slice(0,2800));console.log(errors);await page.screenshot({path:`${out}/failure.png`,fullPage:true});throw error;}

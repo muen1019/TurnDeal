@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "cards": 5,
+  "rounds": 17,
+  "viewports": [
+    1440,
+    390
+  ],
+  "horizontal_overflow": false,
+  "page_errors": [],
+  "dialogue": "Structured decision projection, not raw model transcript"
+}

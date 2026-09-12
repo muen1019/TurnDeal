@@ -3,9 +3,10 @@ import { check, copy, immutable } from './contracts.mjs';
 import { BuyerAgent, SellerAgent } from './agents.mjs';
 import { ModelGateway, LimitReached } from './model.mjs';
 import { validateDrafts, activeOffers, advanceOffers, buildContext, pruneUnavailable, competitiveTerms } from './validation.mjs';
+import { proposalReference, buyerMessage, sellerMessage } from './tradeoffs.mjs';
 
 export const DEFAULT_OPTIONS = Object.freeze({ round_timeout_ms: 30000, global_deadline_ms: 150000,
-  model_timeout_ms: 12000, max_calls: 50, max_tokens: 250000, max_output_tokens: 1200, offer_ttl_ms: 600000 });
+  model_timeout_ms: 12000, max_calls: 50, max_tokens: 400000, max_output_tokens: 1200, offer_ttl_ms: 600000 });
 
 function optionsWithDefaults(options) {
   for (const key of Object.keys(options)) if (!(key in DEFAULT_OPTIONS)) throw new Error(`unknown_option: ${key}`);
@@ -79,18 +80,29 @@ export async function negotiate({ requestId, buyerId, orchestration, repository,
         const seller = catalog.sellers.find(s => s.seller_id === branch.seller_id);
         const pair = agents.get(branch.seller_id);
         const previous = currentOffers().filter(o => o.seller_id === branch.seller_id);
+        const conversation = traces.filter(t => t.seller_id === branch.seller_id && t.result).map(t => ({
+          round: t.round, proposal: t.rfq?.proposal ?? null,
+          buyer_message: buyerMessage(t.rfq?.proposal), seller_message: sellerMessage(t.result),
+          result: { outcome: t.result.outcome, is_final: t.result.is_final,
+            quotes: history.filter(o => o.seller_id === branch.seller_id && o.round === t.round && o.eligibility.status === 'eligible')
+              .map(o => ({ variant: o.variant, total_price_twd: o.total_price_twd, product_id:o.items[0].product_id,
+                benefit_ids:(o.benefits ?? []).map(b=>b.benefit_id) })),
+            proposal_response: t.result.proposal_response ?? null },
+        }));
         const audit = [];
         let rfq = null;
         let buyerProvider = null;
         branch.status = 'negotiating';
         const outcome = await bounded(async signal => {
           try {
-            const buyerSeller = immutable({ seller_id: seller.seller_id, products: seller.products.map(p => ({
+            const buyerSeller = immutable({ seller_id: seller.seller_id,
+              public_benefit_kinds: [...new Set((seller.benefits ?? []).filter(e => e.enabled && e.available_units > 0).map(e => e.definition.kind))],
+              products: seller.products.map(p => ({
               product_id: p.product_id, category: p.category, brand: p.brand, model: p.model,
               features: copy(p.features), attributes: copy(p.attributes),
             })) });
             const buyer = await pair.buyer.negotiate({ requestId, round, intent: immutable(copy(intent)), branch: immutable(copy(branch)), seller: buyerSeller,
-              previous: immutable(copy(previous)), context: previousContext, now: now(), signal, audit });
+              previous: immutable(copy(previous)), history: immutable(copy(conversation)), context: previousContext, now: now(), signal, audit });
             signal.throwIfAborted();
             buyerProvider = buyer.provider;
             if (buyer.stop) return { stop: 'no_adjustment' };
@@ -101,11 +113,13 @@ export async function negotiate({ requestId, buyerId, orchestration, repository,
             const admissibleContext = { ...previousContext, offers: previousContext.offers.filter(o => availableIds.has(o.offer_id)) };
             outgoing.competitive_terms = round === 1 ? [] : competitiveTerms(admissibleContext, seller, branch.candidate_products.map(p => p.product_id), now());
             if (!outgoing.competitive_terms.some(t => t.variant === 'standalone' && t.total_price_twd === outgoing.target_total_twd)) outgoing.target_total_twd = null;
+            const freshPrevious = currentOffers().filter(o => o.seller_id === branch.seller_id);
+            proposalReference(outgoing, freshPrevious, now());
             rfq = immutable(outgoing);
             check('SellerRFQ', rfq);
             // Buyer adapters never gain authority to change the target Seller.
             if (rfq.request_id !== requestId || rfq.seller_id !== branch.seller_id || rfq.round !== round) throw new Error('invalid_buyer_rfq');
-            const result = await pair.seller.negotiate({ rfq, previous: immutable(copy(previous)), now: now(), offerTtlMs: config.offer_ttl_ms, signal, audit });
+            const result = await pair.seller.negotiate({ rfq, previous: immutable(copy(freshPrevious)), history: immutable(copy(conversation)), now: now(), offerTtlMs: config.offer_ttl_ms, signal, audit });
             signal.throwIfAborted();
             return result;
           } catch (error) {
@@ -114,22 +128,23 @@ export async function negotiate({ requestId, buyerId, orchestration, repository,
           }
         }, timeoutMs);
         // Snapshot now: late promises cannot mutate the committed audit.
-        return { branch, seller, outcome, rfq: copy(rfq), audit: copy(audit), buyerProvider };
+        return { branch, seller, outcome, rfq: copy(rfq), audit: copy(audit), buyerProvider, previous, conversation };
       }));
       if (monotonic() >= deadline) globalStop = 'global_deadline';
-      for (const { branch, seller, outcome, rfq, audit, buyerProvider } of results) {
+      for (const { branch, seller, outcome, rfq, audit, buyerProvider, previous, conversation } of results) {
         if (outcome.stop) {
           branch.stop_reason = outcome.stop;
           branch.status = 'offered';
           if (['call_budget', 'token_budget'].includes(outcome.stop)) globalStop ??= outcome.stop;
-          traces.push({ seller_id: branch.seller_id, round, context_revision: previousContext.context_revision, rfq, audit, stop_reason: outcome.stop });
+          traces.push({ seller_id: branch.seller_id, round, context_revision: previousContext.context_revision, rfq, audit,
+            buyer_provider: buyerProvider, stop_reason: outcome.stop });
           continue;
         }
         let result = outcome.result;
         let offers = [];
         if (!outcome.timeout && !outcome.error) {
           try {
-            offers = validateDrafts({ result, rfq, intent, seller, terms: catalog.terms, now: now(), idFactory });
+            offers = validateDrafts({ result, rfq, intent, seller, terms: catalog.terms, now: now(), idFactory, previous, history: conversation });
             if ((result.withdrawn_offer_ids ?? []).some(id => !history.some(o => o.offer_id === id && o.seller_id === seller.seller_id))) throw new Error('invalid_withdrawal');
             const ids = new Set([...history.map(o => o.offer_id), ...offers.map(o => o.offer_id)]);
             if (ids.size !== history.length + offers.length) throw new Error('duplicate_offer_id');

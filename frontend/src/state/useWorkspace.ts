@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {newId} from './id';
-import type { RequestSnapshot } from "../contract.generated";
+import type { RequestSnapshot, LlmModel } from "../contract.generated";
 import {
   ApiFailure,
   apiPaths,
@@ -36,7 +36,7 @@ interface PendingBoot {
   error: string;
 }
 
-export function useWorkspace() {
+export function useWorkspace(options: {model?:LlmModel} = {}) {
   const [boot] = useState(() => loadWorkspace());
   const [pendingBoot] = useState<PendingBoot>(() => {
     try {
@@ -595,7 +595,7 @@ export function useWorkspace() {
       submit({
         kind: "create",
         path: apiPaths.createRequest,
-        body: { ...body },
+        body: { ...body, ...(options.model?{model:options.model}:{}) },
         conversationId: conversation.id,
         requestId: null,
       });
@@ -765,6 +765,12 @@ export function useWorkspace() {
     review,
     newConversation,
     selectConversation,
+    clearHistory: () => {
+      if(isLocked()||ref.current.conversations.some(c=>processing(c.snapshot?.status)))return;
+      const conversation=freshConversation();
+      update(w=>({...w,conversations:[conversation],activeId:conversation.id}));
+      setVerified(null);setError('');navigate('chat',null,undefined,true);
+    },
     deleteConversation: (id: string) => {
       const target=ref.current.conversations.find(c=>c.id===id);
       if(!target||isLocked()||processing(target.snapshot?.status))return;

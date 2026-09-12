@@ -9,12 +9,12 @@ import { ModelGateway } from '../../src/negotiation/model.mjs';
 
 // E2E-only composition, using the upstream prepare API unchanged. The canonical
 // configured Seller IDs remain canonical; draft discovery_seller_* policies are not enabled.
-export function prepareHandoffE2E(db) {
+export function prepareHandoffE2E(db, {intent = demoFixture.request.normalized_intent, documents = demoFixture.request.documents} = {}) {
   const requestId = `req_${randomUUID()}`, buyerId = 'user_demo_001', now = new Date().toISOString();
-  const docs = demoFixture.request.documents;
+  const docs = documents;
   db.prepare(`INSERT INTO requests (request_id,user_id,revision,intent_md,preference_md,normalized_intent_json,status,created_at,updated_at)
     VALUES (?,?,1,?,?,?,'orchestrating',?,?)`).run(requestId,buyerId,docs.intent_md,docs.preference_md,
-      JSON.stringify(demoFixture.request.normalized_intent),now,now);
+      JSON.stringify(intent),now,now);
   const ids = salesProfiles.map(s => s.seller_id);
   const data = createOrchestratorDataTools({ db, userId: buyerId, registeredSellerIds: ids })
     .load_discovery_input({ request_id: requestId, now });
@@ -23,11 +23,11 @@ export function prepareHandoffE2E(db) {
     sellers: data.sellers.map(s => {
       const t = data.seller_trust.find(t => t.seller_id === s.seller_id).trust;
       return { seller_id: s.seller_id, name: s.name, platform: 'demo', rating: t.marketplace_rating,
-        rating_count: t.marketplace_count, enabled: s.enabled, data_origin: 'deterministic_fixture' };
+        rating_count: t.marketplace_count, enabled: s.enabled, persona:s.persona, data_origin: 'deterministic_fixture' };
     }), listings: data.catalog.map(p => ({ listing_id: `${p.seller_id}:${p.product_id}`, product_id: p.product_id,
       seller_id: p.seller_id, name: p.name, category: p.category, features: p.features, attributes: p.attributes,
       item_price_twd: p.list_price_twd, shipping_twd: 0, price_includes_tax: true, rating: null, rating_count: 0,
-      stock: p.stock, delivery_days: p.delivery_days, source_ids: p.source_ids, data_origin: 'deterministic_fixture', synthetic_fields: [] })),
+      stock: p.stock, delivery_days: p.delivery_days, source_ids: p.source_ids, public_services:p.public_services, data_origin: 'deterministic_fixture', synthetic_fields: [] })),
     campaigns: data.campaigns.map(c => ({ campaign_id: c.campaign_id, seller_id: c.seller_id, category: c.target_category,
       bid_twd: c.bid_twd, enabled: true, starts_at: c.starts_at, ends_at: c.ends_at })) };
   db.prepare('INSERT INTO discovery_catalogs VALUES (?,?,?,?)').run(snapshotId,catalog.source_snapshot_id,JSON.stringify(catalog),now);

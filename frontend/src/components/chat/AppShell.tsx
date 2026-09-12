@@ -31,6 +31,8 @@ export function AppShell({
   onNewConversation,
   onSelectConversation,
   onDeleteConversation,
+  onClearHistory,
+  modelPicker,
   historyLocked=false,
 }: AppShellProps) {
   const [navigationOpen, setNavigationOpen] = useState(false);
@@ -61,7 +63,7 @@ export function AppShell({
           <span className="chat-brand-mark" aria-hidden="true">
             <MousePointer2 size={18} />
           </span>
-          <span>OfferMesh</span>
+          <div className="brand-with-model"><span>OfferMesh</span>{modelPicker}</div>
         </div>
         <div className="chat-header-actions">
           <button ref={toggle} className="icon-button mobile-navigation-toggle" type="button" onClick={()=>setNavigationOpen(v=>!v)} aria-label="切換導覽" aria-controls="history-sidebar" aria-expanded={navigationOpen}><PanelLeft size={20}/></button>
@@ -130,6 +132,8 @@ export function AppShell({
           </div>
 
           <div className="chat-recents-list">
+            {onClearHistory&&<button className="history-clear-all" disabled={historyLocked} onClick={()=>setDeleting('all')}><Trash2 size={15}/>清除全部歷史紀錄</button>}
+            {deleting==='all'&&<div className="history-delete-confirm" role="group" aria-label="確認清除全部歷史"><p>清除這個分頁的全部對話與草稿？<small>保留個人設定；SQLite 報價與決策稽核不刪除。</small></p><button disabled={historyLocked} onClick={()=>{onClearHistory?.();close();}}>確認清除全部</button><button onClick={()=>setDeleting(null)}>取消</button></div>}
             {recentRequests.length === 0 ? (
               <p className="chat-empty-note">尚無對話</p>
             ) : (

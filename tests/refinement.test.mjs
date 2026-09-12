@@ -46,7 +46,7 @@ test('rejection makes one durable questions child; answers rerun full pipeline w
 test('refinement uses stronger model, passes no checkout/private catalog, and validates output',async()=>{
  const parent={intent:{max_total_twd:1000},documents:{preference_md:'偏好藍色'},decision:{feedback:'希望安靜'}};
  const result=await refinementQuestions(parent,{apiKey:'fake',fetch:async(_url,init)=>{
-  const body=JSON.parse(init.body);assert.equal(body.model,'gpt-4.1');assert.equal(body.store,false);assert.ok(!JSON.stringify(body.input).includes('shipping_address'));
+  const body=JSON.parse(init.body);assert.equal(body.model,'gpt-5.6-sol');assert.deepEqual(body.reasoning,{effort:'none'});assert.equal(body.store,false);assert.ok(!JSON.stringify(body.input).includes('shipping_address'));
   return Response.json({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify({questions:[{field:'other',text:'需要靜音按鍵嗎？',options:['靜音','維持原有其他條件']}]})}]}]});
  }});
  assert.equal(result.provider,'openai');assert.equal(result.questions[0].suggestions[0].value,'靜音');
