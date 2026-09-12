@@ -1,0 +1,20 @@
+{
+  "accept_after_left_swipe": {
+    "action": "accept",
+    "offer_id": "offer_b_r5",
+    "selection_version": 1,
+    "rejected_offer_ids": ["offer_a_r5"]
+  },
+  "all_rejected_without_feedback": {
+    "action": "reject",
+    "selection_version": 1,
+    "rejected_offer_ids": ["offer_a_r5", "offer_b_r5"],
+    "feedback": ""
+  },
+  "all_rejected_with_explicit_preference": {
+    "action": "reject",
+    "selection_version": 1,
+    "rejected_offer_ids": ["offer_a_r5", "offer_b_r5"],
+    "feedback": "這次預算改成 800 元。我挑滑鼠一直都偏好小尺寸。"
+  }
+}

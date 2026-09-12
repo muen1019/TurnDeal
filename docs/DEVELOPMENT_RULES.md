@@ -33,7 +33,7 @@
 - 流程：Request、Format、Orchestrate、Negotiate、Evaluate、Result 或 Feedback。
 - 議價：每家最多五輪，同輪 active branches 平行、輪間同步；final／refuse／timeout／error 只停止該分支，其餘繼續。round timeout、整體 deadline 與呼叫／token 預算須在 Backend 啟動 Request 時固定；具體值待實測，不沿用舊版 8 秒作為五輪完成承諾。
 - 儲存：單一常駐 Backend 與 SQLite；不引入 Redis、訊息佇列或微服務。
-- 交易：採用後以 immutable `offer_id` 在期限內完成虛擬兌換。真實付款、ACP 與廣告計費不在本版範圍。
+- 交易：採用後可透過 API 明確確認 ACP 測試購買（前端接線另行交付）；使用 immutable accepted offer、模擬付款與持久化訂單。操作與 payload 見 [ACP_PURCHASE.md](ACP_PURCHASE.md)。真實付款、正式 PSP 與廣告計費仍不在本版範圍；舊 redemption 設計不能當作整合 runtime 已存在的端點。
 
 ## 必須維持的信任邊界
 

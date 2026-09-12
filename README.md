@@ -1,6 +1,14 @@
 # OfferMesh
 
-文件定義正本：[intent.md / preference.md 定義與分類](docs/INTENT_PREFERENCE_SPEC.md)。preference 是長期偏好的可讀表示，intent 是本輪購買目標／限制／例外；目前 API preference_md 是本輪快照，不是更新長期偏好的命令。前端儲存僅限分頁，長期偏好更新尚未實作。
+文件定義正本：[intent.md / preference.md 定義與分類](docs/INTENT_PREFERENCE_SPEC.md)。preference 是長期偏好的可讀表示，intent 是本輪購買目標／限制／例外；目前 API preference_md 是本輪快照，不是更新長期偏好的命令。前端儲存僅限分頁；Improver 已有內部偏好版本寫入，前端帳戶偏好同步尚未接入。
+
+## Buyer Request Improver
+
+已實作 Context Builder、LLM Revision Engine、語意驗證、SQLite 工作／文件版本與恢復。每次改善保存新版 intent；全域 preference 僅依明確長期表述提出並驗證 patch。既有 v0.3 reject 回應與原始快照保持不變。
+
+`npm run test:improver` 執行核心與 Node 24 runtime 內部整合測試；`npm run demo:improver` 執行離線合成案例。明示執行 `npm run demo:improver:live` 才使用 `.env` 的 `API_KEY` 呼叫模型，模型名稱由 `IMPROVER_MODEL` 控制（預設 gpt-4.1-mini）。詳見 [使用方式與接線邊界](docs/BUYER_REQUEST_IMPROVER.md) 及 [驗證紀錄](docs/IMPROVER_TEST_REPORT.md)。
+
+整合版 runtime 已接上 selection_version: 1：API 接受採用時一併提供的拒絕紀錄，或完整拒絕集合，並排入改善工作。決策與工作原子保存，API 提供進度、需求草稿與澄清問題，前端接線不在本提交內。只憑滑動不更新全域偏好；自動 child、澄清後再提交及全域偏好編輯器仍未實作。
 
 ## 完整前後端入口（最新）
 
@@ -294,3 +302,7 @@ change 維持未封存，尚待任務表中的完整視覺與裝置驗收。根�
 五家 Seller 由 Catalog、私有政策與協商狀態控制，支援加贈滑鼠墊、取消贈品換折扣、回購券、物流與售後權益。權益使用 SQLite 登錄的模擬履約證據，未來券不折抵本次價格。`npm run test:e2e:full` 可產生含逐輪決策對話與五個推薦方案的 HTML 報告；真實模型使用 `npm run test:e2e:full:live`。設計、限制與測試說明見 [SELLER_PERSONAS.md](docs/SELLER_PERSONAS.md)。
 
 本次進一步將 Persona 預先綁定賣家，新增 SKU 成本／讓步政策，真實模型在 Backend 的合法範圍內選價。公開售後條件可用於 Discovery 匹配及 Evaluator 排序，Persona 名稱與私有底價不參與排名。使用 `node scripts/e2e-negotiation.mjs --live --evaluate --after-sales` 可查看售後優先的五方案報告；預設為價格優先。實作與尚未支援的通用規則見 [SELLER_POLICY_IMPLEMENTATION.md](docs/SELLER_POLICY_IMPLEMENTATION.md)。
+
+## ACP 測試購買
+
+整合 runtime 已支援購買 API → ACP HTTP 測試商家 → 模擬付款 → 持久化訂單。前端接線不在本提交內。採用不自動下單，須另提交明確確認；不會實際扣款或出貨。操作、六個 API payload 與正式付款邊界見 [ACP 購買說明](docs/ACP_PURCHASE.md)，實跑證據見 [驗證報告](docs/ACP_PURCHASE_TEST_REPORT.md)。
