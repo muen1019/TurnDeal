@@ -1,0 +1,11 @@
+{
+  "fixture_version": "0.2",
+  "description": "User-approved E2E showcase preferences, separate from the canonical historical demo. All commercial preferences are synthetic.",
+  "profiles": [
+    { "seller_id": "seller_a", "label": "願意讓價", "description": "逐輪降價，優先匹配競爭價格，配送較慢。", "bundle_discount_twd": 0, "always_offer_bundle": false, "addon_product_id": null },
+    { "seller_id": "seller_b", "label": "快速配送", "description": "以一天到貨為優勢，保留較高售價。", "bundle_discount_twd": 0, "always_offer_bundle": false, "addon_product_id": null },
+    { "seller_id": "seller_c", "label": "免費送周邊", "description": "提供單買與同價贈送滑鼠墊，贈品可拒絕。", "bundle_discount_twd": 0, "always_offer_bundle": true, "addon_product_id": "pad_c_black" },
+    { "seller_id": "seller_d", "label": "組合更便宜", "description": "滑鼠加滑鼠墊比同輪單買便宜 NT$30，配件可拒絕。", "bundle_discount_twd": 30, "always_offer_bundle": true, "addon_product_id": "pad_c_black" },
+    { "seller_id": "seller_e", "label": "固定價格", "description": "維持 NT$679，不跟價，第一輪報最終價。", "bundle_discount_twd": 0, "always_offer_bundle": false, "addon_product_id": null }
+  ]
+}

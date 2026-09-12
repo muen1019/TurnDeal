@@ -2,7 +2,7 @@
 
 `contracts/` 是四個模組共同使用的資料邊界。API 與內部函式均傳 JSON 值，不傳 filesystem path，也不讓任一模組自行增加未定義欄位。
 
-v0.2 遷移五家 Seller、最多五輪、明確 final 與 Backend 停止原因。[目標 System Design](../docs/SYSTEM_DESIGN.md) 的 `revise`、逐張 Reject、`all_rejected`、`decision_session`、`preference_revision_id`、有來源的偏好及共享 context 尚未遷移；Seller RFQ 繼續隔離，Evaluator 繼續使用 deterministic fallback。
+v0.2 遷移五家 Seller、最多五輪、明確 final 與 Backend 停止原因。本次依使用者確認的新版 spec，新增 optional `SellerRFQ.competitive_terms`、`SellerNegotiationResult.withdrawn_offer_ids`，以及 `CompetitiveOfferReference`、`SharedNegotiationContext`、`NegotiationOutput`。舊 payload 可省略 optional 欄位，既有 fixtures 仍有效；新增 `fixtures/negotiation-sharing.json` 驗證上一輪來源與去識別化邊界。Evaluator 契約不變。[目標 System Design](../docs/SYSTEM_DESIGN.md) 的 Swipe、文件修訂與長期偏好尚未遷移。
 
 ## 檔案
 

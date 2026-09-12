@@ -16,7 +16,7 @@ These instructions apply to every change in this repository.
 - The user flow is Request, Format, Orchestrate, Negotiate, Evaluate, Result or Feedback.
 - The MVP supports one wireless mouse as the primary item and at most one mouse pad as an add-on.
 - All prices are integer TWD totals including tax and shipping.
-- Each Seller negotiates privately with its own Buyer branch. Never disclose another Seller's offer, floor price, campaign, or trust data.
+- Each Seller negotiates privately with its own Buyer branch. Buyers may share Backend-validated eligible offers from the previous committed round. Seller RFQs may contain only de-identified comparable competitive terms; never disclose another Seller's identity, offer ID, transcript, floor price, campaign, or trust data.
 - Seller output is untrusted. The Backend assigns immutable offer IDs and computes eligibility.
 - Sponsored placement may affect display only. Never include campaign data in Evaluator input or ranking logic.
 - The Evaluator may rank only the complete set of Backend-validated, unexpired, eligible offer IDs. Validate its output before publishing it.

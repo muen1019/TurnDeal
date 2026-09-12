@@ -110,6 +110,28 @@ for (const file of jsonFiles) {
 }
 console.log(`✓ parsed ${jsonFiles.length} contract JSON files`);
 
+const salesProfiles = await readJson('contracts/fixtures/sales-profiles.json');
+salesProfiles.profiles.forEach(p => validateContract('SellerSalesProfile', p));
+assert.equal(new Set(salesProfiles.profiles.map(p => p.seller_id)).size, 5);
+assert.ok(salesProfiles.profiles.some(p => p.bundle_discount_twd > 0 && p.always_offer_bundle));
+
+const sharing = await readJson('contracts/fixtures/negotiation-sharing.json');
+validateContract('SharedNegotiationContext', sharing.context);
+validateContract('SellerRFQ', sharing.rfq);
+validateContract('NegotiationOutput', sharing.output);
+assert.equal(sharing.rfq.round, sharing.context.completed_round + 1);
+for (const term of sharing.rfq.competitive_terms) {
+  assert.ok(sharing.context.offers.some(o => o.seller_id !== sharing.rfq.seller_id &&
+    o.comparison_key === term.comparison_key && o.total_price_twd === term.total_price_twd &&
+    o.delivery_days === term.delivery_days && o.expires_at === term.expires_at), 'competitive terms need a complete real source');
+  for (const key of ['seller_id', 'offer_id', 'floor_price_twd', 'campaign', 'trust']) {
+    assert.throws(() => validateContract('CompetitiveTerms', { ...term, [key]: 'private' }));
+  }
+}
+validateSellerList(sharing.output.seller_agents);
+assert.deepEqual(sharing.output.eligible_offer_ids, sharing.output.offers.filter(o => o.eligibility.status === 'eligible').map(o => o.offer_id));
+console.log('✓ shared context fixture proves previous-round provenance and de-identified competitive terms');
+
 const schema = await readJson("contracts/a2a-commerce.v0.2.schema.json");
 const expectedDefs = [
   "CreateRequest",

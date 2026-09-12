@@ -2,7 +2,7 @@
 
 本文件將主辦方簡報、產品提案與團隊分工整理成可執行的工程規則。後續開發與驗收均以此文件及 `contracts/` 為準。
 
-新版目標設計已整理於 [SYSTEM_DESIGN.md](SYSTEM_DESIGN.md)。五家 Seller 各派一個 Buyer Agent、最多五輪議價與提前停止已遷移至 v0.2 契約及測資。共享競爭資訊、Swipe 決策與長期偏好仍屬目標設計；完整差異與 Evaluator fallback 的待決事項見該文件開頭。
+新版目標設計已整理於 [SYSTEM_DESIGN.md](SYSTEM_DESIGN.md)。五家 Seller、最多五輪、同步 barrier、共享競爭條件、真實模型與 deterministic fallback 已有協商模組，見 [NEGOTIATION.md](NEGOTIATION.md)。Swipe 決策與長期偏好仍屬目標設計。
 
 ## 主辦方評分標準
 
@@ -35,7 +35,7 @@
 
 ## 必須維持的信任邊界
 
-1. Seller 只取得自己的 RFQ，不取得完整原文、買家私有預算、個人交易紀錄、Campaign 或其他 Seller 報價。
+1. Seller 只取得自己的 RFQ，可包含上一輪 Backend 已驗證、仍有效且去識別化的競爭條件；不取得其他 Seller 名稱／ID、Offer ID、逐字稿、底價、完整原文、買家私有預算、個人交易紀錄或 Campaign。不同型號須保留差異，不能把不同 Offer 的價格與交期合成虛構條件。
 2. Seller 回傳的是報價草稿，不可自行宣告 `eligible`。
 3. Backend 依 Catalog 快照、預算、交期、商品規格、配件授權、條件與期限計算 eligibility。
 4. Evaluator 只收到 eligible Offer、NormalizedIntent 與有來源的 Trust 摘要，不收到 Sponsored/Campaign 資料。

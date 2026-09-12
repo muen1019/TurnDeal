@@ -1,0 +1,991 @@
+{
+  "fixture_version": "0.2",
+  "description": "Generated offline negotiation exchange: prior-round provenance and de-identified RFQ.",
+  "context": {
+    "request_id": "req_sharing_fixture",
+    "context_revision": 1,
+    "completed_round": 1,
+    "as_of": "2026-09-12T05:00:00.000Z",
+    "offers": [
+      {
+        "seller_id": "seller_a",
+        "offer_id": "offer_sharing_1",
+        "comparison_key": "6c23e70a0d35def6fa7ff0fd1c6e2afdd74367fb6609a9111a201618165c729a",
+        "primary_product": {
+          "brand": "Logitech",
+          "model": "M240 Silent",
+          "features": [
+            "bluetooth",
+            "silent_click",
+            "wireless"
+          ],
+          "attributes": {
+            "size_class": "small",
+            "color": "black",
+            "shape": "symmetrical",
+            "length_mm": 99,
+            "width_mm": 60,
+            "height_mm": 39
+          }
+        },
+        "total_price_twd": 599,
+        "delivery_days": 5,
+        "terms": {
+          "warranty_months": 12,
+          "return_days": 7,
+          "payment_obligation": "one_time"
+        },
+        "expires_at": "2026-09-12T05:10:00.000Z",
+        "variant": "standalone",
+        "addon_categories": []
+      },
+      {
+        "seller_id": "seller_d",
+        "offer_id": "offer_sharing_2",
+        "comparison_key": "6c23e70a0d35def6fa7ff0fd1c6e2afdd74367fb6609a9111a201618165c729a",
+        "primary_product": {
+          "brand": "Logitech",
+          "model": "M240 Silent",
+          "features": [
+            "bluetooth",
+            "silent_click",
+            "wireless"
+          ],
+          "attributes": {
+            "size_class": "small",
+            "color": "black",
+            "shape": "symmetrical",
+            "length_mm": 99,
+            "width_mm": 60,
+            "height_mm": 39
+          }
+        },
+        "total_price_twd": 679,
+        "delivery_days": 2,
+        "terms": {
+          "warranty_months": 12,
+          "return_days": 7,
+          "payment_obligation": "one_time"
+        },
+        "expires_at": "2026-09-12T05:10:00.000Z",
+        "variant": "standalone",
+        "addon_categories": []
+      },
+      {
+        "seller_id": "seller_b",
+        "offer_id": "offer_sharing_3",
+        "comparison_key": "6c23e70a0d35def6fa7ff0fd1c6e2afdd74367fb6609a9111a201618165c729a",
+        "primary_product": {
+          "brand": "Logitech",
+          "model": "Pebble Mouse 2 M350s",
+          "features": [
+            "bluetooth",
+            "multi_device",
+            "silent_click",
+            "wireless"
+          ],
+          "attributes": {
+            "size_class": "small",
+            "color": "black",
+            "shape": "symmetrical",
+            "length_mm": 106.7,
+            "width_mm": 58.7,
+            "height_mm": 26.62
+          }
+        },
+        "total_price_twd": 769,
+        "delivery_days": 1,
+        "terms": {
+          "warranty_months": 12,
+          "return_days": 7,
+          "payment_obligation": "one_time"
+        },
+        "expires_at": "2026-09-12T05:10:00.000Z",
+        "variant": "standalone",
+        "addon_categories": []
+      },
+      {
+        "seller_id": "seller_e",
+        "offer_id": "offer_sharing_4",
+        "comparison_key": "6c23e70a0d35def6fa7ff0fd1c6e2afdd74367fb6609a9111a201618165c729a",
+        "primary_product": {
+          "brand": "Logitech",
+          "model": "M240 Silent",
+          "features": [
+            "bluetooth",
+            "silent_click",
+            "wireless"
+          ],
+          "attributes": {
+            "size_class": "small",
+            "color": "black",
+            "shape": "symmetrical",
+            "length_mm": 99,
+            "width_mm": 60,
+            "height_mm": 39
+          }
+        },
+        "total_price_twd": 679,
+        "delivery_days": 4,
+        "terms": {
+          "warranty_months": 12,
+          "return_days": 7,
+          "payment_obligation": "one_time"
+        },
+        "expires_at": "2026-09-12T05:10:00.000Z",
+        "variant": "standalone",
+        "addon_categories": []
+      },
+      {
+        "seller_id": "seller_c",
+        "offer_id": "offer_sharing_5",
+        "comparison_key": "6c23e70a0d35def6fa7ff0fd1c6e2afdd74367fb6609a9111a201618165c729a",
+        "primary_product": {
+          "brand": "Logitech",
+          "model": "M331 SilentPlus",
+          "features": [
+            "silent_click",
+            "wireless",
+            "wireless_usb"
+          ],
+          "attributes": {
+            "size_class": "small",
+            "color": "black",
+            "shape": "asymmetrical_right",
+            "length_mm": 105.4,
+            "width_mm": 67.9,
+            "height_mm": 38.4
+          }
+        },
+        "total_price_twd": 669,
+        "delivery_days": 3,
+        "terms": {
+          "warranty_months": 12,
+          "return_days": 7,
+          "payment_obligation": "one_time"
+        },
+        "expires_at": "2026-09-12T05:10:00.000Z",
+        "variant": "standalone",
+        "addon_categories": []
+      },
+      {
+        "seller_id": "seller_c",
+        "offer_id": "offer_sharing_6",
+        "comparison_key": "5a377262c2e4e2388c77cd10532b2f6366212630a21850e94bda5d1996dafbea",
+        "primary_product": {
+          "brand": "Logitech",
+          "model": "M331 SilentPlus",
+          "features": [
+            "silent_click",
+            "wireless",
+            "wireless_usb"
+          ],
+          "attributes": {
+            "size_class": "small",
+            "color": "black",
+            "shape": "asymmetrical_right",
+            "length_mm": 105.4,
+            "width_mm": 67.9,
+            "height_mm": 38.4
+          }
+        },
+        "total_price_twd": 669,
+        "delivery_days": 3,
+        "terms": {
+          "warranty_months": 12,
+          "return_days": 7,
+          "payment_obligation": "one_time"
+        },
+        "expires_at": "2026-09-12T05:10:00.000Z",
+        "variant": "bundle",
+        "addon_categories": [
+          "mouse_pad"
+        ]
+      }
+    ]
+  },
+  "rfq": {
+    "request_id": "req_sharing_fixture",
+    "seller_id": "seller_b",
+    "round": 2,
+    "category": "mouse",
+    "required_features": [
+      "wireless",
+      "silent_click"
+    ],
+    "candidate_product_ids": [
+      "mouse_b_black_small"
+    ],
+    "product_preferences": [
+      {
+        "preference_id": "pf_color_black",
+        "strength": "required",
+        "attribute": "color",
+        "operator": "in",
+        "values": [
+          "black"
+        ]
+      },
+      {
+        "preference_id": "pf_size_small",
+        "strength": "preferred",
+        "attribute": "size_class",
+        "operator": "in",
+        "values": [
+          "small"
+        ]
+      },
+      {
+        "preference_id": "pf_shape_symmetrical",
+        "strength": "preferred",
+        "attribute": "shape",
+        "operator": "in",
+        "values": [
+          "symmetrical"
+        ]
+      }
+    ],
+    "pending_checks": [],
+    "delivery_days_max": 7,
+    "allowed_addon_categories": [
+      "mouse_pad"
+    ],
+    "target_total_twd": 599,
+    "previous_offer_ids": [
+      "offer_sharing_3"
+    ],
+    "competitive_terms": [
+      {
+        "comparison_key": "6c23e70a0d35def6fa7ff0fd1c6e2afdd74367fb6609a9111a201618165c729a",
+        "primary_product": {
+          "brand": "Logitech",
+          "model": "M240 Silent",
+          "features": [
+            "bluetooth",
+            "silent_click",
+            "wireless"
+          ],
+          "attributes": {
+            "size_class": "small",
+            "color": "black",
+            "shape": "symmetrical",
+            "length_mm": 99,
+            "width_mm": 60,
+            "height_mm": 39
+          }
+        },
+        "total_price_twd": 599,
+        "delivery_days": 5,
+        "terms": {
+          "warranty_months": 12,
+          "return_days": 7,
+          "payment_obligation": "one_time"
+        },
+        "expires_at": "2026-09-12T05:10:00.000Z",
+        "variant": "standalone",
+        "addon_categories": [],
+        "differences": [
+          "Different model or specifications; meets the same request hard constraints."
+        ]
+      },
+      {
+        "comparison_key": "6c23e70a0d35def6fa7ff0fd1c6e2afdd74367fb6609a9111a201618165c729a",
+        "primary_product": {
+          "brand": "Logitech",
+          "model": "M240 Silent",
+          "features": [
+            "bluetooth",
+            "silent_click",
+            "wireless"
+          ],
+          "attributes": {
+            "size_class": "small",
+            "color": "black",
+            "shape": "symmetrical",
+            "length_mm": 99,
+            "width_mm": 60,
+            "height_mm": 39
+          }
+        },
+        "total_price_twd": 679,
+        "delivery_days": 2,
+        "terms": {
+          "warranty_months": 12,
+          "return_days": 7,
+          "payment_obligation": "one_time"
+        },
+        "expires_at": "2026-09-12T05:10:00.000Z",
+        "variant": "standalone",
+        "addon_categories": [],
+        "differences": [
+          "Different model or specifications; meets the same request hard constraints."
+        ]
+      },
+      {
+        "comparison_key": "6c23e70a0d35def6fa7ff0fd1c6e2afdd74367fb6609a9111a201618165c729a",
+        "primary_product": {
+          "brand": "Logitech",
+          "model": "M240 Silent",
+          "features": [
+            "bluetooth",
+            "silent_click",
+            "wireless"
+          ],
+          "attributes": {
+            "size_class": "small",
+            "color": "black",
+            "shape": "symmetrical",
+            "length_mm": 99,
+            "width_mm": 60,
+            "height_mm": 39
+          }
+        },
+        "total_price_twd": 679,
+        "delivery_days": 4,
+        "terms": {
+          "warranty_months": 12,
+          "return_days": 7,
+          "payment_obligation": "one_time"
+        },
+        "expires_at": "2026-09-12T05:10:00.000Z",
+        "variant": "standalone",
+        "addon_categories": [],
+        "differences": [
+          "Different model or specifications; meets the same request hard constraints."
+        ]
+      },
+      {
+        "comparison_key": "6c23e70a0d35def6fa7ff0fd1c6e2afdd74367fb6609a9111a201618165c729a",
+        "primary_product": {
+          "brand": "Logitech",
+          "model": "M331 SilentPlus",
+          "features": [
+            "silent_click",
+            "wireless",
+            "wireless_usb"
+          ],
+          "attributes": {
+            "size_class": "small",
+            "color": "black",
+            "shape": "asymmetrical_right",
+            "length_mm": 105.4,
+            "width_mm": 67.9,
+            "height_mm": 38.4
+          }
+        },
+        "total_price_twd": 669,
+        "delivery_days": 3,
+        "terms": {
+          "warranty_months": 12,
+          "return_days": 7,
+          "payment_obligation": "one_time"
+        },
+        "expires_at": "2026-09-12T05:10:00.000Z",
+        "variant": "standalone",
+        "addon_categories": [],
+        "differences": [
+          "Different model or specifications; meets the same request hard constraints."
+        ]
+      },
+      {
+        "comparison_key": "5a377262c2e4e2388c77cd10532b2f6366212630a21850e94bda5d1996dafbea",
+        "primary_product": {
+          "brand": "Logitech",
+          "model": "M331 SilentPlus",
+          "features": [
+            "silent_click",
+            "wireless",
+            "wireless_usb"
+          ],
+          "attributes": {
+            "size_class": "small",
+            "color": "black",
+            "shape": "asymmetrical_right",
+            "length_mm": 105.4,
+            "width_mm": 67.9,
+            "height_mm": 38.4
+          }
+        },
+        "total_price_twd": 669,
+        "delivery_days": 3,
+        "terms": {
+          "warranty_months": 12,
+          "return_days": 7,
+          "payment_obligation": "one_time"
+        },
+        "expires_at": "2026-09-12T05:10:00.000Z",
+        "variant": "bundle",
+        "addon_categories": [
+          "mouse_pad"
+        ],
+        "differences": [
+          "Different model or specifications; meets the same request hard constraints."
+        ]
+      }
+    ]
+  },
+  "output": {
+    "request_id": "req_sharing_fixture",
+    "status": "evaluating",
+    "seller_agents": [
+      {
+        "seller_id": "seller_a",
+        "name": "Budget Mouse Co.",
+        "listing_rank": 1,
+        "match_reason": "黑色滑鼠符合所有必要規格並命中小尺寸與左右對稱偏好",
+        "candidate_products": [
+          {
+            "product_id": "mouse_a_black_small",
+            "attributes": {
+              "size_class": "small",
+              "color": "black",
+              "shape": "symmetrical",
+              "length_mm": 99,
+              "width_mm": 60,
+              "height_mm": 39
+            },
+            "matched_preference_ids": [
+              "pf_color_black",
+              "pf_size_small",
+              "pf_shape_symmetrical"
+            ],
+            "unmatched_preference_ids": [],
+            "pending_checks": []
+          }
+        ],
+        "trust": {
+          "personal_band": "positive",
+          "personal_rating": 4.8,
+          "personal_count": 3,
+          "marketplace_rating": 4.6,
+          "marketplace_count": 128
+        },
+        "status": "offered",
+        "rounds": [
+          {
+            "round": 1,
+            "outcome": "offered",
+            "offer_ids": [
+              "offer_sharing_1"
+            ],
+            "is_final": false
+          },
+          {
+            "round": 2,
+            "outcome": "offered",
+            "offer_ids": [
+              "offer_sharing_7"
+            ],
+            "is_final": false
+          },
+          {
+            "round": 3,
+            "outcome": "offered",
+            "offer_ids": [
+              "offer_sharing_12"
+            ],
+            "is_final": false
+          },
+          {
+            "round": 4,
+            "outcome": "offered",
+            "offer_ids": [
+              "offer_sharing_17"
+            ],
+            "is_final": false
+          },
+          {
+            "round": 5,
+            "outcome": "offered",
+            "offer_ids": [
+              "offer_sharing_21"
+            ],
+            "is_final": false
+          }
+        ],
+        "final_offer_ids": [
+          "offer_sharing_21"
+        ],
+        "stop_reason": "max_rounds"
+      },
+      {
+        "seller_id": "seller_d",
+        "name": "SteadyShip Market",
+        "listing_rank": 2,
+        "match_reason": "黑色滑鼠符合所有必要規格並命中小尺寸與左右對稱偏好",
+        "candidate_products": [
+          {
+            "product_id": "mouse_d_black_small",
+            "attributes": {
+              "size_class": "small",
+              "color": "black",
+              "shape": "symmetrical",
+              "length_mm": 99,
+              "width_mm": 60,
+              "height_mm": 39
+            },
+            "matched_preference_ids": [
+              "pf_color_black",
+              "pf_size_small",
+              "pf_shape_symmetrical"
+            ],
+            "unmatched_preference_ids": [],
+            "pending_checks": []
+          }
+        ],
+        "trust": {
+          "personal_band": "positive",
+          "personal_rating": 4.5,
+          "personal_count": 2,
+          "marketplace_rating": 4.5,
+          "marketplace_count": 50
+        },
+        "status": "offered",
+        "rounds": [
+          {
+            "round": 1,
+            "outcome": "offered",
+            "offer_ids": [
+              "offer_sharing_2"
+            ],
+            "is_final": false
+          },
+          {
+            "round": 2,
+            "outcome": "offered",
+            "offer_ids": [
+              "offer_sharing_8"
+            ],
+            "is_final": false
+          },
+          {
+            "round": 3,
+            "outcome": "offered",
+            "offer_ids": [
+              "offer_sharing_13"
+            ],
+            "is_final": true
+          }
+        ],
+        "final_offer_ids": [
+          "offer_sharing_13"
+        ],
+        "stop_reason": "seller_final"
+      },
+      {
+        "seller_id": "seller_b",
+        "name": "FlashShip Tech",
+        "listing_rank": 3,
+        "match_reason": "黑色滑鼠符合所有必要規格並提供最快到貨",
+        "candidate_products": [
+          {
+            "product_id": "mouse_b_black_small",
+            "attributes": {
+              "size_class": "small",
+              "color": "black",
+              "shape": "symmetrical",
+              "length_mm": 106.7,
+              "width_mm": 58.7,
+              "height_mm": 26.62
+            },
+            "matched_preference_ids": [
+              "pf_color_black",
+              "pf_size_small",
+              "pf_shape_symmetrical"
+            ],
+            "unmatched_preference_ids": [],
+            "pending_checks": []
+          }
+        ],
+        "trust": {
+          "personal_band": "neutral",
+          "personal_rating": null,
+          "personal_count": 0,
+          "marketplace_rating": 4.8,
+          "marketplace_count": 502
+        },
+        "status": "offered",
+        "rounds": [
+          {
+            "round": 1,
+            "outcome": "offered",
+            "offer_ids": [
+              "offer_sharing_3"
+            ],
+            "is_final": false
+          },
+          {
+            "round": 2,
+            "outcome": "offered",
+            "offer_ids": [
+              "offer_sharing_9"
+            ],
+            "is_final": false
+          },
+          {
+            "round": 3,
+            "outcome": "offered",
+            "offer_ids": [
+              "offer_sharing_14"
+            ],
+            "is_final": false
+          },
+          {
+            "round": 4,
+            "outcome": "offered",
+            "offer_ids": [
+              "offer_sharing_18"
+            ],
+            "is_final": false
+          },
+          {
+            "round": 5,
+            "outcome": "offered",
+            "offer_ids": [
+              "offer_sharing_22"
+            ],
+            "is_final": false
+          }
+        ],
+        "final_offer_ids": [
+          "offer_sharing_22"
+        ],
+        "stop_reason": "max_rounds"
+      },
+      {
+        "seller_id": "seller_e",
+        "name": "ClearPrice Store",
+        "listing_rank": 4,
+        "match_reason": "黑色滑鼠符合所有必要規格並命中小尺寸與左右對稱偏好",
+        "candidate_products": [
+          {
+            "product_id": "mouse_e_black_small",
+            "attributes": {
+              "size_class": "small",
+              "color": "black",
+              "shape": "symmetrical",
+              "length_mm": 99,
+              "width_mm": 60,
+              "height_mm": 39
+            },
+            "matched_preference_ids": [
+              "pf_color_black",
+              "pf_size_small",
+              "pf_shape_symmetrical"
+            ],
+            "unmatched_preference_ids": [],
+            "pending_checks": []
+          }
+        ],
+        "trust": {
+          "personal_band": "neutral",
+          "personal_rating": null,
+          "personal_count": 0,
+          "marketplace_rating": 4.4,
+          "marketplace_count": 50
+        },
+        "status": "offered",
+        "rounds": [
+          {
+            "round": 1,
+            "outcome": "offered",
+            "offer_ids": [
+              "offer_sharing_4"
+            ],
+            "is_final": true
+          }
+        ],
+        "final_offer_ids": [
+          "offer_sharing_4"
+        ],
+        "stop_reason": "seller_final"
+      },
+      {
+        "seller_id": "seller_c",
+        "name": "Bundle Lab",
+        "listing_rank": 5,
+        "match_reason": "黑色右手滑鼠符合必要規格，可提供免費可拒絕的滑鼠墊；未命中左右對稱偏好",
+        "candidate_products": [
+          {
+            "product_id": "mouse_c_black_small",
+            "attributes": {
+              "size_class": "small",
+              "color": "black",
+              "shape": "asymmetrical_right",
+              "length_mm": 105.4,
+              "width_mm": 67.9,
+              "height_mm": 38.4
+            },
+            "matched_preference_ids": [
+              "pf_color_black",
+              "pf_size_small"
+            ],
+            "unmatched_preference_ids": [
+              "pf_shape_symmetrical"
+            ],
+            "pending_checks": []
+          }
+        ],
+        "trust": {
+          "personal_band": "negative",
+          "personal_rating": 2.5,
+          "personal_count": 2,
+          "marketplace_rating": 4.3,
+          "marketplace_count": 76
+        },
+        "status": "offered",
+        "rounds": [
+          {
+            "round": 1,
+            "outcome": "offered",
+            "offer_ids": [
+              "offer_sharing_5",
+              "offer_sharing_6"
+            ],
+            "is_final": false
+          },
+          {
+            "round": 2,
+            "outcome": "offered",
+            "offer_ids": [
+              "offer_sharing_10",
+              "offer_sharing_11"
+            ],
+            "is_final": false
+          },
+          {
+            "round": 3,
+            "outcome": "offered",
+            "offer_ids": [
+              "offer_sharing_15",
+              "offer_sharing_16"
+            ],
+            "is_final": false
+          },
+          {
+            "round": 4,
+            "outcome": "offered",
+            "offer_ids": [
+              "offer_sharing_19",
+              "offer_sharing_20"
+            ],
+            "is_final": false
+          },
+          {
+            "round": 5,
+            "outcome": "offered",
+            "offer_ids": [
+              "offer_sharing_23",
+              "offer_sharing_24"
+            ],
+            "is_final": false
+          }
+        ],
+        "final_offer_ids": [
+          "offer_sharing_23",
+          "offer_sharing_24"
+        ],
+        "stop_reason": "max_rounds"
+      }
+    ],
+    "offers": [
+      {
+        "offer_id": "offer_sharing_21",
+        "seller_id": "seller_a",
+        "round": 5,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_a_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click"
+        ],
+        "total_price_twd": 549,
+        "delivery_days": 5,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T05:10:00.000Z",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      {
+        "offer_id": "offer_sharing_13",
+        "seller_id": "seller_d",
+        "round": 3,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_d_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click"
+        ],
+        "total_price_twd": 600,
+        "delivery_days": 2,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T05:10:00.000Z",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      {
+        "offer_id": "offer_sharing_22",
+        "seller_id": "seller_b",
+        "round": 5,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_b_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click",
+          "multi_device"
+        ],
+        "total_price_twd": 710,
+        "delivery_days": 1,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T05:10:00.000Z",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      {
+        "offer_id": "offer_sharing_4",
+        "seller_id": "seller_e",
+        "round": 1,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_e_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click"
+        ],
+        "total_price_twd": 679,
+        "delivery_days": 4,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T05:10:00.000Z",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      {
+        "offer_id": "offer_sharing_23",
+        "seller_id": "seller_c",
+        "round": 5,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_c_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "wireless_usb",
+          "silent_click"
+        ],
+        "total_price_twd": 610,
+        "delivery_days": 3,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T05:10:00.000Z",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      {
+        "offer_id": "offer_sharing_24",
+        "seller_id": "seller_c",
+        "round": 5,
+        "variant": "bundle",
+        "items": [
+          {
+            "product_id": "mouse_c_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          },
+          {
+            "product_id": "pad_c_black",
+            "category": "mouse_pad",
+            "role": "addon",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "wireless_usb",
+          "silent_click"
+        ],
+        "total_price_twd": 610,
+        "delivery_days": 3,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": true,
+        "expires_at": "2026-09-12T05:10:00.000Z",
+        "baseline_offer_id": "offer_sharing_23",
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      }
+    ],
+    "eligible_offer_ids": [
+      "offer_sharing_21",
+      "offer_sharing_13",
+      "offer_sharing_22",
+      "offer_sharing_4",
+      "offer_sharing_23",
+      "offer_sharing_24"
+    ],
+    "confirmation_offer_ids": [],
+    "completed_rounds": 5,
+    "usage": {
+      "calls": 0,
+      "reserved_tokens": 0,
+      "actual_tokens": 0
+    },
+    "stop_reason": null
+  }
+}
