@@ -2,6 +2,8 @@
 
 `contracts/` 是四個模組共同使用的資料邊界。API 與內部函式均傳 JSON 值，不傳 filesystem path，也不讓任一模組自行增加未定義欄位。
 
+[目標 System Design](../docs/SYSTEM_DESIGN.md) 第 9 節描述下一版 API 草案，與本目錄的 v0.1 尚不相容。`revise`、逐張 Reject、`all_rejected`、`decision_session`、`preference_revision_id`、有來源的偏好及十輪／共享 context 都需契約升版；本次文件整併未變更現有 schema 或 fixtures。
+
 ## 檔案
 
 | 檔案 | 用途 |
