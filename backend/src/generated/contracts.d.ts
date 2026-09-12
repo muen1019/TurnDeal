@@ -71,6 +71,9 @@ export type ProductCategory = "mouse" | "mouse_pad";
  */
 export type Status =
   | "formatting"
+  | "orchestrating"
+  | "negotiating"
+  | "evaluating"
   | "awaiting_user"
   | "needs_clarification"
   | "needs_confirmation"
@@ -240,6 +243,8 @@ export interface RangeProductPreference {
   max: number | null;
 }
 /**
+ * Immutable request-scoped original text, not generated Markdown or a durable preference update. See docs/INTENT_PREFERENCE_SPEC.md.
+ *
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
  * via the `definition` "DocumentBundle".
  */
@@ -249,6 +254,8 @@ export interface DocumentBundle {
   preference_md: string;
 }
 /**
+ * intent_md describes this purchase and its temporary constraints/preferences. preference_md is a request-bound preference snapshot; omission/empty text does not clear active SQLite product preferences. Neither field updates the durable profile.
+ *
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
  * via the `definition` "CreateRequest".
  */

@@ -4,8 +4,26 @@
 
 ## ADDED Requirements
 
+### Requirement: Distinguish request intent from durable preferences
+The document semantics SHALL follow docs/INTENT_PREFERENCE_SPEC.md. intent_md SHALL describe one purchase, its hard constraints and temporary preferences. CreateRequest.preference_md SHALL be a request-bound snapshot of preference text, not a write command for durable preferences. NormalizedIntent SHALL be the merged execution representation, not a newly generated preference.md. The current editor SHALL identify saved definitions as sessionStorage templates; it SHALL NOT claim account synchronization or automatic Markdown generation.
+
+#### Scenario: Override a long-term preference for one purchase
+- **WHEN** the buyer usually prefers black but explicitly requests white in intent_md
+- **THEN** this request uses white and leaves durable preferences unchanged
+- **AND** another request without that exception can still inherit black
+
+#### Scenario: Save only this tab's preference text
+- **WHEN** the user saves preference.md in the current editor
+- **THEN** the UI identifies tab-local storage, and submission copies the text into the new Request
+- **AND** no user_preferences update, preference revision, or filesystem write is claimed
+
+#### Scenario: Reuse a template with conflicting purchase limits
+- **WHEN** the saved intent template and this purchase text supply conflicting hard limits
+- **THEN** the current Formatter asks for clarification rather than assuming that concatenation is an Agent rewrite
+- **AND** the editor recommends keeping prior purchase budgets and deadlines out of reusable templates
+
 ### Requirement: Display request execution progress in the conversation
-The Chat UI SHALL expose a reusable AgentProgress component with the shared RequestSnapshot as the authority for final outcomes. The v0.3 RequestSnapshot status enum SHALL remain unchanged. In explicitly enabled development mock mode, GET /__mock/requests/{request_id}/progress SHALL return request_id, a non-negative integer sequence, and stage (formatting, orchestrating, negotiating, evaluating, awaiting_user, failed, needs_clarification, needs_confirmation or no_match). In normal API mode, progress SHALL use the observed RequestSnapshot status without calling a new progress endpoint. The UI SHALL show Formatter, Orchestrator, Negotiation and Evaluation with concise Traditional Chinese descriptions, completed indicators, the current step and pending steps. The UI SHALL NOT advance steps using presentation timers, invent a completion percentage, or expose raw payloads or identifiers.
+The Chat UI SHALL expose a reusable AgentProgress component with the shared RequestSnapshot as the authority for final outcomes. The shared v0.3 Status includes formatting, orchestrating, negotiating and evaluating for the integrated runtime; generated consumers SHALL stay aligned. In explicitly enabled development mock mode, GET /__mock/requests/{request_id}/progress SHALL return request_id, a non-negative integer sequence, and stage (formatting, orchestrating, negotiating, evaluating, awaiting_user, failed, needs_clarification, needs_confirmation or no_match). In normal API mode, progress SHALL use the observed RequestSnapshot status without calling a new progress endpoint. The UI SHALL show Formatter, Orchestrator, Negotiation and Evaluation with concise Traditional Chinese descriptions, completed indicators, the current step and pending steps. The UI SHALL NOT advance steps using presentation timers, invent a completion percentage, or expose raw payloads or identifiers.
 
 #### Scenario: Submit and observe the active request
 - **WHEN** the user submits a valid request

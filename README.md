@@ -1,5 +1,13 @@
 # OfferMesh
 
+文件定義正本：[intent.md / preference.md 定義與分類](docs/INTENT_PREFERENCE_SPEC.md)。preference 是長期偏好的可讀表示，intent 是本輪購買目標／限制／例外；目前 API preference_md 是本輪快照，不是更新長期偏好的命令。前端儲存僅限分頁，長期偏好更新尚未實作。
+
+## 完整前後端入口（最新）
+
+使用 Node 24，在根目錄執行 `npm run dev`，開啟 http://127.0.0.1:5173/chat。現已串接 Formatter → Discovery → 五家 Buyer/Seller 議價 → Evaluator → 商品卡 → 採用／拒絕保存。預設離線；隱藏輸入 key 的真實模型模式為 `npm run dev:secure`。
+
+啟動步驟、範例需求、資料庫與目前限制見 [完整接線說明](docs/RUN_FULL_APP.md)。以下舊 Result API 與同步段落保留歷史背景，以本節為準。
+
 ## 目前可執行：Result API v0.3
 
 目前前後端與 main 共用 `contracts/a2a-commerce.v0.3.schema.json`、五家／最多五輪商品資料與 db/migrations。accept/reject 保存及 Buyer Agent 原始回饋交接已整合。Root database tools 使用 Node 24，backend/frontend 使用 Node 20.19.5。

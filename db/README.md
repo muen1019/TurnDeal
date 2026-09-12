@@ -31,7 +31,9 @@ npm run test:db      # 使用記憶體資料庫測試 migration、seed 與 invar
 
 ## 左滑更新偏好
 
-左滑先新增一筆 `feedback_events`。沒有回答原因時只保存 `implicit_only = 1`，不能升級成硬限制；有明確原因時保存 `preference_update_json`，建立新的 child request，必要時再將高信心的跨次偏好寫入 `user_preferences`。既有 Request snapshot 與 Offer 都不可修改。
+目前左滑僅更新前端 skipped；明示拒絕的 feedback/source_documents 保存到 decisions.result_json，不會新增長期偏好或 child。Formatter 會讀取既有 user_preferences，但不修改它。前端「儲存設定」只有 sessionStorage，不是 DB 偏好寫入。
+
+未來才加入逐次 feedback_events、原因詢問、區分本輪例外／跨次偏好、驗證更新候選與獨立版本；既有 Request snapshot 與 Offer 不可修改。欄位已存在不代表完整流程已完成，詳見 [文件定義與儲存分類](../docs/INTENT_PREFERENCE_SPEC.md)。
 
 ## Seed 內容
 

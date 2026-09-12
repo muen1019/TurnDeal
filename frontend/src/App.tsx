@@ -29,6 +29,7 @@ export default function App(){
  const verified=s.verified===c.requestId;
  const canFeedback=!!snapshot&&['awaiting_user','no_match','needs_confirmation'].includes(snapshot.status);
  const messages:ChatMessage[]=[];
+ if(import.meta.env.VITE_OFFERMESH_RUNTIME_MODE)messages.push({id:'runtime-mode',role:'system',content:import.meta.env.VITE_OFFERMESH_RUNTIME_MODE==='live'?'完整服務已接線 · 模型失敗時會使用安全規則 · A–E 虛擬賣家，無實際付款。':'完整離線流程 · 規則 Formatter → 搜尋 → 五家策略議價 → 獨立排序 · 未呼叫 LLM，無實際付款。'});
  if(c.message)messages.push({id:'user-'+c.id,role:'user',content:c.message});
  if(c.historyMissing)messages.push({id:'missing-history',role:'system',content:'本分頁沒有原對話紀錄。以下顯示已發布的需求與結果。'});
  if(snapshot?.intent)messages.push({id:'intent-'+snapshot.request_id,role:'assistant',content:'我會依照以下條件，比較符合需求的優惠。',chips:['無線滑鼠','NT$'+snapshot.intent.max_total_twd.toLocaleString('zh-TW')+' 以內',snapshot.intent.delivery_days_max+' 天內送達']});
