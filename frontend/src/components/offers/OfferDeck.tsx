@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import type {PointerEvent as ReactPointerEvent} from 'react';
 import {motion, useReducedMotion} from 'motion/react';
 import {ArrowLeft, Check, RotateCcw, X} from 'lucide-react';
@@ -13,12 +13,13 @@ import {
 import type {MotionSource} from './offerUtils';
 import {OfferButton, OfferMedia, OfferSummaryMeta, PriceBlock, StatusMessage, StatusPill} from './offerPrimitives';
 import '../../styles/offers.css';
+import '../../styles/swipe-polish.css';
 
 const INTENT_PX = 8;
-const EXIT_DISTANCE_MULTIPLIER = 1.2;
-const EXIT_MS = 200;
-const ENTER_MS = 200;
-const SPRING = {type: 'spring', duration: 0.5, bounce: 0.2} as const;
+const EXIT_DISTANCE_MULTIPLIER = 1.45;
+const EXIT_MS = 280;
+const ENTER_MS = 320;
+const SPRING = {type: 'spring', stiffness: 380, damping: 32, mass: 0.8} as const;
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 
 type VisualPhase = 'resting' | 'dragging' | 'returning' | 'idle';
@@ -78,6 +79,8 @@ export function OfferDeck({
   const reduceMotion = useReducedMotion();
   const cardRef = useRef<HTMLDivElement | null>(null);
   const pointerRef = useRef<PointerState | null>(null);
+  const dragFrameRef = useRef<number|null>(null);
+  const cancelDragFrame = useCallback(()=>{if(dragFrameRef.current!==null){cancelAnimationFrame(dragFrameRef.current);dragFrameRef.current=null;}},[]);
   const suppressClickRef = useRef(false);
   const suppressClickTimeoutRef = useRef<number | null>(null);
   const leavingTimeoutRef = useRef<number | null>(null);
@@ -95,6 +98,7 @@ export function OfferDeck({
   const lastOfferKeyRef = useRef<string | null>(offer ? `${snapshot.request_id}:${offer.offer_id}` : null);
 
   const resolvedSellerName = sellerName ?? (offer ? findSeller(snapshot, offer.seller_id)?.name : undefined) ?? '賣家';
+  const showDetails=useCallback(()=>{if(offer)onDetails(offer.offer_id,offer);},[offer,onDetails]);
   const acceptDisabled = pending || expired || !offer || offer.eligibility.status !== 'eligible' || snapshot.status !== 'awaiting_user';
   const lockKey = offer ? `${snapshot.request_id}:${offer.offer_id}` : null;
   const locallyLocked = lockKey !== null && acceptedLockRef.current === lockKey;
@@ -143,12 +147,13 @@ export function OfferDeck({
   }, [pending, snapshot.status]);
 
   const resetGesture = useCallback((immediate = false) => {
+    cancelDragFrame();
     pointerRef.current = null;
     setVisualDx(0);
     setVisualDy(0);
     setVisualX(0);
     setPhase(immediate || reduceMotion ? 'resting' : 'returning');
-  }, [reduceMotion]);
+  }, [reduceMotion,cancelDragFrame]);
 
   const suppressNextClick = useCallback(() => {
     suppressClickRef.current = true;
@@ -163,13 +168,14 @@ export function OfferDeck({
 
   useEffect(() => {
     return () => {
+      cancelDragFrame();
       if (suppressClickTimeoutRef.current !== null) {
         window.clearTimeout(suppressClickTimeoutRef.current);
       }
       if (leavingTimeoutRef.current !== null) window.clearTimeout(leavingTimeoutRef.current);
       if (keyboardTimeoutRef.current !== null) window.clearTimeout(keyboardTimeoutRef.current);
     };
-  }, []);
+  }, [cancelDragFrame]);
 
   useEffect(() => {
     const cancelImmediate = () => resetGesture(true);
@@ -301,9 +307,15 @@ export function OfferDeck({
     }
 
     event.preventDefault();
-    setVisualDx(rawDx);
-    setVisualDy(rawDy);
-    setVisualX(reduceMotion ? 0 : clampDeckDisplacement(rawDx, pointer.width));
+    // Coalesce high-frequency touch events to one render per display frame.
+    // The latest raw pointer data still decides on release (never stale pixels).
+    if(dragFrameRef.current===null)dragFrameRef.current=requestAnimationFrame(()=>{
+      dragFrameRef.current=null;
+      if(pointerRef.current!==pointer)return;
+      setVisualDx(pointer.rawDx);
+      setVisualDy(pointer.rawDy);
+      setVisualX(reduceMotion ? 0 : clampDeckDisplacement(pointer.rawDx,pointer.width));
+    });
   };
 
   const handlePointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -313,6 +325,7 @@ export function OfferDeck({
     }
 
     const recognized = pointer.recognized;
+    cancelDragFrame();
     const finalDx = pointer.rawDx;
     const finalDy = pointer.rawDy;
     const width = pointer.width;
@@ -408,8 +421,8 @@ export function OfferDeck({
             key={leaving.key}
             className="offer-card-shell offer-card-shell--leaving"
             aria-hidden="true"
-            initial={{transform: `translateX(${leaving.startX}px)`, opacity: 1}}
-            animate={{transform: `translateX(${-leaving.width * EXIT_DISTANCE_MULTIPLIER}px)`, opacity: 0}}
+            initial={{transform: `translateX(${leaving.startX}px) rotate(${Math.max(-9,Math.min(9,leaving.startX/24))}deg)`, opacity: 1}}
+            animate={{transform: `translateX(${-leaving.width * EXIT_DISTANCE_MULTIPLIER}px) translateY(28px) rotate(-18deg)`, opacity: 0}}
             transition={reduceMotion ? {duration: 0} : {duration: EXIT_MS / 1000, ease: EASE_OUT}}
           >
             <OfferCard snapshot={snapshot} offer={leaving.offer} ranking={leaving.ranking} sellerName={leaving.sellerName} inert />
@@ -422,7 +435,7 @@ export function OfferDeck({
           data-testid="offer-card-shell"
           className={`offer-card-shell ${keyboardTransition ? 'offer-card-shell--keyboard' : ''}`.trim()}
           style={{touchAction: 'pan-y'}}
-          initial={reduceMotion || keyboardTransition ? {transform: 'translateY(0px) scale(1)', opacity: 1} : {transform: 'translateY(8px) scale(0.97)', opacity: 0}}
+          initial={reduceMotion || keyboardTransition ? {transform: 'translateY(0px) scale(1)', opacity: 1} : {transform: 'translateY(16px) scale(0.955)', opacity: 0.75}}
           animate={{transform, opacity: 1}}
           transition={transition}
           onPointerDown={handlePointerDown}
@@ -445,7 +458,7 @@ export function OfferDeck({
             label={label}
             pending={pending || locallyLocked}
             expired={expired}
-            onDetails={() => onDetails(offer.offer_id, offer)}
+            onDetails={showDetails}
           />
         </motion.div>
       </div>
@@ -522,9 +535,9 @@ interface OfferCardProps {
   onDetails?: () => void;
 }
 
-function OfferCard({snapshot, offer, ranking, sellerName, label, pending = false, expired = false, inert = false, onDetails}: OfferCardProps) {
+const OfferCard=memo(function OfferCard({snapshot, offer, ranking, sellerName, label, pending = false, expired = false, inert = false, onDetails}: OfferCardProps) {
   return (
-    <article className="offer-card" aria-labelledby={`offer-card-${offer.offer_id}`} aria-hidden={inert ? 'true' : undefined}>
+    <article className="offer-card" inert={inert} aria-labelledby={`offer-card-${offer.offer_id}`} aria-hidden={inert ? 'true' : undefined}>
       <OfferMedia offer={offer} />
       <div className="offer-card__content">
         <div>
@@ -546,4 +559,4 @@ function OfferCard({snapshot, offer, ranking, sellerName, label, pending = false
       </div>
     </article>
   );
-}
+});

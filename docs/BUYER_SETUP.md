@@ -2,6 +2,10 @@
 
 首次進入：基本資料 → 偏好 → 購物首頁。既有 Request 連結仍可查看，不因未設定資料而阻擋讀取或原提交核對。設定入口可重新編輯；只有儲存成功才完成 onboarding。
 
+手機版地址更新：將縣市、鄉鎮市區改成原生連動選單，變更縣市會清除舊區域／郵遞區號，選區域自動帶入三碼郵遞區號。不再另外要求一份「運送地址」，同一組收件地址只輸入街道門牌樓層，並顯示完整地址摘要。既有「台北市／臺北市」自動相容；五／六碼郵遞區號在區域不變時保留。結帳使用相同元件。
+
+行政區資料取自 [essoduke/jQuery-TWzipcode](https://github.com/essoduke/jQuery-TWzipcode) 的 MIT 授權靜態郵遞區號資料，2026-09-12 擷取；資料與 [授權聲明](../frontend/src/reference/TAIWAN_ADDRESS_LICENSE.md) 隨前端打包，離線可用，不呼叫地址或定位服務。這是 Demo 地址選單，不代表郵局已驗證完整街道地址或可配送性。
+
 基本資料：收件人名稱、電子郵件、縣市、區域、郵遞區號（台灣 3／5／6 碼）、街道地址均在設定頁填妥，配送國家固定 TW。付款方式為偏好，不代表付款授權；不收卡號、CVV 或金融帳戶。請用虛構資料展示。資料自動帶入結帳，已儲存的 checkout 資料優先；仍需明確按「確認測試購買」才建立模擬訂單。不放入 intent、RFQ 或模型。
 
 契約：BuyerProfile 保留 name、shipping_address；新增 optional shipping_details {email, city, state, postal_code, country}，存在時內部欄位必填。舊版 profile 仍可讀，重新編輯時補齊運送資訊。完整物件存入既有 buyer_profiles.profile_json，不需新增 migration 或重建資料庫。個資不寫入瀏覽器的 sessionStorage 結帳重試紀錄。

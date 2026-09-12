@@ -1,3 +1,4 @@
+param([switch]$Mobile)
 $ErrorActionPreference = 'Stop'
 $previousAppKey = $env:OPENAI_API_KEY
 $previousAppMode = $env:OFFERMESH_RUNTIME_MODE
@@ -7,7 +8,11 @@ try {
   $env:OPENAI_API_KEY = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($appPointer).Trim()
   if ($env:OPENAI_API_KEY -notmatch '^sk-[A-Za-z0-9_-]{20,}$') { throw 'Invalid API key format; key was not printed or saved.' }
   $env:OFFERMESH_RUNTIME_MODE = 'live'
-  & node (Join-Path $PSScriptRoot 'dev.mjs')
+  if ($Mobile) {
+    & node (Join-Path $PSScriptRoot 'mobile-preview.mjs') --live
+  } else {
+    & node (Join-Path $PSScriptRoot 'dev.mjs')
+  }
   $appExitCode = $LASTEXITCODE
 } finally {
   $env:OPENAI_API_KEY = $previousAppKey

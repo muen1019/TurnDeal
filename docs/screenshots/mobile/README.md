@@ -14,6 +14,7 @@
 | 8. 確認測試購買 | [08-checkout-confirm.png](08-checkout-confirm.png) |
 | 9. 測試訂單完成 | [09-receipt.png](09-receipt.png) |
 | 10. 歷史側欄 | [10-history.png](10-history.png) |
+| 11. 手指左滑中的卡片 | [11-swipe.png](11-swipe.png) |
 
 進度截圖為便於展示，暫停輪詢在 API 初始狀態；百分比是階段進度，不是實測模型耗時。其他購買畫面均由完整離線流程實際產生。
 

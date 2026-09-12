@@ -2,12 +2,18 @@
 
 ## 手機 Demo（可跑測試結帳）
 
+**手機要呼叫真實 LLM：** 執行 `npm run dev:mobile:secure`，在電腦終端隱藏輸入 API key。手機連同一個可信任 Wi-Fi，開啟終端印出的 `http://電腦IP:5176/chat`，輸入終端顯示的 Phone pairing code（不是 API key）。前後端一起啟動：5176 → loopback 3203。會產生 API 費用；每筆實際成功與否以畫面的「LLM 已解析」／離線備援標記為準。
+
+配對碼只用於這次手機連線，不是正式帳號系統。key 不進前端、URL 或 SQLite。使用 HTTP，僅限可信任區網；不可公開部署。重啟會清空此手機版的暫存 DB 並換配對碼，需要重新整理頁面、重新配對；不影響電腦 5173 的 SQLite。
+
 安裝完成後執行 `npm run dev:mobile`，手機連同一個 Wi-Fi，開啟終端顯示的 `http://電腦IP:5174/chat`。
 基本資料 → 偏好 → 輸入需求 → 選商品 → 確認收件資料 → 測試購買完成。
 不需要 API key；使用離線規則／模擬議價與付款，不扣款、不出貨。
 每個瀏覽器使用獨立 Demo 身分，SQLite 在記憶體中，停止後清空；不讀取原本的 `data/app.sqlite`。只在可信任 Wi-Fi 使用，收件資料請填虛構資料，不是正式登入或付款系統。
 
-[手機操作截圖（10 張）](docs/screenshots/mobile/README.md) · [運送資料規格](docs/BUYER_SETUP.md)
+出現「Port 5174 already in use」代表舊離線手機服務仍在運作，可直接開舊網址，或先在原終端按 Ctrl+C 再啟動。真實 LLM 版用 5176，不會和 5174 衝突；不會自動殺掉其他服務。
+
+[手機操作截圖（11 張）](docs/screenshots/mobile/README.md) · [運送資料規格](docs/BUYER_SETUP.md)
 
 ## 最簡單啟動（Windows）
 

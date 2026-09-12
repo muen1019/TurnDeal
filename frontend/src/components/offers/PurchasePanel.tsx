@@ -1,4 +1,5 @@
 import {useEffect,useRef,useState} from 'react';
+import {ShippingAddressFields,validShippingRegion} from '../chat/ShippingAddressFields';
 import type {BuyerProfile} from '../../contract.generated';
 import type {CheckoutUpdate,PurchaseView} from '../../purchase.generated';
 import {ApiFailure,request,postJournal} from '../../api/client';
@@ -39,6 +40,7 @@ export function PurchasePanel({requestId,offerId,profile}:{requestId:string;offe
  };
  const mutate=(action:string,body:Record<string,unknown>={},persist=true)=>void execute({path:view?`/api/purchases/${encodeURIComponent(view.purchase_id)}/${action}`:`/api/requests/${encodeURIComponent(requestId)}/purchases`,body,key:newId()},persist);
  const update=()=>{
+  if(!validShippingRegion(form)){setError('請選擇有效縣市、區域並補齊街道門牌。');return;}
   const body:CheckoutUpdate={buyer:{name:form.name.trim(),email:form.email.trim()},fulfillment_address:{name:form.name.trim(),line_one:form.line_one.trim(),city:form.city.trim(),state:form.state.trim(),country:'TW',postal_code:form.postal_code.trim()},fulfillment_option_id:form.option};
   // Address stays in memory, never in the browser recovery journal. Reload reads server state.
   mutate('checkout',body as unknown as Record<string,unknown>,false);
@@ -57,7 +59,8 @@ export function PurchasePanel({requestId,offerId,profile}:{requestId:string;offe
  {['creating','submitting','reconciling'].includes(view.status)&&<p role="status">正在向測試商家核對結果，請稍候…</p>}
  {view.error&&<p role="alert">{view.error.message||'請重新選擇有效報價。'}</p>}
  {view.checkout&&['ready','needs_input'].includes(view.status)&&<form onSubmit={e=>{e.preventDefault();update();}} className="checkout-form"><fieldset disabled={waiting||ready}>
- {([['name','收件人姓名'],['email','電子郵件'],['line_one','街道地址'],['city','城市／縣市'],['state','區域'],['postal_code','郵遞區號']] as const).map(([key,label])=><label key={key}>{label}<input required maxLength={key==='line_one'?240:100} type={key==='email'?'email':'text'} value={form[key]} onChange={e=>setForm(f=>({...f,[key]:e.target.value}))}/></label>)}
+ {([['name','收件人姓名'],['email','電子郵件']] as const).map(([key,label])=><label key={key}>{label}<input required maxLength={100} type={key==='email'?'email':'text'} value={form[key]} onChange={e=>setForm(f=>({...f,[key]:e.target.value}))}/></label>)}
+ <ShippingAddressFields value={form} disabled={waiting||ready} onChange={value=>setForm(f=>({...f,...value}))}/>
  <label>配送方式<select required value={form.option} onChange={e=>setForm(f=>({...f,option:e.target.value}))}><option value="" disabled>請選擇配送方式</option>{view.checkout.fulfillment_options.map(o=><option key={o.id} value={o.id}>{o.title}</option>)}</select></label></fieldset>
  {!ready&&<button className="button primary" disabled={waiting}>儲存並確認資料</button>}</form>}
  {ready&&<><p>按下確認後會建立一筆測試訂單。付款方式為模擬付款，不需卡號或 API key。</p><button className="button primary" disabled={waiting||!view.allowed_actions.includes('complete')||!view.confirmation_token} onClick={()=>mutate('complete',{confirmation_token:view.confirmation_token})}>確認測試購買 · NT${view.offer.total_price_twd.toLocaleString()}</button><button className="text-button" disabled={waiting} onClick={()=>setEditing(true)}>修改收件資料</button></>}

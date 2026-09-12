@@ -8,14 +8,16 @@ const browser=await chromium.launch({channel:'msedge',headless:true});
 const context=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true});
 const page=await context.newPage();page.setDefaultTimeout(30000);
 const errors=[];page.on('pageerror',e=>errors.push(e.message));
-const shot=async name=>{await page.waitForTimeout(300);await page.screenshot({path:out+'/'+name+'.png'});};
+const shot=async name=>{await page.waitForTimeout(550);await page.screenshot({path:out+'/'+name+'.png'});};
 try{
  await page.goto(origin+'/chat');
  await page.getByRole('textbox',{name:/名稱/}).fill('Demo Buyer');
- for(const [label,value] of [['電子郵件','buyer@example.test'],['城市／縣市','台北市'],['區域','中正區'],['郵遞區號','100'],['運送地址','測試路 1 號（虛構地址）']])
-  await page.getByRole('textbox',{name:new RegExp(label)}).fill(value);
+ await page.getByRole('textbox',{name:'電子郵件',exact:true}).fill('buyer@example.test');
+ await page.getByRole('combobox',{name:'縣市',exact:true}).selectOption('臺北市');
+ await page.getByRole('combobox',{name:'鄉鎮市區',exact:true}).selectOption('中正區');
+ await page.getByRole('textbox',{name:'街道、門牌與樓層',exact:true}).fill('測試路 1 號（虛構地址）');
  await page.getByRole('heading',{name:'先認識一下你'}).scrollIntoViewIfNeeded();await shot('01-settings');
- await page.getByRole('textbox',{name:/運送地址/}).scrollIntoViewIfNeeded();await shot('02-shipping');
+ await page.getByRole('button',{name:/下一步/}).scrollIntoViewIfNeeded();await shot('02-shipping');
  await page.getByRole('button',{name:/下一步/}).click();await shot('03-preferences');
  await page.getByRole('button',{name:/儲存並開始/}).click();await page.getByRole('textbox',{name:'輸入購物需求'}).waitFor();await shot('04-home');
  const response=await context.request.get(origin+'/api/buyer-profile');assert.equal((await response.json()).profile.shipping_details.email,'buyer@example.test');
@@ -23,11 +25,25 @@ try{
  await page.getByRole('textbox',{name:'輸入購物需求'}).fill('買無線滑鼠，含運最高預算1000元，7天內到貨');
  await page.getByRole('button',{name:'送出需求'}).click();
  await page.getByRole('heading',{name:'為你找到的優惠'}).waitFor();await shot('06-products');
- await page.getByRole('button',{name:'立即採用',exact:true}).click();
+ const cdp=await context.newCDPSession(page);
+ async function swipe(from,to,capture=false){
+  const card=page.getByTestId('offer-card-shell');await card.scrollIntoViewIfNeeded();await page.waitForTimeout(350);
+  const box=await card.boundingBox(),y=box.y+90;
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:from,y}]});
+  for(let step=1;step<=12;step++){await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:from+(to-from)*step/12,y}]});await page.waitForTimeout(16);}
+  if(capture){assert.notEqual(await card.evaluate(el=>getComputedStyle(el).transform),'none');await shot('11-swipe');}
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+ }
+ await swipe(240,215);assert.ok(await page.getByRole('heading',{name:'為你找到的優惠'}).isVisible());
+ const firstTitle=await page.locator('.offer-card__content h3').innerText();
+ await swipe(270,65,true);await page.waitForTimeout(400);
+ await page.getByRole('button',{name:'撤回略過',exact:true}).click();await page.waitForTimeout(400);
+ assert.equal(await page.locator('.offer-card__content h3').innerText(),firstTitle);
+ await swipe(100,285);
  await page.getByRole('button',{name:'前往測試結帳'}).click();
  assert.equal(await page.getByRole('textbox',{name:'電子郵件',exact:true}).inputValue(),'buyer@example.test');
- assert.equal(await page.getByRole('textbox',{name:'街道地址',exact:true}).inputValue(),'測試路 1 號（虛構地址）');
- assert.equal(await page.getByRole('textbox',{name:'城市／縣市',exact:true}).inputValue(),'台北市');
+ assert.equal(await page.getByRole('textbox',{name:'街道、門牌與樓層',exact:true}).inputValue(),'測試路 1 號（虛構地址）');
+ assert.equal(await page.getByRole('combobox',{name:'縣市',exact:true}).inputValue(),'臺北市');
  await page.locator('.commerce-panel').evaluate(el=>el.scrollIntoView({block:'start'}));await shot('07-checkout-address');
  await page.getByRole('button',{name:'儲存並確認資料'}).click();
  await page.getByRole('button',{name:/確認測試購買 ·/}).scrollIntoViewIfNeeded();await shot('08-checkout-confirm');
@@ -38,7 +54,7 @@ try{
  await page.getByRole('button',{name:'切換導覽'}).click();await shot('10-history');
  // Capture the real progress UI with polling held on its initial server snapshot.
  await page.getByRole('button',{name:'關閉歷史紀錄'}).click();
- await page.getByRole('button',{name:'開始新對話',exact:true}).click();
+ await page.getByRole('button',{name:'切換導覽'}).click();await page.getByRole('button',{name:'新對話',exact:true}).click();
  let held;
  await page.route(origin+'/api/**',async route=>{
   const req=route.request(),url=new URL(req.url());

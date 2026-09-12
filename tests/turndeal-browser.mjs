@@ -22,7 +22,7 @@ await page.route(ui+'/api/**',async route=>{
 const out='frontend/test-results/turndeal';mkdirSync(out,{recursive:true});
 try{
  await page.goto(ui+'/chat');assert.match(await page.title(),/TurnDeal/);
- await page.getByRole('textbox',{name:/名稱/}).fill('測試買家');for(const [label,value] of [['電子郵件','buyer@example.test'],['城市／縣市','台北市'],['區域','中正區'],['郵遞區號','100'],['運送地址','測試路 1 號']])await page.getByRole('textbox',{name:new RegExp(label)}).fill(value);await page.getByRole('button',{name:/下一步/}).click();await page.getByRole('button',{name:/儲存並開始/}).click();
+ await page.getByRole('textbox',{name:/名稱/}).fill('測試買家');await page.getByRole('textbox',{name:'電子郵件',exact:true}).fill('buyer@example.test');await page.getByRole('combobox',{name:'縣市',exact:true}).selectOption('臺北市');await page.getByRole('combobox',{name:'鄉鎮市區',exact:true}).selectOption('中正區');await page.getByRole('textbox',{name:'街道、門牌與樓層',exact:true}).fill('測試路 1 號');await page.getByRole('button',{name:/下一步/}).click();await page.getByRole('button',{name:/儲存並開始/}).click();
  assert.equal(await page.getByRole('combobox',{name:'新需求使用的模型'}).inputValue(),'gpt-5.6-sol');
  await page.getByRole('combobox',{name:'新需求使用的模型'}).selectOption('gpt-4.1-mini');
  await page.screenshot({path:`${out}/01-home.png`,fullPage:true});
@@ -48,10 +48,10 @@ try{
  await page.getByRole('button',{name:'前往測試結帳'}).click();
  await page.getByRole('textbox',{name:'收件人姓名',exact:true}).fill('測試買家');
  await page.getByRole('textbox',{name:'電子郵件',exact:true}).fill('buyer@example.test');
- await page.getByRole('textbox',{name:'街道地址',exact:true}).fill('測試路 1 號');
- await page.getByRole('textbox',{name:'城市／縣市',exact:true}).fill('台北市');
- await page.getByRole('textbox',{name:'區域',exact:true}).fill('中正區');
- await page.getByRole('textbox',{name:'郵遞區號',exact:true}).fill('100');
+ await page.getByRole('textbox',{name:'街道、門牌與樓層',exact:true}).fill('測試路 1 號');
+ await page.getByRole('combobox',{name:'縣市',exact:true}).selectOption('臺北市');
+ await page.getByRole('combobox',{name:'鄉鎮市區',exact:true}).selectOption('中正區');
+
  await page.getByRole('button',{name:'儲存並確認資料'}).click();await page.getByRole('button',{name:/確認測試購買 ·/}).waitFor();
  await page.screenshot({path:`${out}/03-checkout.png`,fullPage:true});
  await page.getByRole('button',{name:/確認測試購買 ·/}).click();await page.getByRole('button',{name:'核對原購買操作'}).waitFor();
@@ -61,7 +61,7 @@ try{
  assert.equal(app.locals.store.db.prepare('SELECT count(*) n FROM purchases').get().n,1);
  const purchase=app.locals.store.db.prepare('SELECT data_json FROM purchases').get();assert.equal(JSON.parse(purchase.data_json).status,'completed');
  await page.screenshot({path:`${out}/04-receipt.png`,fullPage:true});
- await page.getByRole('button',{name:'開始新對話',exact:true}).click();await page.getByRole('button',{name:'切換導覽'}).click();
+ await page.getByRole('button',{name:'切換導覽'}).click();await page.getByRole('button',{name:'新對話',exact:true}).click();await page.getByRole('button',{name:'切換導覽'}).click();
  const deleteButtons=page.getByRole('button',{name:/刪除對話：/});await deleteButtons.last().click();await page.getByRole('button',{name:'取消',exact:true}).click();
  await deleteButtons.last().click();await page.getByRole('button',{name:'確認刪除',exact:true}).click();
  await page.getByRole('button',{name:'清除全部歷史紀錄'}).click();await page.getByRole('button',{name:'確認清除全部',exact:true}).click();
