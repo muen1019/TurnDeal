@@ -1,5 +1,31 @@
 # TurnDeal
 
+## 最簡單啟動（Windows）
+
+先安裝 **Node.js 24 以上**。在專案根目錄開啟 PowerShell。
+
+第一次下載與安裝：
+
+```powershell
+git clone https://github.com/muen1019/sea-hackathon.git
+cd sea-hackathon
+npm ci
+npm --prefix backend ci
+npm --prefix frontend ci
+```
+
+之後每次啟動只要：
+
+```powershell
+npm run dev:secure
+```
+
+依終端提示隱藏輸入自己的 API key，等到 `Vite ready` 後開啟 [http://127.0.0.1:5173/chat](http://127.0.0.1:5173/chat)。不要把 key 貼到聊天、程式碼或 GitHub。沒有 key 想先玩完整離線流程，改執行 `npm run dev`。
+
+SQLite 與測資會自動建立；已有資料會先備份再升級，**不必手動建立或重建 DB**。結帳是模擬付款，不會扣款或出貨。停止服務按 `Ctrl+C`；更新程式先停止，再 `git pull`、重跑上面三個 `npm ci`，最後重新啟動。若有本機未提交修改，先保存再拉取，不要強制覆蓋。
+
+---
+
 目前完整流程與測試入口：[TurnDeal 購買、完整 Improver、商品顏色與新版進度畫面](docs/TURNDEAL_WORKFLOW.md)。已接上 PR #2 測試結帳與 PR #3 下一輪需求工作流；「確認測試購買」只產生模擬付款訂單，不扣真實款。
 
 最新整合：[模型選擇、歷史清除與資料庫同步](docs/MODEL_HISTORY_SYNC.md)。畫面左上可選新需求模型，預設 GPT-5.6 Sol；側欄支援單筆／全部清除本分頁歷史，保留 SQLite 稽核與個人設定。
