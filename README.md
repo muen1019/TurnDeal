@@ -87,7 +87,7 @@ OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commer
 - [LLM Formatter 與安全 key 設定](docs/FORMATTER_LLM.md)：預設 gpt-4.1-mini、Structured Outputs；`npm run demo:formatter:secure` 在 Windows 隱藏輸入 key，測試不使用真實 key。
 - [Formatter：中文文字到現有流程](docs/FORMATTER.md)：離線規則解析、需求澄清、使用者偏好快照、Request 儲存與 Orchestrator 接線；`npm run demo:formatter` 可跑完整文字入口示範（Seller 為測試替身）。
 - [Orchestrator 前段與 Seller 函式交接](docs/ORCHESTRATOR_HANDOFF.md)：已可執行需求快照 → 搜尋 → RFQ → 第一輪函式呼叫；`npm run demo:handoff` 使用記憶體 DB 與明確標示的測試替身。
-- [Seller 議價設定格式與填寫交接](docs/SELLER_NEGOTIATION_POLICY.md)：15 家／90 筆主商品待填模板；底價等私有設定由 Negotiation owner 填寫，尚未啟用。
+- [完整 Catalog 談判政策](docs/CATALOG_NEGOTIATION_POLICIES.md)：15 家／120 筆 Discovery 商品已配置，與原本五家合計 20 家／129 個 SKU 政策；底價與成本僅供 Seller/Backend 使用。舊 [待填模板](docs/SELLER_NEGOTIATION_POLICY.md) 保留為歷史格式。
 - [目標 System Design 與 repo 整合狀態](docs/SYSTEM_DESIGN.md)
 - [開發與驗收基準](docs/DEVELOPMENT_RULES.md)
 - [共用契約說明](contracts/README.md)
