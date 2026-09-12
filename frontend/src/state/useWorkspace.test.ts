@@ -1,8 +1,8 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { createElement, StrictMode, type ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import apiExamples from "../../../contracts/fixtures/result-api-v0.2.json";
-import fixture from "../../../contracts/fixtures/result-v0.2.json";
+import apiExamples from "../../../contracts/fixtures/result-api-v0.3.json";
+import fixture from "../../../contracts/fixtures/result-v0.3.json";
 import { validateSnapshot } from "../api/client";
 import { pendingKey, storageKey, type Workspace } from "./model";
 import { useWorkspace } from "./useWorkspace";
@@ -219,7 +219,7 @@ describe("useWorkspace pending recovery", () => {
       JSON.stringify({
         kind: "accept",
         path: "/api/requests/req_demo_001/decisions",
-        body: { action: "accept", offer_id: "offer_a_r2" },
+        body: { action: "accept", offer_id: "offer_a_r5" },
         key: "accept-key",
         conversationId: "conv_1",
         requestId: "req_demo_001",
@@ -230,7 +230,7 @@ describe("useWorkspace pending recovery", () => {
     const authoritative = {
       ...structuredClone(fixture.snapshot),
       status: "accepted",
-      selected_offer_id: "offer_a_r2",
+      selected_offer_id: "offer_a_r5",
       decision: acceptResponse,
     };
     const fetchMock = mockFetch((path, init) => {
@@ -413,14 +413,14 @@ describe("useWorkspace decision guards", () => {
 
     act(() => {
       result.current.patch("conv_1", { feedback: "not this one" });
-      result.current.accept("offer_a_r2");
+      result.current.accept("offer_a_r5");
       result.current.reject();
-      result.current.accept("offer_b_r2");
+      result.current.accept("offer_b_r5");
     });
 
     await waitFor(() => expect(postCalls(fetchMock)).toHaveLength(1));
     expect(postCalls(fetchMock)[0][1]?.body).toBe(
-      JSON.stringify({ action: "accept", offer_id: "offer_a_r2" }),
+      JSON.stringify({ action: "accept", offer_id: "offer_a_r5" }),
     );
   });
 
@@ -446,7 +446,7 @@ describe("useWorkspace decision guards", () => {
     await waitFor(() => expect(result.current.verified).toBe("req_demo_001"));
 
     act(() => {
-      result.current.patch("conv_1", { feedback: "ship faster next round" });
+      result.current.patch("conv_1", { feedback: rejectResponse.feedback });
       result.current.reject();
     });
 
@@ -456,7 +456,7 @@ describe("useWorkspace decision guards", () => {
     });
 
     expect(result.current.active.message).toBe("quiet mouse");
-    expect(result.current.active.feedbackHistory).toEqual(["ship faster next round"]);
+    expect(result.current.active.feedbackHistory).toEqual([rejectResponse.feedback]);
     expect(result.current.active.snapshot?.decision).toEqual(rejectResponse);
     expect(postCalls(fetchMock)).toHaveLength(1);
   });

@@ -40,36 +40,8 @@ def write_json(name, data):
 
 
 def seed_workspace(page):
-    page.add_init_script(
-        """
-        (() => {
-          const workspace = {
-            definitions: {
-              intent: '# Buying intent\\nFind a wireless mouse suitable for daily office work.',
-              preference: '# Preferences and limits\\n- Prefer comfort and price\\n- Accept a free mouse pad only when free\\n- Do not accept paid add-ons',
-              savedIntent: '# Buying intent\\nFind a wireless mouse suitable for daily office work.',
-              savedPreference: '# Preferences and limits\\n- Prefer comfort and price\\n- Accept a free mouse pad only when free\\n- Do not accept paid add-ons',
-              version: 1
-            },
-            conversations: [{
-              id: 'e2e-conversation',
-              title: 'E2E shopping request',
-              requestId: null,
-              message: '',
-              definitionVersion: 1,
-              draft: '',
-              feedback: '',
-              feedbackHistory: [],
-              skipped: [],
-              snapshot: null
-            }],
-            activeId: 'e2e-conversation'
-          };
-          sessionStorage.clear();
-          sessionStorage.setItem('offermesh:demo-buyer:workspace:v1', JSON.stringify(workspace));
-        })();
-        """
-    )
+    # A fresh browser context exercises the actual default editor and persistence.
+    pass
 
 
 def api_get(page, path):
@@ -106,7 +78,7 @@ def create_request_via_proxy(page, label, api_posts):
     request_id = response.json()["request_id"]
     snapshot = wait_for_snapshot(page, request_id)
     assert snapshot["status"] == "awaiting_user"
-    assert len(snapshot["seller_agents"]) == 3
+    assert len(snapshot["seller_agents"]) == 5
     assert len(snapshot["ranked_offers"]) >= 3
     return request_id, snapshot
 
@@ -115,11 +87,21 @@ def create_request_from_chat(page, label, api_posts):
     page.goto(BASE + "/chat")
     page.wait_for_load_state("networkidle")
     expect(page.locator(".chat-panel")).to_be_visible()
+    save = page.get_by_role("button", name="儲存設定", exact=True)
+    if save.is_visible() and save.is_enabled():
+        save.click()
     composer = page.locator("#buyer-requirement")
-    expect(composer).to_be_visible()
-    composer.fill(REQUEST_TEXT)
+    composer.fill(SUPPORTED_INTENT)
     expect(page.locator(".chat-send-button")).to_be_enabled()
-    return create_request_via_proxy(page, label, api_posts)
+    with page.expect_response(lambda r: r.request.method == "POST" and r.url.endswith("/api/requests")) as created:
+        composer.press("Enter")
+    response = created.value
+    assert response.status == 202, response.text()
+    api_posts.append({"url":response.url,"body":response.request.post_data_json,"status":response.status})
+    request_id = response.json()["request_id"]
+    snapshot = wait_for_snapshot(page, request_id)
+    expect(page.get_by_role("button", name=f"查看 {len(snapshot['ranked_offers'])} 組優惠", exact=True)).to_be_visible()
+    return request_id, snapshot
 
 
 def stable_box(page, selector):
@@ -128,7 +110,7 @@ def stable_box(page, selector):
     return {key: round(box[key], 2) for key in ("x", "y", "width", "height")}
 
 
-def assert_same_box(a, b, label, tolerance=1.5):
+def assert_same_box(a, b, label, tolerance=1.0):
     for key in ("x", "y", "width", "height"):
         assert abs(a[key] - b[key]) <= tolerance, f"{label} {key}: {a[key]} != {b[key]}"
 
@@ -195,6 +177,9 @@ def assert_no_visible_technical_ui(page, label):
         "campaign_id",
         "terms_id",
         "決策資料",
+        "原始文件",
+        "交接資料",
+        "revision",
     ]
     found = [token for token in forbidden if token in visible_text]
     assert not found, f"{label} exposes technical UI tokens: {found}"
@@ -211,6 +196,7 @@ def assert_same_bounds_for_viewports(page, request_id, first_offer_id, viewports
         chat_shell = stable_box(page, ".chat-app-shell")
         chat_main = stable_box(page, ".chat-main-slot")
         result[f"{name}-chat"] = assert_no_overflow(page, f"{name}-chat")
+        page.screenshot(path=str(ARTIFACTS / f"{name}-chat.png"))
 
         page.goto(f"{BASE}/requests/{request_id}")
         page.wait_for_load_state("networkidle")
@@ -219,6 +205,10 @@ def assert_same_bounds_for_viewports(page, request_id, first_offer_id, viewports
         assert_same_box(chat_shell, stable_box(page, ".chat-app-shell"), f"{name} chat/offers shell")
         assert_same_box(chat_main, stable_box(page, ".chat-main-slot"), f"{name} chat/offers main")
         result[f"{name}-offers"] = assert_no_overflow(page, f"{name}-offers")
+        for action in page.locator('.offer-deck__actions button').all():
+            box = action.bounding_box()
+            assert box and box['y'] >= 0 and box['y'] + box['height'] <= viewport['height'] + 1
+        page.screenshot(path=str(ARTIFACTS / f"{name}-offers.png"))
 
         page.goto(f"{BASE}/requests/{request_id}?view=details&offer_id={first_offer_id}")
         page.wait_for_load_state("networkidle")
@@ -227,6 +217,7 @@ def assert_same_bounds_for_viewports(page, request_id, first_offer_id, viewports
         assert_same_box(chat_shell, stable_box(page, ".chat-app-shell"), f"{name} chat/details shell")
         assert_same_box(chat_main, stable_box(page, ".chat-main-slot"), f"{name} chat/details main")
         result[f"{name}-details"] = assert_no_overflow(page, f"{name}-details")
+        page.screenshot(path=str(ARTIFACTS / f"{name}-details.png"))
     return result
 
 
@@ -374,10 +365,9 @@ def run_primary_flow(playwright):
             page,
             request_id,
             first_offer_id,
-            [("short-1536x668", SHORT_HEIGHT_VIEWPORT)],
+            [("short-1536x668", SHORT_HEIGHT_VIEWPORT), ("mobile-390x668", {"width":390,"height":668}), ("mobile-320x568", {"width":320,"height":568})],
         )
     )
-    page.screenshot(path=str(ARTIFACTS / "short-1536x668-details.png"), full_page=True)
 
     page.set_viewport_size(VIEWPORT_DESKTOP)
     page.goto(f"{BASE}/requests/{request_id}")

@@ -2,7 +2,7 @@ import '@testing-library/jest-dom/vitest';
 import {cleanup, render, screen} from '@testing-library/react';
 import {afterEach, describe, expect, it} from 'vitest';
 import type {RequestSnapshot} from '../../contract.generated';
-import fixture from '../../../../contracts/fixtures/result-v0.2.json';
+import fixture from '../../../../contracts/fixtures/result-v0.3.json';
 import {NegotiationPanel} from './NegotiationPanel';
 
 function snapshot(): RequestSnapshot {
@@ -21,7 +21,7 @@ describe('NegotiationPanel', () => {
 
     render(<NegotiationPanel snapshot={value} />);
 
-    expect(screen.getByText('3 家賣家 · 1 輪議價')).toBeInTheDocument();
+    expect(screen.getByText('5 家賣家 · 1 輪議價')).toBeInTheDocument();
   });
 
   it('keeps sponsorship separate and leaves the campaign id out of the visible summary', () => {

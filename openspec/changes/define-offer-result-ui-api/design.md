@@ -12,11 +12,11 @@
 
 ### 1. 工程與責任分工
 
-frontend/ 使用 React、TypeScript、Vite，backend/ 使用 Express 5、TypeScript、SQLite；應用 Node engines 為 >=20.19.0 <21。前端原生 fetch 與 reducer，開發時 localhost:5173 的相對 /api 代理至 127.0.0.1:3001；部署保持同源，不開放任意 CORS。MVP 以本機固定 server-side demo buyer 為 scope，不接受 body buyer_id、不宣稱正式認證。
+frontend/ 使用 React、TypeScript、Vite，backend/ 使用 Express 5、TypeScript、SQLite；應用 Node engines 為 >=20.19.0 <21。前端原生 fetch 與 reducer，預設開發時 localhost:5173 的相對 /api 代理至 127.0.0.1:3201；可用 OFFERMESH_API_ORIGIN 覆寫 origin（例如 127.0.0.1:3001）以配合本機後端，這是 runtime 配置差異，不代表修改 backend 契約、OpenAPI 或此 change 的 API surface。部署保持同源，不開放任意 CORS。MVP 以本機固定 server-side demo buyer 為 scope，不接受 body buyer_id、不宣稱正式認證。
 
 backend/src/app.ts 負責 requests 與 decisions；store.ts 保存 SQLite requests、offers、decisions、idempotency 並驗證決策；mockResultProvider.ts 是替換正式結果來源的邊界。不存在本次必須實作的 DocumentReviser 或 redemption route。
 
-### 2. HTTP 與資料契約（v0.2）
+### 2. HTTP 與資料契約（v0.3）
 
 以下是待實作契約，不是目前 v0.1 已支援的能力。reject 回應與狀態語意是 breaking change；必須先升版共用 Schema，於同一契約 PR 同步 OpenAPI、fixtures、驗證器、AGENTS.md／DEVELOPMENT_RULES.md 的受影響規則及所有消費端。backend/openapi.json 只引用新共用 Schema，不建立第二套私有 DTO；本次只修改 OpenSpec，不改既有契約檔。
 
@@ -46,7 +46,7 @@ AcceptDecisionResult 保留 action=accept、request_id、status=accepted、selec
 
 source_documents 是原始文件而非改寫結果。RejectDecisionResult 不包含 next_request_id 或新版 documents。Snapshot 保留原有 request/root/parent IDs、documents、intent、seller_agents、discovery_exclusions、sponsored_placement、offers、ranked_offers、confirmation_offer_ids、selected_offer_id、next_request_id、error，新增必填 decision（null | AcceptDecisionResult | RejectDecisionResult）及 Status 的 rejected。decision.request_id 必須等於 snapshot.request_id；accepted/rejected 時 decision 必須為對應型別且與 POST 已保存結果相同，其他本服務狀態為 null。rejected 時 selected_offer_id=null、error=null，source_documents 必須等於 documents。本服務不發布 superseded/redeemed，next_request_id 永遠 null；保留欄位不代表已支援 child。
 
-前端以 ranked_offers.offer_id join offers，再以 seller_id join seller_agents。summary、available_actions 是本機衍生值，不加入 HTTP。商品圖／正式名稱未提供可信 Catalog 時用佔位與 category/product_id；不捏造單價、折扣或免費贈品。Sponsored 獨立展示且不改 rank。
+前端以 ranked_offers.offer_id join offers，再以 seller_id join seller_agents。summary、available_actions 是本機衍生值，不加入 HTTP。商品圖／正式名稱未提供可信 Catalog 時用佔位與 使用者可理解的 category（product_id 僅留在資料層）；不捏造單價、折扣或免費贈品。Sponsored 獨立展示且不改 rank。
 
 ### 3. UI 狀態、手勢與恢復
 
@@ -58,7 +58,7 @@ GET 不重疊，前一次結束後至少一秒再查；只輪詢 formatting（mo
 
 ### 4. Mock 結果來源
 
-MockResultProvider.generate(request_id, revision, documents, clock) 使用 contracts/fixtures 的 seller／happy-path 資料作可信示範來源，輸出可發布結果或 needs_clarification／no_match。初始格式驗證後進 formatting，再發布 awaiting_user；不為展示而假裝執行真實 Agent 階段。Seller 兩輪資料可保留作明示模擬紀錄。
+MockResultProvider.generate(request_id, revision, documents, clock) 使用 contracts/fixtures 的 seller／happy-path 資料作可信示範來源，輸出可發布結果或 needs_clarification／no_match。初始格式驗證後進 formatting，再發布 awaiting_user；不為展示而假裝執行真實 Agent 階段。Seller 最多五輪資料可保留作明示模擬紀錄。
 
 baseline 支援一隻無線滑鼠、最多一张選配滑鼠墊、含稅運整數 TWD 預算與最長交期；三策略為低價慢送、較高價快送、相關選配組合。實作以 fixtures 配套的文件樣本及 parser cases 明列支援語句（含預算／交期／禁用配件變體），依確認的限制過濾候選；未知、缺必要條件或互相矛盾的輸入回 needs_clarification，禁止回任意三張卡假稱符合。沒有配件政策只允許相關且不增加總額的選配；相關付費加購必須明示授權，未支援的政策要求澄清。過濾後可少於三組，零合格為 no_match，不能為湊卡片放寬需求。
 
@@ -72,13 +72,13 @@ requests 保存 buyer、ID、status、原始 documents／revision 與完整發�
 
 accept 短交易重驗 awaiting_user、scope、ranked eligibility、server time < expires_at、可信 mock 庫存及原價格／交期／items／條款，原子寫入 accepted、decision 與冪等結果；不保留或扣庫存。reject 短交易重驗 awaiting_user／no_match／needs_confirmation，原子寫入 rejected、原文 feedback、原 documents 與冪等結果；不呼叫模型。兩者競爭只能一方提交，另一方 409 state_conflict。
 
-404 not_found 隱藏外部 buyer/request 資源；410 offer_expired 不改 selection；錯誤格式仍為 error.code/message/fields。技術不可用回 503 processing_unavailable，內部錯誤回 500 internal_error，未知 commit 結果由重試核對。reject 不做語意解讀，因此不回舊版 422 feedback_requires_clarification。
+404 not_found 隱藏外部 buyer/request 資源；410 offer_expired 不改 selection；錯誤格式仍為 error.code/message/fields。未預期技術錯誤回 500 internal_error；目前不宣告未實作的 HTTP 503，未知 commit 結果由重試核對。reject 不做語意解讀，因此不回舊版 422 feedback_requires_clarification。
 
 重啟保留已完成快照、決策與冪等資料，未完成 generation 標為 failed/processing_interrupted；只有確定無提交的 processing key 才可清理。generation 發布須核對 request_id／revision／formatting，晚到結果不覆蓋終態。
 
 ### 6. Buyer Agent handoff 邊界
 
-Result backend 的交付終點是決策已保存並可回傳／重讀。reject 回原始 source_documents 與 feedback；accept 回 selected_offer_id，呼叫端可用同一 snapshot 讀取完整方案及文件。採用選配不等於修改長期偏好，略過不構成拒絕理由。
+Result backend 的交付終點是決策已保存並可回傳／重讀。reject 的 API payload 保留 source_documents 與 feedback；accept 回 selected_offer_id，呼叫端可用同一 snapshot 讀取完整方案及資料以供 validation、persistence 與 handoff。presentation 仍依第 10 節隱藏 source_documents 與技術欄位。採用選配不等於修改長期偏好，略過不構成拒絕理由。
 
 呼叫端／整合 owner 必須明確消費 POST response 或 GET.decision，再交給 Buyer Agent。沒有 webhook、queue 或自動模型觸發；未接入時只顯示「回饋已保存，Buyer Agent 尚未接入」。外部 handoff 失敗不撤銷 rejected，可重讀後重試交付；整合 owner 依 request_id 與已保存決策去重，不能用 HTTP 冪等宣稱 Agent exactly-once。
 
@@ -98,7 +98,7 @@ Buyer Agent 的語意澄清、改寫、後續提交與 parent/revision 關聯另
 
 | Token | 目標值 | 用途 |
 | --- | --- | --- |
-| color.canvas | #F2EEE6 | 頁面暖色外底 |
+| color.canvas | #E8F1F8 | 全螢幕頁面與 body 背景；不得露出外層暖色邊框 |
 | color.shell | #E8F1F8 | Chat／滑卡共用 AppShell 與側欄 |
 | color.surface | #FFFFFF | 圖卡、內容列、表單 |
 | color.surface-subtle | #F5F8FC | Chat、結果區及收據區背景 |
@@ -113,7 +113,7 @@ Buyer Agent 的語意澄清、改寫、後續提交與 parent/revision 關聯另
 | shadow.raised | 0 8px 24px rgba(37, 42, 40, 0.08) | 活躍卡片或浮起的操作列，最多一層陰影 |
 | space | 4 / 8 / 12 / 16 / 24 / 32px | 共用間距尺；卡片內距 24px，小螢幕 16px |
 | type | system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif | 系統字體，中文使用系統 fallback |
-| type.body / secondary / heading / price | 16/24px、14/20px、24/32px、28/36px | 字級／行高；主文 400，標題／按鈕 600，價格 700 |
+| type.body / secondary / heading / price | 14/22.4px、13/20px、22/30.8px、32/36.8px | 字級／行高；主文 400，標題／按鈕 600，價格 700。手機頁面標題 20/28px、價格 26/29.9px；商品標題桌面 18px／手機 17px；手機編輯欄維持 16px。縮小字級不縮小至少 44×44px 的操作命中區。 |
 
 主按鈕使用 surface 文字／ink 底，次按鈕使用 ink 文字／accent-surface 底。一般文字對比至少 4.5:1，可操作圖示、必要邊界與焦點環相對相鄰底色至少 3:1。停用按鈕保留可讀文字，以 disabled 語意及「提交中／已到期」說明狀態，不以整個卡片降低 opacity 來表達停用。
 
@@ -131,7 +131,7 @@ Buyer Agent 的語意澄清、改寫、後續提交與 parent/revision 關聯另
 
 單頁不是三支手機 mockup 並排；Chat、滑卡與明細使用第 10 節的共同 AppShell 尺寸與 responsive 規則。簡化主卡保留商品圖、seller、組合名稱、主要優惠（有可信資料時）、含稅運總價、交期、精簡期限及「查看 N 件商品明細」。完整 items、條款、理由與 tradeoffs 移至同尺寸主區的 OfferDetails，不在簡化卡片上重複所有明細。不得因移入明細而刪除必填資訊或改變後端數值。
 
-頁面沿正常文件流垂直捲動，卡片不可固定高度截斷內容。底部操作列可 sticky，須保留等高內容空間及 safe-area inset；虛擬鍵盤或放大導致遮擋時改為文件流。不得複製參考圖的狀態列、home indicator、購物車導航、收藏或數量增減控制。頁面首次就顯示「右滑或按採用會立即採用此方案」，不依賴使用者看過動畫教學。
+body 與頁面根節點不得產生 x/y 文件捲動；AppShell 以 #E8F1F8 全螢幕鋪滿 viewport。長 Chat、editor、items、reasons、terms 與 history 只在各自內容區內部捲動，底部操作列在該區域內保持可達並預留 safe-area inset。不得複製參考圖的狀態列、home indicator、購物車導航、收藏或數量增減控制。頁面首次就顯示「右滑或按採用會立即採用此方案」，不依賴使用者看過動畫教學。
 
 ### 9. 動畫與中斷模型（待實作）
 
@@ -148,7 +148,7 @@ Buyer Agent 的語意澄清、改寫、後續提交與 parent/revision 關聯另
 | accept 成功／已核對 accepted | submitting 或 reconciling → accepted | 同一方案切為已採用，展示已保存決策摘要 |
 | POST 結果未知 | submitting → reconciling | 保留原卡與提交鎖，顯示「確認結果中」 |
 | 無副作用且可修正的錯誤 | submitting → 原可操作狀態 | 原卡／回饋草稿保留，顯示 inline error；410／409 依服務端生命週期處理 |
-| 明示 reject 得到 200 | submitting → rejected | 顯示回饋已保存及原始文件，等待外部 Buyer Agent 整合；不生成新輪 |
+| 明示 reject 得到 200 | submitting → rejected | 顯示回饋已保存；source_documents／原始文件僅保留於 API contract、persistence 與 handoff，不出現在 presentation；等待外部 Buyer Agent 整合；不生成新輪 |
 
 #### 動畫參數表
 
@@ -178,27 +178,21 @@ W 是 pointerdown 時的卡片寬度；提交判定使用原始水平位移而�
 - 邏輯與網路驗收用可控制 clock／回應的瀏覽器場景：動畫進度 0%、50%、100% 都插入新操作與伺服器回應。樣式驗收讀 computed styles；duration／curve／spring 設定須等於表值，端點穩定後座標允差 1px、opacity 允差 .01；timer 容差一個渲染 frame，不把低效能裝置的掉幀誤判成設定差異。
 - 後續實作驗收另在觸控裝置及 320、390、768、1440px viewport 檢查捲動、文字放大 200%、焦點及 reduced-motion；目前只交付規格，沒有宣稱視覺或效能測試通過。
 
-### 10. Chat 與滑卡共用的桌面工作區（待實作）
+### 10. Chat 與滑卡共用的全螢幕工作區（待實作）
 
 「同尺寸」指同一 viewport 下 AppShell、WorkspaceHeader、AgentSidebar 與主內容插槽的 bounding box 相同，不要求優惠卡填滿整個 Chat，也不把桌面縮成 390px 手機畫布。AppShell 保持掛載，只切換主區的 chat、offers、details、feedback 或 result 視圖。
 
 | Viewport 寬度 | 共用外框 | 導覽與主內容 |
 | --- | --- | --- |
-| ≥1200px | width=min(1472px, viewport−64px)，置中、上邊距 32px；height=100dvh−64px；panel 圓角 32px | 頂列 64px；左側欄 240px；主區內距 24px。Chat 為彈性對話區＋16px gap＋360px 編輯器。滑卡收起編輯器，主區使用這兩欄原本的完整寬度。 |
-| 768–1199px | width=viewport−48px，四周基準 24px；height=100dvh−48px | 頂列 64px；側欄收為 72px 導覽列，圖示仍有可及名稱；編輯器透過「代理設定」替換主內容，不擠壓 Chat。 |
-| 320–767px | width=viewport−32px，四周基準 16px；height=100dvh−32px | 頂列 56px；不保留固定側欄，改成頁面內可展開導覽，零動畫；Chat／編輯器／滑卡／明細一次一個主視圖。 |
+| ≥1200px | width=100vw；height=visualViewport.height when available, otherwise 100dvh；margin/border/radius=0；background #E8F1F8 | 頂列 64px；左側欄 240px；主區內距 24px。Chat 為彈性對話區＋16px gap＋360px 編輯器。滑卡收起編輯器，主區使用這兩欄原本的完整寬度。 |
+| 768–1199px | width=100vw；height=visualViewport.height when available, otherwise 100dvh；margin/border/radius=0；background #E8F1F8 | 頂列 64px；側欄收為 72px 導覽列，圖示仍有可及名稱；編輯器透過「代理設定」替換主內容，不擠壓 Chat。 |
+| 320–767px | width=100vw；height=visualViewport.height when available, otherwise 100dvh；margin/border/radius=0；background #E8F1F8 | 頂列 56px；不保留固定側欄，改成頁面內可展開導覽，零動畫；Chat／編輯器／滑卡／明細一次一個主視圖。 |
 
-正常桌面高度下主區各自垂直捲動，頂列／側欄保持穩定；Chat 訊息與 editor 可各自捲動，composer 留在 Chat 底部且不遮擋訊息。內容超長、200% 放大或軟鍵盤造成控制不可達時，共同降級為文件流及 min-height，不裁切內容、不造成頁面水平溢位。相同 viewport 與相同無障礙設定下，各 view 使用同一降級規則，不能只有滑卡改成窄外框。
+body、html、root 與 AppShell 不得產生頁面層級水平或垂直捲動，也不得使用舊版 min-height:720px 或文件流 fallback 撐開外頁。正常與窄高 viewport 下，只有主內容內的 Chat thread、definition editor、OfferDeck、OfferDetails、feedback、accepted/rejected result 與 negotiation history 可各自捲動；頂列、側欄與當前視圖的主要操作保持可達。軟鍵盤、200% 文字放大或超長內容不得把送出、儲存、採用、略過、返回與回饋操作推出不可達區域。
 
-桌面 OfferDeck 佔滿主區，卡片置中；≥1200px 的卡寬為 min(640px, deck 可用寬−96px)，內部商品圖與資訊兩欄、gap 24px；較小 viewport 改單欄、最大 480px，保留 16px 安全間距。圖片沿用 4:3，卡片高度由內容決定。卡片下方操作列固定在自己的版面位置，不跟隨 translateX；桌面不是放大手機 mockup。rank／N 計數沿用後端原始 rank 與總方案數，略過不重編排名；全部略過時另顯示回饋。
+桌面 OfferDeck 佔滿主區，卡片置中；≥1200px 的卡寬為 min(640px, deck 可用寬−96px)，內部商品圖與資訊兩欄、gap 24px；較小 viewport 改單欄、最大 480px，保留 16px 安全間距。圖片沿用 4:3，卡片高度由內容決定，但卡片所在主區內部捲動，不造成 body 捲動。卡片下方操作列固定在自己的版面位置，不跟隨 translateX；桌面不是放大手機 mockup。rank／N 計數沿用後端原始 rank 與總方案數，略過不重編排名；全部略過時另顯示回饋。
 
-左右拖曳的回饋背景固定在卡片 resting 區域：左滑露出右側 accent-surface 背景及「← 放開以略過」；右滑露出左側 #E4F3E8 背景及 success 色「→ 放開以採用」。回饋只有門檻成立才顯示文字，不能使用已成功勾選狀態。卡片位移以 deck 為 clipping boundary，不跨入側欄；主框、頂列、側欄、標題、操作列與回饋背景全部保持原位。沿用 M1–M6、8px 意圖與 25% 卡寬門檻，桌面 640px 卡的 release 門檻因此為 160px，不固定沿用手機像素值。
-
-主卡不顯示完整價格拆帳、多個行銷標籤或長段推薦；優惠標籤最多一個，只有可信資料支援才顯示「免費贈品」等描述。schema 未提供原價／單項優惠價時不能補造刪除線價格、折抵或百分比。期限仍保留一行短格式，完整日期、時區及條款可在明細閱讀，到期即停用採用。
-
-點擊非拖曳卡片區、商品圖或「查看明細」會切換至同一 AppShell 的 OfferDetails，網址為 `/requests/{request_id}?view=details&offer_id={offer_id}`；不彈新視窗、不進購物車。drag 一旦被認定，即使 release 未達 commit 門檻，也不得把隨後 click 解讀為開明細。明細逐列展示所有 items 的圖／佔位、可信名稱或 category/product_id、數量、primary／addon 角色、契約提供的價格與條款，並呈現推薦理由／tradeoffs 及總額。現有 OfferItem 沒有單價欄位，顯示「以組合總價計」，不可用總價均分或僅因 addon 角色就推定免費／捏造原價。返回時恢復同一 offer、skip 集合、捲動位置及焦點；明細中的採用使用相同 offer_id／pending 鎖，商品數量不可編輯。
-
-NegotiationPanel 和 Sponsored 沿用既有資料隔離：主區保留 Seller／round 摘要與「議價紀錄」入口；Sponsored 有值時顯示在主卡外的獨立標示區，不為畫面简化而刪除。概念圖未展開的完整歷史及其他狀態仍依 requirements 實作。
+使用者可見 UI 不顯示 technical/debug data：不得顯示 request_id、offer_id、product_id、terms_id、campaign_id、raw JSON、decision payload 或 source_documents 內容。API v0.3 仍保留 source_documents 與 decision 等 contract 欄位供 validation、persistence、handoff 與 reconciliation 使用；本節只要求 presentation 隱藏。可見內容應保留使用者需要的 seller、round、total price、delivery、expiry、items with quantity、自然語言條款、推薦理由、tradeoffs、saved feedback summary、Sponsored 標籤，以及使用者明確要求的 intent.md／preference.md 編輯器。
 
 M7 workspace transition：點「查看優惠」、返回 Chat 或開／關 editor 時，新主區 opacity 0→1，160ms ease-out、delay 0；離開內容立即不再互動，外框不動畫、不縮放、不改尺寸。重複導覽以最新 view 為準並取消舊動畫；鍵盤導覽 0ms，reduced-motion 只保留 160ms opacity。details 採高頻 M6 的 0ms。背景網路工作由 request scope 管理，切畫面不取消已送出的決策或清除 pending journal。
 
@@ -216,7 +210,7 @@ Chat 狀態為 empty／draft／sending／processing／ready／failed。需求限
 
 發送前保存 request-creation journal（key＋exact body＋本機對話識別），sending 期間防止重複 Enter／click。202 回來記住 request_id，依既有 GET 輪詢顯示真實階段；逾時以同 key／body 重試，不因返回 Chat 或重新整理而產生新工作。未配置 AI adapter 時以明示 demo 的 deterministic 狀態訊息呈現，不假稱模型對話或議價已完成。
 
-awaiting_user 後提供「查看 N 組優惠」，不自動導航、不自動採用。`/requests/{request_id}` 顯示 offers；返回 `/chat?request_id={request_id}` 恢復該次對話及 draft，直達 request 若無聊天歷史則只顯示可驗證的需求快照與「本分頁沒有原對話紀錄」。active awaiting_user 的「補充需求」沿用明示 feedback，送出按鈕顯示「送出回饋」，呼叫 reject API 保存回饋並回傳原始文件；200 後顯示 rejected，不自動建立 child 或宣稱 intent 已改寫。後續 Buyer Agent 整合未接入時明示。processing 或未知 POST 結果期間可以打草稿，但禁止會造成另一輪決策的送出；已結束的輪次要透過「新對話」開始新需求。
+awaiting_user 後提供「查看 N 組優惠」，不自動導航、不自動採用。`/requests/{request_id}` 顯示 offers；返回 `/chat?request_id={request_id}` 恢復該次對話及 draft，直達 request 若無聊天歷史則只顯示可驗證的需求快照與「本分頁沒有原對話紀錄」。active awaiting_user 的「補充需求」沿用明示 feedback，送出按鈕顯示「送出回饋」，呼叫 reject API 保存回饋；API v0.3 可回傳 source_documents 供 validation、persistence 與 handoff，但 UI 只顯示回饋已保存摘要，不顯示原始文件或 source_documents 內容；200 後顯示 rejected，不自動建立 child 或宣稱 intent 已改寫。後續 Buyer Agent 整合未接入時明示。processing 或未知 POST 結果期間可以打草稿，但禁止會造成另一輪決策的送出；已結束的輪次要透過「新對話」開始新需求。
 
 設定保存、新 chat request、reject 或 accept 各有獨立本機狀態，不把修改文件當成採用，也不把返回 Chat 當成拒絕。附件、語音、跨裝置同步及帳號設定服務不在本次範圍；概念圖中如有相應裝飾 icon，實作不建立無作用按鈕。
 
@@ -226,7 +220,7 @@ awaiting_user 後提供「查看 N 組優惠」，不自動導航、不自動採
 
 | ID | 需要決定的事項 | 未決前行為與影響 |
 | --- | --- | --- |
-| P1 | 是否提供可信商品圖片／名稱，以及由哪個 Catalog 提供？ | 用中性佔位與既有 category/product_id；不抓取參考圖商品照片、不新增 wire 欄位。核准真實素材後需另定資料來源與失敗回退。 |
+| P1 | 是否提供可信商品圖片／名稱，以及由哪個 Catalog 提供？ | 用中性佔位與既有 使用者可理解的 category（product_id 僅留在資料層）；不抓取參考圖商品照片、不新增 wire 欄位。核准真實素材後需另定資料來源與失敗回退。 |
 | P2 | 是否要參考圖的收藏、分類篩選、購物車或數量編輯？ | 本次不加入。若要加入，須另定篩選與排名關係、收藏保存位置，以及修改數量如何形成新需求；不能直接修改不可變 offer。 |
 | P4 | Buyer Agent 定義與聊天記錄是否需要跨分頁／跨裝置保存？ | MVP 明示保存在本分頁，既有已發布請求仍由 backend 保存。若需帳號級持久化，另定權限、版本衝突與 API，不假稱本次三個 HTTP 操作 已支援。 |
 
@@ -242,3 +236,7 @@ awaiting_user 後提供「查看 N 組優惠」，不自動導航、不自動採
 ## Migration Plan
 
 先升版共享契約及 owner 文件，再依 tasks.md 建立 MockResultProvider、API／SQLite，最後串接前端。此規格變更不代表功能已交付，不 archive，也不宣稱舊 fixture 已驗證新契約。保留既有資料與已發布 ID；實作時不得用刪庫掩蓋決策或相容性問題。
+
+## v0.3 契約與資料庫統一
+
+使用唯一 a2a-commerce.v0.3.schema.json；old contracts 歸檔至 contracts/archive。Mock 使用 main Catalog，A/B/C 五輪、D 三輪、E 一輪，所有歷史 Offer 可查詢但僅 final IDs 可採用。Backend 使用 db/migrations 的正規化表格，003 保存 Result state 與原始決策，保留 frozen snapshot 與舊資料備份。

@@ -1,5 +1,5 @@
 import {describe,it,expect,beforeEach} from 'vitest';
-import fixture from '../../../contracts/fixtures/result-v0.2.json';
+import fixture from '../../../contracts/fixtures/result-v0.3.json';
 import {validateSnapshot} from '../api/client';
 import {freshConversation,currentRank,skipOffer,undoSkip,initialWorkspace,saveWorkspace,loadWorkspace,loadPending,pendingKey} from './model';
 beforeEach(()=>sessionStorage.clear());

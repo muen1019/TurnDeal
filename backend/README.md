@@ -1,6 +1,6 @@
 # OfferMesh Result Backend
 
-已實作 Express 5、TypeScript 與 SQLite（sql.js）的 Result API。HTTP 正本為 [openapi.json](openapi.json)，資料正本為 [Result v0.2 schema](../contracts/result-api.v0.2.schema.json)。main 的 [完整產品 v0.2 契約](../contracts/a2a-commerce.v0.2.schema.json) 保留五家／五輪設計；目前 Result 使用獨立的三家／兩輪 mock 測資，兩者尚未串接。
+已實作 Express 5、TypeScript 與 SQLite（sql.js）的 Result API。HTTP 正本為 [openapi.json](openapi.json)，所有模組使用 [共用 v0.3 schema](../contracts/a2a-commerce.v0.3.schema.json)。五家／五輪資料與原始回饋交接已統一。
 
 ## 啟動與測試
 
@@ -26,7 +26,7 @@ accept 保存選定 offer；不付款、不扣庫存、不兌換。reject 保存
 
 也支援 `Wireless silent mouse under TWD 1000, delivery within 7 days.`，搭配 `Prefer black, small, and symmetrical. Free related accessories are okay.`，以及前端預設文件。預算與天數使用阿拉伯數字；可填「不要滑鼠墊」。未知或互相矛盾的限制回 needs_clarification；有效但無方案回 no_match，不放寬限制湊數。
 
-Result 使用 src/mockResultProvider.ts：三家虛擬賣家、兩輪固定策略、四個最終選項（依限制可能減少），包含歷史報價。新 request 配置新 Offer IDs；價格、期限及結果一旦發布便固定。src/demoPipeline.ts 是保留的舊 pipeline，不由 Result routes 呼叫。
+Result 使用 src/mockResultProvider.ts：五家虛擬賣家、最多五輪固定策略、六個最終選項（依限制可能減少），包含歷史報價。新 request 配置新 Offer IDs；價格、期限及結果一旦發布便固定。A／B／C 五輪、D 三輪、E 一輪；以 is_final／stop_reason 表達提前結束。src/demoPipeline.ts 僅重新匯出同一 mock provider，沒有第二套 pipeline。
 
 ## Buyer Agent 交接
 
@@ -39,3 +39,11 @@ Result 使用 src/mockResultProvider.ts：三家虛擬賣家、兩輪固定策�
 Buyer Agent 之後可用 feedback + source_documents 改寫 intent。此服务只保存和提供資料，没有自動模型、webhook 或 queue 交付；尚未接入時 UI 顯示「回饋已保存」。可從 GET 的 decision 恢復同一份交接資料。
 
 規格：[Result API](../openspec/changes/define-offer-result-ui-api/specs/result-api/spec.md)、[Feedback](../openspec/changes/define-offer-result-ui-api/specs/feedback-loop/spec.md)。
+
+## 資料庫遷移
+
+Backend 使用 db/migrations 的 main 正規化表格，003_result_decisions.sql 新增 result_state_json、contract_version 與 decisions.result_json。published_snapshot_json 保持不可變；GET 的決策狀態由獨立 Result state 保存。DB 內 reject 對應既有 reject_all action，HTTP 固定為 action=reject。
+
+既有 Result v0.2 檔案會先備份為 *.pre-v03-*.bak，再匯入共用表格；原表改名為 legacy_result_* 留存，價格與決策不重算，原成功決策可重播。舊 snapshot 缺少的 round final 預設 false，兩輪完成以 no_adjustment 表示，不捏造賣家 final。main 的舊版 published snapshot 原封保留，符合 v0.3 的既有 snapshot 可恢復 GET；已 superseded/redeemed 或其他不相容歷史只保留在資料庫，不冒充現行 Result。
+
+請只啟動一個程序使用同一個資料庫。Root 的 db tools 使用 Node 24，Result server 仍使用 Node 20.19.5；不要對正在使用的資料庫執行 db:rebuild。

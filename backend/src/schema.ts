@@ -16,7 +16,7 @@ export type ValidatorName =
   | "RedemptionReceipt"
   | "ErrorResponse";
 
-const contractPath = contractFile("result-api.v0.2.schema.json");
+const contractPath = contractFile("a2a-commerce.v0.3.schema.json");
 export const contractSchema = JSON.parse(readFileSync(contractPath, "utf8"));
 
 const AjvCtor = Ajv2020Module as unknown as new (options: Record<string, unknown>) => {

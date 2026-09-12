@@ -1,6 +1,6 @@
 ﻿import Ajv2020 from "ajv/dist/2020";
 import addFormats from "ajv-formats";
-import schema from "../../../contracts/result-api.v0.2.schema.json";
+import schema from "../../../contracts/a2a-commerce.v0.3.schema.json";
 import { apiPaths } from "./routes.generated";
 export { apiPaths };
 export const decisionPath = (id: string) => apiPaths.submitDecision.replace("{request_id}", encodeURIComponent(id));

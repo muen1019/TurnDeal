@@ -5,7 +5,7 @@
 ## ADDED Requirements
 
 ### Requirement: Version the changed result contract before implementation
-The implementation SHALL use a versioned successor to the shared v0.1 contract. It SHALL define rejected, RejectDecisionResult and RequestSnapshot.decision as specified in design.md section 2, and update OpenAPI, fixtures and validators together before changing consumers. The current v0.1 artifacts SHALL NOT be described as compatible with this change.
+The implementation SHALL use a unified v0.3 successor to the main v0.2 contract and the local Result contract. It SHALL define rejected, RejectDecisionResult and RequestSnapshot.decision as specified in design.md section 2, and update OpenAPI, fixtures and validators together before changing consumers. The current v0.1 artifacts SHALL NOT be described as compatible with this change.
 
 #### Scenario: Prepare integration artifacts
 - **WHEN** implementation of the new result lifecycle starts
@@ -21,11 +21,11 @@ The API SHALL accept POST /api/requests with nonblank intent_md and optional pre
 - **AND** decision and selected_offer_id are null and no Buyer Agent model is called
 
 ### Requirement: Generate deterministic supported combinations
-The service SHALL implement MockResultProvider.generate(request_id, revision, documents, clock) using the existing seller and offer fixture data. For the supported baseline it SHALL return three visibly different strategies: lower price/slower delivery, faster delivery/higher price and a related optional bundle. It SHALL validate all published offers against trusted fixture data and supported intent constraints, assign new immutable offer IDs per request and label the experience as demo.
+The service SHALL implement MockResultProvider.generate(request_id, revision, documents, clock) using the existing seller and offer fixture data. For the supported baseline it SHALL return five reproducible seller strategies with up to five rounds, including lower price/slower delivery, faster delivery/higher price, a related optional bundle, balanced delivery and firm pricing. It SHALL validate all published offers against trusted fixture data and supported intent constraints, assign new immutable offer IDs per request and label the experience as demo.
 
 #### Scenario: Apply a supported budget and accessory policy
 - **WHEN** supported input lowers the budget or forbids accessories
-- **THEN** over-budget or forbidden bundles are excluded from eligible rankings, and fewer than three offers are permitted
+- **THEN** over-budget or forbidden bundles are excluded from eligible rankings, and fewer than six offers are permitted
 - **AND** no_match with an error is returned when no compliant offer remains, without silently relaxing the input
 
 #### Scenario: Input cannot be interpreted safely
@@ -35,7 +35,7 @@ The service SHALL implement MockResultProvider.generate(request_id, revision, do
 #### Scenario: Repeat a deterministic scenario
 - **WHEN** equivalent supported documents are processed with a controlled clock
 - **THEN** fixture prices, item combinations and rank policy are reproducible, while each request receives distinct offer IDs and publication-time expiry
-- **AND** any two-round seller history is explicitly simulated fixture history, not evidence of real Seller or Evaluator execution
+- **AND** any up-to-five-round seller history is explicitly simulated fixture history, not evidence of real Seller or Evaluator execution
 
 ### Requirement: Read stable snapshots and recover decisions
 GET /api/requests/{request_id} SHALL return 200 RequestSnapshot without creating work, reranking, extending expiry or rewriting documents. It SHALL return the persisted decision for accepted and rejected requests and null before a decision. Access SHALL be scoped to the server-derived buyer; missing or foreign resources SHALL return 404 not_found.

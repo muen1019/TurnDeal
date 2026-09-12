@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "OfferMesh Result API",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Deterministic mock offers, durable accept/reject and recoverable Buyer Agent handoff. Fixed local demo buyer. No model rewriting or redemption."
   },
   "servers": [
@@ -61,9 +61,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "503": {
-            "$ref": "#/components/responses/Unavailable"
           }
         }
       }
@@ -164,9 +161,6 @@
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
-          },
-          "503": {
-            "$ref": "#/components/responses/Unavailable"
           }
         }
       }
@@ -244,48 +238,38 @@
             }
           }
         }
-      },
-      "Unavailable": {
-        "description": "processing_unavailable：提交前的服務暫時不可用；不是使用者回饋錯誤",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/ErrorResponse"
-            }
-          }
-        }
       }
     },
     "schemas": {
       "ID": {
-        "$ref": "../contracts/result-api.v0.2.schema.json#/$defs/Id"
+        "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/Id"
       },
       "CreateRequest": {
-        "$ref": "../contracts/result-api.v0.2.schema.json#/$defs/CreateRequest"
+        "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/CreateRequest"
       },
       "DocumentBundle": {
-        "$ref": "../contracts/result-api.v0.2.schema.json#/$defs/DocumentBundle"
+        "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/DocumentBundle"
       },
       "RequestSnapshot": {
-        "$ref": "../contracts/result-api.v0.2.schema.json#/$defs/RequestSnapshot"
+        "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/RequestSnapshot"
       },
       "AcceptDecision": {
-        "$ref": "../contracts/result-api.v0.2.schema.json#/$defs/AcceptDecision"
+        "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/AcceptDecision"
       },
       "RejectDecision": {
-        "$ref": "../contracts/result-api.v0.2.schema.json#/$defs/RejectDecision"
+        "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/RejectDecision"
       },
       "AcceptedResult": {
-        "$ref": "../contracts/result-api.v0.2.schema.json#/$defs/AcceptDecisionResult"
+        "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/AcceptDecisionResult"
       },
       "RejectedResult": {
-        "$ref": "../contracts/result-api.v0.2.schema.json#/$defs/RejectDecisionResult"
+        "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/RejectDecisionResult"
       },
       "ErrorResponse": {
-        "$ref": "../contracts/result-api.v0.2.schema.json#/$defs/ErrorResponse"
+        "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/ErrorResponse"
       },
       "DecisionResult": {
-        "$ref": "../contracts/result-api.v0.2.schema.json#/$defs/DecisionResult"
+        "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/DecisionResult"
       }
     }
   }

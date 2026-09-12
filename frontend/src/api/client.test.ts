@@ -1,5 +1,5 @@
 import {describe,it,expect,vi,afterEach} from 'vitest';
-import fixture from '../../../contracts/fixtures/result-v0.2.json';
+import fixture from '../../../contracts/fixtures/result-v0.3.json';
 import {composeRequest,validateSnapshot,request,ApiFailure} from './client';
 describe('shared contract boundary',()=>{
  it('accepts the published fixture without editing its prices or expiry',()=>{const s=structuredClone(fixture.snapshot);expect(validateSnapshot(s)).toEqual(s);});

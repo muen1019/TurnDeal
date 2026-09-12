@@ -3,7 +3,7 @@ import {cleanup, fireEvent, render, screen} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import type {ComponentProps, CSSProperties, ReactNode} from 'react';
 import type {Offer, RankedOffer, RequestSnapshot} from '../../contract.generated';
-import fixture from '../../../../contracts/fixtures/result-v0.2.json';
+import fixture from '../../../../contracts/fixtures/result-v0.3.json';
 import {OfferDeck} from './OfferDeck';
 import {OfferDetails} from './OfferDetails';
 

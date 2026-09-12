@@ -4,6 +4,8 @@ import {formatTwd, outcomeLabel, sellerStatusLabel} from './offerUtils';
 import {StatusPill} from './offerPrimitives';
 import '../../styles/offers.css';
 
+const stopLabels: Record<string,string> = {seller_final:'賣家已提出最終報價',max_rounds:'已完成五輪',refused:'賣家拒絕',timeout:'賣家逾時',error:'賣家發生錯誤',no_adjustment:'無進一步調整',global_deadline:'已達整體期限',call_budget:'已達呼叫上限',token_budget:'已達 token 上限'};
+
 export interface NegotiationPanelProps {
   snapshot: RequestSnapshot;
   activeOfferId?: string | null;
@@ -37,6 +39,7 @@ export function NegotiationPanel({snapshot, activeOfferId = null, onSelectOffer}
               <div>
                 <h3>{seller.name}</h3>
                 <p>{seller.match_reason}</p>
+                {seller.stop_reason && <p>{stopLabels[seller.stop_reason]}</p>}
               </div>
               <div className="negotiation-seller__badges">
                 <StatusPill tone={seller.status === 'offered' ? 'success' : seller.status === 'error' ? 'danger' : 'neutral'}>
@@ -52,6 +55,7 @@ export function NegotiationPanel({snapshot, activeOfferId = null, onSelectOffer}
                   <div>
                     <strong>第 {round.round} 輪</strong>
                     <span>{outcomeLabel(round.outcome)}</span>
+                    {round.is_final && <StatusPill tone="success">最終報價</StatusPill>}
                   </div>
                   <div className="negotiation-round__offers">
                     {round.offer_ids.length ? (

@@ -16,10 +16,10 @@ const create=(a:Awaited<ReturnType<typeof createApp>>,key='create',body:object=b
 async function ready(a:Awaited<ReturnType<typeof createApp>>,key='create',body:object=baseline){const c=await create(a,key,body).expect(202);a.locals.store.processRequest(c.body.request_id);return (await request(a).get(`/api/requests/${c.body.request_id}`).expect(200)).body;}
 const decide=(a:Awaited<ReturnType<typeof createApp>>,id:string,key:string,body:object)=>request(a).post(`/api/requests/${id}/decisions`).set('Idempotency-Key',key).send(body);
 
-describe('Result v0.2 HTTP + SQLite',()=>{
+describe('Result v0.3 HTTP + SQLite',()=>{
  it('publishes valid immutable mock offers with unique per-request IDs',async()=>{
   const a=await app();const c=await create(a).expect(202);expect(c.body.status).toBe('formatting');expect(isValid('RequestSnapshot',c.body)).toBe(true);a.locals.store.processRequest(c.body.request_id);
-  const s=(await request(a).get(`/api/requests/${c.body.request_id}`)).body;expect(s.status).toBe('awaiting_user');expect(s.seller_agents).toHaveLength(3);expect(s.ranked_offers).toHaveLength(4);expect(isValid('RequestSnapshot',s)).toBe(true);
+  const s=(await request(a).get(`/api/requests/${c.body.request_id}`)).body;expect(s.status).toBe('awaiting_user');expect(s.seller_agents).toHaveLength(5);expect(s.ranked_offers).toHaveLength(6);expect(isValid('RequestSnapshot',s)).toBe(true);
   const again=await request(a).get(`/api/requests/${s.request_id}`);expect(again.body).toEqual(s);
   const other=await ready(a,'other');expect(other.offers.every((o:any)=>!s.offers.some((x:any)=>x.offer_id===o.offer_id))).toBe(true);
   const replay=await create(a).expect(202);expect(replay.body).toEqual(c.body);
@@ -88,12 +88,12 @@ describe('mock input constraints',()=>{
  const run=(intent=baseline.intent_md,preference=baseline.preference_md)=>runDemoPipeline('req_test',{revision:1,intent_md:intent,preference_md:preference},now());
  it('supports the frontend default documents composed with a Chinese request',()=>{
   const result=run('# Buying intent\nFind a wireless mouse suitable for daily office work.\n\n## 本次購買需求\n'+baseline.intent_md,'# Preferences and limits\n- Prefer comfort and price\n- Accept a free mouse pad\n- Do not accept paid add-ons');
-  expect(result.status).toBe('awaiting_user');expect(result.ranked_offers).toHaveLength(4);
+  expect(result.status).toBe('awaiting_user');expect(result.ranked_offers).toHaveLength(6);
  });
  it.each([
-  ['辦公用無線滑鼠，預算 800 元含稅運，7 天內到貨。','不要滑鼠墊',1],
+  ['辦公用無線滑鼠，預算 600 元含稅運，7 天內到貨。','不要滑鼠墊',1],
   ['辦公用無線滑鼠，預算 900 元含稅運，1 天內到貨。','',1],
-  [baseline.intent_md,'不要滑鼠墊',3],
+  [baseline.intent_md,'不要滑鼠墊',5],
  ])('filters supported limits %s', (intent,pref,count)=>expect(run(intent,pref).ranked_offers).toHaveLength(count));
  it('returns no_match without raising budget',()=>expect(run('辦公用無線滑鼠，預算 100 元含稅運，7 天內到貨。','').status).toBe('no_match'));
  it.each(['想買鍵盤','無線滑鼠','辦公用無線滑鼠，預算 900 元含稅運，7 天內到貨。必須紅色','無線滑鼠，預算 900，預算 800，7 天內到貨。'])('clarifies unsupported/incomplete/conflicting input %s',intent=>expect(run(intent,'').status).toBe('needs_clarification'));

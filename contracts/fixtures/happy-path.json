@@ -2886,7 +2886,8 @@
     "confirmation_offer_ids": [],
     "selected_offer_id": null,
     "next_request_id": null,
-    "error": null
+    "error": null,
+    "decision": null
   },
   "evaluator_input": {
     "request_id": "req_demo_001",

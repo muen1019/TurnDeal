@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { AgentProgressStatus } from "./AgentProgress";
 
 export type AppShellView =
   | "chat"
@@ -55,6 +56,7 @@ export type ChatStatus =
 export interface ChatPanelProps {
   messages: ChatMessage[];
   status: ChatStatus;
+  progressStatus?: AgentProgressStatus;
   teaser?: OfferTeaser;
   draft: string;
   onDraft: (draft: string) => void;
@@ -62,6 +64,7 @@ export interface ChatPanelProps {
   onOpenOffers: (requestId: string) => void;
   sending: boolean;
   error?: string;
+  progressError?: string;
   unsavedDefinitions: boolean;
   savedDefinitionValid: boolean;
   onEditDefinitions?: () => void;

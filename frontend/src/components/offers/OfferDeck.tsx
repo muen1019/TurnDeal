@@ -80,6 +80,8 @@ export function OfferDeck({
   const pointerRef = useRef<PointerState | null>(null);
   const suppressClickRef = useRef(false);
   const suppressClickTimeoutRef = useRef<number | null>(null);
+  const leavingTimeoutRef = useRef<number | null>(null);
+  const keyboardTimeoutRef = useRef<number | null>(null);
   const acceptedLockRef = useRef<string | null>(null);
   const keyboardActionRef = useRef(false);
   const [phase, setPhase] = useState<VisualPhase>('idle');
@@ -164,6 +166,8 @@ export function OfferDeck({
       if (suppressClickTimeoutRef.current !== null) {
         window.clearTimeout(suppressClickTimeoutRef.current);
       }
+      if (leavingTimeoutRef.current !== null) window.clearTimeout(leavingTimeoutRef.current);
+      if (keyboardTimeoutRef.current !== null) window.clearTimeout(keyboardTimeoutRef.current);
     };
   }, []);
 
@@ -223,11 +227,13 @@ export function OfferDeck({
         width,
         key: Date.now(),
       });
-      window.setTimeout(() => setLeaving((current) => (current?.offer.offer_id === offer.offer_id ? null : current)), EXIT_MS);
+      if (leavingTimeoutRef.current !== null) window.clearTimeout(leavingTimeoutRef.current);
+      leavingTimeoutRef.current = window.setTimeout(() => setLeaving((current) => (current?.offer.offer_id === offer.offer_id ? null : current)), EXIT_MS);
     } else {
       setLeaving(null);
       setKeyboardTransition(source === 'keyboard');
-      window.setTimeout(() => setKeyboardTransition(false), 0);
+      if (keyboardTimeoutRef.current !== null) window.clearTimeout(keyboardTimeoutRef.current);
+      keyboardTimeoutRef.current = window.setTimeout(() => setKeyboardTransition(false), 0);
     }
 
     setPhase('resting');
