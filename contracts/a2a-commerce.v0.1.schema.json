@@ -1,0 +1,839 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sea-hackathon.local/contracts/a2a-commerce.v0.1.schema.json",
+  "title": "A2A Commerce RequestSnapshot v0.1",
+  "description": "Authoritative shared contracts. The document root validates a RequestSnapshot; reusable contracts live in $defs.",
+  "$ref": "#/$defs/RequestSnapshot",
+  "$defs": {
+    "Id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+    },
+    "Timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "MoneyTwd": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "ProductCategory": {
+      "type": "string",
+      "enum": ["mouse", "mouse_pad"]
+    },
+    "Status": {
+      "type": "string",
+      "enum": [
+        "formatting",
+        "orchestrating",
+        "negotiating",
+        "evaluating",
+        "awaiting_user",
+        "needs_clarification",
+        "needs_confirmation",
+        "no_match",
+        "failed",
+        "accepted",
+        "superseded",
+        "redeemed"
+      ]
+    },
+    "EligibilityReasonCode": {
+      "type": "string",
+      "enum": [
+        "related_bundle",
+        "no_extra_cost",
+        "within_addon_cap",
+        "addon_consent_required",
+        "baseline_unavailable",
+        "over_budget",
+        "missing_feature",
+        "quantity_changed",
+        "delivery_too_late",
+        "expired",
+        "invalid_offer",
+        "unrelated_addon",
+        "bundle_disabled",
+        "terms_changed",
+        "addon_not_optional"
+      ]
+    },
+    "DocumentBundle": {
+      "type": "object",
+      "properties": {
+        "revision": {"type": "integer", "minimum": 1},
+        "intent_md": {"type": "string", "minLength": 1, "maxLength": 20000},
+        "preference_md": {"type": "string", "maxLength": 20000}
+      },
+      "required": ["revision", "intent_md", "preference_md"],
+      "additionalProperties": false
+    },
+    "CreateRequest": {
+      "type": "object",
+      "properties": {
+        "intent_md": {"type": "string", "minLength": 1, "maxLength": 20000},
+        "preference_md": {"type": "string", "maxLength": 20000, "default": ""}
+      },
+      "required": ["intent_md"],
+      "additionalProperties": false
+    },
+    "AcceptDecision": {
+      "type": "object",
+      "properties": {
+        "action": {"const": "accept"},
+        "offer_id": {"$ref": "#/$defs/Id"}
+      },
+      "required": ["action", "offer_id"],
+      "additionalProperties": false
+    },
+    "RejectDecision": {
+      "type": "object",
+      "properties": {
+        "action": {"const": "reject"},
+        "feedback": {"type": "string", "minLength": 1, "maxLength": 2000}
+      },
+      "required": ["action", "feedback"],
+      "additionalProperties": false
+    },
+    "RedeemRequest": {
+      "type": "object",
+      "properties": {
+        "request_id": {"$ref": "#/$defs/Id"},
+        "offer_id": {"$ref": "#/$defs/Id"}
+      },
+      "required": ["request_id", "offer_id"],
+      "additionalProperties": false
+    },
+    "NegotiationPolicy": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "bundle_mode": {"const": "disabled"},
+            "allowed_addon_categories": {"type": "array", "maxItems": 0},
+            "max_addon_increment_twd": {"const": 0}
+          },
+          "required": ["bundle_mode", "allowed_addon_categories", "max_addon_increment_twd"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "bundle_mode": {"const": "related_no_extra_cost"},
+            "allowed_addon_categories": {
+              "type": "array",
+              "items": {"const": "mouse_pad"},
+              "uniqueItems": true,
+              "maxItems": 1
+            },
+            "max_addon_increment_twd": {"const": 0}
+          },
+          "required": ["bundle_mode", "allowed_addon_categories", "max_addon_increment_twd"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "bundle_mode": {"const": "related_with_cap"},
+            "allowed_addon_categories": {
+              "type": "array",
+              "items": {"const": "mouse_pad"},
+              "minItems": 1,
+              "maxItems": 1,
+              "uniqueItems": true
+            },
+            "max_addon_increment_twd": {"type": "integer", "minimum": 1}
+          },
+          "required": ["bundle_mode", "allowed_addon_categories", "max_addon_increment_twd"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "CategoricalProductPreference": {
+      "type": "object",
+      "properties": {
+        "preference_id": {"$ref": "#/$defs/Id"},
+        "strength": {"type": "string", "enum": ["required", "preferred"]},
+        "source_text": {"type": "string", "minLength": 1, "maxLength": 500},
+        "attribute": {"type": "string", "enum": ["size_class", "color", "shape"]},
+        "operator": {"type": "string", "enum": ["in", "not_in"]},
+        "values": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1, "maxLength": 64},
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": ["preference_id", "strength", "source_text", "attribute", "operator", "values"],
+      "additionalProperties": false
+    },
+    "RangeProductPreference": {
+      "type": "object",
+      "properties": {
+        "preference_id": {"$ref": "#/$defs/Id"},
+        "strength": {"type": "string", "enum": ["required", "preferred"]},
+        "source_text": {"type": "string", "minLength": 1, "maxLength": 500},
+        "attribute": {"type": "string", "enum": ["length_mm", "width_mm", "height_mm"]},
+        "operator": {"const": "range"},
+        "min": {"type": ["number", "null"], "exclusiveMinimum": 0},
+        "max": {"type": ["number", "null"], "exclusiveMinimum": 0}
+      },
+      "required": ["preference_id", "strength", "source_text", "attribute", "operator", "min", "max"],
+      "additionalProperties": false,
+      "not": {
+        "properties": {"min": {"type": "null"}, "max": {"type": "null"}},
+        "required": ["min", "max"]
+      }
+    },
+    "ProductPreference": {
+      "oneOf": [
+        {"$ref": "#/$defs/CategoricalProductPreference"},
+        {"$ref": "#/$defs/RangeProductPreference"}
+      ]
+    },
+    "NormalizedIntent": {
+      "type": "object",
+      "properties": {
+        "category": {"const": "mouse"},
+        "max_total_twd": {"$ref": "#/$defs/MoneyTwd"},
+        "delivery_days_max": {"type": "integer", "minimum": 1},
+        "required_features": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1, "maxLength": 64},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "preferences": {
+          "type": "array",
+          "items": {"type": "string", "enum": ["price_first", "delivery_first", "trust_first"]},
+          "uniqueItems": true
+        },
+        "product_preferences": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/ProductPreference"}
+        },
+        "negotiation_policy": {"$ref": "#/$defs/NegotiationPolicy"}
+      },
+      "required": [
+        "category",
+        "max_total_twd",
+        "delivery_days_max",
+        "required_features",
+        "preferences",
+        "product_preferences",
+        "negotiation_policy"
+      ],
+      "additionalProperties": false
+    },
+    "ProductAttributes": {
+      "type": "object",
+      "properties": {
+        "size_class": {"type": ["string", "null"]},
+        "color": {"type": ["string", "null"]},
+        "shape": {"type": ["string", "null"]},
+        "length_mm": {"type": ["number", "null"], "exclusiveMinimum": 0},
+        "width_mm": {"type": ["number", "null"], "exclusiveMinimum": 0},
+        "height_mm": {"type": ["number", "null"], "exclusiveMinimum": 0}
+      },
+      "required": ["size_class", "color", "shape", "length_mm", "width_mm", "height_mm"],
+      "additionalProperties": false
+    },
+    "ProductMatch": {
+      "type": "object",
+      "properties": {
+        "product_id": {"$ref": "#/$defs/Id"},
+        "attributes": {"$ref": "#/$defs/ProductAttributes"},
+        "matched_preference_ids": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/Id"},
+          "uniqueItems": true
+        },
+        "unmatched_preference_ids": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/Id"},
+          "uniqueItems": true
+        },
+        "pending_checks": {
+          "type": "array",
+          "items": {"type": "string", "enum": ["availability", "delivery"]},
+          "uniqueItems": true
+        }
+      },
+      "required": ["product_id", "attributes", "matched_preference_ids", "unmatched_preference_ids", "pending_checks"],
+      "additionalProperties": false
+    },
+    "Trust": {
+      "type": "object",
+      "properties": {
+        "personal_band": {"type": "string", "enum": ["positive", "neutral", "negative"]},
+        "personal_rating": {"type": ["number", "null"], "minimum": 1, "maximum": 5},
+        "personal_count": {"type": "integer", "minimum": 0},
+        "marketplace_rating": {"type": ["number", "null"], "minimum": 1, "maximum": 5},
+        "marketplace_count": {"type": "integer", "minimum": 0}
+      },
+      "required": ["personal_band", "personal_rating", "personal_count", "marketplace_rating", "marketplace_count"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {"properties": {"personal_count": {"const": 0}}, "required": ["personal_count"]},
+          "then": {"properties": {"personal_rating": {"type": "null"}}}
+        },
+        {
+          "if": {"properties": {"marketplace_count": {"const": 0}}, "required": ["marketplace_count"]},
+          "then": {"properties": {"marketplace_rating": {"type": "null"}}}
+        }
+      ]
+    },
+    "SellerRound": {
+      "type": "object",
+      "properties": {
+        "round": {"type": "integer", "enum": [1, 2]},
+        "outcome": {"type": "string", "enum": ["offered", "refused", "timeout", "error"]},
+        "offer_ids": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/Id"},
+          "uniqueItems": true,
+          "maxItems": 2
+        }
+      },
+      "required": ["round", "outcome", "offer_ids"],
+      "additionalProperties": false
+    },
+    "SellerAgent": {
+      "type": "object",
+      "properties": {
+        "seller_id": {"$ref": "#/$defs/Id"},
+        "name": {"type": "string", "minLength": 1, "maxLength": 100},
+        "listing_rank": {"type": "integer", "minimum": 1},
+        "match_reason": {"type": "string", "minLength": 1, "maxLength": 500},
+        "candidate_products": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/ProductMatch"},
+          "minItems": 1
+        },
+        "trust": {"$ref": "#/$defs/Trust"},
+        "status": {"type": "string", "enum": ["pending", "negotiating", "offered", "refused", "timeout", "error"]},
+        "rounds": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/SellerRound"},
+          "maxItems": 2
+        },
+        "final_offer_ids": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/Id"},
+          "uniqueItems": true,
+          "maxItems": 2
+        }
+      },
+      "required": ["seller_id", "name", "listing_rank", "match_reason", "candidate_products", "trust", "status", "rounds", "final_offer_ids"],
+      "additionalProperties": false
+    },
+    "SponsoredPlacement": {
+      "type": "object",
+      "properties": {
+        "seller_id": {"$ref": "#/$defs/Id"},
+        "campaign_id": {"$ref": "#/$defs/Id"},
+        "label": {"const": "Sponsored"}
+      },
+      "required": ["seller_id", "campaign_id", "label"],
+      "additionalProperties": false
+    },
+    "DiscoveryProductCheck": {
+      "type": "object",
+      "properties": {
+        "product_id": {"$ref": "#/$defs/Id"},
+        "reason": {
+          "type": "string",
+          "enum": ["required_mismatch", "required_attribute_unknown", "feature_mismatch", "out_of_stock", "delivery_too_late"]
+        },
+        "preference_id": {"anyOf": [{"$ref": "#/$defs/Id"}, {"type": "null"}]},
+        "missing_attribute": {
+          "type": ["string", "null"],
+          "enum": ["size_class", "color", "shape", "length_mm", "width_mm", "height_mm", null]
+        }
+      },
+      "required": ["product_id", "reason", "preference_id", "missing_attribute"],
+      "additionalProperties": false
+    },
+    "DiscoveryExclusion": {
+      "type": "object",
+      "properties": {
+        "seller_id": {"$ref": "#/$defs/Id"},
+        "reason": {"type": "string", "enum": ["seller_unavailable", "no_matching_product", "insufficient_product_data"]},
+        "product_checks": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/DiscoveryProductCheck"}
+        }
+      },
+      "required": ["seller_id", "reason", "product_checks"],
+      "additionalProperties": false
+    },
+    "OrchestrationResult": {
+      "type": "object",
+      "properties": {
+        "seller_agents": {"type": "array", "items": {"$ref": "#/$defs/SellerAgent"}},
+        "discovery_exclusions": {"type": "array", "items": {"$ref": "#/$defs/DiscoveryExclusion"}},
+        "sponsored_placement": {"anyOf": [{"$ref": "#/$defs/SponsoredPlacement"}, {"type": "null"}]}
+      },
+      "required": ["seller_agents", "discovery_exclusions", "sponsored_placement"],
+      "additionalProperties": false
+    },
+    "OfferItem": {
+      "type": "object",
+      "properties": {
+        "product_id": {"$ref": "#/$defs/Id"},
+        "category": {"$ref": "#/$defs/ProductCategory"},
+        "role": {"type": "string", "enum": ["primary", "addon"]},
+        "quantity": {"const": 1}
+      },
+      "required": ["product_id", "category", "role", "quantity"],
+      "additionalProperties": false
+    },
+    "Eligibility": {
+      "type": "object",
+      "properties": {
+        "status": {"type": "string", "enum": ["eligible", "needs_confirmation", "rejected"]},
+        "reason_codes": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/EligibilityReasonCode"},
+          "uniqueItems": true
+        }
+      },
+      "required": ["status", "reason_codes"],
+      "additionalProperties": false
+    },
+    "Offer": {
+      "type": "object",
+      "properties": {
+        "offer_id": {"$ref": "#/$defs/Id"},
+        "seller_id": {"$ref": "#/$defs/Id"},
+        "round": {"type": "integer", "enum": [1, 2]},
+        "variant": {"type": "string", "enum": ["standalone", "bundle"]},
+        "baseline_offer_id": {"anyOf": [{"$ref": "#/$defs/Id"}, {"type": "null"}]},
+        "items": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/OfferItem"},
+          "minItems": 1,
+          "maxItems": 2
+        },
+        "primary_features": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1, "maxLength": 64},
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "total_price_twd": {"$ref": "#/$defs/MoneyTwd"},
+        "delivery_days": {"type": "integer", "minimum": 1},
+        "terms_id": {"$ref": "#/$defs/Id"},
+        "optional_addons": {"type": "boolean"},
+        "expires_at": {"$ref": "#/$defs/Timestamp"},
+        "eligibility": {"$ref": "#/$defs/Eligibility"}
+      },
+      "required": [
+        "offer_id",
+        "seller_id",
+        "round",
+        "variant",
+        "baseline_offer_id",
+        "items",
+        "primary_features",
+        "total_price_twd",
+        "delivery_days",
+        "terms_id",
+        "optional_addons",
+        "expires_at",
+        "eligibility"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {"properties": {"variant": {"const": "standalone"}}, "required": ["variant"]},
+          "then": {
+            "properties": {
+              "baseline_offer_id": {"type": "null"},
+              "items": {
+                "minItems": 1,
+                "maxItems": 1,
+                "contains": {
+                  "type": "object",
+                  "properties": {"category": {"const": "mouse"}, "role": {"const": "primary"}},
+                  "required": ["category", "role"]
+                }
+              },
+              "optional_addons": {"const": false}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"variant": {"const": "bundle"}}, "required": ["variant"]},
+          "then": {
+            "properties": {
+              "baseline_offer_id": {"$ref": "#/$defs/Id"},
+              "items": {
+                "minItems": 2,
+                "maxItems": 2,
+                "allOf": [
+                  {
+                    "contains": {
+                      "type": "object",
+                      "properties": {"category": {"const": "mouse"}, "role": {"const": "primary"}},
+                      "required": ["category", "role"]
+                    },
+                    "minContains": 1,
+                    "maxContains": 1
+                  },
+                  {
+                    "contains": {
+                      "type": "object",
+                      "properties": {"category": {"const": "mouse_pad"}, "role": {"const": "addon"}},
+                      "required": ["category", "role"]
+                    },
+                    "minContains": 1,
+                    "maxContains": 1
+                  }
+                ]
+              },
+              "optional_addons": {"const": true}
+            }
+          }
+        }
+      ]
+    },
+    "RankedOffer": {
+      "type": "object",
+      "properties": {
+        "rank": {"type": "integer", "minimum": 1},
+        "offer_id": {"$ref": "#/$defs/Id"},
+        "reason": {"type": "string", "minLength": 1, "maxLength": 500},
+        "tradeoffs": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1, "maxLength": 300},
+          "maxItems": 5
+        }
+      },
+      "required": ["rank", "offer_id", "reason", "tradeoffs"],
+      "additionalProperties": false
+    },
+    "ApiError": {
+      "type": "object",
+      "properties": {
+        "code": {"type": "string", "minLength": 1, "maxLength": 64},
+        "message": {"type": "string", "minLength": 1, "maxLength": 500},
+        "fields": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1, "maxLength": 128},
+          "uniqueItems": true
+        }
+      },
+      "required": ["code", "message", "fields"],
+      "additionalProperties": false
+    },
+    "RequestSnapshot": {
+      "type": "object",
+      "properties": {
+        "request_id": {"$ref": "#/$defs/Id"},
+        "root_request_id": {"$ref": "#/$defs/Id"},
+        "parent_request_id": {"anyOf": [{"$ref": "#/$defs/Id"}, {"type": "null"}]},
+        "status": {"$ref": "#/$defs/Status"},
+        "documents": {"$ref": "#/$defs/DocumentBundle"},
+        "intent": {"anyOf": [{"$ref": "#/$defs/NormalizedIntent"}, {"type": "null"}]},
+        "seller_agents": {"type": "array", "items": {"$ref": "#/$defs/SellerAgent"}},
+        "discovery_exclusions": {"type": "array", "items": {"$ref": "#/$defs/DiscoveryExclusion"}},
+        "sponsored_placement": {"anyOf": [{"$ref": "#/$defs/SponsoredPlacement"}, {"type": "null"}]},
+        "offers": {"type": "array", "items": {"$ref": "#/$defs/Offer"}},
+        "ranked_offers": {"type": "array", "items": {"$ref": "#/$defs/RankedOffer"}},
+        "confirmation_offer_ids": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/Id"},
+          "uniqueItems": true
+        },
+        "selected_offer_id": {"anyOf": [{"$ref": "#/$defs/Id"}, {"type": "null"}]},
+        "next_request_id": {"anyOf": [{"$ref": "#/$defs/Id"}, {"type": "null"}]},
+        "error": {"anyOf": [{"$ref": "#/$defs/ApiError"}, {"type": "null"}]}
+      },
+      "required": [
+        "request_id",
+        "root_request_id",
+        "parent_request_id",
+        "status",
+        "documents",
+        "intent",
+        "seller_agents",
+        "discovery_exclusions",
+        "sponsored_placement",
+        "offers",
+        "ranked_offers",
+        "confirmation_offer_ids",
+        "selected_offer_id",
+        "next_request_id",
+        "error"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {"properties": {"status": {"const": "formatting"}}, "required": ["status"]},
+          "then": {
+            "properties": {
+              "intent": {"type": "null"},
+              "seller_agents": {"maxItems": 0},
+              "offers": {"maxItems": 0},
+              "ranked_offers": {"maxItems": 0}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"status": {"const": "awaiting_user"}}, "required": ["status"]},
+          "then": {
+            "properties": {
+              "intent": {"$ref": "#/$defs/NormalizedIntent"},
+              "ranked_offers": {"minItems": 1},
+              "selected_offer_id": {"type": "null"},
+              "error": {"type": "null"}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"status": {"const": "needs_confirmation"}}, "required": ["status"]},
+          "then": {
+            "properties": {
+              "ranked_offers": {"maxItems": 0},
+              "confirmation_offer_ids": {"minItems": 1}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"status": {"const": "no_match"}}, "required": ["status"]},
+          "then": {
+            "properties": {
+              "ranked_offers": {"maxItems": 0},
+              "confirmation_offer_ids": {"maxItems": 0},
+              "error": {"$ref": "#/$defs/ApiError"}
+            }
+          }
+        },
+        {
+          "if": {"properties": {"status": {"enum": ["accepted", "redeemed"]}}, "required": ["status"]},
+          "then": {"properties": {"selected_offer_id": {"$ref": "#/$defs/Id"}}},
+          "else": {"properties": {"selected_offer_id": {"type": "null"}}}
+        },
+        {
+          "if": {"properties": {"status": {"const": "superseded"}}, "required": ["status"]},
+          "then": {"properties": {"next_request_id": {"$ref": "#/$defs/Id"}}}
+        }
+      ]
+    },
+    "AcceptDecisionResult": {
+      "type": "object",
+      "properties": {
+        "action": {"const": "accept"},
+        "request_id": {"$ref": "#/$defs/Id"},
+        "status": {"const": "accepted"},
+        "selected_offer_id": {"$ref": "#/$defs/Id"},
+        "expires_at": {"$ref": "#/$defs/Timestamp"}
+      },
+      "required": ["action", "request_id", "status", "selected_offer_id", "expires_at"],
+      "additionalProperties": false
+    },
+    "RejectDecisionResult": {
+      "type": "object",
+      "properties": {
+        "action": {"const": "reject"},
+        "request_id": {"$ref": "#/$defs/Id"},
+        "status": {"const": "superseded"},
+        "next_request_id": {"$ref": "#/$defs/Id"},
+        "documents": {"$ref": "#/$defs/DocumentBundle"}
+      },
+      "required": ["action", "request_id", "status", "next_request_id", "documents"],
+      "additionalProperties": false
+    },
+    "DecisionResult": {
+      "oneOf": [
+        {"$ref": "#/$defs/AcceptDecisionResult"},
+        {"$ref": "#/$defs/RejectDecisionResult"}
+      ]
+    },
+    "RedemptionReceipt": {
+      "type": "object",
+      "properties": {
+        "redemption_id": {"$ref": "#/$defs/Id"},
+        "request_id": {"$ref": "#/$defs/Id"},
+        "offer_id": {"$ref": "#/$defs/Id"},
+        "seller_id": {"$ref": "#/$defs/Id"},
+        "status": {"const": "redeemed"},
+        "mode": {"const": "virtual_market"},
+        "total_price_twd": {"$ref": "#/$defs/MoneyTwd"},
+        "redeemed_at": {"$ref": "#/$defs/Timestamp"}
+      },
+      "required": ["redemption_id", "request_id", "offer_id", "seller_id", "status", "mode", "total_price_twd", "redeemed_at"],
+      "additionalProperties": false
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "properties": {"error": {"$ref": "#/$defs/ApiError"}},
+      "required": ["error"],
+      "additionalProperties": false
+    },
+    "RFQProductPreference": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "preference_id": {"$ref": "#/$defs/Id"},
+            "strength": {"type": "string", "enum": ["required", "preferred"]},
+            "attribute": {"type": "string", "enum": ["size_class", "color", "shape"]},
+            "operator": {"type": "string", "enum": ["in", "not_in"]},
+            "values": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true}
+          },
+          "required": ["preference_id", "strength", "attribute", "operator", "values"],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "preference_id": {"$ref": "#/$defs/Id"},
+            "strength": {"type": "string", "enum": ["required", "preferred"]},
+            "attribute": {"type": "string", "enum": ["length_mm", "width_mm", "height_mm"]},
+            "operator": {"const": "range"},
+            "min": {"type": ["number", "null"]},
+            "max": {"type": ["number", "null"]}
+          },
+          "required": ["preference_id", "strength", "attribute", "operator", "min", "max"],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "SellerRFQ": {
+      "type": "object",
+      "properties": {
+        "request_id": {"$ref": "#/$defs/Id"},
+        "seller_id": {"$ref": "#/$defs/Id"},
+        "round": {"type": "integer", "enum": [1, 2]},
+        "category": {"const": "mouse"},
+        "required_features": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+        "candidate_product_ids": {"type": "array", "items": {"$ref": "#/$defs/Id"}, "minItems": 1, "uniqueItems": true},
+        "product_preferences": {"type": "array", "items": {"$ref": "#/$defs/RFQProductPreference"}},
+        "pending_checks": {"type": "array", "items": {"type": "string", "enum": ["availability", "delivery"]}, "uniqueItems": true},
+        "delivery_days_max": {"type": "integer", "minimum": 1},
+        "allowed_addon_categories": {"type": "array", "items": {"const": "mouse_pad"}, "uniqueItems": true, "maxItems": 1},
+        "target_total_twd": {"type": ["integer", "null"], "minimum": 1},
+        "previous_offer_ids": {"type": "array", "items": {"$ref": "#/$defs/Id"}, "uniqueItems": true, "maxItems": 2}
+      },
+      "required": [
+        "request_id",
+        "seller_id",
+        "round",
+        "category",
+        "required_features",
+        "candidate_product_ids",
+        "product_preferences",
+        "pending_checks",
+        "delivery_days_max",
+        "allowed_addon_categories",
+        "target_total_twd",
+        "previous_offer_ids"
+      ],
+      "additionalProperties": false
+    },
+    "SellerOfferDraft": {
+      "type": "object",
+      "description": "Untrusted Seller proposal. The Backend assigns offer_id and eligibility after validation.",
+      "properties": {
+        "draft_ref": {"$ref": "#/$defs/Id"},
+        "variant": {"type": "string", "enum": ["standalone", "bundle"]},
+        "baseline_draft_ref": {"anyOf": [{"$ref": "#/$defs/Id"}, {"type": "null"}]},
+        "items": {"type": "array", "items": {"$ref": "#/$defs/OfferItem"}, "minItems": 1, "maxItems": 2},
+        "primary_features": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+        "total_price_twd": {"$ref": "#/$defs/MoneyTwd"},
+        "delivery_days": {"type": "integer", "minimum": 1},
+        "terms_id": {"$ref": "#/$defs/Id"},
+        "optional_addons": {"type": "boolean"},
+        "expires_at": {"$ref": "#/$defs/Timestamp"}
+      },
+      "required": [
+        "draft_ref",
+        "variant",
+        "baseline_draft_ref",
+        "items",
+        "primary_features",
+        "total_price_twd",
+        "delivery_days",
+        "terms_id",
+        "optional_addons",
+        "expires_at"
+      ],
+      "additionalProperties": false
+    },
+    "SellerNegotiationResult": {
+      "type": "object",
+      "properties": {
+        "request_id": {"$ref": "#/$defs/Id"},
+        "seller_id": {"$ref": "#/$defs/Id"},
+        "round": {"type": "integer", "enum": [1, 2]},
+        "outcome": {"type": "string", "enum": ["offered", "refused", "timeout", "error"]},
+        "drafts": {"type": "array", "items": {"$ref": "#/$defs/SellerOfferDraft"}, "maxItems": 2},
+        "message": {"type": "string", "minLength": 1, "maxLength": 500}
+      },
+      "required": ["request_id", "seller_id", "round", "outcome", "drafts", "message"],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {"properties": {"outcome": {"const": "offered"}}, "required": ["outcome"]},
+          "then": {"properties": {"drafts": {"minItems": 1}}},
+          "else": {"properties": {"drafts": {"maxItems": 0}}}
+        }
+      ]
+    },
+    "SellerTrustEntry": {
+      "type": "object",
+      "properties": {
+        "seller_id": {"$ref": "#/$defs/Id"},
+        "trust": {"$ref": "#/$defs/Trust"}
+      },
+      "required": ["seller_id", "trust"],
+      "additionalProperties": false
+    },
+    "EligibleOffer": {
+      "allOf": [
+        {"$ref": "#/$defs/Offer"},
+        {
+          "type": "object",
+          "properties": {
+            "eligibility": {
+              "type": "object",
+              "properties": {
+                "status": {"const": "eligible"},
+                "reason_codes": {"type": "array", "items": {"$ref": "#/$defs/EligibilityReasonCode"}, "uniqueItems": true}
+              },
+              "required": ["status", "reason_codes"],
+              "additionalProperties": false
+            }
+          },
+          "required": ["eligibility"]
+        }
+      ]
+    },
+    "EvaluatorInput": {
+      "type": "object",
+      "description": "Campaign and Sponsored data are intentionally absent.",
+      "properties": {
+        "request_id": {"$ref": "#/$defs/Id"},
+        "evaluated_at": {"$ref": "#/$defs/Timestamp"},
+        "intent": {"$ref": "#/$defs/NormalizedIntent"},
+        "offers": {"type": "array", "items": {"$ref": "#/$defs/EligibleOffer"}, "minItems": 1},
+        "seller_trust": {"type": "array", "items": {"$ref": "#/$defs/SellerTrustEntry"}}
+      },
+      "required": ["request_id", "evaluated_at", "intent", "offers", "seller_trust"],
+      "additionalProperties": false
+    },
+    "EvaluatorOutput": {
+      "type": "object",
+      "properties": {
+        "ranked_offers": {"type": "array", "items": {"$ref": "#/$defs/RankedOffer"}, "minItems": 1}
+      },
+      "required": ["ranked_offers"],
+      "additionalProperties": false
+    }
+  }
+}

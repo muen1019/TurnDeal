@@ -1,0 +1,10 @@
+{
+  "name": "offermesh",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "npm run test:contracts",
+    "test:contracts": "node scripts/validate-contracts.mjs"
+  }
+}

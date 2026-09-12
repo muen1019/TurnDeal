@@ -1,0 +1,46 @@
+{
+  "type": "json_schema",
+  "name": "a2a_offer_ranking_v0_1",
+  "strict": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "ranked_offers": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "$ref": "#/$defs/ranked_offer"
+        }
+      }
+    },
+    "required": ["ranked_offers"],
+    "additionalProperties": false,
+    "$defs": {
+      "ranked_offer": {
+        "type": "object",
+        "properties": {
+          "rank": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "offer_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "tradeoffs": {
+            "type": "array",
+            "maxItems": 5,
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["rank", "offer_id", "reason", "tradeoffs"],
+        "additionalProperties": false
+      }
+    }
+  }
+}
