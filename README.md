@@ -56,6 +56,8 @@ OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commer
 
 ## 開發前必讀
 
+- [LLM Formatter 與安全 key 設定](docs/FORMATTER_LLM.md)：預設 gpt-4.1-mini、Structured Outputs；`npm run demo:formatter:secure` 在 Windows 隱藏輸入 key，測試不使用真實 key。
+- [Formatter：中文文字到現有流程](docs/FORMATTER.md)：離線規則解析、需求澄清、使用者偏好快照、Request 儲存與 Orchestrator 接線；`npm run demo:formatter` 可跑完整文字入口示範（Seller 為測試替身）。
 - [Orchestrator 前段與 Seller 函式交接](docs/ORCHESTRATOR_HANDOFF.md)：已可執行需求快照 → 搜尋 → RFQ → 第一輪函式呼叫；`npm run demo:handoff` 使用記憶體 DB 與明確標示的測試替身。
 - [Seller 議價設定格式與填寫交接](docs/SELLER_NEGOTIATION_POLICY.md)：15 家／90 筆主商品待填模板；底價等私有設定由 Negotiation owner 填寫，尚未啟用。
 - [目標 System Design 與 repo 整合狀態](docs/SYSTEM_DESIGN.md)
@@ -208,6 +210,8 @@ npm test
 
 ## 黑客松期間新增內容
 
+LLM Formatter 已加入 Responses Structured Outputs、原文 evidence 驗證、API timeout／安全 fallback、非同步 service 與 key 隱藏輸入啟動器。使用者本機已回報 live LLM → ready → 五家搜尋結果成功；新增安全診斷與明確排序優先權檢查，mock API 與離線測試通過。
+Formatter v0.1 已實作有界中文規則解析、缺值與衝突澄清、SQLite 使用者偏好合併、不可變解析紀錄與 idempotency，並串接既有搜尋／第一輪交接。不是通用 LLM 解析器；未知語意會詢問，不自動忽略或授權購買。
 前段整合已加入完整商品偏好轉換、SellerRFQ 白名單、綁定快照的函式 registry、第一輪平行派發／逾時／回應驗證、SQLite 交接計畫與重播防護。Seller 策略與後續輪次、正式 Offer 商務驗證仍待接續；這不是完整議價或付款流程。既有 DB 可用 `npm run db:migrate` 備份後非破壞性升級。
 目前新增了 SQLite-backed Orchestrator 讀取工具、15 家 Seller／120 筆合成刊登（90 滑鼠、30 滑鼠墊）、五個不同 Seller 的確定性排序與結果快照。目標價格選填，缺值時按有效指標重新分配權重，詳見 [評分標準](docs/DISCOVERY_SCORING.md)。不滿五個合格結果時可補標記替代方案，但違反硬限制者不能自動議價；不足五個可用賣家則明確回報。新增資料不是 120 筆真實爬取商品。
 

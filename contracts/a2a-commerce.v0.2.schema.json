@@ -5,6 +5,24 @@
   "description": "Authoritative shared contracts. The document root validates a RequestSnapshot; reusable contracts live in $defs.",
   "$ref": "#/$defs/RequestSnapshot",
   "$defs": {
+    "FormatterResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parser_version", "status", "normalized_intent", "target_total_twd", "questions", "warnings"],
+      "properties": {
+        "parser_version": {"enum": ["formatter-rules-v0.1", "formatter-llm-v0.1"]},
+        "status": {"enum": ["ready", "needs_clarification"]},
+        "normalized_intent": {"anyOf": [{"$ref": "#/$defs/NormalizedIntent"}, {"type": "null"}]},
+        "target_total_twd": {"type": ["integer", "null"], "minimum": 1},
+        "questions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "warnings": {"type": "array", "items": {"type": "string", "minLength": 1}}
+      },
+      "allOf": [{
+        "if": {"properties": {"status": {"const": "ready"}}},
+        "then": {"properties": {"normalized_intent": {"$ref": "#/$defs/NormalizedIntent"}, "questions": {"maxItems": 0}}},
+        "else": {"properties": {"normalized_intent": {"type": "null"}, "questions": {"minItems": 1}}}
+      }]
+    },
     "NegotiationRound": {"type": "integer", "minimum": 1, "maximum": 5},
     "BranchStopReason": {"type": ["string", "null"], "enum": [null, "seller_final", "refused", "timeout", "error", "no_adjustment", "max_rounds", "global_deadline", "call_budget", "token_budget"]},
     "Id": {

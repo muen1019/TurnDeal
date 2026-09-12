@@ -7,7 +7,11 @@
     "node": ">=24"
   },
   "scripts": {
-    "test": "npm run test:contracts && npm run test:db && npm run test:orchestrator && npm run test:seller-policies",
+    "test": "npm run test:contracts && npm run test:db && npm run test:orchestrator && npm run test:seller-policies && npm run test:formatter",
+    "test:formatter": "node --test tests/formatter.test.ts tests/formatter-llm.test.ts",
+    "demo:formatter:llm": "node examples/formatter-llm.ts",
+    "demo:formatter:secure": "powershell -NoProfile -File scripts/run-formatter-secure.ps1",
+    "demo:formatter": "node examples/formatter.ts",
     "test:seller-policies": "node scripts/validate-seller-policies.mjs && node --test tests/seller-policies.test.mjs",
     "test:orchestrator": "node --test tests/orchestrator-data.test.ts tests/discovery.test.ts tests/handoff.test.ts",
     "demo:handoff": "node examples/handoff.ts",

@@ -1,5 +1,7 @@
 # Orchestrator 前段與 Seller 交接
 
+文字入口現已由 `src/formatter/service.ts` 的 prepare_from_text 接上此流程；規則支援範圍與澄清方式見 [FORMATTER.md](FORMATTER.md)。以下「自然語言 Formatter 不在本模組內」指 handoff.ts 的責任邊界，不代表整個 repo 尚未提供 Formatter。
+
 ## 已實作的範圍
 
 已解析的 Request（SQLite）→ 固定偏好快照 → DiscoveryQuery → 120 筆搜尋排名 → 合格 Seller 的 OrchestrationResult / SellerRFQ → 真正的函式 registry → 平行呼叫第一輪 → 原始回應稽核。

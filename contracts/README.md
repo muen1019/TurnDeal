@@ -24,6 +24,7 @@ v0.2 遷移五家 Seller、最多五輪、明確 final 與 Backend 停止原因�
 | --- | --- | --- |
 | API client | Formatter | `CreateRequest`, `DocumentBundle` |
 | Formatter | Orchestrator | `NormalizedIntent` |
+| Formatter service | Backend caller | `FormatterResult`（ready 或 needs_clarification，含問題、警告與選填目標價） |
 | Orchestrator | Seller branch | `SellerRFQ` |
 | Seller branch | Backend validator | `SellerNegotiationResult` |
 | Backend validator | Evaluator | `EvaluatorInput` |

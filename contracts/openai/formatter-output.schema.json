@@ -1,0 +1,166 @@
+{
+  "type": "object",
+  "properties": {
+    "category": {
+      "enum": [
+        "mouse",
+        "unsupported",
+        null
+      ],
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "max_total_twd": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "target_total_twd": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "delivery_days_max": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "budget_evidence": {
+      "type": "string"
+    },
+    "target_evidence": {
+      "type": "string"
+    },
+    "delivery_evidence": {
+      "type": "string"
+    },
+    "required_features": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "wireless",
+          "silent_click",
+          "bluetooth",
+          "multi_device"
+        ],
+        "type": "string"
+      }
+    },
+    "preferences": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "price_first",
+          "delivery_first",
+          "trust_first"
+        ],
+        "type": "string"
+      }
+    },
+    "product_preferences": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "attribute": {
+            "enum": [
+              "color",
+              "shape",
+              "size_class",
+              "length_mm",
+              "width_mm",
+              "height_mm"
+            ],
+            "type": "string"
+          },
+          "operator": {
+            "enum": [
+              "in",
+              "not_in",
+              "range"
+            ],
+            "type": "string"
+          },
+          "strength": {
+            "enum": [
+              "required",
+              "preferred"
+            ],
+            "type": "string"
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "min": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "max": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "source_text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "attribute",
+          "operator",
+          "strength",
+          "values",
+          "min",
+          "max",
+          "source_text"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "bundle_mode": {
+      "enum": [
+        "disabled",
+        "related_no_extra_cost"
+      ],
+      "type": "string"
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "unsupported_conditions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "category",
+    "max_total_twd",
+    "target_total_twd",
+    "delivery_days_max",
+    "budget_evidence",
+    "target_evidence",
+    "delivery_evidence",
+    "required_features",
+    "preferences",
+    "product_preferences",
+    "bundle_mode",
+    "questions",
+    "unsupported_conditions"
+  ],
+  "additionalProperties": false
+}
