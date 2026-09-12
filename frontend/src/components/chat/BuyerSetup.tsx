@@ -2,10 +2,11 @@ import {useRef,useState} from 'react';
 import {ArrowLeft,ArrowRight,Check,CreditCard,MapPin,ShieldCheck,SlidersHorizontal,UserRound} from 'lucide-react';
 import type {BuyerProfile} from '../../contract.generated';
 export const defaultBuyerProfile:BuyerProfile={name:'',shipping_address:'',payment_method:'later',weights:{price:45,delivery:20,trust:20,color:15},colors:[]};
+const emptyShipping={email:'',city:'',state:'',postal_code:'',country:'TW' as const};
 const colors=[['black','墨黑','#17283f'],['white','霧白','#f3f6fb'],['blue','冰藍','#70b5ef'],['red','紅色','#d76778'],['rose','粉色','#e8bbd7']] as const;
 const factors=[['price','價格','在預算內，更在意價格'],['delivery','到貨速度','希望商品更快送達'],['trust','賣家評價','更看重賣家的可信度'],['color','顏色符合度','更接近你喜歡的顏色']] as const;
 export function BuyerSetup({initial,onSave,onCancel,busy,error,uncertain,onRetry,onReload}:{initial:BuyerProfile|null;onSave:(p:BuyerProfile)=>Promise<boolean>;onCancel?:()=>void;busy:boolean;error:string;uncertain:boolean;onRetry:()=>void;onReload:()=>void}){
-  const [step,setStep]=useState(0),[draft,setDraft]=useState<BuyerProfile>(()=>structuredClone(initial??defaultBuyerProfile));
+  const [step,setStep]=useState(0),[draft,setDraft]=useState<BuyerProfile>(()=>structuredClone({...initial??defaultBuyerProfile,shipping_details:initial?.shipping_details??emptyShipping}));
   const [localError,setLocalError]=useState('');const root=useRef<HTMLElement>(null);
   const jump=(next:number)=>{setStep(next);const scroller=root.current?.closest('.setup-container');if(scroller)scroller.scrollTop=0;};
   const activeTotal=draft.weights.price+draft.weights.delivery+draft.weights.trust+(draft.colors.length?draft.weights.color:0);
@@ -13,6 +14,8 @@ export function BuyerSetup({initial,onSave,onCancel,busy,error,uncertain,onRetry
   async function submit(){
     if(!draft.name.trim()){setLocalError('請先填寫名稱。');jump(0);return;}
     if(/sk-[A-Za-z0-9_-]{16,}|(?:\d[ -]?){13,19}/.test(draft.name+' '+draft.shipping_address)){setLocalError('請勿填寫 API key、信用卡號或金融帳號。');jump(0);return;}
+    const shipping=draft.shipping_details;
+    if(!draft.shipping_address.trim()||!shipping||!shipping.city.trim()||!shipping.state.trim()||!/^\S+@\S+\.\S+$/.test(shipping.email)||!/^\d{3}(\d{2,3})?$/.test(shipping.postal_code)){setLocalError('請填妥收件電子郵件、縣市、區域、郵遞區號與街道地址。');jump(0);return;}
     setLocalError('');
     if(step===0){jump(1);return;}
     if(!activeTotal){setLocalError('至少提高一項有效偏好的重要程度。');return;}
@@ -25,8 +28,10 @@ export function BuyerSetup({initial,onSave,onCancel,busy,error,uncertain,onRetry
     <form onSubmit={e=>{e.preventDefault();void submit();}}>
       <fieldset disabled={busy||uncertain} className="setup-fields">
         {step===0?<>
-          <label className="setup-label"><span><UserRound size={16}/> 名稱 <small>必填</small></span><input autoComplete="off" maxLength={60} placeholder="你的稱呼" value={draft.name} onChange={e=>change('name',e.target.value)}/></label>
-          <label className="setup-label"><span><MapPin size={16}/> 運送地址 <small>選填</small></span><textarea autoComplete="off" rows={2} maxLength={240} placeholder="縣市、區域與街道地址" value={draft.shipping_address} onChange={e=>change('shipping_address',e.target.value)}/></label>
+          <label className="setup-label"><span><UserRound size={16}/> 名稱（收件人） <small>必填</small></span><input autoComplete="off" maxLength={60} placeholder="你的稱呼" value={draft.name} onChange={e=>change('name',e.target.value)}/></label>
+          {([['email','電子郵件'],['city','城市／縣市'],['state','區域'],['postal_code','郵遞區號']] as const).map(([key,label])=><label className="setup-label" key={key}><span>{label} <small>必填</small></span><input aria-label={label} autoComplete="off" type={key==='email'?'email':'text'} inputMode={key==='postal_code'?'numeric':undefined} maxLength={key==='postal_code'?6:100} value={draft.shipping_details?.[key]??''} onChange={e=>change('shipping_details',{...draft.shipping_details??emptyShipping,[key]:e.target.value})}/></label>)}
+          <p className="setup-footnote">配送國家：台灣。資料會自動帶入測試結帳，確認後才建立訂單。</p>
+          <label className="setup-label"><span><MapPin size={16}/> 運送地址 <small>必填</small></span><textarea autoComplete="off" rows={2} maxLength={240} placeholder="街道、門牌與樓層" value={draft.shipping_address} onChange={e=>change('shipping_address',e.target.value)}/></label>
           <label className="setup-label"><span><CreditCard size={16}/> 偏好付款方式</span><select value={draft.payment_method} onChange={e=>change('payment_method',e.target.value as BuyerProfile['payment_method'])}><option value="later">結帳時再決定</option><option value="card">信用卡</option><option value="mobile">行動支付</option><option value="cash_on_delivery">貨到付款</option></select></label>
           <div className="setup-privacy"><ShieldCheck size={18}/><p>Demo 請使用虛構資料。不收卡號或安全碼，基本資料不會送給 AI，也不會自動付款。</p></div>
         </>:<>

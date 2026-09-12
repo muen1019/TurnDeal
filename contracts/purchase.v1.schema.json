@@ -703,6 +703,43 @@
           "type": "string",
           "maxLength": 240
         },
+        "shipping_details": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "email": {
+              "type": "string",
+              "format": "email",
+              "maxLength": 100
+            },
+            "city": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "\\S"
+            },
+            "state": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "\\S"
+            },
+            "postal_code": {
+              "type": "string",
+              "pattern": "^[0-9]{3}([0-9]{2,3})?$"
+            },
+            "country": {
+              "const": "TW"
+            }
+          },
+          "required": [
+            "email",
+            "city",
+            "state",
+            "postal_code",
+            "country"
+          ]
+        },
         "payment_method": {
           "enum": [
             "later",

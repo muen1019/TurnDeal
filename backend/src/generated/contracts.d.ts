@@ -416,6 +416,13 @@ export interface RedeemRequest {
 export interface BuyerProfile {
   name: string;
   shipping_address: string;
+  shipping_details?: {
+    email: string;
+    city: string;
+    state: string;
+    postal_code: string;
+    country: "TW";
+  };
   payment_method: "later" | "card" | "mobile" | "cash_on_delivery";
   weights: RankingWeights;
   colors: ("black" | "white" | "blue" | "red" | "rose")[];

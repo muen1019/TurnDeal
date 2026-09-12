@@ -11,7 +11,7 @@ export function PurchasePanel({requestId,offerId,profile}:{requestId:string;offe
  const journalKey='turndeal.purchase:'+requestId;
  const [view,setView]=useState<PurchaseView|null>(null),[loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState(''),[uncertain,setUncertain]=useState(false);
  const pending=useRef<Pending|null>(null),locked=useRef(false),mounted=useRef(true);
- const [form,setForm]=useState({name:profile?.name??'',email:'',line_one:profile?.shipping_address??'',city:'',state:'',postal_code:'',option:''});
+ const [form,setForm]=useState({name:profile?.name??'',email:profile?.shipping_details?.email??'',line_one:profile?.shipping_address??'',city:profile?.shipping_details?.city??'',state:profile?.shipping_details?.state??'',postal_code:profile?.shipping_details?.postal_code??'',option:''});
  const [editing,setEditing]=useState(false);
  const apply=(raw:unknown)=>{const next=purchaseView(raw,requestId,offerId);if(mounted.current)setView(next);return next;};
  const load=async()=>{

@@ -18,6 +18,8 @@ test('profile persistence is buyer scoped, replay safe, and snapshots contain pr
   await post({...profile,shipping_address:'4111111111111111'},'card').expect(400);
   await post({...profile,card_number:'4111111111111111'},'unknown').expect(400);
   assert.deepEqual((await request(app).get('/api/buyer-profile')).body.profile,profile);
+  const legacy={...profile};delete legacy.shipping_details;
+  await request(app).post('/api/buyer-profile').set('x-test-buyer','legacy').set('Idempotency-Key','legacy').send(legacy).expect(200);
   assert.equal((await request(app).get('/api/buyer-profile').set('x-test-buyer','other')).body.profile,null);
   const created=(await request(app).post('/api/requests').set('Idempotency-Key','buy').send({intent_md:'買無線滑鼠，預算1000元，7天內到貨'}).expect(202)).body;
   await post({...profile,weights:{price:0,delivery:100,trust:0,color:0}},'changed');
@@ -27,7 +29,8 @@ test('profile persistence is buyer scoped, replay safe, and snapshots contain pr
   const formatter=store.db.prepare('SELECT input_json FROM formatter_runs WHERE request_id=?').get(created.request_id).input_json;
   const evaluation=store.db.prepare('SELECT input_json FROM evaluation_runs WHERE request_id=?').get(created.request_id).input_json;
   for(const text of [formatter,evaluation,JSON.stringify(result)]){assert.ok(!text.includes(profile.name));assert.ok(!text.includes(profile.shipping_address));assert.ok(!text.includes('payment_method'));}
-  assert.equal(store.db.prepare('SELECT count(*) AS n FROM buyer_profiles').get().n,1);
+  assert.ok(!formatter.includes(profile.shipping_details.email));assert.ok(!evaluation.includes(profile.shipping_details.email));
+  assert.equal(store.db.prepare('SELECT count(*) AS n FROM buyer_profiles').get().n,2);
  }finally{await store.close();}
 });
 test('weights change evaluator and discovery order; explicit intent priority overrides profile',()=>{
