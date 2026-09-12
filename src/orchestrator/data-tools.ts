@@ -1,4 +1,6 @@
 import { DatabaseSync } from 'node:sqlite';
+import { publicServices } from './public-services.mjs';
+import type { PublicService } from './discovery.ts';
 
 export type Category = 'mouse' | 'mouse_pad';
 export type Attributes = {
@@ -11,7 +13,7 @@ export type ProductPreference = {
   | { attribute: 'length_mm' | 'width_mm' | 'height_mm'; operator: 'range'; min: number | null; max: number | null });
 export type NormalizedIntent = {
   category: 'mouse'; max_total_twd: number; delivery_days_max: number;
-  required_features: string[]; preferences: ('price_first' | 'delivery_first' | 'trust_first')[];
+  required_features: string[]; preferences: ('price_first' | 'delivery_first' | 'trust_first' | 'after_sales_first')[];
   product_preferences: ProductPreference[];
   negotiation_policy: {
     bundle_mode: 'disabled' | 'related_no_extra_cost' | 'related_with_cap';
@@ -27,9 +29,11 @@ export type CatalogItem = {
   product_id: string; seller_id: string; category: Category; brand: string; model: string; name: string;
   features: string[]; attributes: Attributes; source_price_twd: number; list_price_twd: number;
   stock: number; delivery_days: number; terms_id: string; source_ids: string[];
+  public_services: PublicService[];
 };
 export type Seller = {
   seller_id: string; name: string; enabled: boolean; handler_registered: boolean;
+  persona: 'price_optimizer' | 'speed_seller' | 'bundle_curator' | 'loyalty_builder' | 'margin_guardian' | null;
 };
 export type Trust = {
   personal_band: 'positive' | 'neutral' | 'negative'; personal_rating: number | null;
@@ -120,12 +124,15 @@ export function createOrchestratorDataTools(options: {
       source_price_twd: Number(row.source_price_twd), list_price_twd: Number(row.list_price_twd),
       stock: Number(row.stock), delivery_days: Number(row.delivery_days), terms_id: String(row.terms_id),
       source_ids: sourceQuery.all(row.product_id).map(source => String(source.source_id)),
+      public_services: publicServices(db,String(row.seller_id),String(row.product_id)),
     }));
   }
 
   function list_sellers(): Seller[] {
-    return db.prepare('SELECT seller_id, name, enabled FROM sellers ORDER BY seller_id').all().map(row => ({
+    return db.prepare(`SELECT s.seller_id, s.name, s.enabled, json_extract(p.policy_json,'$.persona') AS persona
+      FROM sellers s LEFT JOIN seller_persona_policies p ON p.seller_id=s.seller_id ORDER BY s.seller_id`).all().map(row => ({
       seller_id: String(row.seller_id), name: String(row.name), enabled: row.enabled === 1,
+      persona: (row.persona ?? null) as Seller['persona'],
       handler_registered: handlers.has(String(row.seller_id)),
     }));
   }

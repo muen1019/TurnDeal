@@ -92,15 +92,18 @@ test('invalid model ordering and unavailable/timeout/truncated/refused outputs u
   }
 });
 
-test('runtime publishes seven ranked immutable offers as five groups; no automatic acceptance', async t => {
+test('runtime ranks five eligible persona offers and excludes the paid bundle; no automatic acceptance', async t => {
   const { db, input, run } = await setup(t);
   const result = await run();
-  assert.equal(result.status, 'awaiting_user'); assert.equal(result.snapshot.ranked_offers.length, 7);
+  assert.equal(result.status, 'awaiting_user'); assert.equal(result.snapshot.ranked_offers.length, 5);
   assert.equal(result.solutions.length, 5); assert.equal(result.snapshot.selected_offer_id, null);
-  assert.deepEqual(result.solutions.map(s => s.seller_id), ['seller_a','seller_d','seller_c','seller_e','seller_b']);
+  assert.deepEqual(result.solutions.map(s => s.seller_id), ['seller_a','seller_c','seller_d','seller_b','seller_e']);
   const d = result.solutions.find(s => s.seller_id === 'seller_d');
-  assert.equal(result.snapshot.offers.find(o => o.offer_id === d.recommended_offer_id).total_price_twd, 600);
-  assert.equal(d.alternative_offer_ids.length, 1);
+  assert.equal(result.snapshot.offers.find(o => o.offer_id === d.recommended_offer_id).total_price_twd, 709);
+  assert.equal(d.alternative_offer_ids.length, 0);
+  const paidBundle = result.snapshot.offers.find(o => o.variant === 'bundle');
+  assert.equal(paidBundle.eligibility.status, 'needs_confirmation');
+  assert.ok(!result.snapshot.ranked_offers.some(r => r.offer_id === paidBundle.offer_id));
   assert.deepEqual(groupSolutions(result.snapshot.ranked_offers, result.snapshot.offers), result.solutions);
   check('RequestSnapshot', result.snapshot);
   const replay = await run({ apiKey: 'unused', fetchImpl: () => assert.fail('replay cannot call API'), now: () => NOW + 99999999 });
@@ -135,7 +138,7 @@ test('one seller loses inventory during inference; remaining set and explanation
     db.prepare('UPDATE seller_inventory SET stock=0 WHERE seller_id=?').run('seller_a');
     return response(deterministicRanking(input));
   } });
-  assert.equal(result.solutions.length, 4); assert.equal(result.solutions[0].seller_id, 'seller_d');
+  assert.equal(result.solutions.length, 4); assert.equal(result.solutions[0].seller_id, 'seller_c');
   assert.ok(!result.snapshot.offers.some(o => o.seller_id === 'seller_a'));
   assert.equal(result.fallback_reason, 'eligible_set_changed');
   const row = db.prepare('SELECT input_json, ranked_offers_json FROM evaluations WHERE request_id=?').get(result.request_id);
@@ -192,5 +195,6 @@ test('hard budgets, quantities, unrelated/paid bundles and terms are independent
     assert.ok(!validate(offers).some(o => o.seller_id === 'seller_a'));
   }
   const paid = structuredClone(final.offers); paid.find(o => o.seller_id === 'seller_c' && o.variant === 'bundle').total_price_twd += 100;
+  paid.find(o => o.variant === 'bundle').eligibility = { status: 'eligible', reason_codes: [] };
   assert.ok(!validate(paid).some(o => o.seller_id === 'seller_c' && o.variant === 'bundle'));
 });

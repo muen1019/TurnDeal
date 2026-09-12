@@ -60,7 +60,7 @@ test('full preferences preserve not_in, multi-value, required ranges and private
     const normal=rankCandidates(catalog,{...q,target_total_twd:800,priorities:[]},now().toISOString());
     const delivery=rankCandidates(catalog,{...q,target_total_twd:800,priorities:['delivery_first']},now().toISOString());
     assert.ok(delivery.weights.delivery>normal.weights.delivery);
-    assert.equal(rankCandidates(catalog,{...q,priorities:['price_first']},now().toISOString()).weights.price,0);
+    assert.ok(rankCandidates(catalog,{...q,priorities:['price_first']},now().toISOString()).weights.price>0);
     const ranked=rankCandidates(catalog,q,now().toISOString());
     assert.ok(ranked.candidates.filter(c=>c.candidate_status==='qualified').every(c=>c.listing.attributes.color!=='black'));
     intent.product_preferences=[{preference_id:'range',strength:'required',attribute:'length_mm',operator:'range',min:90,max:120,source_text:'private'}];

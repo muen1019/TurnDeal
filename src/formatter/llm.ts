@@ -18,7 +18,7 @@ Missing hard budget or delivery stays null. A target like 'around 800' is NOT a 
 budget_evidence, target_evidence and delivery_evidence must be exact substrings supporting each number; use empty string when null. Do not use a target quote as hard-budget evidence.
 product preference source_text must be exact supporting text. Set unused values=[] or min/max=null. Color mappings: 黑 black,白 white,粉 rose,紅 red,藍 blue; size small/medium/large; shape symmetrical/asymmetrical_right.
 If mouse category is clear, default wireless because of MVP. Wired mouse, unsupported categories, brands, DPI, features not expressible in this schema, or paid addons must go in unsupported_conditions, not be silently dropped. Ask Traditional Chinese clarification questions for missing/ambiguous/conflicting requirements.
-Only explicitly specified priorities. Default related_no_extra_cost, unless user disallows addons then disabled. Never authorize paid addons. No inferred personal preferences.`;
+Only explicitly specified priorities. after_sales_first means explicit preference for after-sales service/warranty, not seller ratings. Exact minimum warranty requirements remain unsupported_conditions until a hard service requirement shape exists. Default related_no_extra_cost, unless user disallows addons then disabled. Never authorize paid addons. No inferred personal preferences.`;
 type Input={intent_md:string;preference_md?:string};
 type Extraction={category:'mouse'|'unsupported'|null;max_total_twd:number|null;target_total_twd:number|null;delivery_days_max:number|null;
   budget_evidence:string;target_evidence:string;delivery_evidence:string;required_features:string[];preferences:NormalizedIntent['preferences'];
@@ -73,6 +73,7 @@ export function convertExtraction(data:Extraction,input:Input):FormatResult {
     price_first:/(?:價格|價錢|便宜|省錢).{0,8}(?:優先|最重要)|越便宜越好|最便宜|儘量便宜|盡量便宜|(?:price|cost).{0,12}(?:first|priority)|cheapest/i,
     delivery_first:/(?:交期|到貨|送達|速度).{0,8}(?:優先|最重要)|越快越好|最快到貨|(?:delivery|shipping|speed).{0,12}(?:first|priority)|fastest delivery/i,
     trust_first:/(?:信任|評分|信譽).{0,8}(?:優先|最重要)|(?:trust|rating|reputation).{0,12}(?:first|priority)/i,
+    after_sales_first:/(?:售後|保固).{0,8}(?:優先|最重要|好)|重視售後|(?:after.sales|warranty).{0,12}(?:first|priority)/i,
   };
   const priorities=[...new Set(data.preferences)].filter(p=>source.some(s=>preferenceLanguage[p].test(s)));
   const intent:NormalizedIntent={category:'mouse',max_total_twd:data.max_total_twd!,delivery_days_max:data.delivery_days_max!,

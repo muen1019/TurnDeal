@@ -57,7 +57,8 @@
         "enum": [
           "price_first",
           "delivery_first",
-          "trust_first"
+          "trust_first",
+          "after_sales_first"
         ],
         "type": "string"
       }

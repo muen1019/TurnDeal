@@ -26,7 +26,7 @@
     "db:check": "node scripts/db.mjs --check",
     "test:evaluator": "node --test tests/evaluator.test.mjs",
     "test:negotiation": "node --test tests/negotiation.test.mjs",
-    "test:unit": "node --test tests/agents.unit.test.mjs tests/validation.unit.test.mjs tests/model.unit.test.mjs",
+    "test:unit": "node --test tests/agents.unit.test.mjs tests/validation.unit.test.mjs tests/model.unit.test.mjs tests/tradeoffs.test.mjs tests/personas.test.mjs",
     "test:e2e": "node scripts/e2e-negotiation.mjs --offline",
     "test:e2e:live": "node scripts/e2e-negotiation.mjs --live",
     "test:e2e:full": "node scripts/e2e-negotiation.mjs --offline --evaluate",

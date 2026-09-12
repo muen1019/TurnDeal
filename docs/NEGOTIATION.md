@@ -1,5 +1,7 @@
 # Buyer / Seller 協商模組
 
+目前的五種經濟 Persona、條件交換、已登錄權益與對話報告見 [SELLER_PERSONAS.md](SELLER_PERSONAS.md)。展示 E2E 已改用 A 清庫／B 物流／C 組合／D 回購／E 售後；下文舊 C／D 組合與七筆 Offer 的實測紀錄屬歷史版本，請勿作為目前展示預期。
+
 以已選好的 Orchestrator 候選清單為起點，每家建立一個 Buyer 與 Seller 實例。五家最多五輪；入選少於五家時只處理實際名單，不新增 Sponsored 分支。模組在 Backend 內呼叫，不新增網路服務。
 
 ## 執行
@@ -55,7 +57,7 @@ Backend 需先透過 migrations 初始化 DB，建立 `requests`，狀態為 `or
 | `global_deadline_ms` | 150000 |
 | `model_timeout_ms`（單次模型呼叫） | 12000 |
 | `max_calls`（模型 HTTP 呼叫次數） | 50 |
-| `max_tokens`（保守預留額度） | 250000 |
+| `max_tokens`（保守預留額度） | 400000 |
 | `max_output_tokens`（單次輸出上限） | 1200 |
 | `offer_ttl_ms` | 600000 |
 

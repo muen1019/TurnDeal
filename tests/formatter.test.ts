@@ -6,8 +6,17 @@ import { formatIntent } from '../src/formatter/parser.ts';
 import { createFormatterService } from '../src/formatter/service.ts';
 import { initializeDatabase, applyMigrations } from '../scripts/db.mjs';
 import { seedDiscovery } from '../scripts/discovery-db.mjs';
+import { toDiscoveryQuery } from '../src/orchestrator/handoff.ts';
 import type { SellerHandler } from '../src/orchestrator/handoff.ts';
 const scenarios=JSON.parse(readFileSync(new URL('../contracts/fixtures/formatter-scenarios.json',import.meta.url),'utf8'));
+test('explicit service and low-price preferences survive formatting and discovery handoff',()=>{
+  for(const [text,priority] of [['偏好售後好','after_sales_first'],['偏好價格低','price_first']]) {
+    const formatted=formatIntent({intent_md:`我想買無線滑鼠，預算1000元，7天內到貨，${text}`});
+    assert.equal(formatted.status,'ready');
+    assert.deepEqual(toDiscoveryQuery(formatted.normalized_intent!).priorities,[priority]);
+  }
+  assert.equal(formatIntent({intent_md:'我想買無線滑鼠，預算1000元，7天內到貨，保固必須三年'}).status,'needs_clarification');
+});
 test('existing Formatter DB survives the later Result table rebuild with replay and immutability intact',()=>{
   const db=new DatabaseSync(':memory:');
   try {

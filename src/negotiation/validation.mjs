@@ -1,5 +1,8 @@
 import { createHash } from 'node:crypto';
 import { check, copy, immutable } from './contracts.mjs';
+import { quotePolicy, bundlePrice, exchangeDiscount, proposalResponse } from './tradeoffs.mjs';
+import { validateBenefits, evidenceSupports, personaFinal } from './personas.mjs';
+import { economicallyValid, countWithDrafts } from './economics.mjs';
 
 export function matches(product, preference) {
   const value = product.attributes[preference.attribute];
@@ -14,9 +17,36 @@ export function validProduct(product, intent) {
     intent.product_preferences.filter(p => p.strength === 'required').every(p => matches(product, p));
 }
 
-export function validateDrafts({ result, rfq, intent, seller, terms, now, idFactory }) {
+export function validateDrafts({ result, rfq, intent, seller, terms, now, idFactory, previous = [], history = [] }) {
   check('SellerNegotiationResult', result);
   if (result.request_id !== rfq.request_id || result.seller_id !== rfq.seller_id || result.round !== rfq.round) throw new Error('response_identity_mismatch');
+  if (rfq.proposal || seller.strategy.persona) {
+    const base = result.drafts.find(d => d.variant === 'standalone');
+    const bundle = result.drafts.find(d => d.variant === 'bundle');
+    let discount = 0;
+    if (result.outcome === 'offered') {
+      const product = seller.products.find(p => p.product_id === base?.items[0]?.product_id && p.category === 'mouse');
+      if (!product) throw new Error('proposal_product_missing');
+      const pad = seller.products.find(p => p.category === 'mouse_pad' && p.stock > 0);
+      const canBundle = seller.strategy.bundle_mode === 'free_optional_mouse_pad' && rfq.allowed_addon_categories.includes('mouse_pad') &&
+        Boolean(pad) && pad.delivery_days <= product.delivery_days && pad.terms_id === product.terms_id &&
+        (!seller.strategy.persona || rfq.round >= seller.strategy.persona.gift_from_round);
+      const bound = quotePolicy({ seller, rfq, previous, history, now, product, canBundle });
+      if (!bound.referenceMatches || base.total_price_twd < bound.minimum || base.total_price_twd > bound.maximum ||
+        (bundle && (!canBundle || bundle.total_price_twd !== bundlePrice(bound, base.total_price_twd)))) throw new Error('proposal_policy_violation');
+      discount = exchangeDiscount(bound, base.total_price_twd);
+      const bounded = seller.strategy.persona?.decision_mode==='bounded';
+      const count = bounded ? countWithDrafts(history,result.drafts,product) : 0;
+      if (bounded && count>product.negotiation_policy.max_concession_count) throw new Error('concession_limit_exceeded');
+      if (seller.strategy.persona && result.is_final !== (personaFinal(seller, rfq.round, bound.credited + discount) ||
+        (bounded && count>=product.negotiation_policy.max_concession_count))) throw new Error('invalid_persona_final');
+    }
+    const expected = rfq.proposal ? proposalResponse(rfq, result.drafts, discount) : null;
+    if (result.proposal_response && (!expected || result.proposal_response.status !== expected.status || result.proposal_response.exchange_discount_twd !== expected.exchange_discount_twd))
+      throw new Error('invalid_proposal_response');
+    // Optional legacy adapters receive a Backend-derived response after validation.
+    if (expected) result.proposal_response = expected;
+  } else if (result.proposal_response) throw new Error('unexpected_proposal_response');
   const refs = new Set();
   const variants = new Set();
   for (const draft of result.drafts) {
@@ -34,6 +64,10 @@ export function validateDrafts({ result, rfq, intent, seller, terms, now, idFact
     if (!seller.enabled || !product || !rfq.candidate_product_ids.includes(primary?.product_id)) reject('invalid_offer');
     if (draft.items.some(i => i.quantity !== 1) || draft.items.filter(i => i.role === 'primary').length !== 1) reject('quantity_changed');
     if (product) {
+      if (seller.strategy.persona && (!seller.strategy.persona.sku_ids.includes(product.product_id) ||
+        Date.parse(draft.expires_at) > now + seller.strategy.persona.quote_ttl_seconds * 1000)) reject('invalid_offer');
+      if (!validateBenefits(seller, product, rfq.round, draft.benefits ?? [], previous)) reject('invalid_offer');
+      if (!economicallyValid(seller,product,draft.total_price_twd,draft.benefits ?? [],draft.items.find(i=>i.role==='addon')?.product_id ?? null)) reject('invalid_offer');
       if (!intent.required_features.every(f => product.features.includes(f))) reject('missing_feature');
       if (!intent.product_preferences.filter(p => p.strength === 'required').every(p => matches(product, p))) reject('invalid_offer');
       if (draft.primary_features.some(f => !product.features.includes(f)) || !intent.required_features.every(f => draft.primary_features.includes(f))) reject('missing_feature');
@@ -98,7 +132,9 @@ export function pruneUnavailable(latest, liveCatalog, snapshotCatalog, intent, n
       offer.primary_features.some(f => !product.features.includes(f)) ||
       JSON.stringify(liveTerms) !== JSON.stringify(snapshotTerms) ||
       offer.items.some(i => !seller.products.some(p => p.product_id === i.product_id && p.category === i.category && p.stock >= i.quantity && p.delivery_days <= offer.delivery_days));
-    if (unavailable || Date.parse(offer.expires_at) <= now) latest.delete(key);
+    const lostBenefit = (offer.benefits ?? []).some(b => !(seller?.benefits ?? []).some(entry =>
+      JSON.stringify(entry.definition) === JSON.stringify(b) && evidenceSupports(seller, entry, product)));
+    if (unavailable || lostBenefit || Date.parse(offer.expires_at) <= now) latest.delete(key);
   }
   for (const [key, offer] of latest) if (offer.variant === 'bundle' && latest.get(`${offer.seller_id}/standalone`)?.offer_id !== offer.baseline_offer_id) latest.delete(key);
 }
@@ -108,7 +144,9 @@ export function advanceOffers(latest, offers) {
     if (offer.eligibility.status === 'rejected') continue;
     const key = `${offer.seller_id}/${offer.variant}`;
     // Unauthorised additions must not evict an authorised bundle.
-    if (offer.eligibility.status === 'needs_confirmation' && latest.get(key)?.eligibility.status === 'eligible') continue;
+    const existing = latest.get(key);
+    if (offer.eligibility.status === 'needs_confirmation' && existing?.eligibility.status === 'eligible' &&
+      latest.get(`${offer.seller_id}/standalone`)?.offer_id === existing.baseline_offer_id) continue;
     latest.set(key, offer);
   }
   for (const [key, offer] of latest) {
@@ -141,7 +179,16 @@ export function buildContext({ requestId, revision, round, offers, catalog, inte
 
 export function competitiveTerms(context, seller, candidateIds, now) {
   const products = seller.products.filter(p => candidateIds.includes(p.product_id));
-  return context.offers.filter(o => o.seller_id !== seller.seller_id && Date.parse(o.expires_at) > now)
+  const valid = context.offers.filter(o => o.seller_id !== seller.seller_id && Date.parse(o.expires_at) > now);
+  // Bound repeated model context: cheapest standalone, fastest standalone, and
+  // cheapest bundle. Each remains one complete, attributable real offer.
+  const standalone = valid.filter(o => o.variant === 'standalone');
+  const selected = [
+    [...standalone].sort((a,b) => a.total_price_twd-b.total_price_twd || a.offer_id.localeCompare(b.offer_id))[0],
+    [...standalone].sort((a,b) => a.delivery_days-b.delivery_days || a.total_price_twd-b.total_price_twd || a.offer_id.localeCompare(b.offer_id))[0],
+    valid.filter(o => o.variant === 'bundle').sort((a,b) => a.total_price_twd-b.total_price_twd || a.offer_id.localeCompare(b.offer_id))[0],
+  ].filter(Boolean);
+  return [...new Map(selected.map(o => [o.offer_id,o])).values()]
     .map(({ seller_id, offer_id, ...term }) => ({
       ...copy(term), differences: products.some(p => p.brand === term.primary_product.brand && p.model === term.primary_product.model &&
         JSON.stringify(p.attributes) === JSON.stringify(term.primary_product.attributes)) ? [] : ['Different model or specifications; meets the same request hard constraints.'],

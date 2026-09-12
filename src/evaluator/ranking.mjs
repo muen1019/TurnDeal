@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { check, copy, immutable } from '../negotiation/contracts.mjs';
+import { serviceScore } from '../orchestrator/service-score.mjs';
 
 export const evaluatorFormat = immutable(JSON.parse(readFileSync(new URL('../../contracts/openai/evaluator-output.schema.json', import.meta.url), 'utf8')));
 export const instructions = `You are the independent OfferMesh Evaluator, acting solely for the buyer.
@@ -8,12 +9,14 @@ Rank EVERY provided offer_id exactly once; use contiguous ranks 1..N. Do not inv
 All amounts are integer TWD including tax and shipping. Use the ordered intent.preferences lexicographically:
 price_first = lowest total; delivery_first = fewest days; trust_first = personal band (positive > neutral > negative),
 then personal rating (missing=3), then marketplace rating (missing=3). Apply subsequent preferences only on ties.
+after_sales_first = highest verified service score (warranty up to 730 days:50, return up to 30 days:25, defect exchange up to 30 days:15, support:10 divided by response days). Unknown dimensions score zero. Only benefits on the provided complete offers count. Persona labels never count.
 If preferences is empty use price_first, then delivery_first, then trust_first.
 Remaining ties: faster delivery, higher trust, standalone before bundle, then offer_id alphabetical.
 Do not reward a gift just for being a gift. A cheaper authorized bundle may beat a standalone; both must remain ranked.
 Personal ratings are buyer-specific, marketplace ratings are aggregate; mention low sample counts when relevant.
 The current Offer contract does not include product attributes: do not infer color, shape, size or preference matches from SKU IDs.
 Do not infer warranty details from terms_id. Do not invent discounts, endorsements or guarantees.
+Verified benefits are rendered separately in the result cards. Do not discuss benefits, coupons, warranties or compensation in ranking reasons/tradeoffs; explain the specified price/delivery/trust order only. Future coupons and points NEVER reduce total_price_twd or affect the price comparator.
 Return concise Traditional Chinese reasons with concrete supplied price/delivery facts and up to five factual tradeoffs.
 In reason, write the exact own price as NT$<integer> and exact delivery as <integer> 天. Never round prices.
 Use objective facts; do not claim highest value, product specifications, warranty or other unsupported benefits.
@@ -27,6 +30,7 @@ export function instructionsFor(input) {
     ? 'PRIMARY RULE: Sort total_price_twd ASCENDING. A lower price MUST rank above every higher price, even with slower delivery or lower ratings. Only equal prices can use the other criteria.'
     : first === 'delivery_first'
       ? 'PRIMARY RULE: Sort delivery_days ASCENDING. Faster delivery MUST rank above slower delivery, even when it costs more. Only equal delivery can use other criteria.'
+      : first === 'after_sales_first' ? 'PRIMARY RULE: Preserve the supplied order by verified after-sales service score. Explain that the order follows registered service conditions, without inventing service guarantees or amounts.'
       : 'PRIMARY RULE: Compare trust before price or delivery, using the trust tuple defined above.';
   return `${instructions}\n${primary}\nThere are exactly ${input.offers.length} eligible offers. The input list is already ordered by the verified preference comparator; preserve that order and explain each offer. Return exactly ${input.offers.length} rows, copying each input offer_id once. Do not group by seller, omit a variant, or append commentary rows. Check numeric order and ID uniqueness before returning.`;
 }
@@ -37,7 +41,7 @@ function trustValues(input, offer) {
 }
 const compareNumbers = (a, b) => a.reduce((difference, value, i) => difference || value - b[i], 0);
 export function compareOffers(input, a, b) {
-  const values = (key, o) => key === 'price_first' ? [o.total_price_twd] : key === 'delivery_first' ? [o.delivery_days] : trustValues(input, o);
+  const values = (key, o) => key === 'price_first' ? [o.total_price_twd] : key === 'delivery_first' ? [o.delivery_days] : key==='after_sales_first' ? [-serviceScore(o.benefits ?? [])] : trustValues(input, o);
   for (const key of input.intent.preferences.length ? input.intent.preferences : ['price_first', 'delivery_first', 'trust_first']) {
     const difference = compareNumbers(values(key, a), values(key, b));
     if (difference) return difference;
@@ -89,7 +93,7 @@ export function validateExplanation(row, offer, input) {
 export function deterministicRanking(input) {
   check('EvaluatorInput', input);
   const prices = input.offers.map(o => o.total_price_twd), days = input.offers.map(o => o.delivery_days);
-  const priority = { price_first: '價格', delivery_first: '配送', trust_first: '信任' }[input.intent.preferences[0] ?? 'price_first'];
+  const priority = { price_first: '價格', delivery_first: '配送', trust_first: '信任', after_sales_first:'已登錄售後條件' }[input.intent.preferences[0] ?? 'price_first'];
   return { ranked_offers: [...input.offers].sort((a, b) => compareOffers(input, a, b)).map((o, i) => {
     const tradeoffs = [];
     if (o.total_price_twd > Math.min(...prices)) tradeoffs.push(`比本次最低價高 NT$${o.total_price_twd - Math.min(...prices)}。`);

@@ -10,6 +10,31 @@ const fixture = (): Catalog => JSON.parse(readFileSync(new URL('../contracts/fix
 const now = '2026-09-12T10:00:00+08:00';
 const query = { category: 'mouse' as const, target_total_twd: 800 };
 
+test('explicit price-first rewards lower totals even without a target, while a plain target remains proximity',()=> {
+  const c=fixture(); const base=c.listings.find(l=>l.category==='mouse')!;
+  c.sellers=c.sellers.slice(0,2).map(s=>({...s,enabled:true,rating:4.5,rating_count:100}));
+  c.listings=c.sellers.map((s,i)=>({...structuredClone(base),listing_id:`price_${i}`,seller_id:s.seller_id,stock:10,item_price_twd:i?800:600,shipping_twd:0,price_includes_tax:true}));
+  assert.equal(rankCandidates(c,{category:'mouse',target_total_twd:800},now).candidates[0].listing.listing_id,'price_1');
+  for(const target of [undefined,800]) assert.equal(rankCandidates(c,{category:'mouse',target_total_twd:target,priorities:['price_first']},now).candidates[0].listing.listing_id,'price_0');
+});
+
+test('after-sales preference uses valid included service terms, never persona labels or negotiable promises', () => {
+  const c=fixture(); const base=c.listings.find(l=>l.category==='mouse')!;
+  c.sellers=c.sellers.slice(0,2).map((s,i)=>({...s,enabled:true,rating:4.5,rating_count:100,persona:i?'price_optimizer':'margin_guardian'}));
+  c.listings=c.sellers.map((s,i)=>({...structuredClone(base),listing_id:`service_${i}`,seller_id:s.seller_id,stock:10,
+    item_price_twd:800,shipping_twd:0,price_includes_tax:true,public_services:i?[{
+      benefit_id:'warranty_b',kind:'warranty_extension',duration_days:730,conditions:'Synthetic repair terms',
+      evidence_id:'registered_b',simulation:true,commitment:'included',valid_until:'2027-01-01T00:00:00Z'
+    }]:[]}));
+  const q={category:'mouse' as const,priorities:['after_sales_first' as const]};
+  assert.equal(rankCandidates(c,q,now).candidates[0].seller.seller_id,c.sellers[1].seller_id);
+  c.listings[1].public_services![0].commitment='negotiable';
+  assert.equal(rankCandidates(c,q,now).candidates[0].listing.listing_id,'service_0');
+  c.listings[1].public_services![0].commitment='included';
+  c.listings[1].public_services![0].valid_until='2025-01-01T00:00:00Z';
+  assert.equal(rankCandidates(c,q,now).candidates[0].listing.listing_id,'service_0');
+});
+
 test('optional target price: renormalized weights and price-independent ranking', () => {
   for (const preferred_attributes of [undefined, { color: 'black' }]) {
     const c = fixture();
@@ -79,7 +104,7 @@ test('additive SQLite seed is repeatable, persists runs and preserves old record
     assert.equal(noPrice.candidates.length,5);
     const stored = db.prepare('SELECT input_json, policy_version FROM discovery_runs WHERE run_id=?').get(noPrice.run_id);
     assert.deepEqual(JSON.parse(String(stored?.input_json)),{category:'mouse'});
-    assert.equal(stored?.policy_version,'discovery-score-v0.4');
+    assert.equal(stored?.policy_version,'discovery-score-v0.5');
     assert.deepEqual(db.prepare('PRAGMA foreign_key_check').all(),[]);
     assert.throws(()=>db.exec("UPDATE discovery_runs SET result_json='{}'"),/immutable/);
   } finally {db.close();}

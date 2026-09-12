@@ -1,0 +1,12 @@
+
+> @offermesh/backend@0.3.0 prebuild
+> npm run generate:types
+
+
+> @offermesh/backend@0.3.0 generate:types
+> node scripts/generate-types.mjs
+
+
+> @offermesh/backend@0.3.0 build
+> tsc -p tsconfig.json
+
