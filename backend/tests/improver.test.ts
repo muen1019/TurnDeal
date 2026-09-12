@@ -142,8 +142,9 @@ describe('Durable jobs and concurrent revisions',()=>{
     const dir=mkdtempSync(join(tmpdir(),'improver-upgrade-'));dirs.push(dir);const dbPath=join(dir,'old.sqlite');
     const {store,id}=await setup(undefined,{dbPath});const snapshot=store.snapshot(id,buyer);
     const access=store.improvementStorage();access.transaction(()=>{
-      access.run('DROP TABLE improver_intent_revisions');access.run('DROP TABLE improver_jobs');access.run('DROP TABLE improver_global_preferences');
+      access.run('DROP TABLE improver_workflows');access.run('DROP TABLE improver_intent_revisions');access.run('DROP TABLE improver_jobs');access.run('DROP TABLE improver_global_preferences');
       access.run("DELETE FROM schema_migrations WHERE version='004_buyer_request_improver'");
+      access.run("DELETE FROM schema_migrations WHERE version='006_improver_followups'");
     });
     store.close();stores.splice(stores.indexOf(store),1);
     const reopened=await OfferStore.open({dbPath,now:()=>new Date('2026-09-12T02:00:00Z')});stores.push(reopened);

@@ -24,9 +24,10 @@
 ## 4. 外層整合（selection v1 已接線；後续工作獨立列出）
 
 - [x] 4.1 以 selection_version: 1 擴充接受／全部拒絕提交、unknown-outcome 恢復與狀態查詢；同步 Schema/OpenAPI/fixtures/型別及 OpenSpec，不修改舊保存回應。
-- [ ] 4.2 定義全域偏好編輯器同步、澄清後提交與後續 request 契約，釐清 sessionStorage 草稿與權威全域來源；驗證 buyer scope 及版本衝突。
+- [x] 4.2 定義後端澄清提交與後續 request 契約；驗證 buyer scope、不可變 successor 與重送衝突。前端串接方式見 docs/IMPROVER_BACKEND_INTEGRATION.md，本次不含 UI。
+- [ ] 4.5 全域偏好編輯器與一般新對話的權威全域來源同步。
 - [x] 4.3 接上原子接受／拒絕＋工作提交 adapter；測試完整非空排名集合、expiry、accept race 及無回饋事件，不捏造 feedback。
-- [ ] 4.4 接上 ready → child workflow，以 improvement_id 去重；驗證 root/parent/revision、通知遺失及每次拒絕最多一輪。
+- [x] 4.4 接上後端 ready → child workflow，以 durable workflow 去重；驗證 root/parent/revision、交易回滾、重啟恢復及每次拒絕最多一輪。不回填歷史 jobs。
 
 ## 5. 驗收與發布（API／hook 已驗證；完整後續循環仍待辦）
 

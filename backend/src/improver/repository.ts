@@ -31,7 +31,7 @@ export class ImprovementRepository {
   enqueueSelection(buyer:string,requestId:string):Job {
     return this.storage.transaction(()=>{
       const snapshot=this.storage.snapshot(requestId,buyer);
-      const existing=this.storage.rows('SELECT * FROM improver_jobs WHERE parent_request_id=? AND buyer_id=?',[requestId,buyer])[0];
+      const existing=this.storage.rows('SELECT * FROM improver_jobs WHERE parent_request_id=? AND buyer_id=? AND source_improvement_id IS NULL',[requestId,buyer])[0];
       if(existing)return this.decode(existing);
       if(!['accepted','rejected'].includes(snapshot.status)||!snapshot.decision||!snapshot.intent||!snapshot.ranked_offers.length)throw new Error('saved_round_rejection_required');
       const decision=snapshot.decision;
@@ -70,6 +70,23 @@ export class ImprovementRepository {
   }
   private decode(row:SqlRow):Job {
     return {improvement_id:String(row.improvement_id),status:row.status as Job['status'],context:parseContext(JSON.parse(String(row.context_json))),attempts:Number(row.attempts),claims:Number(row.claims),lease_token:row.lease_token as string|null,lease_until:row.lease_until===null?null:Number(row.lease_until),result:row.result_json?parseResult(JSON.parse(String(row.result_json))):null,error:row.error as string|null};
+  }
+  /** A new immutable job; never reset a terminal result or reuse its model budget. */
+  enqueueClarification(buyer:string,sourceId:string,feedback:string):Job {
+    return this.storage.transaction(()=>{
+      const source=this.get(buyer,sourceId);
+      const workflow=this.storage.rows('SELECT * FROM improver_workflows WHERE parent_request_id=? AND buyer_id=?',[source.context.parent_request_id,buyer])[0];
+      if(!workflow||workflow.next_request_id||workflow.current_improvement_id!==sourceId||source.status!=='needs_clarification'||this.storage.snapshot(source.context.parent_request_id,buyer).status!=='rejected')throw new Error('clarification_state_conflict');
+      const improvement_id=`imp_${randomUUID()}`;
+      const context=parseContext({...source.context,improvement_id,global_preference:this.globalPreference(buyer),
+        // The answer is the complete replacement instruction. Previous text remains in the source job.
+        evidence:[...source.context.evidence.filter(e=>e.kind==='rejection'),{evidence_id:'feedback',text:feedback,kind:'user_feedback'}],
+        history:[...source.context.history,{improvement_id:sourceId,status:source.status,intent_md:source.result!.documents.intent_md}].slice(-20)});
+      const now=this.storage.now().toISOString();
+      this.storage.run('INSERT INTO improver_jobs(improvement_id,buyer_id,parent_request_id,status,context_json,created_at,updated_at,source_improvement_id) VALUES(?,?,?,?,?,?,?,?)',[improvement_id,buyer,context.parent_request_id,'queued',JSON.stringify(context),now,now,sourceId]);
+      this.storage.run('UPDATE improver_workflows SET current_improvement_id=?,error=NULL WHERE parent_request_id=?',[improvement_id,context.parent_request_id]);
+      return this.get(buyer,improvement_id);
+    });
   }
   get(buyer:string,id:string):Job {
     const row=this.storage.rows('SELECT * FROM improver_jobs WHERE improvement_id=? AND buyer_id=?',[id,buyer])[0];

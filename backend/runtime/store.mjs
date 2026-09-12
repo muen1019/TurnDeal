@@ -43,6 +43,8 @@ export class RuntimeStore {
     // Startup only: never silently repeat a paid call after a crash.
     for(const row of db.prepare('SELECT * FROM requests WHERE result_state_json IS NOT NULL').all()) {
       const s=JSON.parse(row.result_state_json);
+      // A committed child not dispatched before a crash is safe to start once; no model ran yet.
+      if(s.status==='formatting'&&db.prepare('SELECT 1 FROM improver_workflows WHERE next_request_id=?').get(s.request_id)&&!db.prepare('SELECT 1 FROM formatter_runs WHERE request_id=?').get(s.request_id))continue;
       if(active.includes(s.status)) {
         if(row.published_snapshot_json) {
           const published=JSON.parse(row.published_snapshot_json);
@@ -78,13 +80,13 @@ export class RuntimeStore {
       return result;
     });
   }
-  create(buyer,documents){
+  create(buyer,documents,lineage){
     const id=`req_${randomUUID()}`,time=new Date(this.now()).toISOString();
-    const s={request_id:id,root_request_id:id,parent_request_id:null,status:'formatting',documents:{revision:1,...documents},
+    const s={request_id:id,root_request_id:lineage?.root_request_id??id,parent_request_id:lineage?.parent_request_id??null,status:'formatting',documents:{revision:lineage?.revision??1,intent_md:documents.intent_md,preference_md:documents.preference_md},
       intent:null,seller_agents:[],discovery_exclusions:[],sponsored_placement:null,offers:[],ranked_offers:[],confirmation_offer_ids:[],selected_offer_id:null,next_request_id:null,error:null,decision:null};
     assertContract('RequestSnapshot',s);
-    this.db.prepare(`INSERT INTO requests(request_id,user_id,revision,intent_md,preference_md,normalized_intent_json,status,result_state_json,contract_version,created_at,updated_at)
-      VALUES(?,?,1,?,?,'null','formatting',?,'0.3',?,?)`).run(id,buyer,documents.intent_md,documents.preference_md,JSON.stringify(s),time,time);
+    this.db.prepare(`INSERT INTO requests(request_id,user_id,parent_request_id,revision,intent_md,preference_md,normalized_intent_json,status,result_state_json,contract_version,created_at,updated_at)
+      VALUES(?,?,?,?,?,?,'null','formatting',?,'0.3',?,?)`).run(id,buyer,s.parent_request_id,s.documents.revision,documents.intent_md,documents.preference_md,JSON.stringify(s),time,time);
     return {status:202,body:s,scheduleRequestId:id};
   }
   process(id,buyer){
@@ -100,7 +102,15 @@ export class RuntimeStore {
     const initial=this.snapshot(id,buyer);
     const formatterConfig={db:this.db,userId:buyer,registrations:[],timeoutMs:30000,existingRequestId:id,now:()=>new Date(this.now())};
     const formatter=this.apiKey?createLlmFormatterService(formatterConfig,{apiKey:this.apiKey,...this.formatterOptions}):createFormatterService(formatterConfig);
-    const {result}=await formatter.submit({intent_md:initial.documents.intent_md,preference_md:initial.documents.preference_md,idempotency_key:`http:${id}`});
+    const frozen=this.db.prepare('SELECT formatter_json FROM improver_workflows WHERE next_request_id=? AND buyer_id=?').get(id,buyer);
+    let result;
+    if(frozen){
+      result=JSON.parse(frozen.formatter_json);assertContract('FormatterResult',result);
+      this.transaction(()=>{
+        this.db.prepare('UPDATE requests SET normalized_intent_json=? WHERE request_id=? AND user_id=?').run(JSON.stringify(result.normalized_intent),id,buyer);
+        this.db.prepare('INSERT INTO formatter_runs VALUES(?,?,?,?,?,?,?)').run(id,buyer,`http:${id}`,JSON.stringify(initial.documents),'[]',JSON.stringify(result),new Date(this.now()).toISOString());
+      });
+    }else ({result}=await formatter.submit({intent_md:initial.documents.intent_md,preference_md:initial.documents.preference_md,idempotency_key:`http:${id}`}));
     let s={...initial,intent:result.normalized_intent,status:result.status==='ready'?'orchestrating':'needs_clarification',
       error:result.status==='ready'?null:{code:'needs_clarification',message:result.questions.join(' '),fields:['intent_md']}};
     this.save(s);if(result.status!=='ready')return;
