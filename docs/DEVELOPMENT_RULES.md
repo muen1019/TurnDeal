@@ -2,7 +2,7 @@
 
 本文件將主辦方簡報、產品提案與團隊分工整理成可執行的工程規則。後續開發與驗收均以此文件及 `contracts/` 為準。
 
-新版目標設計已整理於 [SYSTEM_DESIGN.md](SYSTEM_DESIGN.md)。它規劃十輪議價、共享競爭資訊、Swipe 決策與長期偏好，但尚未取代本文件的 v0.1 規則；完整契約差異與 Evaluator fallback 的待決事項見該文件開頭。正式遷移時須依下方契約變更流程同步更新驗收與共同規則。
+新版目標設計已整理於 [SYSTEM_DESIGN.md](SYSTEM_DESIGN.md)。它規劃五家 Seller 各派一個 Buyer Agent、最多五輪議價、共享競爭資訊、Swipe 決策與長期偏好，但尚未取代本文件的 v0.1 規則；完整契約差異與 Evaluator fallback 的待決事項見該文件開頭。正式遷移時須依下方契約變更流程同步更新驗收與共同規則。
 
 ## 主辦方評分標準
 

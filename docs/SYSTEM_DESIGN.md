@@ -2,7 +2,7 @@
 >
 > 來源：[HackMD 設計文件](https://hackmd.io/uVLaU-wzQJueJDNmEf51PQ?both)；來源最後更新：2026-09-12T03:26:00.107Z；匯入日期：2026-09-12。
 >
-> 除本段 repo 整合說明外，下方保留此次讀取的 HackMD 正文。此檔為匯入快照，沒有自動雙向同步。後續修改應明確同步另一份文件。
+> 此檔以 HackMD 匯入快照為基礎，沒有自動雙向同步。2026-09-12 本地 spec 更新：Orchestrator 選出五家 Seller，各派一個 Buyer Agent，每次議價最多五輪；合格 Seller 不足五家時依實際數量進行。此更新尚未同步回 HackMD。
 
 ## Repo 整合狀態
 
@@ -10,13 +10,14 @@
 
 | 主題 | Repo v0.1 基準 | 本文目標／遷移範圍 |
 | --- | --- | --- |
-| 議價輪次 | Round enum 為 1、2 | 最多十輪同步 barrier；更新 SellerRound／Offer／SellerRFQ／SellerNegotiationResult、fixtures 與驗證器 |
+| Seller 名單 | 三家固定虛擬商家 | 五家固定登錄商家；Orchestrator 依自然排序選前五家合格 Seller，各派一個 Buyer Agent；不足五家時依實際數量進行，須擴充 Seller 資料與驗收 |
+| 議價輪次 | Round enum 為 1、2 | 最多五輪同步 barrier；更新 SellerRound／Offer／SellerRFQ／SellerNegotiationResult、fixtures 與驗證器 |
 | 資訊共享 | 不向 Seller 披露其他 Seller 報價 | Buyer 共享已驗證 context，Seller 只取得可比較的去識別化條件；須同步變更隱私規則與 RFQ 測試 |
 | 決策 | reject + feedback 建立 child | reject 處理目前 Offer；revise + feedback 建立 child；更新 RejectDecision／DecisionResult |
 | Swipe 狀態 | 沒有逐張 DecisionSession 或 all_rejected | 新增 session、current_offer_id、互動事件與 all_rejected；更新 RequestSnapshot／Status |
 | 偏好來源 | ProductPreference 沒有 source；交易偏好為字串 | explicit／behavioral 分層，有來源的交易偏好與證據，更新 Formatter／Evaluator input |
 | 文件版本 | DocumentBundle 的 Request revision | 另增長期 preference_revision_id 與背景更新紀錄；新版本不改既有 Request 快照 |
-| 時間預算 | 單次 3 秒、整體 8 秒 | 十輪上限、round timeout、global deadline 與成本限制，具體值須量測 |
+| 時間預算 | 單次 3 秒、整體 8 秒 | 五輪上限、round timeout、global deadline 與成本限制，具體值須量測 |
 | Evaluator 失敗 | 必須提供 deterministic fallback | 本文規劃 invalid／unavailable 進 failed；這項差異尚待取捨，現行 v0.1 繼續遵守 fallback 規則 |
 | 持久化與恢復 | 已有 SQLite migration、seed、完整性檢查及 feedback_events／user_preferences 資料表；尚未完成完整 Backend pipeline | 須在既有資料庫基礎上補齊 Shared Context revisions、DecisionSession、偏好更新工作與中斷恢復，並對齊新版 Swipe 語意 |
 
@@ -42,9 +43,9 @@ Buyer Agent 帶著 `intent.md` 與選填 `preference.md` 提出需求。系統�
 
 | 本版做什麼 | 最小實作 |
 | --- | --- |
-| 商品與 Seller | 滑鼠、滑鼠墊；三家固定登錄商家與本地商品／政策資料 |
-| Orchestrator | 相關商家、個人交易信任、賣場評分、獨立 Sponsored 位置 |
-| Negotiate / Evaluate | 每家最多十輪同步議價、共享競爭報價、單買與搭售方案；獨立 Agent 輸出排序，不替使用者決定購買 |
+| 商品與 Seller | 滑鼠、滑鼠墊；五家固定登錄商家與本地商品／政策資料 |
+| Orchestrator | 依商品匹配與信任等自然排序列出五家合格 Seller，不足時列出實際數量；每家各派一個 Buyer Agent，另有獨立 Sponsored 位置 |
+| Negotiate / Evaluate | 每家最多五輪同步議價、共享競爭報價、單買與搭售方案；獨立 Agent 輸出排序，不替使用者決定購買 |
 | Result loop | 逐張 Swipe、First Accept、all_rejected；revise 建立 child request；行為更新未來偏好 |
 | 方案兌換 | 使用不可變 offer_id，在期限內於虛擬市場一次性套用 |
 | 執行與儲存 | 一個常駐後端、四個 HTTP endpoints、SQLite 保存工作／文件版本／議價 context／互動／採用與兌換紀錄 |
@@ -61,7 +62,7 @@ SQLite 用於讓文件迭代與兌換狀態跨重啟保留；不引入 Redis、�
 
 不同 Seller 彼此無法直接交換資訊，但所有 Buyer Agents 都代表同一個 Buyer，因此可以透過 Shared Negotiation Context 分享已取得的競爭性市場資訊。例如 Buyer Agent A 從 Seller A 得到 NT$800 的報價後，Buyer Agent B 可以利用此資訊與 Seller B 進一步議價。
 
-每個 Seller 最多進行 10 輪 negotiation。完成後，系統凍結各 Seller 的最終有效方案並交給 Evaluator。Evaluator 根據本次需求、`preference.md`、商品條件與 Seller 信任資訊產生 personalized ranking。
+每個 Seller 最多進行 5 輪 negotiation。完成後，系統凍結各 Seller 的最終有效方案並交給 Evaluator。Evaluator 根據本次需求、`preference.md`、商品條件與 Seller 信任資訊產生 personalized ranking。
 
 使用者依排序逐一查看 Offer，並透過左右滑決定：
 
@@ -207,7 +208,7 @@ flowchart LR
 | Request Manager            | 建立 Request、管理 Request lifecycle、觸發後續 pipeline                              |
 | Formatter                  | 將 `intent.md` 與 `preference.md` 正規化成結構化需求                                  |
 | Orchestrator               | 商品篩選、Seller discovery、偏好排序、Trust 排序與 Sponsored placement                   |
-| Buyer Agent Manager        | 為每個 Seller 建立 Buyer Agent，協調最多 10 輪 negotiation                            |
+| Buyer Agent Manager        | 為每個 Seller 建立 Buyer Agent，協調最多 5 輪 negotiation                            |
 | Shared Negotiation Context | 保存 Buyer Agents 之間可共享的競爭性市場資訊                                              |
 | Seller Adapter             | 與指定 Seller 進行 RFQ / negotiation                                            |
 | Offer Validator            | 驗證 SKU、價格、交期、Bundle、Policy、有效期限與其他 hard constraints                        |
@@ -251,7 +252,7 @@ flowchart LR
     F["2 Format"]
     O["3 Orchestrator"]
 
-    N["4 Multi-Agent Negotiation<br/>Max 10 Rounds"]
+    N["4 Multi-Agent Negotiation<br/>Max 5 Rounds"]
 
     V["Freeze + Validate"]
 
@@ -520,7 +521,7 @@ symmetrical
 
 則 A 的 Seller 可以排在 B 前。
 
-但只要 B 仍符合所有 hard constraints，它仍然可以進入 negotiation。
+只要 B 仍符合所有 hard constraints，它仍可列入候選；Orchestrator 依自然排序選前五家 Seller 進入 negotiation。合格 Seller 不足五家時全部入選，沒有合格 Seller 時回 no_match，不為湊滿五家放寬硬條件。
 
 因此：
 
@@ -565,6 +566,7 @@ Campaign 只決定：
 
 * 讓不符合需求的商品進入
 * 改變 hard constraint
+* 改變前五家 Seller 的選取或增加議價分支
 * 改變 Evaluator ranking
 * 改寫 `preference.md`
 
@@ -572,13 +574,14 @@ Campaign 只決定：
 
 ### 2.11 Buyer Agent Creation
 
-Orchestrator 完成後，為每一個 Candidate Seller 建立：
+Orchestrator 完成後，為入選名單中的每一個 Seller 建立一個獨立 Buyer Agent；五家 Seller 對應五個 Buyer Agents，合格 Seller 不足五家時依實際數量建立：
 
 ```text
 Buyer Agent A
 Buyer Agent B
 Buyer Agent C
-...
+Buyer Agent D
+Buyer Agent E
 ```
 
 每個 Buyer Agent 只直接與指定 Seller 溝通：
@@ -587,6 +590,8 @@ Buyer Agent C
 Buyer Agent A ↔ Seller A
 Buyer Agent B ↔ Seller B
 Buyer Agent C ↔ Seller C
+Buyer Agent D ↔ Seller D
+Buyer Agent E ↔ Seller E
 ```
 
 Seller 彼此沒有直接 communication channel。
@@ -649,6 +654,8 @@ type SharedNegotiationContext = {
 Seller A → NT$850
 Seller B → NT$900
 Seller C → NT$820
+Seller D → NT$870
+Seller E → NT$880
 ```
 
 Shared Negotiation Context：
@@ -673,7 +680,11 @@ Seller A ←→ Buyer Agent A ─┐
                            │
 Seller B ←→ Buyer Agent B ─┼→ Shared Context
                            │
-Seller C ←→ Buyer Agent C ─┘
+Seller C ←→ Buyer Agent C ─┤
+                           │
+Seller D ←→ Buyer Agent D ─┤
+                           │
+Seller E ←→ Buyer Agent E ─┘
 ```
 
 Buyer Agents 可以在 Backend 內知道是哪一個 Seller 提供競爭方案。
@@ -729,10 +740,10 @@ Shared Negotiation Context 只能從實際 Seller response 與 Backend verificat
 每個 Seller 最多：
 
 ```text
-10 rounds
+5 rounds
 ```
 
-10 輪是：
+5 輪是：
 
 ```text
 maximum
@@ -761,7 +772,7 @@ Negotiation 使用：
 
 > **Round-based Parallel Negotiation**
 
-而不是讓每個 Seller branch 完全 independently asynchronous 執行十輪。
+而不是讓每個 Seller branch 完全 independently asynchronous 執行五輪。
 
 例如：
 
@@ -770,7 +781,9 @@ Round 1
 
 Seller A ─┐
 Seller B ─┼── Parallel
-Seller C ─┘
+Seller C ─┤
+Seller D ─┤
+Seller E ─┘
 
     ↓
 
@@ -791,7 +804,7 @@ Round 2
 
 每一輪中的所有 active Sellers 使用的都是上一輪結束後產生的 Shared Context。Round N 的結果全部完成或到達 round timeout 後，Backend 驗證並一次提交 context N，才開始 Round N+1。Round 1 使用空 context；已退出分支不再派發，但尚未失效的最後報價可留在 context。
 
-設定 max_rounds=10、round_timeout_ms、global_deadline_ms 與每 Request 的 Agent 呼叫／token 預算。Timeout 包含該輪 Buyer 推理與 Seller 呼叫；遲到回覆不納入已提交輪次。到達任一上限即凍結現有候選。數值須依所用模型量測；舊版 8 秒 deadline 不沿用為十輪的完成承諾。
+設定 max_rounds=5、round_timeout_ms、global_deadline_ms 與每 Request 的 Agent 呼叫／token 預算。Timeout 包含該輪 Buyer 推理與 Seller 呼叫；遲到回覆不納入已提交輪次。到達任一上限即凍結現有候選。數值須依所用模型量測；舊版 8 秒 deadline 不沿用為五輪的完成承諾。
 
 ---
 
@@ -800,9 +813,11 @@ Round 2
 假設完全 asynchronous：
 
 ```text
-Seller A → Round 8
+Seller A → Round 5
 Seller B → Round 2
-Seller C → Round 5
+Seller C → Round 4
+Seller D → Round 3
+Seller E → Round 1
 ```
 
 Seller B 的 Buyer Agent 可能看到大量來自 A、C 未來 Round 的資訊，而 A 在早期 Round 並沒有相同資訊。
@@ -910,7 +925,7 @@ rejected
 
 ### 2.20 Final Offer Snapshot
 
-不會把十輪所有歷史 Offer 都交給 Evaluator。
+不會把五輪所有歷史 Offer 都交給 Evaluator。
 
 Negotiation 完成後，每個 Seller 最多保留：
 
@@ -923,15 +938,21 @@ latest valid bundle offer
 
 ```text
 Seller A
-├─ standalone A10
-└─ bundle A9
+├─ standalone A5
+└─ bundle A4
 
 Seller B
-└─ standalone B8
+└─ standalone B4
 
 Seller C
-├─ standalone C10
-└─ bundle C10
+├─ standalone C5
+└─ bundle C5
+
+Seller D
+└─ standalone D3
+
+Seller E
+└─ standalone E5
 ```
 
 這些構成：
@@ -940,7 +961,7 @@ Seller C
 Final Offer Snapshot
 ```
 
-歷史 Round Offers 保留在 Database 中供 audit 與 debug。無效的新提案不會自動取代舊有效報價；已明確撤回、過期或被有效新版本取代的 Offer 不能復活。A10 standalone 與 A9 bundle 只有在 A9 的 baseline 仍有效且符合第 6.4 節時才能並存；baseline 更新須由 Seller 重新確認並產生新的 bundle offer_id，不能修改 A9。
+歷史 Round Offers 保留在 Database 中供 audit 與 debug。無效的新提案不會自動取代舊有效報價；已明確撤回、過期或被有效新版本取代的 Offer 不能復活。A5 standalone 與 A4 bundle 只有在 A4 的 baseline 仍有效且符合第 6.4 節時才能並存；baseline 更新須由 Seller 重新確認並產生新的 bundle offer_id，不能修改 A4。
 
 ---
 
@@ -1967,12 +1988,14 @@ Seller branch 的 failure 不應使整體 Request 失敗。
 Seller A → success
 Seller B → timeout
 Seller C → success
+Seller D → success
+Seller E → success
 ```
 
 仍可以：
 
 ```text
-A + C
+A + C + D + E
 → Evaluator
 ```
 
@@ -2161,7 +2184,7 @@ flowchart LR
 
     SNC["Shared Negotiation Context"]
 
-    N["4 Negotiation<br/>Max 10 Rounds"]
+    N["4 Negotiation<br/>Max 5 Rounds"]
 
     V["Freeze + Validate"]
 
@@ -2336,7 +2359,7 @@ Seller Offers
 每家 Seller：
 
 ```text
-maximum 10 rounds
+maximum 5 rounds
 ```
 
 且可以提前結束。
@@ -2473,14 +2496,15 @@ Swipe History
 
 ### 2.51 整合調整與實作前檢查
 
-以下為本次整合採用的規則與待量測項目，第 3～9 節已同步。保留十輪同步議價、Shared Context、First Accept 與跨 Request 偏好學習作為核心設計。
+以下為本次整合採用的規則與待量測項目，第 3～9 節已同步。保留五輪同步議價、Shared Context、First Accept 與跨 Request 偏好學習作為核心設計。
 
 | 項目 | 整合後規則／理由 |
 | --- | --- |
 | Reject 與重新搜尋 | reject 僅記錄目前卡片與前進；revise + explicit feedback 才建立 child。避免一次左滑就重啟整個 pipeline。 |
 | 偏好推導 | 「不要大尺寸」只排除 large；不能額外排除 medium。行為偏好永遠 preferred，不能放寬預算或加購授權。 |
 | 競爭報價 | 每個比較數值必須可回溯至仍有效且可比較的 offer_id。Buyer Agents 共用 request-scoped context；Seller 只收到必要條件。 |
-| 輪次與時間 | 十輪為上限；round timeout、global deadline、呼叫與 token 上限共同停止。模型延遲與成本須用實際執行量測。 |
+| Seller 派發 | Orchestrator 依自然排序選前五家合格 Seller，各派一個 Buyer Agent；不足五家依實際數量，不放寬硬條件，分支退出不補派。Sponsored 不影響名單。 |
+| 輪次與時間 | 五輪為上限；round timeout、global deadline、呼叫與 token 上限共同停止。模型延遲與成本須用實際執行量測。 |
 | 決策一致性 | accept／reject 都只能處理 current_offer_id。唯一約束與短交易保證 first accept，Idempotency-Key 保證同一操作重播。 |
 | 偏好來源與版本 | 明確偏好與行為偏好分層；全域 preference_revision_id 與 Request documents.revision 分開；當次文件、排序保持固定。 |
 | 回饋品質 | 未展示 Offer 不當 reject；位置偏差、價差、配送與 Seller 差異會混淆行為推論，證據不足時 NoChange。 |
@@ -2554,9 +2578,9 @@ Formatter 將商品描述轉成 `product_preferences[]`。每條規則保留 `so
 | 2. SKU 硬條件 | 每個 SKU 同時符合 required_features 與全部 required 商品偏好 | 不能拿同店 A 商品的黑色與 B 商品的小尺寸拼成一個符合方案 |
 | 3. 已知可售／交期 | 排除已知缺貨與已知超出最晚交期的 SKU | 尚未確認的可售／交期保留為 pending_checks，交給 Seller 議價時確認 |
 | 4. SKU 軟偏好 | 對通過硬條件的每個 SKU 分別計算 explicit preferred 與 behavioral preferred 規則命中數 | 不符軟偏好仍可候選；未知值不算命中，列入 unmatched_preference_ids |
-| 5. 彙整 Seller | 至少一個合格 SKU 才放入 seller_agents；保留全部 candidate_products | 某 Seller 沒有商品符合才不派發，而不是記住「不要這家」 |
-| 6. 自然排序 | 依該 Seller 最佳實際 SKU 的（explicit 命中數、behavioral 命中數）作字典序比較，再依信任、賣場評分、樣本數、seller_id | 所有合格 Seller 都議價，不以 Top K 截斷 |
-| 7. 贊助曝光 | 只在合格 Seller 中檢查 Campaign 並選一個 Sponsored | bid 不改自然名單、商品匹配或議價資源 |
+| 5. 彙整 Seller | 至少一個合格 SKU 才列入 Seller 候選；保留該 Seller 全部合格 candidate_products | 沒有符合商品的 Seller 不列入候選，不持久化為禁用名單 |
+| 6. 自然排序與選取 | 依該 Seller 最佳實際 SKU 的（explicit 命中數、behavioral 命中數）作字典序比較，再依信任、賣場評分、樣本數、seller_id | 取前五家不同 Seller 放入 seller_agents，每家派一個 Buyer Agent；不足五家依實際數量，零家回 no_match，不放寬硬條件湊數 |
+| 7. 贊助曝光 | 只在已入選 seller_agents 中檢查 Campaign 並選一個 Sponsored | bid 不改自然名單、商品匹配或議價資源，不增加第六個 Seller 分支 |
 
 required 屬性缺失不能視為符合。本地 MVP 不另建資料補全服務：該 SKU 暫不進入可派發候選，輸出 `required_attribute_unknown` 與 missing_attribute；這表示資料不足，不表示商品已證實不符。若全部無合格商品則 no_match，顯示原因，不能自動放寬 required。若只是 preferred 未命中，仍返回候選與取捨。
 
@@ -2566,7 +2590,7 @@ required 屬性缺失不能視為符合。本地 MVP 不另建資料補全服務
 
 商品匹配優先於信任：Seller 分數高但沒有符合硬要求的商品，仍不能入列。兩層軟偏好命中數都相同時，個人交易評分平均 4～5 為 positive、低於 3 為 negative，其餘／無紀錄為 neutral，按 positive → neutral → negative 排序；再依賣場平均分、樣本數由高至低、seller_id 排列。無評分為 null，同層排在有評分者之後，不偽造零分。
 
-自然名單與額外 Sponsored 卡片分開。Campaign 必須啟用、在有效期間、目標類別符合且 bid 為正；合格者取 bid 最高，平手按 campaign_id。贊助商仍要有符合商品；廣告不能讓被商品條件排除者重新加入。MVP 只有本地 Campaign 與 placement_selected 紀錄，沒有計費／Budget，概念參考見 [REF-10](REFERENCE.md#ref-10)。
+自然名單與額外 Sponsored 卡片分開。Campaign 必須啟用、在有效期間、目標類別符合且 bid 為正；在已入選 seller_agents 的合格者中取 bid 最高，平手按 campaign_id。贊助商仍要有符合商品；廣告不能讓被商品條件排除或未進前五名者加入議價名單。MVP 只有本地 Campaign 與 placement_selected 紀錄，沒有計費／Budget，概念參考見 [REF-10](REFERENCE.md#ref-10)。
 
 ### 5.4 輸出為何？
 
@@ -2574,11 +2598,11 @@ required 屬性缺失不能視為符合。本地 MVP 不另建資料補全服務
 
 | 輸出 | 內容 | 消費者 |
 | --- | --- | --- |
-| seller_agents[] | 已排序的合格 Seller；每家帶 candidate_products、matched／unmatched preference IDs、match_reason、信任摘要 | UI 羅列與 Buyer Agent 派發 |
+| seller_agents[] | 依自然排序入選的前五家合格 Seller，不足五家則為實際數量；每家帶 candidate_products、matched／unmatched preference IDs、match_reason、信任摘要 | UI 羅列與 Buyer Agent 派發 |
 | discovery_exclusions[] | 本次同類商品無法入選的 Seller、逐 SKU 原因／缺失屬性 | UI 解釋篩選，不作下次的固定封鎖表 |
 | sponsored_placement | 合格名單中的贊助商、campaign_id、Sponsored label，或 null | UI 額外曝光 |
 
-為每個合格 Seller 建立獨立 Buyer Agent，RFQ 限定 candidate_product_ids 並帶商品規則及必要 pending_checks。MVP Seller 只能對這些主商品 SKU 報價；最終 Offer 再按實際主商品驗證，不可用店內另一個合格 SKU 幫不合格 Offer 過關。Catalog 與正規化規則在 request 中保留版本快照供重播；兌換時另確認即時可履約性。
+僅為 seller_agents 中每個入選 Seller 建立一個獨立 Buyer Agent，最多五個分支；名單在本次 Request 議價開始前固定，分支提前結束後不補派其他 Seller。RFQ 限定 candidate_product_ids 並帶商品規則及必要 pending_checks。MVP Seller 只能對這些主商品 SKU 報價；最終 Offer 再按實際主商品驗證，不可用店內另一個合格 SKU 幫不合格 Offer 過關。Catalog 與正規化規則在 request 中保留版本快照供重播；兌換時另確認即時可履約性。
 
 Evaluator 取得商品匹配與有來源的信任摘要，不取得 Campaign、bid、廣告文案或曝光位置。Orchestrator 排的是「哪些 Seller 有可談的商品」，Evaluator 排的是「談完後哪些 Offer 值得採用」。
 
@@ -2592,13 +2616,17 @@ Evaluator 取得商品匹配與有來源的信任摘要，不取得 Campaign、b
 - 搭售：可接受不加價的滑鼠墊。
 ```
 
-假設三家均可供貨且交期符合：
+假設五家均可供貨且交期符合，仍須依商品硬條件決定入選數量：
 
 | Seller 的商品 | 判定 |
 | --- | --- |
 | A：黑色／小尺寸／左右對稱 | 入列，命中兩個軟偏好 |
 | B：紅色／小尺寸／左右對稱 | 不入列，顏色違反 required |
 | C：黑色／大尺寸／左右對稱 | 入列，命中一個軟偏好，排 A 後面 |
+| D：黑色／小尺寸／右手型 | 入列，命中一個軟偏好；與 C 再依信任等條件排序 |
+| E：黑色／中尺寸／右手型 | 入列，未命中軟偏好，排上述合格 Seller 後面 |
+
+本例只有四家通過硬條件，因此列出四家並建立四個 Buyer Agents，不加入不合格的 B 湊滿五家。
 
 使用者回饋「小尺寸是必要的，大尺寸不能接受」後，preference.md 將尺寸更新為 required，再 Format → Orchestrator；C 此時無符合 SKU 才退出。如果 C 增加黑色小尺寸商品，下一輪自然重新入列。若只說「A 的滑鼠太大」，在缺少尺寸門檻或可比較商品基準時澄清，不把 seller_a 加進排除名單。
 
@@ -2612,7 +2640,7 @@ Evaluator 取得商品匹配與有來源的信任摘要，不取得 Campaign、b
 
 Seller 只能與自己的 Buyer Agent 分支互動，不能存取其他 Seller 的逐字稿、底價或 Buyer 個人信任資料。Buyer Agents 可讀取同一 Request 已驗證的 Shared Negotiation Context，並向自己的 Seller 轉述去識別化且可比較的真實競爭條件；不得虛構報價或交付完整 context。詳見第 2.12～2.17 節。
 
-每家最多十輪，同一輪的 active branches 平行執行，共用上一輪已提交的 context revision。每輪可提出單買與一個搭售方案。每一個不同商品／價格／條件版本生成唯一且不可變的 `offer_id`；這就是之後採用與兌換使用的優惠組合編號，不再建立另一套 coupon_id。維持原方案可沿用 ID；任何商務條件變動都產生新 ID。
+每家最多五輪，同一輪的 active branches 平行執行，共用上一輪已提交的 context revision。每輪可提出單買與一個搭售方案。每一個不同商品／價格／條件版本生成唯一且不可變的 `offer_id`；這就是之後採用與兌換使用的優惠組合編號，不再建立另一套 coupon_id。維持原方案可沿用 ID；任何商務條件變動都產生新 ID。
 
 Seller 回傳單買與搭售，搭售用 baseline_offer_id 指向同款單買。後端保留歷史版本供稽核，凍結快照只包含每家最新有效的 standalone／bundle，至多兩筆。正式報價依商品目錄、底價、庫存及條件驗證；模型不能自行補造優惠。
 
@@ -2620,10 +2648,12 @@ Seller 回傳單買與搭售，搭售用 baseline_offer_id 指向同款單買。
 
 | 條件 | 處理 |
 | --- | --- |
-| 最多十輪 | Round 1 詢價；Round 2～10 根據上一輪 context 還價／調整；可提早結束 |
+| 最多五輪 | Round 1 詢價；Round 2～5 根據上一輪 context 還價／調整；可提早結束 |
 | Seller final／refuse，或 Backend 接受停止建議 | 該分支提早結束，保留仍有效最後報價 |
 | round_timeout_ms 到期或分支錯誤 | 關閉逾時分支，保留已驗證有效報價；其他分支繼續；遲到回覆不得加入已提交輪次 |
-| 全部分支完成、十輪完成、global_deadline_ms 或呼叫／token 上限到達 | 關閉協商、驗證並凍結快照；忽略遲到回覆 |
+| 全部分支完成、五輪完成、global_deadline_ms 或呼叫／token 上限到達 | 關閉協商、驗證並凍結快照；忽略遲到回覆 |
+
+分支先回覆本輪報價，只代表該輪完成；仍須等待本輪 barrier 才能進下一輪。單一 Seller 宣告 final 只結束自己的分支，其他 active branches 繼續；全部分支結束才提前關閉整場協商。每次 Request 的共同輪次最多為 Round 1～5，不因分支數或提前退出而重新計算。
 
 round timeout 包含 Buyer 推理與 Seller 回應，每輪 barrier 有界。Deadline 與成本上限在 Request 啟動時固定並保存；具體數值待實測，非效能保證。議價 deadline 與 Offer 的 expires_at 是不同概念：前者停止聊天，後者限制採用／兌換。期限語意背景見 [REF-07](REFERENCE.md#ref-07)。
 
@@ -2854,10 +2884,10 @@ type ErrorResponse = { error: ApiError };
 | 範圍 | 限制 |
 | --- | --- |
 | Markdown / feedback | intent_md 去空白後非空，最多 20,000 字元；preference_md 最多 20,000，省略則取長期偏好快照、無紀錄為空字串；reject.feedback 選填，revise.feedback 必填，提供時去空白非空且最多 2,000；不接受 filesystem path 取代內容 |
-| Money / count | *_twd 為整數新台幣元，總額含稅運；預算／價格 >0、加價上限 >=0；revision／rank／交期為正整數；count >=0；round 為 1..10 的整數 |
+| Money / count | *_twd 為整數新台幣元，總額含稅運；預算／價格 >0、加價上限 >=0；revision／rank／交期為正整數；count >=0；round 為 1..5 的整數 |
 | Trust | rating 為 1..5 或 null；無樣本時 count=0 且 rating=null；來源僅伺服器交易資料，不能從 request 覆寫 |
 | Product preferences | preference_id 唯一；source=behavioral 僅能 strength=preferred；in／not_in 的 values 非空且為受控標籤；range 至少一個界限非 null，界限為正數毫米且 min<=max；未提供某屬性規則即不限制；unknown 不通過 required，也不命中 preferred |
-| Discovery | candidate_products 非空，全部通過同一 SKU 的硬條件；matched／unmatched IDs 分割全部 product_preferences；listing_rank 為連續正整數；排除紀錄僅供本次解釋，不持久化成 Seller 禁用策略 |
+| Discovery | seller_agents 最多五家且 seller_id 不重複，依自然排序取前五家、不足時取全部；candidate_products 非空，全部通過同一 SKU 的硬條件；matched／unmatched IDs 分割全部 product_preferences；listing_rank 為連續正整數；排除紀錄僅供本次解釋，不持久化成 Seller 禁用策略 |
 | Policy | disabled：配件陣列空且上限 0；related_no_extra_cost：上限 0；related_with_cap：上限須明示；允許類別為 mouse_pad 白名單子集 |
 | Offer items | standalone 恰一個 primary，baseline=null；bundle 恰一 primary 加一 addon，數量皆 1；主商品 ID 必在該 Seller 的 candidate_products，尺寸／顏色／外型依相同 Catalog 快照重驗；同款基準、條件與有效性依第 6 節 |
 | References | final_offer_ids 指向該 Seller 的快照 Offer；baseline 指向同 Seller 有效 standalone；歷史 round ID 可只存在伺服器歷史記錄 |
