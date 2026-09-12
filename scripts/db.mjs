@@ -17,7 +17,7 @@ function json(value) {
   return JSON.stringify(value);
 }
 
-function applyMigrations(db) {
+export function applyMigrations(db) {
   for (const filename of readdirSync(migrationsDirectory).filter(name => /^\d+_.+\.sql$/.test(name)).sort()) {
     const version = filename.slice(0, -4);
     const hasMigrations = db.prepare("SELECT 1 FROM sqlite_schema WHERE name = 'schema_migrations'").get();
@@ -362,7 +362,7 @@ function verifyLegacyMigration() {
     const preserved = ["requests", "offers", "decisions", "redemptions"].map(table => [table, db.prepare(`SELECT * FROM ${table}`).all()]);
     applyMigrations(db);
     applyMigrations(db); // Applying already-recorded migrations must be a no-op.
-    for (const [table, rows] of preserved) assert.deepEqual(db.prepare(`SELECT * FROM ${table}`).all(), rows, `${table} must survive the v0.2 migration unchanged`);
+    for (const [table, rows] of preserved) assert.deepEqual(db.prepare(`SELECT ${Object.keys(rows[0]).join(",")} FROM ${table}`).all(), rows, `${table} must survive the v0.2 migration unchanged`);
     assert.deepEqual(JSON.parse(db.prepare("SELECT round_discounts_json FROM sellers").get().round_discounts_json), [30, 60, 60, 60, 60]);
     assert.equal(db.prepare("SELECT is_final FROM negotiation_rounds").get().is_final, 0);
     assert.equal(db.prepare("SELECT stop_reason FROM request_sellers").get().stop_reason, null);
@@ -452,7 +452,7 @@ function verifyDatabase(db) {
     FROM sqlite_schema
     WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
   `).get().count);
-  assert.equal(tableCount, 26, "database must include discovery, negotiation and evaluation runtime tables");
+  assert.equal(tableCount, 27, "database must include discovery, negotiation and evaluation runtime tables");
 
   verifyNegotiationConstraints(db);
 

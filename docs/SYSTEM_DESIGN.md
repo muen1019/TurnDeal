@@ -1,4 +1,6 @@
-> 文件定位：目標系統設計；五家 Seller／最多五輪已遷移至 v0.2 JSON Schema／fixtures，其餘差異如下。
+> 現行 Result API 已統一 v0.3；accept/reject 與資料庫遷移見 [統一契約](UNIFIED_RESULT_CONTRACT.md)。本文其餘完整 Agent pipeline 屬目標設計。
+
+> 文件定位：目標系統設計；五家 Seller／最多五輪已遷移至 v0.3 JSON Schema／fixtures，其餘差異如下。
 >
 > 來源：[HackMD 設計文件](https://hackmd.io/uVLaU-wzQJueJDNmEf51PQ?both)；來源最後更新：2026-09-12T03:26:00.107Z；匯入日期：2026-09-12。
 >
@@ -6,7 +8,7 @@
 
 ## Repo 整合狀態
 
-目前契約與驗收以 [v0.2 schema](../contracts/a2a-commerce.v0.2.schema.json)、[開發規則](DEVELOPMENT_RULES.md) 與 [AGENTS.md](../AGENTS.md) 為準。五家 Seller、最多五輪同步排程、共享競爭條件、模型／fallback 及 SQLite 稽核已實作於 [協商模組](NEGOTIATION.md)。完整 Backend pipeline 仍需整合；第 9 節其餘 API 草案不是現有 HTTP API 已支援的宣告。
+目前契約與驗收以 [v0.3 schema](../contracts/a2a-commerce.v0.3.schema.json)、[開發規則](DEVELOPMENT_RULES.md) 與 [AGENTS.md](../AGENTS.md) 為準。五家 Seller、最多五輪同步排程、共享競爭條件、模型／fallback 及 SQLite 稽核已實作於 [協商模組](NEGOTIATION.md)。完整 Backend pipeline 仍需整合；第 9 節其餘 API 草案不是現有 HTTP API 已支援的宣告。
 
 | 主題 | Repo v0.2 基準 | 本文目標／剩餘遷移範圍 |
 | --- | --- | --- |
