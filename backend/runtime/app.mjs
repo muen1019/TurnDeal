@@ -2,10 +2,13 @@ import express from 'express';
 import { RuntimeStore } from './store.mjs';
 import { assertContract } from '../../src/orchestrator/contract.ts';
 import { HttpError } from '../src/httpError.ts';
+import { installPurchases } from './purchase/service.mjs';
+import { installImprover } from './improver.mjs';
 
-export function createRuntimeApp({buyerId=()=> 'demo_buyer',autoProcess=true,...options}={}) {
+export function createRuntimeApp({buyerId=()=> 'demo_buyer',autoProcess=true,purchaseOptions={},improverOptions={},...options}={}) {
+  if(purchaseOptions.mode&&purchaseOptions.mode!=='test')throw new HttpError(503,'live_checkout_not_configured','正式購買尚未配置');
   const store=new RuntimeStore(options),app=express();app.locals.store=store;
-  app.use(express.json({limit:'256kb',strict:true}));
+  app.use(express.json({limit:'256kb',strict:true,verify(req,_res,buf){req.rawBody=buf.toString();}}));
   app.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next();});
   const validate=(name,body)=>{
     // Reject accidental credential pastes before any DB/idempotency write.
@@ -21,12 +24,20 @@ export function createRuntimeApp({buyerId=()=> 'demo_buyer',autoProcess=true,...
     if(result.scheduleRequestId&&autoProcess)setImmediate(()=>{void store.process(result.scheduleRequestId,buyer);});
   }catch(e){next(e);}});
   app.get('/api/requests/:request_id',(req,res,next)=>{try{res.json(store.snapshot(req.params.request_id,buyerId(req)));}catch(e){next(e);}});
+  const improvement=installImprover(app,store,buyerId,improverOptions);
   app.post('/api/requests/:request_id/decisions',(req,res,next)=>{try{
     const body=validate(req.body?.action==='accept'?'AcceptDecision':'RejectDecision',req.body),buyer=buyerId(req),id=req.params.request_id;
     store.snapshot(id,buyer);
-    const result=store.idempotent(buyer,'POST',`/api/requests/${id}/decisions`,req.header('Idempotency-Key'),body,()=>store.decide(buyer,id,body));
+    const result=store.idempotent(buyer,'POST',`/api/requests/${id}/decisions`,req.header('Idempotency-Key'),body,()=>{
+      const decision=store.decide(buyer,id,body);
+      if(body.selection_version===1&&body.rejected_offer_ids.length)improvement.improver.repository.enqueueSelection(buyer,id);
+      return decision;
+    });
     res.status(result.status).json(result.body);
+    const job=store.db.prepare('SELECT improvement_id FROM improver_jobs WHERE parent_request_id=? AND buyer_id=?').get(id,buyer);
+    if(job)improvement.schedule(buyer,job.improvement_id);
   }catch(e){next(e);}});
+  installPurchases(app,store,buyerId,purchaseOptions);
   app.use((_req,_res,next)=>next(new HttpError(404,'not_found','找不到這個資源。')));
   app.use((error,_req,res,_next)=>{
     if(error instanceof SyntaxError||error?.type==='entity.too.large')error=new HttpError(400,'invalid_request','JSON 格式錯誤或內容過長。');

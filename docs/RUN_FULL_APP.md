@@ -41,7 +41,7 @@ npm run dev:secure
 6. 前端透過原 GET /api/requests/{id} 輪詢狀態並呈現商品卡。
 7. POST /api/requests/{id}/decisions 保存採用或拒絕。採用時重新驗證 provenance、庫存、價格、規格、交期、條款、期限與配件授權。拒絕保存原始 feedback/source_documents；尚未自動更新長期偏好。
 
-共用契約新增 orchestrating、negotiating、evaluating 三個 Status 值；生成型別與前端進度判斷同步更新。沒有增加 /progress、付款或 redemption endpoint。
+共用契約新增 orchestrating、negotiating、evaluating 三個 Status 值；生成型別與前端進度判斷同步更新。採用後可呼叫購買 API 建立 ACP 測試 checkout，提交明確確認後完成模擬訂單；本提交未含購買 UI 接線；六個購買端點、payload 與模式邊界見 [ACP_PURCHASE.md](ACP_PURCHASE.md)。沒有真實扣款或 redemption endpoint。
 
 ## 資料與既有模組
 
