@@ -79,7 +79,7 @@ test('additive SQLite seed is repeatable, persists runs and preserves old record
     assert.equal(noPrice.candidates.length,5);
     const stored = db.prepare('SELECT input_json, policy_version FROM discovery_runs WHERE run_id=?').get(noPrice.run_id);
     assert.deepEqual(JSON.parse(String(stored?.input_json)),{category:'mouse'});
-    assert.equal(stored?.policy_version,'discovery-score-v0.3');
+    assert.equal(stored?.policy_version,'discovery-score-v0.4');
     assert.deepEqual(db.prepare('PRAGMA foreign_key_check').all(),[]);
     assert.throws(()=>db.exec("UPDATE discovery_runs SET result_json='{}'"),/immutable/);
   } finally {db.close();}

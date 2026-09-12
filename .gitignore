@@ -9,6 +9,7 @@ data/*.sqlite
 data/*.sqlite-shm
 data/*.sqlite-wal
 data/*.db
+data/backups/
 
 # Logs and editor state
 *.log
