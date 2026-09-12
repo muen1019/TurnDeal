@@ -3,6 +3,7 @@ node_modules/
 .env
 .env.*
 !.env.example
+!.env.expamle
 
 # Local SQLite runtime files (rebuild with npm run db:init)
 data/*.sqlite

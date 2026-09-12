@@ -75,7 +75,9 @@ OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commer
 
 `contracts/a2a-commerce.v0.2.schema.json` 是跨模組唯一資料契約。任何欄位改名、刪除、型別變更、enum 收窄或狀態語意改變，都必須先討論並升版，不能由單一模組自行修改。
 
-`docs/SYSTEM_DESIGN.md` 已整併 HackMD 的新版目標設計，涵蓋五家 Seller 各派一個 Buyer Agent、最多五輪同步議價、Buyer Shared Context、逐張 Swipe 決策及長期偏好更新。v0.2 已遷移五家 Seller、五輪上限、明確 final／停止原因，以及相關 fixtures、驗證器與 SQLite。Shared Context、逐張 Swipe 與長期偏好等仍待契約升版；完整 Backend pipeline 與同步排程器尚未實作，差異列在設計文件開頭。
+`docs/SYSTEM_DESIGN.md` 描述新版目標設計。已實作五家 Seller 的同步協商、Buyer Shared Context、真實模型／fallback 與 SQLite 稽核紀錄，以及獨立 Evaluator 的完整 ID 排序、發布前重新驗證與不可變快照。協商入口見 [協商模組說明](docs/NEGOTIATION.md)，排序與整合測試見 [Evaluator 說明](docs/EVALUATOR.md)。
+
+本次開發新增的 `npm run test:evaluator` 驗證排序與失敗路徑；`npm run test:e2e:full`／`npm run test:e2e:full:live` 從 SQLite 已解析需求，沿用遠端 Orchestrator 的 prepare 接口，執行協商、Evaluator 與重開重播，產生五套方案報告。正式自然語言 Formatter、HTTP、Swipe 及交易端尚未包含在這條測試路徑。
 
 ## 團隊分工與交付
 
@@ -178,7 +180,7 @@ git push --force-with-lease
 
 - Seller 只回傳草稿，不得自行設定正式 `offer_id` 或 eligibility。
 - Backend 配置 immutable `offer_id`，並驗證價格、規格、交期、庫存、條款、搭售授權與期限。
-- Seller 不能看到其他 Seller 的報價、底價、Campaign 或買家私有信任資料。
+- Seller 只能看到去識別化且可比較的真實競爭條件；不得取得其他 Seller 的名稱／ID、逐字稿、底價、Campaign 或買家私有信任資料。
 - Sponsored 只影響 UI 曝光，不得進入 Evaluator input 或影響排序。
 - Evaluator 只能完整排序 Backend 已驗證的 eligible Offer。不存在、重複、遺漏或過期 ID 一律拒絕。
 - OpenAI API 失敗時必須使用 deterministic fallback，主 Demo 不可因此中斷。
@@ -215,7 +217,11 @@ npm test
 
 本 repository 為本次黑客松建立。第一版已完成共同開發規則、完整資料契約、OpenAI Structured Outputs 格式、三家 Seller 固定測資、兩輪議價範例、API 範例與無第三方相依的契約驗證器。
 
-v0.2 已完成五家 Seller／最多五輪的契約、19 次議價交換與 6 筆最終 Offer 測資、提前 final／失敗停止驗證，以及保留舊資料的 SQLite migration。新增 Ajv／ajv-formats 驗證實際 JSON Schema。共享 context、同步排程器、Swipe session 及偏好學習仍未列為已完成功能。
+v0.2 已完成五家 Seller／最多五輪的契約、19 次議價交換與 6 筆最終 Offer 測資、提前 final／失敗停止驗證，以及保留舊資料的 SQLite migration。新增 Ajv／ajv-formats 驗證實際 JSON Schema。
+
+本次新增 `src/negotiation/`：五組獨立 Buyer／Seller、最多五輪同步 barrier、去識別化共享競爭條件、Responses API Structured Outputs、deterministic fallback、Backend 報價驗證、期限／成本上限與 SQLite 不可變稽核紀錄。`npm run demo:negotiate -- --offline` 可執行完整協商；填入 `.env` 的 `API_KEY` 後執行 `npm run demo:negotiate -- --live`。模型設定及整合限制見 [NEGOTIATION.md](docs/NEGOTIATION.md)。Swipe session 及偏好學習仍未實作。
+
+新增 25 組 unit tests，以及離線／真實模型 E2E：`npm run test:e2e`、`npm run test:e2e:live`。使用者確認的五套 [銷售偏好](contracts/fixtures/sales-profiles.json) 展示讓價、快速配送、免費周邊、較便宜的組合、固定價格。修正模型可繞過固定價格的問題，加入有底價保護的 bundle 折扣。E2E 會產生五張方案卡、逐輪紀錄和 14 項驗證報告；歷史資料庫重開後必須重播同一組 Offer ID。
 
 後續每個 PR 都要更新本節或 PR 說明，讓評審可以辨識黑客松期間完成的工作。
 

@@ -1,0 +1,1908 @@
+{
+  "mode": "offline",
+  "model": "gpt-4.1-mini-2025-04-14",
+  "started_at": "2026-09-12T05:25:13.158Z",
+  "duration_seconds": 0.21,
+  "request_id": "req_41fe3ff5-688e-4bea-8a04-ee064aeb7e96",
+  "status": "awaiting_user",
+  "offer_count": 7,
+  "usage": {
+    "calls": 0,
+    "reserved_tokens": 0,
+    "actual_tokens": 0
+  },
+  "providers": {
+    "openai": 0,
+    "deterministic": 38
+  },
+  "fallbacks": [
+    {
+      "seller_id": "seller_b",
+      "round": 1,
+      "role": "buyer",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_b",
+      "round": 1,
+      "role": "seller",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_d",
+      "round": 1,
+      "role": "buyer",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_d",
+      "round": 1,
+      "role": "seller",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_e",
+      "round": 1,
+      "role": "buyer",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_e",
+      "round": 1,
+      "role": "seller",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_a",
+      "round": 1,
+      "role": "buyer",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_a",
+      "round": 1,
+      "role": "seller",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_c",
+      "round": 1,
+      "role": "buyer",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_c",
+      "round": 1,
+      "role": "seller",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_b",
+      "round": 2,
+      "role": "buyer",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_b",
+      "round": 2,
+      "role": "seller",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_d",
+      "round": 2,
+      "role": "buyer",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_d",
+      "round": 2,
+      "role": "seller",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_a",
+      "round": 2,
+      "role": "buyer",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_a",
+      "round": 2,
+      "role": "seller",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_c",
+      "round": 2,
+      "role": "buyer",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_c",
+      "round": 2,
+      "role": "seller",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_b",
+      "round": 3,
+      "role": "buyer",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_b",
+      "round": 3,
+      "role": "seller",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_d",
+      "round": 3,
+      "role": "buyer",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_d",
+      "round": 3,
+      "role": "seller",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_a",
+      "round": 3,
+      "role": "buyer",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_a",
+      "round": 3,
+      "role": "seller",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_c",
+      "round": 3,
+      "role": "buyer",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_c",
+      "round": 3,
+      "role": "seller",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_b",
+      "round": 4,
+      "role": "buyer",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_b",
+      "round": 4,
+      "role": "seller",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_a",
+      "round": 4,
+      "role": "buyer",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_a",
+      "round": 4,
+      "role": "seller",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_c",
+      "round": 4,
+      "role": "buyer",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_c",
+      "round": 4,
+      "role": "seller",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_b",
+      "round": 5,
+      "role": "buyer",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_b",
+      "round": 5,
+      "role": "seller",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_a",
+      "round": 5,
+      "role": "buyer",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_a",
+      "round": 5,
+      "role": "seller",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_c",
+      "round": 5,
+      "role": "buyer",
+      "reason": "model_unavailable_or_invalid"
+    },
+    {
+      "seller_id": "seller_c",
+      "round": 5,
+      "role": "seller",
+      "reason": "model_unavailable_or_invalid"
+    }
+  ],
+  "pipeline": {
+    "stages": [
+      "Parsed SQLite Request",
+      "Upstream handoff.prepare / Discovery",
+      "Five-round manager / registered Sellers",
+      "Backend validation",
+      "Evaluator",
+      "SQLite snapshot / replay"
+    ],
+    "upstream_commit": "cdce6e5",
+    "handoff_id": "e95b7a38-f1b9-4071-aba5-131ee3798ff9",
+    "discovery_run_id": "7b678562-0a67-4ce8-aada-0d28a018a3bc",
+    "policy_version": "discovery-score-v0.4",
+    "selected_seller_ids": [
+      "seller_b",
+      "seller_d",
+      "seller_e",
+      "seller_a",
+      "seller_c"
+    ]
+  },
+  "negotiation_duration_seconds": 0.14,
+  "evaluation_duration_seconds": 0.02,
+  "evaluation": {
+    "request_id": "req_41fe3ff5-688e-4bea-8a04-ee064aeb7e96",
+    "status": "awaiting_user",
+    "provider": "deterministic_fallback",
+    "model": null,
+    "fallback_reason": "model_unconfigured",
+    "usage": {
+      "calls": 0,
+      "reserved_tokens": 0,
+      "actual_tokens": 0
+    },
+    "evaluated_at": "2026-09-12T05:25:13.430Z",
+    "snapshot": {
+      "request_id": "req_41fe3ff5-688e-4bea-8a04-ee064aeb7e96",
+      "root_request_id": "req_41fe3ff5-688e-4bea-8a04-ee064aeb7e96",
+      "parent_request_id": null,
+      "status": "awaiting_user",
+      "documents": {
+        "revision": 1,
+        "intent_md": "# 購買需求\n無線靜音滑鼠，含稅運 1000 元內，7 天內到貨。",
+        "preference_md": "# 偏好\n只接受黑色，偏好小尺寸及左右對稱。價格優先，可接受不加價且可拒絕的滑鼠墊。"
+      },
+      "intent": {
+        "category": "mouse",
+        "max_total_twd": 1000,
+        "delivery_days_max": 7,
+        "required_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "preferences": [
+          "price_first"
+        ],
+        "product_preferences": [
+          {
+            "preference_id": "pf_color_black",
+            "strength": "required",
+            "source_text": "只接受黑色",
+            "attribute": "color",
+            "operator": "in",
+            "values": [
+              "black"
+            ]
+          },
+          {
+            "preference_id": "pf_size_small",
+            "strength": "preferred",
+            "source_text": "偏好小尺寸",
+            "attribute": "size_class",
+            "operator": "in",
+            "values": [
+              "small"
+            ]
+          },
+          {
+            "preference_id": "pf_shape_symmetrical",
+            "strength": "preferred",
+            "source_text": "偏好左右對稱",
+            "attribute": "shape",
+            "operator": "in",
+            "values": [
+              "symmetrical"
+            ]
+          }
+        ],
+        "negotiation_policy": {
+          "bundle_mode": "related_no_extra_cost",
+          "allowed_addon_categories": [
+            "mouse_pad"
+          ],
+          "max_addon_increment_twd": 0
+        }
+      },
+      "seller_agents": [
+        {
+          "seller_id": "seller_b",
+          "name": "FlashShip Tech",
+          "listing_rank": 1,
+          "match_reason": "偏好命中 2/2；含稅運 799 元；未設定目標價格，價格不參與評分",
+          "candidate_products": [
+            {
+              "product_id": "mouse_b_black_small",
+              "attributes": {
+                "size_class": "small",
+                "color": "black",
+                "shape": "symmetrical",
+                "length_mm": 106.7,
+                "width_mm": 58.7,
+                "height_mm": 26.62
+              },
+              "matched_preference_ids": [
+                "pf_color_black",
+                "pf_size_small",
+                "pf_shape_symmetrical"
+              ],
+              "unmatched_preference_ids": [],
+              "pending_checks": []
+            }
+          ],
+          "trust": {
+            "personal_band": "neutral",
+            "personal_rating": null,
+            "personal_count": 0,
+            "marketplace_rating": 4.8,
+            "marketplace_count": 502
+          },
+          "status": "offered",
+          "rounds": [
+            {
+              "round": 1,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_041ae904-a8f8-4f52-959b-d89a0314e120"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 2,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_bf6ad4ff-a491-4114-8938-88d78a4707e5"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 3,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_3cccb7bd-c962-4b96-9d6c-07bb22a2f523"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 4,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_5b1562f3-bb28-40f0-88d9-a10888616bed"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 5,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_d2d0deeb-faef-43c5-a3fb-7ef007a6be2a"
+              ],
+              "is_final": false
+            }
+          ],
+          "stop_reason": "max_rounds",
+          "final_offer_ids": [
+            "offer_d2d0deeb-faef-43c5-a3fb-7ef007a6be2a"
+          ]
+        },
+        {
+          "seller_id": "seller_d",
+          "name": "SteadyShip Market",
+          "listing_rank": 2,
+          "match_reason": "偏好命中 2/2；含稅運 699 元；未設定目標價格，價格不參與評分",
+          "candidate_products": [
+            {
+              "product_id": "mouse_d_black_small",
+              "attributes": {
+                "size_class": "small",
+                "color": "black",
+                "shape": "symmetrical",
+                "length_mm": 99,
+                "width_mm": 60,
+                "height_mm": 39
+              },
+              "matched_preference_ids": [
+                "pf_color_black",
+                "pf_size_small",
+                "pf_shape_symmetrical"
+              ],
+              "unmatched_preference_ids": [],
+              "pending_checks": []
+            }
+          ],
+          "trust": {
+            "personal_band": "neutral",
+            "personal_rating": null,
+            "personal_count": 0,
+            "marketplace_rating": 4.5,
+            "marketplace_count": 50
+          },
+          "status": "offered",
+          "rounds": [
+            {
+              "round": 1,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_02df9cd7-9549-4b97-9e1d-b981c7c72cc3",
+                "offer_e4f05227-8e0c-447f-908a-249ab1bb191d"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 2,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_34f34783-96a0-45cb-a64b-878cc6e817c2",
+                "offer_0b0878b8-6a45-4388-8506-c493e0c2b344"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 3,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_b0e7d930-5a01-4ce4-9a9f-0e33096b534f",
+                "offer_62faee03-876b-4694-8c58-43b93f3dd093"
+              ],
+              "is_final": true
+            }
+          ],
+          "stop_reason": "seller_final",
+          "final_offer_ids": [
+            "offer_b0e7d930-5a01-4ce4-9a9f-0e33096b534f",
+            "offer_62faee03-876b-4694-8c58-43b93f3dd093"
+          ]
+        },
+        {
+          "seller_id": "seller_e",
+          "name": "ClearPrice Store",
+          "listing_rank": 3,
+          "match_reason": "偏好命中 2/2；含稅運 679 元；未設定目標價格，價格不參與評分",
+          "candidate_products": [
+            {
+              "product_id": "mouse_e_black_small",
+              "attributes": {
+                "size_class": "small",
+                "color": "black",
+                "shape": "symmetrical",
+                "length_mm": 99,
+                "width_mm": 60,
+                "height_mm": 39
+              },
+              "matched_preference_ids": [
+                "pf_color_black",
+                "pf_size_small",
+                "pf_shape_symmetrical"
+              ],
+              "unmatched_preference_ids": [],
+              "pending_checks": []
+            }
+          ],
+          "trust": {
+            "personal_band": "neutral",
+            "personal_rating": null,
+            "personal_count": 0,
+            "marketplace_rating": 4.4,
+            "marketplace_count": 50
+          },
+          "status": "offered",
+          "rounds": [
+            {
+              "round": 1,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_603b1901-a633-4c08-8454-cb033ad8cf42"
+              ],
+              "is_final": true
+            }
+          ],
+          "stop_reason": "seller_final",
+          "final_offer_ids": [
+            "offer_603b1901-a633-4c08-8454-cb033ad8cf42"
+          ]
+        },
+        {
+          "seller_id": "seller_a",
+          "name": "Budget Mouse Co.",
+          "listing_rank": 4,
+          "match_reason": "偏好命中 2/2；含稅運 629 元；未設定目標價格，價格不參與評分",
+          "candidate_products": [
+            {
+              "product_id": "mouse_a_black_small",
+              "attributes": {
+                "size_class": "small",
+                "color": "black",
+                "shape": "symmetrical",
+                "length_mm": 99,
+                "width_mm": 60,
+                "height_mm": 39
+              },
+              "matched_preference_ids": [
+                "pf_color_black",
+                "pf_size_small",
+                "pf_shape_symmetrical"
+              ],
+              "unmatched_preference_ids": [],
+              "pending_checks": []
+            }
+          ],
+          "trust": {
+            "personal_band": "neutral",
+            "personal_rating": null,
+            "personal_count": 0,
+            "marketplace_rating": 4.6,
+            "marketplace_count": 128
+          },
+          "status": "offered",
+          "rounds": [
+            {
+              "round": 1,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_ccb3685a-8d97-450f-bac8-116ca7813341"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 2,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_c368ffbc-056a-4b46-8d54-a5dd7cac6be3"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 3,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_75e59514-5bf6-49f1-9a7f-7ce5eea56ee0"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 4,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_6b9f6d3e-b2a6-4a77-92fe-f8ebb9fa0974"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 5,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_475acd99-cbf6-47ee-94bc-024998723021"
+              ],
+              "is_final": false
+            }
+          ],
+          "stop_reason": "max_rounds",
+          "final_offer_ids": [
+            "offer_475acd99-cbf6-47ee-94bc-024998723021"
+          ]
+        },
+        {
+          "seller_id": "seller_c",
+          "name": "Bundle Lab",
+          "listing_rank": 5,
+          "match_reason": "偏好命中 1/2；含稅運 699 元；未設定目標價格，價格不參與評分",
+          "candidate_products": [
+            {
+              "product_id": "mouse_c_black_small",
+              "attributes": {
+                "size_class": "small",
+                "color": "black",
+                "shape": "asymmetrical_right",
+                "length_mm": 105.4,
+                "width_mm": 67.9,
+                "height_mm": 38.4
+              },
+              "matched_preference_ids": [
+                "pf_color_black",
+                "pf_size_small"
+              ],
+              "unmatched_preference_ids": [
+                "pf_shape_symmetrical"
+              ],
+              "pending_checks": []
+            }
+          ],
+          "trust": {
+            "personal_band": "neutral",
+            "personal_rating": null,
+            "personal_count": 0,
+            "marketplace_rating": 4.3,
+            "marketplace_count": 76
+          },
+          "status": "offered",
+          "rounds": [
+            {
+              "round": 1,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_5e07f567-1d30-44dd-b7bf-c3be56e9f426",
+                "offer_c92b3505-569c-45d2-819e-76e93381a741"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 2,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_c772025e-a6cc-4a29-bb53-82c0f2b07be9",
+                "offer_ae66d46a-b4f8-4aae-9aff-a66583d422ab"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 3,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_1b9f0de2-3a9f-4377-ad8a-f26557577eae",
+                "offer_d682a46a-e703-40ae-92c8-369064a56f3d"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 4,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_9d37954f-7505-4557-b3d1-3343d4f6fa13",
+                "offer_7963e511-c6f8-47e6-861f-e56400bd0969"
+              ],
+              "is_final": false
+            },
+            {
+              "round": 5,
+              "outcome": "offered",
+              "offer_ids": [
+                "offer_9c801910-cd7d-40d1-8154-7d804ea2d1b1",
+                "offer_0dd15ca3-ce5d-40e4-b8d6-eef9eb124fc5"
+              ],
+              "is_final": false
+            }
+          ],
+          "stop_reason": "max_rounds",
+          "final_offer_ids": [
+            "offer_9c801910-cd7d-40d1-8154-7d804ea2d1b1",
+            "offer_0dd15ca3-ce5d-40e4-b8d6-eef9eb124fc5"
+          ]
+        }
+      ],
+      "discovery_exclusions": [],
+      "sponsored_placement": {
+        "seller_id": "seller_b",
+        "campaign_id": "campaign_b_launch",
+        "label": "Sponsored"
+      },
+      "offers": [
+        {
+          "offer_id": "offer_d2d0deeb-faef-43c5-a3fb-7ef007a6be2a",
+          "seller_id": "seller_b",
+          "round": 5,
+          "variant": "standalone",
+          "items": [
+            {
+              "product_id": "mouse_b_black_small",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click",
+            "multi_device"
+          ],
+          "total_price_twd": 710,
+          "delivery_days": 1,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T05:35:13.363Z",
+          "baseline_offer_id": null,
+          "eligibility": {
+            "status": "eligible",
+            "reason_codes": []
+          }
+        },
+        {
+          "offer_id": "offer_b0e7d930-5a01-4ce4-9a9f-0e33096b534f",
+          "seller_id": "seller_d",
+          "round": 3,
+          "variant": "standalone",
+          "items": [
+            {
+              "product_id": "mouse_d_black_small",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 630,
+          "delivery_days": 2,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T05:35:13.347Z",
+          "baseline_offer_id": null,
+          "eligibility": {
+            "status": "eligible",
+            "reason_codes": []
+          }
+        },
+        {
+          "offer_id": "offer_62faee03-876b-4694-8c58-43b93f3dd093",
+          "seller_id": "seller_d",
+          "round": 3,
+          "variant": "bundle",
+          "items": [
+            {
+              "product_id": "mouse_d_black_small",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            },
+            {
+              "product_id": "pad_c_black",
+              "category": "mouse_pad",
+              "role": "addon",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 600,
+          "delivery_days": 2,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": true,
+          "expires_at": "2026-09-12T05:35:13.347Z",
+          "baseline_offer_id": "offer_b0e7d930-5a01-4ce4-9a9f-0e33096b534f",
+          "eligibility": {
+            "status": "eligible",
+            "reason_codes": []
+          }
+        },
+        {
+          "offer_id": "offer_603b1901-a633-4c08-8454-cb033ad8cf42",
+          "seller_id": "seller_e",
+          "round": 1,
+          "variant": "standalone",
+          "items": [
+            {
+              "product_id": "mouse_e_black_small",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 679,
+          "delivery_days": 4,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T05:35:13.314Z",
+          "baseline_offer_id": null,
+          "eligibility": {
+            "status": "eligible",
+            "reason_codes": []
+          }
+        },
+        {
+          "offer_id": "offer_475acd99-cbf6-47ee-94bc-024998723021",
+          "seller_id": "seller_a",
+          "round": 5,
+          "variant": "standalone",
+          "items": [
+            {
+              "product_id": "mouse_a_black_small",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "bluetooth",
+            "silent_click"
+          ],
+          "total_price_twd": 549,
+          "delivery_days": 5,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T05:35:13.364Z",
+          "baseline_offer_id": null,
+          "eligibility": {
+            "status": "eligible",
+            "reason_codes": []
+          }
+        },
+        {
+          "offer_id": "offer_9c801910-cd7d-40d1-8154-7d804ea2d1b1",
+          "seller_id": "seller_c",
+          "round": 5,
+          "variant": "standalone",
+          "items": [
+            {
+              "product_id": "mouse_c_black_small",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "wireless_usb",
+            "silent_click"
+          ],
+          "total_price_twd": 610,
+          "delivery_days": 3,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": false,
+          "expires_at": "2026-09-12T05:35:13.364Z",
+          "baseline_offer_id": null,
+          "eligibility": {
+            "status": "eligible",
+            "reason_codes": []
+          }
+        },
+        {
+          "offer_id": "offer_0dd15ca3-ce5d-40e4-b8d6-eef9eb124fc5",
+          "seller_id": "seller_c",
+          "round": 5,
+          "variant": "bundle",
+          "items": [
+            {
+              "product_id": "mouse_c_black_small",
+              "category": "mouse",
+              "role": "primary",
+              "quantity": 1
+            },
+            {
+              "product_id": "pad_c_black",
+              "category": "mouse_pad",
+              "role": "addon",
+              "quantity": 1
+            }
+          ],
+          "primary_features": [
+            "wireless",
+            "wireless_usb",
+            "silent_click"
+          ],
+          "total_price_twd": 610,
+          "delivery_days": 3,
+          "terms_id": "terms_standard_v1",
+          "optional_addons": true,
+          "expires_at": "2026-09-12T05:35:13.364Z",
+          "baseline_offer_id": "offer_9c801910-cd7d-40d1-8154-7d804ea2d1b1",
+          "eligibility": {
+            "status": "eligible",
+            "reason_codes": []
+          }
+        }
+      ],
+      "ranked_offers": [
+        {
+          "rank": 1,
+          "offer_id": "offer_475acd99-cbf6-47ee-94bc-024998723021",
+          "reason": "依價格優先排序；含稅運 NT$549，5 天到貨。",
+          "tradeoffs": [
+            "比最快方案晚 4 天。"
+          ]
+        },
+        {
+          "rank": 2,
+          "offer_id": "offer_62faee03-876b-4694-8c58-43b93f3dd093",
+          "reason": "依價格優先排序；含稅運 NT$600，2 天到貨。",
+          "tradeoffs": [
+            "比本次最低價高 NT$51。",
+            "比最快方案晚 1 天。",
+            "含可拒絕的滑鼠墊；拒絕配件時請另選單買 Offer，其價格可能不同。"
+          ]
+        },
+        {
+          "rank": 3,
+          "offer_id": "offer_9c801910-cd7d-40d1-8154-7d804ea2d1b1",
+          "reason": "依價格優先排序；含稅運 NT$610，3 天到貨。",
+          "tradeoffs": [
+            "比本次最低價高 NT$61。",
+            "比最快方案晚 2 天。"
+          ]
+        },
+        {
+          "rank": 4,
+          "offer_id": "offer_0dd15ca3-ce5d-40e4-b8d6-eef9eb124fc5",
+          "reason": "依價格優先排序；含稅運 NT$610，3 天到貨。",
+          "tradeoffs": [
+            "比本次最低價高 NT$61。",
+            "比最快方案晚 2 天。",
+            "含可拒絕的滑鼠墊；拒絕配件時請另選單買 Offer，其價格可能不同。"
+          ]
+        },
+        {
+          "rank": 5,
+          "offer_id": "offer_b0e7d930-5a01-4ce4-9a9f-0e33096b534f",
+          "reason": "依價格優先排序；含稅運 NT$630，2 天到貨。",
+          "tradeoffs": [
+            "比本次最低價高 NT$81。",
+            "比最快方案晚 1 天。"
+          ]
+        },
+        {
+          "rank": 6,
+          "offer_id": "offer_603b1901-a633-4c08-8454-cb033ad8cf42",
+          "reason": "依價格優先排序；含稅運 NT$679，4 天到貨。",
+          "tradeoffs": [
+            "比本次最低價高 NT$130。",
+            "比最快方案晚 3 天。"
+          ]
+        },
+        {
+          "rank": 7,
+          "offer_id": "offer_d2d0deeb-faef-43c5-a3fb-7ef007a6be2a",
+          "reason": "依價格優先排序；含稅運 NT$710，1 天到貨。",
+          "tradeoffs": [
+            "比本次最低價高 NT$161。"
+          ]
+        }
+      ],
+      "confirmation_offer_ids": [],
+      "selected_offer_id": null,
+      "next_request_id": null,
+      "error": null
+    },
+    "solutions": [
+      {
+        "seller_id": "seller_a",
+        "rank": 1,
+        "recommended_offer_id": "offer_475acd99-cbf6-47ee-94bc-024998723021",
+        "offer_rank": 1,
+        "reason": "依價格優先排序；含稅運 NT$549，5 天到貨。",
+        "tradeoffs": [
+          "比最快方案晚 4 天。"
+        ],
+        "alternative_offer_ids": []
+      },
+      {
+        "seller_id": "seller_d",
+        "rank": 2,
+        "recommended_offer_id": "offer_62faee03-876b-4694-8c58-43b93f3dd093",
+        "offer_rank": 2,
+        "reason": "依價格優先排序；含稅運 NT$600，2 天到貨。",
+        "tradeoffs": [
+          "比本次最低價高 NT$51。",
+          "比最快方案晚 1 天。",
+          "含可拒絕的滑鼠墊；拒絕配件時請另選單買 Offer，其價格可能不同。"
+        ],
+        "alternative_offer_ids": [
+          "offer_b0e7d930-5a01-4ce4-9a9f-0e33096b534f"
+        ]
+      },
+      {
+        "seller_id": "seller_c",
+        "rank": 3,
+        "recommended_offer_id": "offer_9c801910-cd7d-40d1-8154-7d804ea2d1b1",
+        "offer_rank": 3,
+        "reason": "依價格優先排序；含稅運 NT$610，3 天到貨。",
+        "tradeoffs": [
+          "比本次最低價高 NT$61。",
+          "比最快方案晚 2 天。"
+        ],
+        "alternative_offer_ids": [
+          "offer_0dd15ca3-ce5d-40e4-b8d6-eef9eb124fc5"
+        ]
+      },
+      {
+        "seller_id": "seller_e",
+        "rank": 4,
+        "recommended_offer_id": "offer_603b1901-a633-4c08-8454-cb033ad8cf42",
+        "offer_rank": 6,
+        "reason": "依價格優先排序；含稅運 NT$679，4 天到貨。",
+        "tradeoffs": [
+          "比本次最低價高 NT$130。",
+          "比最快方案晚 3 天。"
+        ],
+        "alternative_offer_ids": []
+      },
+      {
+        "seller_id": "seller_b",
+        "rank": 5,
+        "recommended_offer_id": "offer_d2d0deeb-faef-43c5-a3fb-7ef007a6be2a",
+        "offer_rank": 7,
+        "reason": "依價格優先排序；含稅運 NT$710，1 天到貨。",
+        "tradeoffs": [
+          "比本次最低價高 NT$161。"
+        ],
+        "alternative_offer_ids": []
+      }
+    ]
+  },
+  "passed": true,
+  "checks": [
+    {
+      "name": "遠端 handoff.prepare 實際選出五家，計畫與 Discovery 已保存並可重播",
+      "passed": true
+    },
+    {
+      "name": "輸出契約與五家分支狀態正確",
+      "passed": true
+    },
+    {
+      "name": "五家皆提供可履約方案，交給 Evaluator",
+      "passed": true
+    },
+    {
+      "name": "每輪只使用上一個已提交 context",
+      "passed": true
+    },
+    {
+      "name": "RFQ 無競爭者 ID／私有資料，所有競爭條件有真實來源",
+      "passed": true
+    },
+    {
+      "name": "最終報價符合金額、期限、庫存、SKU、數量與交期硬限制",
+      "passed": true
+    },
+    {
+      "name": "A 有讓價，B 保持最快配送",
+      "passed": true
+    },
+    {
+      "name": "C 免費周邊與 D 組合便宜 NT$30 均實際出現",
+      "passed": true
+    },
+    {
+      "name": "E 不接受模型降價，第一輪固定 NT$679",
+      "passed": true
+    },
+    {
+      "name": "最終 Offer ID 唯一，Evaluator ID 集合完整",
+      "passed": true
+    },
+    {
+      "name": "離線模式完全不呼叫 API",
+      "passed": true
+    },
+    {
+      "name": "執行未超過固定模型呼叫與 token 預留上限",
+      "passed": true
+    },
+    {
+      "name": "SQLite Offer 不可變且完整持久化",
+      "passed": true
+    },
+    {
+      "name": "Evaluator 排完全部七個有效 ID，產生五個賣家方案並符合價格優先",
+      "passed": true
+    },
+    {
+      "name": "Evaluator 離線備援不呼叫模型",
+      "passed": true
+    },
+    {
+      "name": "Evaluator 發布快照不可修改，Sponsored 未改變推薦",
+      "passed": true
+    },
+    {
+      "name": "關閉／重開 SQLite 後重播同一結果，不再付模型費用",
+      "passed": true
+    },
+    {
+      "name": "其他買家無法讀取執行結果",
+      "passed": true
+    },
+    {
+      "name": "Evaluator 關閉／重開 SQLite 後保持相同排名與原因",
+      "passed": true
+    }
+  ],
+  "solutions": [
+    {
+      "seller_id": "seller_a",
+      "label": "願意讓價",
+      "description": "逐輪降價，優先匹配競爭價格，配送較慢。",
+      "standalone": {
+        "offer_id": "offer_475acd99-cbf6-47ee-94bc-024998723021",
+        "seller_id": "seller_a",
+        "round": 5,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_a_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click"
+        ],
+        "total_price_twd": 549,
+        "delivery_days": 5,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T05:35:13.364Z",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      "bundle": null,
+      "sponsored": false,
+      "stop_reason": "max_rounds",
+      "rounds": [
+        {
+          "round": 1,
+          "target_total_twd": null,
+          "outcome": "offered",
+          "buyer_provider": "deterministic",
+          "seller_provider": "deterministic",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 599
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "target_total_twd": 669,
+          "outcome": "offered",
+          "buyer_provider": "deterministic",
+          "seller_provider": "deterministic",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 584
+            }
+          ]
+        },
+        {
+          "round": 3,
+          "target_total_twd": 610,
+          "outcome": "offered",
+          "buyer_provider": "deterministic",
+          "seller_provider": "deterministic",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 569
+            }
+          ]
+        },
+        {
+          "round": 4,
+          "target_total_twd": 610,
+          "outcome": "offered",
+          "buyer_provider": "deterministic",
+          "seller_provider": "deterministic",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 559
+            }
+          ]
+        },
+        {
+          "round": 5,
+          "target_total_twd": 610,
+          "outcome": "offered",
+          "buyer_provider": "deterministic",
+          "seller_provider": "deterministic",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 549
+            }
+          ]
+        }
+      ],
+      "ranking": {
+        "seller_id": "seller_a",
+        "rank": 1,
+        "recommended_offer_id": "offer_475acd99-cbf6-47ee-94bc-024998723021",
+        "offer_rank": 1,
+        "reason": "依價格優先排序；含稅運 NT$549，5 天到貨。",
+        "tradeoffs": [
+          "比最快方案晚 4 天。"
+        ],
+        "alternative_offer_ids": []
+      },
+      "recommended": {
+        "offer_id": "offer_475acd99-cbf6-47ee-94bc-024998723021",
+        "seller_id": "seller_a",
+        "round": 5,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_a_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click"
+        ],
+        "total_price_twd": 549,
+        "delivery_days": 5,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T05:35:13.364Z",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      }
+    },
+    {
+      "seller_id": "seller_d",
+      "label": "組合更便宜",
+      "description": "滑鼠加滑鼠墊比同輪單買便宜 NT$30，配件可拒絕。",
+      "standalone": {
+        "offer_id": "offer_b0e7d930-5a01-4ce4-9a9f-0e33096b534f",
+        "seller_id": "seller_d",
+        "round": 3,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_d_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click"
+        ],
+        "total_price_twd": 630,
+        "delivery_days": 2,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T05:35:13.347Z",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      "bundle": {
+        "offer_id": "offer_62faee03-876b-4694-8c58-43b93f3dd093",
+        "seller_id": "seller_d",
+        "round": 3,
+        "variant": "bundle",
+        "items": [
+          {
+            "product_id": "mouse_d_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          },
+          {
+            "product_id": "pad_c_black",
+            "category": "mouse_pad",
+            "role": "addon",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click"
+        ],
+        "total_price_twd": 600,
+        "delivery_days": 2,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": true,
+        "expires_at": "2026-09-12T05:35:13.347Z",
+        "baseline_offer_id": "offer_b0e7d930-5a01-4ce4-9a9f-0e33096b534f",
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      "sponsored": false,
+      "stop_reason": "seller_final",
+      "rounds": [
+        {
+          "round": 1,
+          "target_total_twd": null,
+          "outcome": "offered",
+          "buyer_provider": "deterministic",
+          "seller_provider": "deterministic",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 679
+            },
+            {
+              "variant": "bundle",
+              "total_price_twd": 649
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "target_total_twd": 599,
+          "outcome": "offered",
+          "buyer_provider": "deterministic",
+          "seller_provider": "deterministic",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 630
+            },
+            {
+              "variant": "bundle",
+              "total_price_twd": 600
+            }
+          ]
+        },
+        {
+          "round": 3,
+          "target_total_twd": 584,
+          "outcome": "offered",
+          "buyer_provider": "deterministic",
+          "seller_provider": "deterministic",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 630
+            },
+            {
+              "variant": "bundle",
+              "total_price_twd": 600
+            }
+          ]
+        }
+      ],
+      "ranking": {
+        "seller_id": "seller_d",
+        "rank": 2,
+        "recommended_offer_id": "offer_62faee03-876b-4694-8c58-43b93f3dd093",
+        "offer_rank": 2,
+        "reason": "依價格優先排序；含稅運 NT$600，2 天到貨。",
+        "tradeoffs": [
+          "比本次最低價高 NT$51。",
+          "比最快方案晚 1 天。",
+          "含可拒絕的滑鼠墊；拒絕配件時請另選單買 Offer，其價格可能不同。"
+        ],
+        "alternative_offer_ids": [
+          "offer_b0e7d930-5a01-4ce4-9a9f-0e33096b534f"
+        ]
+      },
+      "recommended": {
+        "offer_id": "offer_62faee03-876b-4694-8c58-43b93f3dd093",
+        "seller_id": "seller_d",
+        "round": 3,
+        "variant": "bundle",
+        "items": [
+          {
+            "product_id": "mouse_d_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          },
+          {
+            "product_id": "pad_c_black",
+            "category": "mouse_pad",
+            "role": "addon",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click"
+        ],
+        "total_price_twd": 600,
+        "delivery_days": 2,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": true,
+        "expires_at": "2026-09-12T05:35:13.347Z",
+        "baseline_offer_id": "offer_b0e7d930-5a01-4ce4-9a9f-0e33096b534f",
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      }
+    },
+    {
+      "seller_id": "seller_c",
+      "label": "免費送周邊",
+      "description": "提供單買與同價贈送滑鼠墊，贈品可拒絕。",
+      "standalone": {
+        "offer_id": "offer_9c801910-cd7d-40d1-8154-7d804ea2d1b1",
+        "seller_id": "seller_c",
+        "round": 5,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_c_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "wireless_usb",
+          "silent_click"
+        ],
+        "total_price_twd": 610,
+        "delivery_days": 3,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T05:35:13.364Z",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      "bundle": {
+        "offer_id": "offer_0dd15ca3-ce5d-40e4-b8d6-eef9eb124fc5",
+        "seller_id": "seller_c",
+        "round": 5,
+        "variant": "bundle",
+        "items": [
+          {
+            "product_id": "mouse_c_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          },
+          {
+            "product_id": "pad_c_black",
+            "category": "mouse_pad",
+            "role": "addon",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "wireless_usb",
+          "silent_click"
+        ],
+        "total_price_twd": 610,
+        "delivery_days": 3,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": true,
+        "expires_at": "2026-09-12T05:35:13.364Z",
+        "baseline_offer_id": "offer_9c801910-cd7d-40d1-8154-7d804ea2d1b1",
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      "sponsored": false,
+      "stop_reason": "max_rounds",
+      "rounds": [
+        {
+          "round": 1,
+          "target_total_twd": null,
+          "outcome": "offered",
+          "buyer_provider": "deterministic",
+          "seller_provider": "deterministic",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 669
+            },
+            {
+              "variant": "bundle",
+              "total_price_twd": 669
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "target_total_twd": 599,
+          "outcome": "offered",
+          "buyer_provider": "deterministic",
+          "seller_provider": "deterministic",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 610
+            },
+            {
+              "variant": "bundle",
+              "total_price_twd": 610
+            }
+          ]
+        },
+        {
+          "round": 3,
+          "target_total_twd": 584,
+          "outcome": "offered",
+          "buyer_provider": "deterministic",
+          "seller_provider": "deterministic",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 610
+            },
+            {
+              "variant": "bundle",
+              "total_price_twd": 610
+            }
+          ]
+        },
+        {
+          "round": 4,
+          "target_total_twd": 569,
+          "outcome": "offered",
+          "buyer_provider": "deterministic",
+          "seller_provider": "deterministic",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 610
+            },
+            {
+              "variant": "bundle",
+              "total_price_twd": 610
+            }
+          ]
+        },
+        {
+          "round": 5,
+          "target_total_twd": 559,
+          "outcome": "offered",
+          "buyer_provider": "deterministic",
+          "seller_provider": "deterministic",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 610
+            },
+            {
+              "variant": "bundle",
+              "total_price_twd": 610
+            }
+          ]
+        }
+      ],
+      "ranking": {
+        "seller_id": "seller_c",
+        "rank": 3,
+        "recommended_offer_id": "offer_9c801910-cd7d-40d1-8154-7d804ea2d1b1",
+        "offer_rank": 3,
+        "reason": "依價格優先排序；含稅運 NT$610，3 天到貨。",
+        "tradeoffs": [
+          "比本次最低價高 NT$61。",
+          "比最快方案晚 2 天。"
+        ],
+        "alternative_offer_ids": [
+          "offer_0dd15ca3-ce5d-40e4-b8d6-eef9eb124fc5"
+        ]
+      },
+      "recommended": {
+        "offer_id": "offer_9c801910-cd7d-40d1-8154-7d804ea2d1b1",
+        "seller_id": "seller_c",
+        "round": 5,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_c_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "wireless_usb",
+          "silent_click"
+        ],
+        "total_price_twd": 610,
+        "delivery_days": 3,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T05:35:13.364Z",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      }
+    },
+    {
+      "seller_id": "seller_e",
+      "label": "固定價格",
+      "description": "維持 NT$679，不跟價，第一輪報最終價。",
+      "standalone": {
+        "offer_id": "offer_603b1901-a633-4c08-8454-cb033ad8cf42",
+        "seller_id": "seller_e",
+        "round": 1,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_e_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click"
+        ],
+        "total_price_twd": 679,
+        "delivery_days": 4,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T05:35:13.314Z",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      "bundle": null,
+      "sponsored": false,
+      "stop_reason": "seller_final",
+      "rounds": [
+        {
+          "round": 1,
+          "target_total_twd": null,
+          "outcome": "offered",
+          "buyer_provider": "deterministic",
+          "seller_provider": "deterministic",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 679
+            }
+          ]
+        }
+      ],
+      "ranking": {
+        "seller_id": "seller_e",
+        "rank": 4,
+        "recommended_offer_id": "offer_603b1901-a633-4c08-8454-cb033ad8cf42",
+        "offer_rank": 6,
+        "reason": "依價格優先排序；含稅運 NT$679，4 天到貨。",
+        "tradeoffs": [
+          "比本次最低價高 NT$130。",
+          "比最快方案晚 3 天。"
+        ],
+        "alternative_offer_ids": []
+      },
+      "recommended": {
+        "offer_id": "offer_603b1901-a633-4c08-8454-cb033ad8cf42",
+        "seller_id": "seller_e",
+        "round": 1,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_e_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click"
+        ],
+        "total_price_twd": 679,
+        "delivery_days": 4,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T05:35:13.314Z",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      }
+    },
+    {
+      "seller_id": "seller_b",
+      "label": "快速配送",
+      "description": "以一天到貨為優勢，保留較高售價。",
+      "standalone": {
+        "offer_id": "offer_d2d0deeb-faef-43c5-a3fb-7ef007a6be2a",
+        "seller_id": "seller_b",
+        "round": 5,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_b_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click",
+          "multi_device"
+        ],
+        "total_price_twd": 710,
+        "delivery_days": 1,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T05:35:13.363Z",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      "bundle": null,
+      "sponsored": true,
+      "stop_reason": "max_rounds",
+      "rounds": [
+        {
+          "round": 1,
+          "target_total_twd": null,
+          "outcome": "offered",
+          "buyer_provider": "deterministic",
+          "seller_provider": "deterministic",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 769
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "target_total_twd": 599,
+          "outcome": "offered",
+          "buyer_provider": "deterministic",
+          "seller_provider": "deterministic",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 710
+            }
+          ]
+        },
+        {
+          "round": 3,
+          "target_total_twd": 584,
+          "outcome": "offered",
+          "buyer_provider": "deterministic",
+          "seller_provider": "deterministic",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 710
+            }
+          ]
+        },
+        {
+          "round": 4,
+          "target_total_twd": 569,
+          "outcome": "offered",
+          "buyer_provider": "deterministic",
+          "seller_provider": "deterministic",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 710
+            }
+          ]
+        },
+        {
+          "round": 5,
+          "target_total_twd": 559,
+          "outcome": "offered",
+          "buyer_provider": "deterministic",
+          "seller_provider": "deterministic",
+          "offers": [
+            {
+              "variant": "standalone",
+              "total_price_twd": 710
+            }
+          ]
+        }
+      ],
+      "ranking": {
+        "seller_id": "seller_b",
+        "rank": 5,
+        "recommended_offer_id": "offer_d2d0deeb-faef-43c5-a3fb-7ef007a6be2a",
+        "offer_rank": 7,
+        "reason": "依價格優先排序；含稅運 NT$710，1 天到貨。",
+        "tradeoffs": [
+          "比本次最低價高 NT$161。"
+        ],
+        "alternative_offer_ids": []
+      },
+      "recommended": {
+        "offer_id": "offer_d2d0deeb-faef-43c5-a3fb-7ef007a6be2a",
+        "seller_id": "seller_b",
+        "round": 5,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_b_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "bluetooth",
+          "silent_click",
+          "multi_device"
+        ],
+        "total_price_twd": 710,
+        "delivery_days": 1,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T05:35:13.363Z",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      }
+    }
+  ]
+}

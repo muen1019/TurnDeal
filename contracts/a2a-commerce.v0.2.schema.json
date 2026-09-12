@@ -713,18 +713,85 @@
     "SellerRFQ": {
       "type": "object",
       "properties": {
-        "request_id": {"$ref": "#/$defs/Id"},
-        "seller_id": {"$ref": "#/$defs/Id"},
-        "round": {"$ref": "#/$defs/NegotiationRound"},
-        "category": {"const": "mouse"},
-        "required_features": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
-        "candidate_product_ids": {"type": "array", "items": {"$ref": "#/$defs/Id"}, "minItems": 1, "uniqueItems": true},
-        "product_preferences": {"type": "array", "items": {"$ref": "#/$defs/RFQProductPreference"}},
-        "pending_checks": {"type": "array", "items": {"type": "string", "enum": ["availability", "delivery"]}, "uniqueItems": true},
-        "delivery_days_max": {"type": "integer", "minimum": 1},
-        "allowed_addon_categories": {"type": "array", "items": {"const": "mouse_pad"}, "uniqueItems": true, "maxItems": 1},
-        "target_total_twd": {"type": ["integer", "null"], "minimum": 1},
-        "previous_offer_ids": {"type": "array", "items": {"$ref": "#/$defs/Id"}, "uniqueItems": true, "maxItems": 2}
+        "request_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "seller_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "round": {
+          "$ref": "#/$defs/NegotiationRound"
+        },
+        "category": {
+          "const": "mouse"
+        },
+        "required_features": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "candidate_product_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Id"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "product_preferences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RFQProductPreference"
+          }
+        },
+        "pending_checks": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "availability",
+              "delivery"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "delivery_days_max": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "allowed_addon_categories": {
+          "type": "array",
+          "items": {
+            "const": "mouse_pad"
+          },
+          "uniqueItems": true,
+          "maxItems": 1
+        },
+        "target_total_twd": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "previous_offer_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Id"
+          },
+          "uniqueItems": true,
+          "maxItems": 2
+        },
+        "competitive_terms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CompetitiveTerms"
+          },
+          "maxItems": 8
+        }
       },
       "required": [
         "request_id",
@@ -740,7 +807,8 @@
         "target_total_twd",
         "previous_offer_ids"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "Seller-local RFQ. Optional competitive_terms contain only Backend-validated, unexpired, de-identified offers from the previous round. No private budget, competitor IDs, transcripts, trust or campaign data."
     },
     "SellerOfferDraft": {
       "type": "object",
@@ -774,21 +842,89 @@
     "SellerNegotiationResult": {
       "type": "object",
       "properties": {
-        "request_id": {"$ref": "#/$defs/Id"},
-        "seller_id": {"$ref": "#/$defs/Id"},
-        "round": {"$ref": "#/$defs/NegotiationRound"},
-        "outcome": {"type": "string", "enum": ["offered", "refused", "timeout", "error"]},
-        "is_final": {"type": "boolean", "description": "Seller explicitly ends this branch; valid only with an offered outcome."},
-        "drafts": {"type": "array", "items": {"$ref": "#/$defs/SellerOfferDraft"}, "maxItems": 2},
-        "message": {"type": "string", "minLength": 1, "maxLength": 500}
+        "request_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "seller_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "round": {
+          "$ref": "#/$defs/NegotiationRound"
+        },
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "offered",
+            "refused",
+            "timeout",
+            "error"
+          ]
+        },
+        "is_final": {
+          "type": "boolean",
+          "description": "Seller explicitly ends this branch; valid only with an offered outcome."
+        },
+        "drafts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SellerOfferDraft"
+          },
+          "maxItems": 2
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "withdrawn_offer_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Id"
+          },
+          "uniqueItems": true,
+          "maxItems": 2,
+          "description": "Optional explicit withdrawal of this Seller's own previously issued offers. Backend verifies ownership; invalid new drafts alone never withdraw old offers."
+        }
       },
-      "required": ["request_id", "seller_id", "round", "outcome", "is_final", "drafts", "message"],
+      "required": [
+        "request_id",
+        "seller_id",
+        "round",
+        "outcome",
+        "is_final",
+        "drafts",
+        "message"
+      ],
       "additionalProperties": false,
       "allOf": [
         {
-          "if": {"properties": {"outcome": {"const": "offered"}}, "required": ["outcome"]},
-          "then": {"properties": {"drafts": {"minItems": 1}}},
-          "else": {"properties": {"drafts": {"maxItems": 0}, "is_final": {"const": false}}}
+          "if": {
+            "properties": {
+              "outcome": {
+                "const": "offered"
+              }
+            },
+            "required": [
+              "outcome"
+            ]
+          },
+          "then": {
+            "properties": {
+              "drafts": {
+                "minItems": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "drafts": {
+                "maxItems": 0
+              },
+              "is_final": {
+                "const": false
+              }
+            }
+          }
         }
       ]
     },
@@ -1059,6 +1195,400 @@
       },
       "required": ["fixture_version", "catalog_fixture", "source_snapshot", "canonical_flow_fixture", "scenarios"],
       "additionalProperties": false
+    },
+    "CompetitiveTerms": {
+      "type": "object",
+      "properties": {
+        "comparison_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "primary_product": {
+          "type": "object",
+          "properties": {
+            "brand": {
+              "type": "string"
+            },
+            "model": {
+              "type": "string"
+            },
+            "features": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "attributes": {
+              "$ref": "#/$defs/ProductAttributes"
+            }
+          },
+          "required": [
+            "brand",
+            "model",
+            "features",
+            "attributes"
+          ],
+          "additionalProperties": false
+        },
+        "total_price_twd": {
+          "$ref": "#/$defs/MoneyTwd"
+        },
+        "delivery_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "terms": {
+          "type": "object",
+          "properties": {
+            "warranty_months": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "return_days": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "payment_obligation": {
+              "const": "one_time"
+            }
+          },
+          "required": [
+            "warranty_months",
+            "return_days",
+            "payment_obligation"
+          ],
+          "additionalProperties": false
+        },
+        "expires_at": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "variant": {
+          "enum": [
+            "standalone",
+            "bundle"
+          ]
+        },
+        "addon_categories": {
+          "type": "array",
+          "items": {
+            "const": "mouse_pad"
+          },
+          "maxItems": 1
+        },
+        "differences": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "comparison_key",
+        "primary_product",
+        "total_price_twd",
+        "delivery_days",
+        "terms",
+        "expires_at",
+        "variant",
+        "addon_categories",
+        "differences"
+      ],
+      "additionalProperties": false
+    },
+    "CompetitiveOfferReference": {
+      "type": "object",
+      "properties": {
+        "seller_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "offer_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "comparison_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "primary_product": {
+          "type": "object",
+          "properties": {
+            "brand": {
+              "type": "string"
+            },
+            "model": {
+              "type": "string"
+            },
+            "features": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "attributes": {
+              "$ref": "#/$defs/ProductAttributes"
+            }
+          },
+          "required": [
+            "brand",
+            "model",
+            "features",
+            "attributes"
+          ],
+          "additionalProperties": false
+        },
+        "total_price_twd": {
+          "$ref": "#/$defs/MoneyTwd"
+        },
+        "delivery_days": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "terms": {
+          "type": "object",
+          "properties": {
+            "warranty_months": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "return_days": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "payment_obligation": {
+              "const": "one_time"
+            }
+          },
+          "required": [
+            "warranty_months",
+            "return_days",
+            "payment_obligation"
+          ],
+          "additionalProperties": false
+        },
+        "expires_at": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "variant": {
+          "enum": [
+            "standalone",
+            "bundle"
+          ]
+        },
+        "addon_categories": {
+          "type": "array",
+          "items": {
+            "const": "mouse_pad"
+          },
+          "maxItems": 1
+        }
+      },
+      "required": [
+        "seller_id",
+        "offer_id",
+        "comparison_key",
+        "primary_product",
+        "total_price_twd",
+        "delivery_days",
+        "terms",
+        "expires_at",
+        "variant",
+        "addon_categories"
+      ],
+      "additionalProperties": false
+    },
+    "SharedNegotiationContext": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "context_revision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "completed_round": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "as_of": {
+          "$ref": "#/$defs/Timestamp"
+        },
+        "offers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CompetitiveOfferReference"
+          },
+          "maxItems": 10
+        }
+      },
+      "required": [
+        "request_id",
+        "context_revision",
+        "completed_round",
+        "as_of",
+        "offers"
+      ],
+      "additionalProperties": false
+    },
+    "NegotiationOutput": {
+      "type": "object",
+      "properties": {
+        "request_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "status": {
+          "enum": [
+            "evaluating",
+            "needs_confirmation",
+            "no_match"
+          ]
+        },
+        "seller_agents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SellerAgent"
+          },
+          "maxItems": 5
+        },
+        "offers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Offer"
+          },
+          "maxItems": 10
+        },
+        "eligible_offer_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Id"
+          },
+          "uniqueItems": true,
+          "maxItems": 10
+        },
+        "confirmation_offer_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Id"
+          },
+          "uniqueItems": true,
+          "maxItems": 5
+        },
+        "completed_rounds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5
+        },
+        "usage": {
+          "type": "object",
+          "properties": {
+            "calls": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "reserved_tokens": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "actual_tokens": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "calls",
+            "reserved_tokens",
+            "actual_tokens"
+          ],
+          "additionalProperties": false
+        },
+        "stop_reason": {
+          "enum": [
+            null,
+            "global_deadline",
+            "call_budget",
+            "token_budget"
+          ]
+        }
+      },
+      "required": [
+        "request_id",
+        "status",
+        "seller_agents",
+        "offers",
+        "eligible_offer_ids",
+        "confirmation_offer_ids",
+        "completed_rounds",
+        "usage",
+        "stop_reason"
+      ],
+      "additionalProperties": false
+    },
+    "SellerSalesProfile": {
+      "type": "object",
+      "properties": {
+        "seller_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "bundle_discount_twd": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "always_offer_bundle": {
+          "type": "boolean"
+        },
+        "addon_product_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "seller_id",
+        "label",
+        "description",
+        "bundle_discount_twd",
+        "always_offer_bundle",
+        "addon_product_id"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "addon_product_id": {
+                "type": "null"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "bundle_discount_twd": {
+                "const": 0
+              },
+              "always_offer_bundle": {
+                "const": false
+              }
+            }
+          }
+        }
+      ]
     }
   }
 }

@@ -18,7 +18,7 @@ npm run test:db      # 使用記憶體資料庫測試 migration、seed 與 invar
 - Catalog：`marketplace_sources`、`sellers`、`products`、`product_sources`、`seller_inventory`、`terms`、`campaigns`。
 - Request：`users`、`requests`、`request_sellers`。
 - Negotiation：`negotiation_rounds`、`offers`。
-- Ranking：`evaluations`。
+- Ranking：`evaluations`、`evaluation_runs`（執行權、不可變結果與模型 audit）。
 - Swipe learning：`feedback_events`、`user_preferences`。
 - Checkout：`decisions`、`redemptions`。
 - Reliability：`idempotency_keys`、`schema_migrations`。
@@ -33,6 +33,8 @@ npm run test:db      # 使用記憶體資料庫測試 migration、seed 與 invar
 
 ## v0.2 migration
 
-初始化依序套用 `001_initial.sql` 與 `002_five_seller_negotiation.sql`，再載入目前 fixtures。第二個 migration 擴充 round 為 1～5、每個 Request 最多五家 Seller，加入 is_final／stop_reason，將兩個折扣欄位轉為五輪折扣陣列。舊前兩輪折扣與已保存 Offer、Bundle baseline、採用、兌換及發布快照保持原值；舊資料不推測 final，舊折扣後三輪沿用第二輪值。
+初始化依序套用 `001_initial.sql`、`002_five_seller_negotiation.sql` 與 `003_negotiation_runtime.sql`，再載入目前 fixtures。第二個 migration 擴充 round 為 1～5、每個 Request 最多五家 Seller，加入 is_final／stop_reason，將兩個折扣欄位轉為五輪折扣陣列。第三個 migration 增加 `negotiation_runs`、`negotiation_commits`、`negotiation_offers`，保存真實協商輸入、逐輪不可變歷史與正式 Offer。舊前兩輪折扣與已保存 Offer、Bundle baseline、採用、兌換及發布快照保持原值。
 
-`npm run test:db` 同時驗證含舊資料的升版與全新 seed，現在為 19 次議價、6 筆最終 Offer。CLI 仍以 migrations＋fixtures 重建本機 Demo 為主；既有本機 Demo 資料庫請明確執行 `npm run db:rebuild` 更新，不會自動改寫舊快照。
+`npm run test:db` 同時驗證含舊資料的升版與全新 seed，canonical 歷史為 19 次議價、6 筆最終 Offer。既有本機資料庫可用 `npm run db:migrate` 備份並套用 migration，不需清除已保存的執行紀錄。
+
+`002_discovery.sql` 與 `003_orchestrator_handoff.sql` 保存搜尋與交接計畫。`004_seller_bundle_preferences.sql` 增加私有組合折扣；`005_evaluation_runtime.sql` 與 `006_evaluation_audit.sql` 保存排序執行權、結果與 audit。初始化按 migration 檔名順序套用所有尚未執行的 migration。E2E 在獨立資料庫載入 `sales-profiles.json`，不修改 canonical 歷史快照。

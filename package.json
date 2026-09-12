@@ -7,7 +7,8 @@
     "node": ">=24"
   },
   "scripts": {
-    "test": "npm run test:contracts && npm run test:db && npm run test:orchestrator && npm run test:seller-policies",
+    "test": "npm run test:contracts && npm run test:db && npm run test:orchestrator && npm run test:seller-policies && npm run test:unit && npm run test:negotiation && npm run test:evaluator",
+    "test:evaluator": "node --test tests/evaluator.test.mjs",
     "test:seller-policies": "node scripts/validate-seller-policies.mjs && node --test tests/seller-policies.test.mjs",
     "test:orchestrator": "node --test tests/orchestrator-data.test.ts tests/discovery.test.ts tests/handoff.test.ts",
     "demo:handoff": "node examples/handoff.ts",
@@ -16,12 +17,19 @@
     "demo:orchestrator": "node examples/orchestrator-input.ts",
     "test:contracts": "node scripts/validate-contracts.mjs",
     "test:db": "node scripts/db.mjs --memory",
+    "test:negotiation": "node --test tests/negotiation.test.mjs",
+    "test:unit": "node --test tests/agents.unit.test.mjs tests/validation.unit.test.mjs tests/model.unit.test.mjs",
+    "test:e2e": "node scripts/e2e-negotiation.mjs --offline",
+    "test:e2e:live": "node scripts/e2e-negotiation.mjs --live",
+    "test:e2e:full": "node scripts/e2e-negotiation.mjs --offline --evaluate",
+    "test:e2e:full:live": "node scripts/e2e-negotiation.mjs --live --evaluate",
+    "demo:negotiate": "node scripts/negotiate.mjs",
     "db:init": "node scripts/db.mjs",
     "db:migrate": "node scripts/db.mjs --migrate",
     "db:rebuild": "node scripts/db.mjs --force",
     "db:check": "node scripts/db.mjs --check"
   },
-  "devDependencies": {
+  "dependencies": {
     "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1"
   }

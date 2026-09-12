@@ -6,20 +6,20 @@
 
 ## Repo 整合狀態
 
-目前契約與驗收以 [v0.2 schema](../contracts/a2a-commerce.v0.2.schema.json)、[開發規則](DEVELOPMENT_RULES.md) 與 [AGENTS.md](../AGENTS.md) 為準。v0.2 已同步五家 Seller、五輪上限、is_final／stop_reason、fixtures、驗證器及 SQLite migration。完整 Backend pipeline 與同步排程器尚未實作；第 9 節其餘 TypeScript 與 JSON 草案仍不是現有 API 已支援的宣告。
+目前契約與驗收以 [v0.2 schema](../contracts/a2a-commerce.v0.2.schema.json)、[開發規則](DEVELOPMENT_RULES.md) 與 [AGENTS.md](../AGENTS.md) 為準。五家 Seller、最多五輪同步排程、共享競爭條件、模型／fallback 及 SQLite 稽核已實作於 [協商模組](NEGOTIATION.md)。完整 Backend pipeline 仍需整合；第 9 節其餘 API 草案不是現有 HTTP API 已支援的宣告。
 
 | 主題 | Repo v0.2 基準 | 本文目標／剩餘遷移範圍 |
 | --- | --- | --- |
 | Seller 名單 | 五家測資；OrchestrationResult／RequestSnapshot 的 seller_agents 最多五家，驗證 ID 唯一與 listing_rank 連續 | 依自然排序選前五家合格 Seller，各派一個 Buyer Agent；不足五家依實際數量。實際 discovery／派發服務仍待實作 |
-| 議價輪次 | 共用 NegotiationRound 為 1～5；SellerRound／SellerNegotiationResult 有 is_final，SellerAgent 有 Backend stop_reason；測資示範提前退出 | 同步 barrier、round timeout 與停止後不再派發由後續排程器落實；本版驗證 recorded trace，不宣稱已有 live scheduler |
-| 資訊共享 | 不向 Seller 披露其他 Seller 報價 | Buyer 共享已驗證 context，Seller 只取得可比較的去識別化條件；須同步變更隱私規則與 RFQ 測試 |
+| 議價輪次 | 已有五輪同步 barrier、round timeout、deadline、成本上限與分支提前停止 | HTTP／UI 需串接模組進度事件 |
+| 資訊共享 | 已有 SharedNegotiationContext 與 optional RFQ competitive_terms，使用者已確認新版隱私邊界 | Seller 只取得仍有效、可比較的去識別化條件，不取得競爭者身分／ID／私有資料 |
 | 決策 | reject + feedback 建立 child | reject 處理目前 Offer；revise + feedback 建立 child；更新 RejectDecision／DecisionResult |
 | Swipe 狀態 | 沒有逐張 DecisionSession 或 all_rejected | 新增 session、current_offer_id、互動事件與 all_rejected；更新 RequestSnapshot／Status |
 | 偏好來源 | ProductPreference 沒有 source；交易偏好為字串 | explicit／behavioral 分層，有來源的交易偏好與證據，更新 Formatter／Evaluator input |
 | 文件版本 | DocumentBundle 的 Request revision | 另增長期 preference_revision_id 與背景更新紀錄；新版本不改既有 Request 快照 |
 | 時間預算 | 五輪上限；時間／成本停止原因可記錄，實際 timeout／deadline 數值待 Backend 量測與設定 | 五輪上限、round timeout、global deadline 與成本限制；舊版 8 秒不作五輪完成承諾 |
 | Evaluator 失敗 | 必須提供 deterministic fallback | 本文規劃 invalid／unavailable 進 failed；這項差異尚待取捨，現行 v0.2 繼續遵守 fallback 規則 |
-| 持久化與恢復 | 已有 SQLite migration、seed、完整性檢查及 feedback_events／user_preferences 資料表；尚未完成完整 Backend pipeline | 須在既有資料庫基礎上補齊 Shared Context revisions、DecisionSession、偏好更新工作與中斷恢復，並對齊新版 Swipe 語意 |
+| 持久化與恢復 | 已有 migration／seed、協商輸入快照、不可變 Offer／context revisions、完成重播與重啟中斷標記 | 待整合交易端 runtime Offer 讀取、DecisionSession、偏好工作與新版 Swipe 語意 |
 
 後續契約遷移仍應以獨立升版變更，同步 schema、fixtures、驗證器、受影響 consumer 及共同規則，經專案既定 review 流程後合併。不要直接拿本文件尚未遷移的 payload 傳給 v0.2 consumer。文件中的錯誤狀態、fallback 與跨 Seller 資訊邊界亦須一併對齊。
 
