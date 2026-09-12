@@ -1,14 +1,16 @@
 # UI 驗證紀錄
 
-日期：2026-09-12。前端使用 Node 20.19.5、React、TypeScript、Vite；API 由另一個 session 維護。
+日期：2026-09-12 13:23（Asia/Taipei）。本輪驗證基於 commit 05d9230，使用 Node 20.19.5 與 v0.3 共用契約的真實 backend／SQLite。
 
 ## 已實跑
 
-- `npm test`：8 個測試檔、52 個測試通過。
+- `npm test`：12 個測試檔、81 個測試通過。
 - `npm run build`：共用型別產生、TypeScript 與 Vite production build 通過。
 - 根目錄 `npm run test:contracts` 通過。
 - `npx @fission-ai/openspec validate define-offer-result-ui-api --strict` 通過；這是文件驗證，不代表所有裝置驗收完成。
-- Chrome 開啟 `http://127.0.0.1:5173`，透過 proxy 串接使用者提供的 `http://127.0.0.1:3201/api`。Main 實際操作儲存定義、中文需求送出、4 組優惠、略過／撤回、2 件組合明細、採用及回饋。
+- `npm run test:e2e`：Chromium → 5187 proxy → 3101 真實 API → 隔離 SQLite。操作儲存定義、中文需求送出、5 家賣家／6 組優惠、略過／撤回、2 件組合明細、採用及回饋；多尺寸版面與 reduced-motion 檢查通過，沒有 pageerror。
+- `npm run test:api:e2e`：production build → 5188 preview proxy → 真實 API → 隔離 SQLite 通過。明確驗證兩次建立需求、一次 accept、一次 reject、feedback 前後空白與 source_documents 不變；前端請求只使用 OpenAPI 定義的三個路由。
+- 已目視檢查本輪 chat-1536.png、offers-390.png、mobile-320x568-offers.png：文字與方案可讀，低高度操作按鈕仍在畫面內。
 - Python Playwright 經目前 API 及隔離 SQLite 服務分別執行瀏覽器流程。最後一輪結果由 `test-results/e2e-result.json` 的 base 與 passed 欄位辨識。
 
 ## 瀏覽器檢查內容

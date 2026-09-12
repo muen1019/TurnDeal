@@ -102,7 +102,7 @@ The UI SHALL expose seller status and both negotiation rounds from the shared sn
 
 #### Scenario: Three-seller demo
 - **WHEN** the shared happy-path fixture is displayed
-- **THEN** the user can inspect three distinct sellers and their up-to-five-round history while the offer deck follows the published fixture ranking and the history is explicitly labeled as simulated
+- **THEN** the user can inspect final offers from the selected sellers while the offer deck follows the published fixture ranking; round summaries and negotiation-history UI are not displayed
 - **AND** Sponsored is rendered only from sponsored_placement and is absent when that field is null
 
 ### Requirement: Apply the reference visual system consistently
@@ -151,7 +151,7 @@ The UI SHALL implement the full-bleed viewport, internal-scroll and safe-area ru
 - **AND** every action target is at least 44 by 44 CSS pixels, with standard buttons 48px high
 
 #### Scenario: Read details without moving the workspace
-- **WHEN** the user opens OfferDetails or expands or collapses reasons, tradeoffs or negotiation history within it
+- **WHEN** the user opens OfferDetails or expands or collapses reasons or tradeoffs within it
 - **THEN** the main content or inline content updates immediately using M6 with no animation or modal, and the shared shell retains its geometry
 - **AND** reading, selecting text and scrolling the expanded content never initiate a card swipe
 
@@ -329,6 +329,6 @@ The UI SHALL limit the main card to product imagery, seller, combination name, t
 The UI SHALL NOT render request_id, offer_id, product_id, terms_id, campaign_id, raw JSON, decision payloads or source_documents in offer, details, negotiation, accepted or rejected views. These fields SHALL remain available in the v0.3 contract for validation, persistence, callbacks and handoff.
 
 #### Scenario: Inspect offer result presentation
-- **WHEN** the user views the deck, details, negotiation history, accepted summary or rejected summary
+- **WHEN** the user views the deck, details, accepted summary or rejected summary
 - **THEN** no technical identifiers, raw JSON, decision data or source_documents are present in the DOM as user-visible content
-- **AND** the UI still shows seller, round history, total price, delivery, expiry, item category, quantity, natural-language terms, recommendation reason, tradeoffs, Sponsored labels and saved feedback summary
+- **AND** the UI still shows seller, total price, delivery, expiry, item category, quantity, natural-language terms, recommendation reason, tradeoffs, Sponsored labels and saved feedback summary
