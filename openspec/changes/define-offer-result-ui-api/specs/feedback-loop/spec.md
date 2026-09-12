@@ -4,6 +4,19 @@ Result backend 保存明示決策並提供 Buyer Agent 改寫所需的原始文�
 
 ## ADDED Requirements
 
+### Requirement: Separate rejection evidence from a durable preference update
+Feedback SHALL be treated as evidence, not a replacement intent or a committed preference update. A temporary exception belongs to a new request's intent; a durable change requires a separate validated update workflow. Current accept/reject handling SHALL preserve user_preferences and all original documents unchanged. A single skip or rejection SHALL NOT imply a permanent brand/seller exclusion, a larger budget, paid add-on consent, or successful preference learning.
+
+#### Scenario: Buyer says this purchase should be white
+- **WHEN** rejected feedback says this purchase should be white
+- **THEN** the exact feedback is saved for future processing, without changing long-term black preference
+- **AND** the current UI does not claim to have generated a revised intent, preference document or linked next round
+
+#### Scenario: Buyer asks to remember white for future purchases
+- **WHEN** feedback explicitly says to prefer white in future
+- **THEN** it remains a saved update candidate until the separately scoped Preference Updater exists and commits a validated update
+- **AND** saving feedback alone is not displayed as successful long-term memory storage
+
 ### Requirement: Return original documents with explicit rejection
 The Result API SHALL return 200 RejectDecisionResult with exactly action=reject, request_id, status=rejected, feedback and source_documents. source_documents SHALL contain revision, intent_md and preference_md copied from the immutable request documents. The response SHALL represent a saved decision, not a completed rewrite.
 

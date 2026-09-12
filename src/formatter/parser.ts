@@ -17,7 +17,8 @@ const shapes: Record<string,string> = {左右對稱:'symmetrical',右手型:'asy
 
 function parseText(input: string, prefix: string): Parsed {
   const result: Parsed = {category:false,max:[],target:[],days:[],features:[],priorities:[],products:[],questions:[],bundleDisabled:false,bundleMentioned:false};
-  const normalized=input.normalize('NFKC').replace(/(?<=\d),(?=\d{3}(?:\D|$))/g,'');
+  const normalized=input.normalize('NFKC').replace(/(?<=\d),(?=\d{3}(?:\D|$))/g,'')
+    .replace(/^## 本次購買需求\s*$/gm,''); // Exact structural heading emitted by the UI, not arbitrary user headings.
   let productIndex=0;
   for (const source of normalized.split(/[，,。；;\n]/).map(s=>s.trim()).filter(Boolean)) {
     let rest=source;
@@ -31,6 +32,7 @@ function parseText(input: string, prefix: string): Parsed {
     take(/一(?:週|周)(?:以)?內(?:到貨|送達|收到)?/g,()=>result.days.push(7));
     take(/不要(?:任何)?(?:贈品|配件|加購|滑鼠墊)/g,()=>{result.bundleDisabled=true;result.bundleMentioned=true;});
     take(/只接受免費(?:贈品|配件|滑鼠墊)/g,()=>{result.bundleMentioned=true;});
+    take(/可接受免費(?:贈品|配件|滑鼠墊)|不接受付費加購/g,()=>{result.bundleMentioned=true;});
     take(/價格優先|便宜優先/g,()=>result.priorities.push('price_first'));
     take(/交期優先|快速到貨優先/g,()=>result.priorities.push('delivery_first'));
     take(/評分優先|信任優先/g,()=>result.priorities.push('trust_first'));
@@ -47,7 +49,7 @@ function parseText(input: string, prefix: string): Parsed {
     take(/無線|靜音|藍牙/g,token=>result.features.push(({無線:'wireless',靜音:'silent_click',藍牙:'bluetooth'} as Record<string,string>)[token]));
     take(/滑鼠(?!墊)/g,()=>{result.category=true;});
     // Only harmless shopping connective words may remain. Unknown brands/specs stay visible.
-    rest=rest.replace(/我想買|我想要|我需要|想買|想要|幫我找|幫我買|找|買|一個|一隻|個|的|以及|並且|而且|和|與|請|、|\s/g,'');
+    rest=rest.replace(/辦公用|含稅運費|含稅運|含運|我想買|我想要|我需要|想買|想要|幫我找|幫我買|找|買|一個|一隻|個|的|以及|並且|而且|和|與|請|、|\s/g,'');
     if(rest) result.questions.push(`尚未理解「${rest}」，請改用明確條件或確認可忽略。`);
   }
   return result;
