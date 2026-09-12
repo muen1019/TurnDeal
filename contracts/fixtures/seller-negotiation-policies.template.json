@@ -1,0 +1,472 @@
+{
+  "schema_version": "seller-policy-v0.1",
+  "snapshot_id": "discovery_demo_v02",
+  "data_origin": "synthetic",
+  "sellers": [
+    {
+      "seller_id": "discovery_seller_01",
+      "status": "draft",
+      "settings": null,
+      "listings": [
+        {
+          "listing_id": "listing_001",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_002",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_003",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_004",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_005",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_006",
+          "terms": null
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_02",
+      "status": "draft",
+      "settings": null,
+      "listings": [
+        {
+          "listing_id": "listing_009",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_010",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_011",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_012",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_013",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_014",
+          "terms": null
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_03",
+      "status": "draft",
+      "settings": null,
+      "listings": [
+        {
+          "listing_id": "listing_017",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_018",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_019",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_020",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_021",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_022",
+          "terms": null
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_04",
+      "status": "draft",
+      "settings": null,
+      "listings": [
+        {
+          "listing_id": "listing_025",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_026",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_027",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_028",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_029",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_030",
+          "terms": null
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_05",
+      "status": "draft",
+      "settings": null,
+      "listings": [
+        {
+          "listing_id": "listing_033",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_034",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_035",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_036",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_037",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_038",
+          "terms": null
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_06",
+      "status": "draft",
+      "settings": null,
+      "listings": [
+        {
+          "listing_id": "listing_041",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_042",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_043",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_044",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_045",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_046",
+          "terms": null
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_07",
+      "status": "draft",
+      "settings": null,
+      "listings": [
+        {
+          "listing_id": "listing_049",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_050",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_051",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_052",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_053",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_054",
+          "terms": null
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_08",
+      "status": "draft",
+      "settings": null,
+      "listings": [
+        {
+          "listing_id": "listing_057",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_058",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_059",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_060",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_061",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_062",
+          "terms": null
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_09",
+      "status": "draft",
+      "settings": null,
+      "listings": [
+        {
+          "listing_id": "listing_065",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_066",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_067",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_068",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_069",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_070",
+          "terms": null
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_10",
+      "status": "draft",
+      "settings": null,
+      "listings": [
+        {
+          "listing_id": "listing_073",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_074",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_075",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_076",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_077",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_078",
+          "terms": null
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_11",
+      "status": "draft",
+      "settings": null,
+      "listings": [
+        {
+          "listing_id": "listing_081",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_082",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_083",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_084",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_085",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_086",
+          "terms": null
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_12",
+      "status": "draft",
+      "settings": null,
+      "listings": [
+        {
+          "listing_id": "listing_089",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_090",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_091",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_092",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_093",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_094",
+          "terms": null
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_13",
+      "status": "draft",
+      "settings": null,
+      "listings": [
+        {
+          "listing_id": "listing_097",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_098",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_099",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_100",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_101",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_102",
+          "terms": null
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_14",
+      "status": "draft",
+      "settings": null,
+      "listings": [
+        {
+          "listing_id": "listing_105",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_106",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_107",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_108",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_109",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_110",
+          "terms": null
+        }
+      ]
+    },
+    {
+      "seller_id": "discovery_seller_15",
+      "status": "draft",
+      "settings": null,
+      "listings": [
+        {
+          "listing_id": "listing_113",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_114",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_115",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_116",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_117",
+          "terms": null
+        },
+        {
+          "listing_id": "listing_118",
+          "terms": null
+        }
+      ]
+    }
+  ]
+}

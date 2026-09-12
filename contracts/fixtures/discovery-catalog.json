@@ -1,0 +1,5057 @@
+{
+  "version": "0.2",
+  "snapshot_id": "discovery_demo_v02",
+  "source_snapshot_id": "marketplace_snapshot_2026_09_12",
+  "description": "120 synthetic listings based on previously sourced product families; not 120 scraped listings.",
+  "sellers": [
+    {
+      "seller_id": "discovery_seller_01",
+      "name": "Demo 配件館 1",
+      "platform": "shopee_demo",
+      "rating": 4,
+      "rating_count": 30,
+      "enabled": true,
+      "data_origin": "synthetic"
+    },
+    {
+      "seller_id": "discovery_seller_02",
+      "name": "Demo 配件館 2",
+      "platform": "amazon_demo",
+      "rating": 4.1,
+      "rating_count": 167,
+      "enabled": true,
+      "data_origin": "synthetic"
+    },
+    {
+      "seller_id": "discovery_seller_03",
+      "name": "Demo 配件館 3",
+      "platform": "shopee_demo",
+      "rating": 4.2,
+      "rating_count": 304,
+      "enabled": true,
+      "data_origin": "synthetic"
+    },
+    {
+      "seller_id": "discovery_seller_04",
+      "name": "Demo 配件館 4",
+      "platform": "amazon_demo",
+      "rating": 4.3,
+      "rating_count": 441,
+      "enabled": true,
+      "data_origin": "synthetic"
+    },
+    {
+      "seller_id": "discovery_seller_05",
+      "name": "Demo 配件館 5",
+      "platform": "shopee_demo",
+      "rating": 4.4,
+      "rating_count": 578,
+      "enabled": true,
+      "data_origin": "synthetic"
+    },
+    {
+      "seller_id": "discovery_seller_06",
+      "name": "Demo 配件館 6",
+      "platform": "amazon_demo",
+      "rating": 4.5,
+      "rating_count": 715,
+      "enabled": true,
+      "data_origin": "synthetic"
+    },
+    {
+      "seller_id": "discovery_seller_07",
+      "name": "Demo 配件館 7",
+      "platform": "shopee_demo",
+      "rating": 4.6,
+      "rating_count": 852,
+      "enabled": true,
+      "data_origin": "synthetic"
+    },
+    {
+      "seller_id": "discovery_seller_08",
+      "name": "Demo 配件館 8",
+      "platform": "amazon_demo",
+      "rating": 4.7,
+      "rating_count": 989,
+      "enabled": true,
+      "data_origin": "synthetic"
+    },
+    {
+      "seller_id": "discovery_seller_09",
+      "name": "Demo 配件館 9",
+      "platform": "shopee_demo",
+      "rating": 4.8,
+      "rating_count": 1126,
+      "enabled": true,
+      "data_origin": "synthetic"
+    },
+    {
+      "seller_id": "discovery_seller_10",
+      "name": "Demo 配件館 10",
+      "platform": "amazon_demo",
+      "rating": 4,
+      "rating_count": 1263,
+      "enabled": true,
+      "data_origin": "synthetic"
+    },
+    {
+      "seller_id": "discovery_seller_11",
+      "name": "Demo 配件館 11",
+      "platform": "shopee_demo",
+      "rating": 4.1,
+      "rating_count": 1400,
+      "enabled": true,
+      "data_origin": "synthetic"
+    },
+    {
+      "seller_id": "discovery_seller_12",
+      "name": "Demo 配件館 12",
+      "platform": "amazon_demo",
+      "rating": 4.2,
+      "rating_count": 1537,
+      "enabled": true,
+      "data_origin": "synthetic"
+    },
+    {
+      "seller_id": "discovery_seller_13",
+      "name": "Demo 配件館 13",
+      "platform": "shopee_demo",
+      "rating": 4.3,
+      "rating_count": 1674,
+      "enabled": true,
+      "data_origin": "synthetic"
+    },
+    {
+      "seller_id": "discovery_seller_14",
+      "name": "Demo 配件館 14",
+      "platform": "amazon_demo",
+      "rating": 4.4,
+      "rating_count": 1811,
+      "enabled": true,
+      "data_origin": "synthetic"
+    },
+    {
+      "seller_id": "discovery_seller_15",
+      "name": "Demo 配件館 15",
+      "platform": "shopee_demo",
+      "rating": null,
+      "rating_count": 0,
+      "enabled": false,
+      "data_origin": "synthetic"
+    }
+  ],
+  "listings": [
+    {
+      "listing_id": "listing_001",
+      "product_id": "model_1",
+      "seller_id": "discovery_seller_01",
+      "name": "Logitech M240 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 539,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": null,
+      "rating_count": 0,
+      "stock": 0,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_002",
+      "product_id": "model_2",
+      "seller_id": "discovery_seller_01",
+      "name": "Logitech Pebble Mouse 2 M350s",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 709,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 3.9,
+      "rating_count": 42,
+      "stock": 4,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_003",
+      "product_id": "model_3",
+      "seller_id": "discovery_seller_01",
+      "name": "Logitech M331 SilentPlus",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "asymmetrical_right"
+      },
+      "item_price_twd": 609,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4,
+      "rating_count": 83,
+      "stock": 5,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_m331_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_004",
+      "product_id": "model_4",
+      "seller_id": "discovery_seller_01",
+      "name": "Logitech M221 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 459,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.1,
+      "rating_count": 124,
+      "stock": 6,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_m221_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_005",
+      "product_id": "model_5",
+      "seller_id": "discovery_seller_01",
+      "name": "Logitech M240 Silent White",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "white",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 539,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.2,
+      "rating_count": 165,
+      "stock": 7,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_006",
+      "product_id": "model_6",
+      "seller_id": "discovery_seller_01",
+      "name": "Logitech M350s Rose",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "rose",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 709,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.3,
+      "rating_count": 206,
+      "stock": 8,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_007",
+      "product_id": "model_7",
+      "seller_id": "discovery_seller_01",
+      "name": "Logitech Studio Mouse Pad Graphite",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 109,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.4,
+      "rating_count": 247,
+      "stock": 9,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_008",
+      "product_id": "model_8",
+      "seller_id": "discovery_seller_01",
+      "name": "Logitech Studio Mouse Pad Blue",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "blue",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 109,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.5,
+      "rating_count": 288,
+      "stock": 10,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_009",
+      "product_id": "model_1",
+      "seller_id": "discovery_seller_02",
+      "name": "Logitech M240 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 584,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 3.9,
+      "rating_count": 74,
+      "stock": 10,
+      "delivery_days": 2,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_010",
+      "product_id": "model_2",
+      "seller_id": "discovery_seller_02",
+      "name": "Logitech Pebble Mouse 2 M350s",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 754,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4,
+      "rating_count": 115,
+      "stock": 11,
+      "delivery_days": 2,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_011",
+      "product_id": "model_3",
+      "seller_id": "discovery_seller_02",
+      "name": "Logitech M331 SilentPlus",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "asymmetrical_right"
+      },
+      "item_price_twd": 654,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.1,
+      "rating_count": 156,
+      "stock": 12,
+      "delivery_days": 2,
+      "source_ids": [
+        "src_shopee_tw_m331_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_012",
+      "product_id": "model_4",
+      "seller_id": "discovery_seller_02",
+      "name": "Logitech M221 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 504,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.2,
+      "rating_count": 197,
+      "stock": 13,
+      "delivery_days": 2,
+      "source_ids": [
+        "src_shopee_tw_m221_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_013",
+      "product_id": "model_5",
+      "seller_id": "discovery_seller_02",
+      "name": "Logitech M240 Silent White",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "white",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 584,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.3,
+      "rating_count": 238,
+      "stock": 14,
+      "delivery_days": 2,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_014",
+      "product_id": "model_6",
+      "seller_id": "discovery_seller_02",
+      "name": "Logitech M350s Rose",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "rose",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 754,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.4,
+      "rating_count": 279,
+      "stock": 15,
+      "delivery_days": 2,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_015",
+      "product_id": "model_7",
+      "seller_id": "discovery_seller_02",
+      "name": "Logitech Studio Mouse Pad Graphite",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 154,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.5,
+      "rating_count": 320,
+      "stock": 16,
+      "delivery_days": 2,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_016",
+      "product_id": "model_8",
+      "seller_id": "discovery_seller_02",
+      "name": "Logitech Studio Mouse Pad Blue",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "blue",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 154,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.6,
+      "rating_count": 361,
+      "stock": 17,
+      "delivery_days": 2,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_017",
+      "product_id": "model_1",
+      "seller_id": "discovery_seller_03",
+      "name": "Logitech M240 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 629,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4,
+      "rating_count": 147,
+      "stock": 17,
+      "delivery_days": 3,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_018",
+      "product_id": "model_2",
+      "seller_id": "discovery_seller_03",
+      "name": "Logitech Pebble Mouse 2 M350s",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 799,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.1,
+      "rating_count": 188,
+      "stock": 18,
+      "delivery_days": 3,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_019",
+      "product_id": "model_3",
+      "seller_id": "discovery_seller_03",
+      "name": "Logitech M331 SilentPlus",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "asymmetrical_right"
+      },
+      "item_price_twd": 699,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.2,
+      "rating_count": 229,
+      "stock": 19,
+      "delivery_days": 3,
+      "source_ids": [
+        "src_shopee_tw_m331_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_020",
+      "product_id": "model_4",
+      "seller_id": "discovery_seller_03",
+      "name": "Logitech M221 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 549,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.3,
+      "rating_count": 270,
+      "stock": 20,
+      "delivery_days": 3,
+      "source_ids": [
+        "src_shopee_tw_m221_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_021",
+      "product_id": "model_5",
+      "seller_id": "discovery_seller_03",
+      "name": "Logitech M240 Silent White",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "white",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 629,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.4,
+      "rating_count": 311,
+      "stock": 21,
+      "delivery_days": 3,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_022",
+      "product_id": "model_6",
+      "seller_id": "discovery_seller_03",
+      "name": "Logitech M350s Rose",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "rose",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 799,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.5,
+      "rating_count": 352,
+      "stock": 22,
+      "delivery_days": 3,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_023",
+      "product_id": "model_7",
+      "seller_id": "discovery_seller_03",
+      "name": "Logitech Studio Mouse Pad Graphite",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 199,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.6,
+      "rating_count": 393,
+      "stock": 23,
+      "delivery_days": 3,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_024",
+      "product_id": "model_8",
+      "seller_id": "discovery_seller_03",
+      "name": "Logitech Studio Mouse Pad Blue",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "blue",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 199,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.7,
+      "rating_count": 434,
+      "stock": 24,
+      "delivery_days": 3,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_025",
+      "product_id": "model_1",
+      "seller_id": "discovery_seller_04",
+      "name": "Logitech M240 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 674,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.1,
+      "rating_count": 220,
+      "stock": 24,
+      "delivery_days": 4,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_026",
+      "product_id": "model_2",
+      "seller_id": "discovery_seller_04",
+      "name": "Logitech Pebble Mouse 2 M350s",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 844,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.2,
+      "rating_count": 261,
+      "stock": 25,
+      "delivery_days": 4,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_027",
+      "product_id": "model_3",
+      "seller_id": "discovery_seller_04",
+      "name": "Logitech M331 SilentPlus",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "asymmetrical_right"
+      },
+      "item_price_twd": 744,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.3,
+      "rating_count": 302,
+      "stock": 26,
+      "delivery_days": 4,
+      "source_ids": [
+        "src_shopee_tw_m331_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_028",
+      "product_id": "model_4",
+      "seller_id": "discovery_seller_04",
+      "name": "Logitech M221 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 594,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.4,
+      "rating_count": 343,
+      "stock": 27,
+      "delivery_days": 4,
+      "source_ids": [
+        "src_shopee_tw_m221_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_029",
+      "product_id": "model_5",
+      "seller_id": "discovery_seller_04",
+      "name": "Logitech M240 Silent White",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "white",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 674,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.5,
+      "rating_count": 384,
+      "stock": 28,
+      "delivery_days": 4,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_030",
+      "product_id": "model_6",
+      "seller_id": "discovery_seller_04",
+      "name": "Logitech M350s Rose",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "rose",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 844,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.6,
+      "rating_count": 425,
+      "stock": 29,
+      "delivery_days": 4,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_031",
+      "product_id": "model_7",
+      "seller_id": "discovery_seller_04",
+      "name": "Logitech Studio Mouse Pad Graphite",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 244,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.7,
+      "rating_count": 466,
+      "stock": 30,
+      "delivery_days": 4,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_032",
+      "product_id": "model_8",
+      "seller_id": "discovery_seller_04",
+      "name": "Logitech Studio Mouse Pad Blue",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "blue",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 244,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.8,
+      "rating_count": 507,
+      "stock": 31,
+      "delivery_days": 4,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_033",
+      "product_id": "model_1",
+      "seller_id": "discovery_seller_05",
+      "name": "Logitech M240 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 719,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.2,
+      "rating_count": 293,
+      "stock": 31,
+      "delivery_days": 5,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_034",
+      "product_id": "model_2",
+      "seller_id": "discovery_seller_05",
+      "name": "Logitech Pebble Mouse 2 M350s",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 889,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.3,
+      "rating_count": 334,
+      "stock": 32,
+      "delivery_days": 5,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_035",
+      "product_id": "model_3",
+      "seller_id": "discovery_seller_05",
+      "name": "Logitech M331 SilentPlus",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "asymmetrical_right"
+      },
+      "item_price_twd": 789,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.4,
+      "rating_count": 375,
+      "stock": 33,
+      "delivery_days": 5,
+      "source_ids": [
+        "src_shopee_tw_m331_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_036",
+      "product_id": "model_4",
+      "seller_id": "discovery_seller_05",
+      "name": "Logitech M221 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 639,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.5,
+      "rating_count": 416,
+      "stock": 34,
+      "delivery_days": 5,
+      "source_ids": [
+        "src_shopee_tw_m221_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_037",
+      "product_id": "model_5",
+      "seller_id": "discovery_seller_05",
+      "name": "Logitech M240 Silent White",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "white",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 719,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.6,
+      "rating_count": 457,
+      "stock": 35,
+      "delivery_days": 5,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_038",
+      "product_id": "model_6",
+      "seller_id": "discovery_seller_05",
+      "name": "Logitech M350s Rose",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "rose",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 889,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.7,
+      "rating_count": 498,
+      "stock": 36,
+      "delivery_days": 5,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_039",
+      "product_id": "model_7",
+      "seller_id": "discovery_seller_05",
+      "name": "Logitech Studio Mouse Pad Graphite",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 289,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.8,
+      "rating_count": 539,
+      "stock": 37,
+      "delivery_days": 5,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_040",
+      "product_id": "model_8",
+      "seller_id": "discovery_seller_05",
+      "name": "Logitech Studio Mouse Pad Blue",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "blue",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 289,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.9,
+      "rating_count": 580,
+      "stock": 38,
+      "delivery_days": 5,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_041",
+      "product_id": "model_1",
+      "seller_id": "discovery_seller_06",
+      "name": "Logitech M240 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 764,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.3,
+      "rating_count": 366,
+      "stock": 38,
+      "delivery_days": 6,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_042",
+      "product_id": "model_2",
+      "seller_id": "discovery_seller_06",
+      "name": "Logitech Pebble Mouse 2 M350s",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 934,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.4,
+      "rating_count": 407,
+      "stock": 39,
+      "delivery_days": 6,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_043",
+      "product_id": "model_3",
+      "seller_id": "discovery_seller_06",
+      "name": "Logitech M331 SilentPlus",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "asymmetrical_right"
+      },
+      "item_price_twd": 834,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.5,
+      "rating_count": 448,
+      "stock": 40,
+      "delivery_days": 6,
+      "source_ids": [
+        "src_shopee_tw_m331_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_044",
+      "product_id": "model_4",
+      "seller_id": "discovery_seller_06",
+      "name": "Logitech M221 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 684,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.6,
+      "rating_count": 489,
+      "stock": 41,
+      "delivery_days": 6,
+      "source_ids": [
+        "src_shopee_tw_m221_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_045",
+      "product_id": "model_5",
+      "seller_id": "discovery_seller_06",
+      "name": "Logitech M240 Silent White",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "white",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 764,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.7,
+      "rating_count": 530,
+      "stock": 42,
+      "delivery_days": 6,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_046",
+      "product_id": "model_6",
+      "seller_id": "discovery_seller_06",
+      "name": "Logitech M350s Rose",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "rose",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 934,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.8,
+      "rating_count": 571,
+      "stock": 43,
+      "delivery_days": 6,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_047",
+      "product_id": "model_7",
+      "seller_id": "discovery_seller_06",
+      "name": "Logitech Studio Mouse Pad Graphite",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 334,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.9,
+      "rating_count": 612,
+      "stock": 44,
+      "delivery_days": 6,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_048",
+      "product_id": "model_8",
+      "seller_id": "discovery_seller_06",
+      "name": "Logitech Studio Mouse Pad Blue",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "blue",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 334,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 3.8,
+      "rating_count": 653,
+      "stock": 45,
+      "delivery_days": 6,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_049",
+      "product_id": "model_1",
+      "seller_id": "discovery_seller_07",
+      "name": "Logitech M240 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 809,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.4,
+      "rating_count": 439,
+      "stock": 45,
+      "delivery_days": 7,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_050",
+      "product_id": "model_2",
+      "seller_id": "discovery_seller_07",
+      "name": "Logitech Pebble Mouse 2 M350s",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 979,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.5,
+      "rating_count": 480,
+      "stock": 46,
+      "delivery_days": 7,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_051",
+      "product_id": "model_3",
+      "seller_id": "discovery_seller_07",
+      "name": "Logitech M331 SilentPlus",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "asymmetrical_right"
+      },
+      "item_price_twd": 879,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.6,
+      "rating_count": 521,
+      "stock": 47,
+      "delivery_days": 7,
+      "source_ids": [
+        "src_shopee_tw_m331_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_052",
+      "product_id": "model_4",
+      "seller_id": "discovery_seller_07",
+      "name": "Logitech M221 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 729,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.7,
+      "rating_count": 562,
+      "stock": 3,
+      "delivery_days": 7,
+      "source_ids": [
+        "src_shopee_tw_m221_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_053",
+      "product_id": "model_5",
+      "seller_id": "discovery_seller_07",
+      "name": "Logitech M240 Silent White",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "white",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 809,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.8,
+      "rating_count": 603,
+      "stock": 4,
+      "delivery_days": 7,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_054",
+      "product_id": "model_6",
+      "seller_id": "discovery_seller_07",
+      "name": "Logitech M350s Rose",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "rose",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 979,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.9,
+      "rating_count": 644,
+      "stock": 5,
+      "delivery_days": 7,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_055",
+      "product_id": "model_7",
+      "seller_id": "discovery_seller_07",
+      "name": "Logitech Studio Mouse Pad Graphite",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 379,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 3.8,
+      "rating_count": 685,
+      "stock": 6,
+      "delivery_days": 7,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_056",
+      "product_id": "model_8",
+      "seller_id": "discovery_seller_07",
+      "name": "Logitech Studio Mouse Pad Blue",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "blue",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 379,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 3.9,
+      "rating_count": 726,
+      "stock": 0,
+      "delivery_days": 7,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_057",
+      "product_id": "model_1",
+      "seller_id": "discovery_seller_08",
+      "name": "Logitech M240 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 539,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.5,
+      "rating_count": 512,
+      "stock": 7,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_058",
+      "product_id": "model_2",
+      "seller_id": "discovery_seller_08",
+      "name": "Logitech Pebble Mouse 2 M350s",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 709,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.6,
+      "rating_count": 553,
+      "stock": 8,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_059",
+      "product_id": "model_3",
+      "seller_id": "discovery_seller_08",
+      "name": "Logitech M331 SilentPlus",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "asymmetrical_right"
+      },
+      "item_price_twd": 609,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.7,
+      "rating_count": 594,
+      "stock": 9,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_m331_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_060",
+      "product_id": "model_4",
+      "seller_id": "discovery_seller_08",
+      "name": "Logitech M221 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 459,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.8,
+      "rating_count": 635,
+      "stock": 10,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_m221_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_061",
+      "product_id": "model_5",
+      "seller_id": "discovery_seller_08",
+      "name": "Logitech M240 Silent White",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "white",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 539,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.9,
+      "rating_count": 676,
+      "stock": 11,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_062",
+      "product_id": "model_6",
+      "seller_id": "discovery_seller_08",
+      "name": "Logitech M350s Rose",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "rose",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 709,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 3.8,
+      "rating_count": 717,
+      "stock": 12,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_063",
+      "product_id": "model_7",
+      "seller_id": "discovery_seller_08",
+      "name": "Logitech Studio Mouse Pad Graphite",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 109,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 3.9,
+      "rating_count": 758,
+      "stock": 0,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_064",
+      "product_id": "model_8",
+      "seller_id": "discovery_seller_08",
+      "name": "Logitech Studio Mouse Pad Blue",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "blue",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 109,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4,
+      "rating_count": 799,
+      "stock": 14,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_065",
+      "product_id": "model_1",
+      "seller_id": "discovery_seller_09",
+      "name": "Logitech M240 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 584,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.6,
+      "rating_count": 585,
+      "stock": 14,
+      "delivery_days": 2,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_066",
+      "product_id": "model_2",
+      "seller_id": "discovery_seller_09",
+      "name": "Logitech Pebble Mouse 2 M350s",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 754,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.7,
+      "rating_count": 626,
+      "stock": 15,
+      "delivery_days": 2,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_067",
+      "product_id": "model_3",
+      "seller_id": "discovery_seller_09",
+      "name": "Logitech M331 SilentPlus",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "asymmetrical_right"
+      },
+      "item_price_twd": 654,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.8,
+      "rating_count": 667,
+      "stock": 16,
+      "delivery_days": 2,
+      "source_ids": [
+        "src_shopee_tw_m331_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_068",
+      "product_id": "model_4",
+      "seller_id": "discovery_seller_09",
+      "name": "Logitech M221 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 504,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.9,
+      "rating_count": 708,
+      "stock": 17,
+      "delivery_days": 2,
+      "source_ids": [
+        "src_shopee_tw_m221_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_069",
+      "product_id": "model_5",
+      "seller_id": "discovery_seller_09",
+      "name": "Logitech M240 Silent White",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "white",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 584,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 3.8,
+      "rating_count": 749,
+      "stock": 18,
+      "delivery_days": 2,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_070",
+      "product_id": "model_6",
+      "seller_id": "discovery_seller_09",
+      "name": "Logitech M350s Rose",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "rose",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 754,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 3.9,
+      "rating_count": 790,
+      "stock": 0,
+      "delivery_days": 2,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_071",
+      "product_id": "model_7",
+      "seller_id": "discovery_seller_09",
+      "name": "Logitech Studio Mouse Pad Graphite",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 154,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4,
+      "rating_count": 831,
+      "stock": 20,
+      "delivery_days": 2,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_072",
+      "product_id": "model_8",
+      "seller_id": "discovery_seller_09",
+      "name": "Logitech Studio Mouse Pad Blue",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "blue",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 154,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.1,
+      "rating_count": 872,
+      "stock": 21,
+      "delivery_days": 2,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_073",
+      "product_id": "model_1",
+      "seller_id": "discovery_seller_10",
+      "name": "Logitech M240 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 629,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.7,
+      "rating_count": 658,
+      "stock": 21,
+      "delivery_days": 3,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_074",
+      "product_id": "model_2",
+      "seller_id": "discovery_seller_10",
+      "name": "Logitech Pebble Mouse 2 M350s",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 799,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.8,
+      "rating_count": 699,
+      "stock": 22,
+      "delivery_days": 3,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_075",
+      "product_id": "model_3",
+      "seller_id": "discovery_seller_10",
+      "name": "Logitech M331 SilentPlus",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "asymmetrical_right"
+      },
+      "item_price_twd": 699,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.9,
+      "rating_count": 740,
+      "stock": 23,
+      "delivery_days": 3,
+      "source_ids": [
+        "src_shopee_tw_m331_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_076",
+      "product_id": "model_4",
+      "seller_id": "discovery_seller_10",
+      "name": "Logitech M221 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 549,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 3.8,
+      "rating_count": 781,
+      "stock": 24,
+      "delivery_days": 3,
+      "source_ids": [
+        "src_shopee_tw_m221_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_077",
+      "product_id": "model_5",
+      "seller_id": "discovery_seller_10",
+      "name": "Logitech M240 Silent White",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "white",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 629,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 3.9,
+      "rating_count": 822,
+      "stock": 0,
+      "delivery_days": 3,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_078",
+      "product_id": "model_6",
+      "seller_id": "discovery_seller_10",
+      "name": "Logitech M350s Rose",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "rose",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 799,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4,
+      "rating_count": 863,
+      "stock": 26,
+      "delivery_days": 3,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_079",
+      "product_id": "model_7",
+      "seller_id": "discovery_seller_10",
+      "name": "Logitech Studio Mouse Pad Graphite",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 199,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.1,
+      "rating_count": 904,
+      "stock": 27,
+      "delivery_days": 3,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_080",
+      "product_id": "model_8",
+      "seller_id": "discovery_seller_10",
+      "name": "Logitech Studio Mouse Pad Blue",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "blue",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 199,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.2,
+      "rating_count": 945,
+      "stock": 28,
+      "delivery_days": 3,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_081",
+      "product_id": "model_1",
+      "seller_id": "discovery_seller_11",
+      "name": "Logitech M240 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 674,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.8,
+      "rating_count": 731,
+      "stock": 28,
+      "delivery_days": 4,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_082",
+      "product_id": "model_2",
+      "seller_id": "discovery_seller_11",
+      "name": "Logitech Pebble Mouse 2 M350s",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 844,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.9,
+      "rating_count": 772,
+      "stock": 29,
+      "delivery_days": 4,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_083",
+      "product_id": "model_3",
+      "seller_id": "discovery_seller_11",
+      "name": "Logitech M331 SilentPlus",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "asymmetrical_right"
+      },
+      "item_price_twd": 744,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 3.8,
+      "rating_count": 813,
+      "stock": 30,
+      "delivery_days": 4,
+      "source_ids": [
+        "src_shopee_tw_m331_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_084",
+      "product_id": "model_4",
+      "seller_id": "discovery_seller_11",
+      "name": "Logitech M221 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 594,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 3.9,
+      "rating_count": 854,
+      "stock": 0,
+      "delivery_days": 4,
+      "source_ids": [
+        "src_shopee_tw_m221_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_085",
+      "product_id": "model_5",
+      "seller_id": "discovery_seller_11",
+      "name": "Logitech M240 Silent White",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "white",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 674,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4,
+      "rating_count": 895,
+      "stock": 32,
+      "delivery_days": 4,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_086",
+      "product_id": "model_6",
+      "seller_id": "discovery_seller_11",
+      "name": "Logitech M350s Rose",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "rose",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 844,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.1,
+      "rating_count": 936,
+      "stock": 33,
+      "delivery_days": 4,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_087",
+      "product_id": "model_7",
+      "seller_id": "discovery_seller_11",
+      "name": "Logitech Studio Mouse Pad Graphite",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 244,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.2,
+      "rating_count": 977,
+      "stock": 34,
+      "delivery_days": 4,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_088",
+      "product_id": "model_8",
+      "seller_id": "discovery_seller_11",
+      "name": "Logitech Studio Mouse Pad Blue",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "blue",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 244,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": null,
+      "rating_count": 0,
+      "stock": 35,
+      "delivery_days": 4,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_089",
+      "product_id": "model_1",
+      "seller_id": "discovery_seller_12",
+      "name": "Logitech M240 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 719,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.9,
+      "rating_count": 804,
+      "stock": 35,
+      "delivery_days": 5,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_090",
+      "product_id": "model_2",
+      "seller_id": "discovery_seller_12",
+      "name": "Logitech Pebble Mouse 2 M350s",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 889,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 3.8,
+      "rating_count": 845,
+      "stock": 36,
+      "delivery_days": 5,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_091",
+      "product_id": "model_3",
+      "seller_id": "discovery_seller_12",
+      "name": "Logitech M331 SilentPlus",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "asymmetrical_right"
+      },
+      "item_price_twd": 789,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 3.9,
+      "rating_count": 886,
+      "stock": 0,
+      "delivery_days": 5,
+      "source_ids": [
+        "src_shopee_tw_m331_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_092",
+      "product_id": "model_4",
+      "seller_id": "discovery_seller_12",
+      "name": "Logitech M221 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 639,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4,
+      "rating_count": 927,
+      "stock": 38,
+      "delivery_days": 5,
+      "source_ids": [
+        "src_shopee_tw_m221_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_093",
+      "product_id": "model_5",
+      "seller_id": "discovery_seller_12",
+      "name": "Logitech M240 Silent White",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "white",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 719,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.1,
+      "rating_count": 968,
+      "stock": 39,
+      "delivery_days": 5,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_094",
+      "product_id": "model_6",
+      "seller_id": "discovery_seller_12",
+      "name": "Logitech M350s Rose",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "rose",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 889,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.2,
+      "rating_count": 1009,
+      "stock": 40,
+      "delivery_days": 5,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_095",
+      "product_id": "model_7",
+      "seller_id": "discovery_seller_12",
+      "name": "Logitech Studio Mouse Pad Graphite",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 289,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": null,
+      "rating_count": 0,
+      "stock": 41,
+      "delivery_days": 5,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_096",
+      "product_id": "model_8",
+      "seller_id": "discovery_seller_12",
+      "name": "Logitech Studio Mouse Pad Blue",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "blue",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 289,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.4,
+      "rating_count": 1091,
+      "stock": 42,
+      "delivery_days": 5,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_097",
+      "product_id": "model_1",
+      "seller_id": "discovery_seller_13",
+      "name": "Logitech M240 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 764,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 3.8,
+      "rating_count": 877,
+      "stock": 42,
+      "delivery_days": 6,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_098",
+      "product_id": "model_2",
+      "seller_id": "discovery_seller_13",
+      "name": "Logitech Pebble Mouse 2 M350s",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 934,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 3.9,
+      "rating_count": 918,
+      "stock": 0,
+      "delivery_days": 6,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_099",
+      "product_id": "model_3",
+      "seller_id": "discovery_seller_13",
+      "name": "Logitech M331 SilentPlus",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "asymmetrical_right"
+      },
+      "item_price_twd": 834,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4,
+      "rating_count": 959,
+      "stock": 44,
+      "delivery_days": 6,
+      "source_ids": [
+        "src_shopee_tw_m331_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_100",
+      "product_id": "model_4",
+      "seller_id": "discovery_seller_13",
+      "name": "Logitech M221 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 684,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.1,
+      "rating_count": 1000,
+      "stock": 45,
+      "delivery_days": 6,
+      "source_ids": [
+        "src_shopee_tw_m221_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_101",
+      "product_id": "model_5",
+      "seller_id": "discovery_seller_13",
+      "name": "Logitech M240 Silent White",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "white",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 764,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.2,
+      "rating_count": 1041,
+      "stock": 46,
+      "delivery_days": 6,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_102",
+      "product_id": "model_6",
+      "seller_id": "discovery_seller_13",
+      "name": "Logitech M350s Rose",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "rose",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 934,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": null,
+      "rating_count": 0,
+      "stock": 47,
+      "delivery_days": 6,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_103",
+      "product_id": "model_7",
+      "seller_id": "discovery_seller_13",
+      "name": "Logitech Studio Mouse Pad Graphite",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 334,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.4,
+      "rating_count": 1123,
+      "stock": 3,
+      "delivery_days": 6,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_104",
+      "product_id": "model_8",
+      "seller_id": "discovery_seller_13",
+      "name": "Logitech Studio Mouse Pad Blue",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "blue",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 334,
+      "shipping_twd": 60,
+      "price_includes_tax": true,
+      "rating": 4.5,
+      "rating_count": 1164,
+      "stock": 4,
+      "delivery_days": 6,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_105",
+      "product_id": "model_1",
+      "seller_id": "discovery_seller_14",
+      "name": "Logitech M240 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 809,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 3.9,
+      "rating_count": 950,
+      "stock": 0,
+      "delivery_days": 7,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_106",
+      "product_id": "model_2",
+      "seller_id": "discovery_seller_14",
+      "name": "Logitech Pebble Mouse 2 M350s",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 979,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4,
+      "rating_count": 991,
+      "stock": 5,
+      "delivery_days": 7,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_107",
+      "product_id": "model_3",
+      "seller_id": "discovery_seller_14",
+      "name": "Logitech M331 SilentPlus",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "asymmetrical_right"
+      },
+      "item_price_twd": 879,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.1,
+      "rating_count": 1032,
+      "stock": 6,
+      "delivery_days": 7,
+      "source_ids": [
+        "src_shopee_tw_m331_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_108",
+      "product_id": "model_4",
+      "seller_id": "discovery_seller_14",
+      "name": "Logitech M221 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 729,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.2,
+      "rating_count": 1073,
+      "stock": 7,
+      "delivery_days": 7,
+      "source_ids": [
+        "src_shopee_tw_m221_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_109",
+      "product_id": "model_5",
+      "seller_id": "discovery_seller_14",
+      "name": "Logitech M240 Silent White",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "white",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 809,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": null,
+      "rating_count": 0,
+      "stock": 8,
+      "delivery_days": 7,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_110",
+      "product_id": "model_6",
+      "seller_id": "discovery_seller_14",
+      "name": "Logitech M350s Rose",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "rose",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 979,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.4,
+      "rating_count": 1155,
+      "stock": 9,
+      "delivery_days": 7,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_111",
+      "product_id": "model_7",
+      "seller_id": "discovery_seller_14",
+      "name": "Logitech Studio Mouse Pad Graphite",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 379,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.5,
+      "rating_count": 1196,
+      "stock": 10,
+      "delivery_days": 7,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_112",
+      "product_id": "model_8",
+      "seller_id": "discovery_seller_14",
+      "name": "Logitech Studio Mouse Pad Blue",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "blue",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 379,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.6,
+      "rating_count": 1237,
+      "stock": 11,
+      "delivery_days": 7,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_113",
+      "product_id": "model_1",
+      "seller_id": "discovery_seller_15",
+      "name": "Logitech M240 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 539,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4,
+      "rating_count": 1023,
+      "stock": 11,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_114",
+      "product_id": "model_2",
+      "seller_id": "discovery_seller_15",
+      "name": "Logitech Pebble Mouse 2 M350s",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 709,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.1,
+      "rating_count": 1064,
+      "stock": 12,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_115",
+      "product_id": "model_3",
+      "seller_id": "discovery_seller_15",
+      "name": "Logitech M331 SilentPlus",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "asymmetrical_right"
+      },
+      "item_price_twd": 609,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.2,
+      "rating_count": 1105,
+      "stock": 13,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_m331_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_116",
+      "product_id": "model_4",
+      "seller_id": "discovery_seller_15",
+      "name": "Logitech M221 Silent",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 459,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": null,
+      "rating_count": 0,
+      "stock": 14,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_m221_black_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_117",
+      "product_id": "model_5",
+      "seller_id": "discovery_seller_15",
+      "name": "Logitech M240 Silent White",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click"
+      ],
+      "attributes": {
+        "color": "white",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 539,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.4,
+      "rating_count": 1187,
+      "stock": 15,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_m240_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_118",
+      "product_id": "model_6",
+      "seller_id": "discovery_seller_15",
+      "name": "Logitech M350s Rose",
+      "brand": "Logitech",
+      "category": "mouse",
+      "features": [
+        "wireless",
+        "bluetooth",
+        "silent_click",
+        "multi_device"
+      ],
+      "attributes": {
+        "color": "rose",
+        "size_class": "small",
+        "shape": "symmetrical"
+      },
+      "item_price_twd": 709,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.5,
+      "rating_count": 1228,
+      "stock": 16,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_m350s_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_119",
+      "product_id": "model_7",
+      "seller_id": "discovery_seller_15",
+      "name": "Logitech Studio Mouse Pad Graphite",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "black",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 109,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.6,
+      "rating_count": 1269,
+      "stock": 17,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    },
+    {
+      "listing_id": "listing_120",
+      "product_id": "model_8",
+      "seller_id": "discovery_seller_15",
+      "name": "Logitech Studio Mouse Pad Blue",
+      "brand": "Logitech",
+      "category": "mouse_pad",
+      "features": [
+        "non_slip"
+      ],
+      "attributes": {
+        "color": "blue",
+        "size_class": "small",
+        "shape": "rectangular"
+      },
+      "item_price_twd": 109,
+      "shipping_twd": 0,
+      "price_includes_tax": true,
+      "rating": 4.7,
+      "rating_count": 1310,
+      "stock": 18,
+      "delivery_days": 1,
+      "source_ids": [
+        "src_shopee_tw_studio_mouse_pad_graphite_20260912"
+      ],
+      "data_origin": "synthetic",
+      "synthetic_fields": [
+        "seller",
+        "variant_mapping",
+        "item_price_twd",
+        "shipping_twd",
+        "rating",
+        "rating_count",
+        "stock",
+        "delivery_days",
+        "attributes"
+      ],
+      "notes": "型號／參考價沿用既有公開來源；本刊登、變體屬性與全部商務數值是離線模擬，非平台真實刊登。"
+    }
+  ],
+  "campaigns": [
+    {
+      "campaign_id": "discovery_ad_1",
+      "seller_id": "discovery_seller_01",
+      "category": "mouse",
+      "bid_twd": 10,
+      "enabled": true,
+      "starts_at": "2026-09-01T00:00:00+08:00",
+      "ends_at": "2026-10-01T00:00:00+08:00",
+      "data_origin": "synthetic"
+    },
+    {
+      "campaign_id": "discovery_ad_2",
+      "seller_id": "discovery_seller_04",
+      "category": "mouse",
+      "bid_twd": 17,
+      "enabled": true,
+      "starts_at": "2026-09-01T00:00:00+08:00",
+      "ends_at": "2026-10-01T00:00:00+08:00",
+      "data_origin": "synthetic"
+    },
+    {
+      "campaign_id": "discovery_ad_3",
+      "seller_id": "discovery_seller_07",
+      "category": "mouse",
+      "bid_twd": 24,
+      "enabled": true,
+      "starts_at": "2026-09-01T00:00:00+08:00",
+      "ends_at": "2026-10-01T00:00:00+08:00",
+      "data_origin": "synthetic"
+    },
+    {
+      "campaign_id": "discovery_ad_4",
+      "seller_id": "discovery_seller_10",
+      "category": "mouse",
+      "bid_twd": 31,
+      "enabled": false,
+      "starts_at": "2026-09-01T00:00:00+08:00",
+      "ends_at": "2026-10-01T00:00:00+08:00",
+      "data_origin": "synthetic"
+    },
+    {
+      "campaign_id": "discovery_ad_5",
+      "seller_id": "discovery_seller_13",
+      "category": "mouse",
+      "bid_twd": 38,
+      "enabled": true,
+      "starts_at": "2026-09-01T00:00:00+08:00",
+      "ends_at": "2026-09-10T00:00:00+08:00",
+      "data_origin": "synthetic"
+    }
+  ]
+}

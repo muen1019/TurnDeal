@@ -7,7 +7,12 @@
     "node": ">=24"
   },
   "scripts": {
-    "test": "npm run test:contracts && npm run test:db",
+    "test": "npm run test:contracts && npm run test:db && npm run test:orchestrator && npm run test:seller-policies",
+    "test:seller-policies": "node scripts/validate-seller-policies.mjs && node --test tests/seller-policies.test.mjs",
+    "test:orchestrator": "node --test tests/orchestrator-data.test.ts tests/discovery.test.ts",
+    "db:seed:discovery": "node scripts/discovery-db.mjs",
+    "demo:discovery": "node examples/discovery.ts",
+    "demo:orchestrator": "node examples/orchestrator-input.ts",
     "test:contracts": "node scripts/validate-contracts.mjs",
     "test:db": "node scripts/db.mjs --memory",
     "db:init": "node scripts/db.mjs",

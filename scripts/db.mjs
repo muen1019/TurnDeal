@@ -262,7 +262,7 @@ function insertCanonicalFlow(db, happy) {
   );
 }
 
-function initializeDatabase(db) {
+export function initializeDatabase(db) {
   const marketplace = readJson("contracts/fixtures/marketplace-source-snapshot.json");
   const sellerStore = readJson("contracts/fixtures/sellers.json");
   const happy = readJson("contracts/fixtures/happy-path.json");
@@ -297,7 +297,7 @@ function verifyDatabase(db) {
   assert.deepEqual(db.prepare("PRAGMA foreign_key_check").all(), [], "foreign keys must be valid");
 
   const expectedCounts = {
-    schema_migrations: 1,
+    schema_migrations: db.prepare("SELECT name FROM sqlite_schema WHERE name='discovery_catalogs'").get() ? 2 : 1,
     users: 1,
     marketplace_sources: 11,
     sellers: 3,
@@ -361,7 +361,7 @@ function verifyDatabase(db) {
     FROM sqlite_schema
     WHERE type = 'table' AND name NOT LIKE 'sqlite_%'
   `).get().count);
-  assert.equal(tableCount, 19, "database must expose 17 domain tables plus migration and source-link tables");
+  assert.equal(tableCount, expectedCounts.schema_migrations === 2 ? 21 : 19, "unexpected database table count");
 
   return { integrity, tableCount, counts: expectedCounts };
 }
@@ -422,4 +422,4 @@ function main() {
   }
 }
 
-main();
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
