@@ -1,6 +1,6 @@
 {
   "name": "offermesh",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -18,5 +18,9 @@
     "db:init": "node scripts/db.mjs",
     "db:rebuild": "node scripts/db.mjs --force",
     "db:check": "node scripts/db.mjs --check"
+  },
+  "devDependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1"
   }
 }

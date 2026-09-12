@@ -1,10 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://sea-hackathon.local/contracts/a2a-commerce.v0.1.schema.json",
-  "title": "A2A Commerce RequestSnapshot v0.1",
+  "$id": "https://sea-hackathon.local/contracts/a2a-commerce.v0.2.schema.json",
+  "title": "A2A Commerce RequestSnapshot v0.2",
   "description": "Authoritative shared contracts. The document root validates a RequestSnapshot; reusable contracts live in $defs.",
   "$ref": "#/$defs/RequestSnapshot",
   "$defs": {
+    "NegotiationRound": {"type": "integer", "minimum": 1, "maximum": 5},
+    "BranchStopReason": {"type": ["string", "null"], "enum": [null, "seller_final", "refused", "timeout", "error", "no_adjustment", "max_rounds", "global_deadline", "call_budget", "token_budget"]},
     "Id": {
       "type": "string",
       "minLength": 1,
@@ -289,8 +291,9 @@
     "SellerRound": {
       "type": "object",
       "properties": {
-        "round": {"type": "integer", "enum": [1, 2]},
+        "round": {"$ref": "#/$defs/NegotiationRound"},
         "outcome": {"type": "string", "enum": ["offered", "refused", "timeout", "error"]},
+        "is_final": {"type": "boolean", "description": "Seller explicitly ends this branch; valid only with an offered outcome."},
         "offer_ids": {
           "type": "array",
           "items": {"$ref": "#/$defs/Id"},
@@ -298,15 +301,17 @@
           "maxItems": 2
         }
       },
-      "required": ["round", "outcome", "offer_ids"],
-      "additionalProperties": false
+      "required": ["round", "outcome", "is_final", "offer_ids"],
+      "additionalProperties": false,
+      "allOf": [{"if": {"properties": {"outcome": {"const": "offered"}}, "required": ["outcome"]}, "then": {"properties": {"offer_ids": {"minItems": 1}}}, "else": {"properties": {"is_final": {"const": false}, "offer_ids": {"maxItems": 0}}}}]
     },
     "SellerAgent": {
       "type": "object",
+      "description": "One Buyer branch for a selected Seller. Backend assigns stop_reason; null means active. IDs and round order require cross-object validation.",
       "properties": {
         "seller_id": {"$ref": "#/$defs/Id"},
         "name": {"type": "string", "minLength": 1, "maxLength": 100},
-        "listing_rank": {"type": "integer", "minimum": 1},
+        "listing_rank": {"type": "integer", "minimum": 1, "maximum": 5},
         "match_reason": {"type": "string", "minLength": 1, "maxLength": 500},
         "candidate_products": {
           "type": "array",
@@ -318,8 +323,9 @@
         "rounds": {
           "type": "array",
           "items": {"$ref": "#/$defs/SellerRound"},
-          "maxItems": 2
+          "maxItems": 5
         },
+        "stop_reason": {"$ref": "#/$defs/BranchStopReason"},
         "final_offer_ids": {
           "type": "array",
           "items": {"$ref": "#/$defs/Id"},
@@ -327,7 +333,7 @@
           "maxItems": 2
         }
       },
-      "required": ["seller_id", "name", "listing_rank", "match_reason", "candidate_products", "trust", "status", "rounds", "final_offer_ids"],
+      "required": ["seller_id", "name", "listing_rank", "match_reason", "candidate_products", "trust", "status", "rounds", "stop_reason", "final_offer_ids"],
       "additionalProperties": false
     },
     "SponsoredPlacement": {
@@ -373,7 +379,7 @@
     "OrchestrationResult": {
       "type": "object",
       "properties": {
-        "seller_agents": {"type": "array", "items": {"$ref": "#/$defs/SellerAgent"}},
+        "seller_agents": {"type": "array", "items": {"$ref": "#/$defs/SellerAgent"}, "maxItems": 5},
         "discovery_exclusions": {"type": "array", "items": {"$ref": "#/$defs/DiscoveryExclusion"}},
         "sponsored_placement": {"anyOf": [{"$ref": "#/$defs/SponsoredPlacement"}, {"type": "null"}]}
       },
@@ -409,7 +415,7 @@
       "properties": {
         "offer_id": {"$ref": "#/$defs/Id"},
         "seller_id": {"$ref": "#/$defs/Id"},
-        "round": {"type": "integer", "enum": [1, 2]},
+        "round": {"$ref": "#/$defs/NegotiationRound"},
         "variant": {"type": "string", "enum": ["standalone", "bundle"]},
         "baseline_offer_id": {"anyOf": [{"$ref": "#/$defs/Id"}, {"type": "null"}]},
         "items": {
@@ -539,7 +545,7 @@
         "status": {"$ref": "#/$defs/Status"},
         "documents": {"$ref": "#/$defs/DocumentBundle"},
         "intent": {"anyOf": [{"$ref": "#/$defs/NormalizedIntent"}, {"type": "null"}]},
-        "seller_agents": {"type": "array", "items": {"$ref": "#/$defs/SellerAgent"}},
+        "seller_agents": {"type": "array", "items": {"$ref": "#/$defs/SellerAgent"}, "maxItems": 5},
         "discovery_exclusions": {"type": "array", "items": {"$ref": "#/$defs/DiscoveryExclusion"}},
         "sponsored_placement": {"anyOf": [{"$ref": "#/$defs/SponsoredPlacement"}, {"type": "null"}]},
         "offers": {"type": "array", "items": {"$ref": "#/$defs/Offer"}},
@@ -709,7 +715,7 @@
       "properties": {
         "request_id": {"$ref": "#/$defs/Id"},
         "seller_id": {"$ref": "#/$defs/Id"},
-        "round": {"type": "integer", "enum": [1, 2]},
+        "round": {"$ref": "#/$defs/NegotiationRound"},
         "category": {"const": "mouse"},
         "required_features": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
         "candidate_product_ids": {"type": "array", "items": {"$ref": "#/$defs/Id"}, "minItems": 1, "uniqueItems": true},
@@ -770,18 +776,19 @@
       "properties": {
         "request_id": {"$ref": "#/$defs/Id"},
         "seller_id": {"$ref": "#/$defs/Id"},
-        "round": {"type": "integer", "enum": [1, 2]},
+        "round": {"$ref": "#/$defs/NegotiationRound"},
         "outcome": {"type": "string", "enum": ["offered", "refused", "timeout", "error"]},
+        "is_final": {"type": "boolean", "description": "Seller explicitly ends this branch; valid only with an offered outcome."},
         "drafts": {"type": "array", "items": {"$ref": "#/$defs/SellerOfferDraft"}, "maxItems": 2},
         "message": {"type": "string", "minLength": 1, "maxLength": 500}
       },
-      "required": ["request_id", "seller_id", "round", "outcome", "drafts", "message"],
+      "required": ["request_id", "seller_id", "round", "outcome", "is_final", "drafts", "message"],
       "additionalProperties": false,
       "allOf": [
         {
           "if": {"properties": {"outcome": {"const": "offered"}}, "required": ["outcome"]},
           "then": {"properties": {"drafts": {"minItems": 1}}},
-          "else": {"properties": {"drafts": {"maxItems": 0}}}
+          "else": {"properties": {"drafts": {"maxItems": 0}, "is_final": {"const": false}}}
         }
       ]
     },
@@ -914,7 +921,7 @@
     "SellerFixtureStore": {
       "type": "object",
       "properties": {
-        "fixture_version": {"type": "string", "const": "0.2"},
+        "fixture_version": {"type": "string", "const": "0.3"},
         "generated_at": {"$ref": "#/$defs/Timestamp"},
         "source_snapshot_id": {"$ref": "#/$defs/Id"},
         "data_classification": {
@@ -953,12 +960,12 @@
               "strategy": {
                 "type": "object",
                 "properties": {
-                  "type": {"type": "string", "enum": ["lowest_price_slow_delivery", "premium_fast_delivery", "value_bundle"]},
-                  "round_1_discount_twd": {"type": "integer", "minimum": 0},
-                  "round_2_discount_twd": {"type": "integer", "minimum": 0},
+                  "type": {"type": "string", "enum": ["lowest_price_slow_delivery", "premium_fast_delivery", "value_bundle", "balanced_delivery", "firm_price"]},
+                  "round_discounts_twd": {"type": "array", "items": {"type": "integer", "minimum": 0}, "minItems": 5, "maxItems": 5},
+                  "final_round": {"anyOf": [{"$ref": "#/$defs/NegotiationRound"}, {"type": "null"}]},
                   "bundle_mode": {"type": "string", "enum": ["none", "free_optional_mouse_pad"]}
                 },
-                "required": ["type", "round_1_discount_twd", "round_2_discount_twd", "bundle_mode"],
+                "required": ["type", "round_discounts_twd", "final_round", "bundle_mode"],
                 "additionalProperties": false
               },
               "trust": {"$ref": "#/$defs/Trust"},
@@ -967,8 +974,8 @@
             "required": ["seller_id", "name", "enabled", "strategy", "trust", "products"],
             "additionalProperties": false
           },
-          "minItems": 3,
-          "maxItems": 3
+          "minItems": 5,
+          "maxItems": 5
         },
         "campaigns": {
           "type": "array",
@@ -994,7 +1001,7 @@
     "DemoScenarioSuite": {
       "type": "object",
       "properties": {
-        "fixture_version": {"type": "string", "const": "0.2"},
+        "fixture_version": {"type": "string", "const": "0.3"},
         "catalog_fixture": {"const": "sellers.json"},
         "source_snapshot": {"const": "marketplace-source-snapshot.json"},
         "canonical_flow_fixture": {"const": "happy-path.json"},
@@ -1030,9 +1037,11 @@
                     "properties": {
                       "seller_a": {"type": "string", "enum": ["offered", "refused", "timeout", "error", "no_match"]},
                       "seller_b": {"type": "string", "enum": ["offered", "refused", "timeout", "error", "no_match"]},
-                      "seller_c": {"type": "string", "enum": ["offered", "refused", "timeout", "error", "no_match"]}
+                      "seller_c": {"type": "string", "enum": ["offered", "refused", "timeout", "error", "no_match"]},
+                      "seller_d": {"type": "string", "enum": ["offered", "refused", "timeout", "error", "no_match"]},
+                      "seller_e": {"type": "string", "enum": ["offered", "refused", "timeout", "error", "no_match"]}
                     },
-                    "required": ["seller_a", "seller_b", "seller_c"],
+                    "required": ["seller_a", "seller_b", "seller_c", "seller_d", "seller_e"],
                     "additionalProperties": false
                   },
                   "eligible_offer_ids": {"type": "array", "items": {"$ref": "#/$defs/Id"}, "uniqueItems": true},

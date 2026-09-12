@@ -11,8 +11,8 @@ test('Orchestrator input resolves seeded data without Seller private policy', ()
     const tools = createOrchestratorDataTools({ db, userId: 'user_demo_001',
       demoTrustUserId: 'user_demo_001', registeredSellerIds: ['seller_a', 'seller_b'] });
     const input = tools.load_discovery_input({ request_id: 'req_demo_001', now: '2026-09-12T02:00:00Z' });
-    assert.equal(input.catalog.length, 6);
-    assert.equal(input.sellers.length, 3);
+    assert.equal(input.catalog.length, 8);
+    assert.equal(input.sellers.length, 5);
     assert.equal(input.sellers.find(s => s.seller_id === 'seller_c')?.handler_registered, false);
     assert.equal(input.catalog.find(p => p.product_id === 'mouse_b_rose_small')?.stock, 0);
     assert.equal(tools.list_catalog({ category: 'mouse_pad' }).length, 1);
@@ -22,6 +22,7 @@ test('Orchestrator input resolves seeded data without Seller private policy', ()
     const serialized = JSON.stringify(input);
     assert.ok(!serialized.includes('floor_price_twd'));
     assert.ok(!serialized.includes('round_1_discount_twd'));
+    assert.ok(!serialized.includes('round_discounts_json'));
     assert.deepEqual(tools.get_request_preferences({ request_id: 'req_demo_001' }).product_preferences,
       input.request.normalized_intent?.product_preferences);
     // Mutating returned values cannot alter the persisted request or future reads.
@@ -51,6 +52,6 @@ test('Request ownership, unpublished intent and long-term preference changes', (
     assert.throws(() => tools.load_discovery_input({ request_id: 'req_pending', now: '2026-09-12T11:00:00Z' }),
       { code: 'intent_not_ready' });
     // Error path releases its read transaction.
-    assert.equal(tools.load_discovery_input({ request_id: 'req_demo_001', now: '2026-09-12T02:00:00Z' }).catalog.length, 6);
+    assert.equal(tools.load_discovery_input({ request_id: 'req_demo_001', now: '2026-09-12T02:00:00Z' }).catalog.length, 8);
   } finally { db.close(); }
 });

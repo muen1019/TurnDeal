@@ -1,17 +1,22 @@
 {
-  "fixture_version": "0.2",
+  "fixture_version": "0.3",
   "catalog_fixture": "sellers.json",
   "source_snapshot": "marketplace-source-snapshot.json",
   "canonical_flow_fixture": "happy-path.json",
   "scenarios": [
     {
       "scenario_id": "price_first_all_sellers",
-      "title": "價格優先，三家皆完成兩輪報價",
+      "title": "五家 Seller 議價，上限五輪，D 第三輪與 E 第一輪提前結束",
       "intent": {
         "max_total_twd": 1000,
         "delivery_days_max": 7,
-        "required_features": ["wireless", "silent_click"],
-        "preferences": ["price_first"],
+        "required_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "preferences": [
+          "price_first"
+        ],
         "required_color": "black",
         "preferred_shape": "symmetrical",
         "bundle_mode": "related_no_extra_cost"
@@ -19,9 +24,22 @@
       "runtime_faults": [],
       "expected": {
         "request_status": "awaiting_user",
-        "seller_statuses": {"seller_a": "offered", "seller_b": "offered", "seller_c": "offered"},
-        "eligible_offer_ids": ["offer_a_r2", "offer_b_r2", "offer_c_standalone_r2", "offer_c_bundle_r2"],
-        "recommended_offer_id": "offer_a_r2",
+        "seller_statuses": {
+          "seller_a": "offered",
+          "seller_b": "offered",
+          "seller_c": "offered",
+          "seller_d": "offered",
+          "seller_e": "offered"
+        },
+        "eligible_offer_ids": [
+          "offer_a_r5",
+          "offer_b_r5",
+          "offer_c_standalone_r5",
+          "offer_c_bundle_r5",
+          "offer_d_r3",
+          "offer_e_r1"
+        ],
+        "recommended_offer_id": "offer_a_r5",
         "reason_codes": []
       }
     },
@@ -31,8 +49,13 @@
       "intent": {
         "max_total_twd": 1000,
         "delivery_days_max": 7,
-        "required_features": ["wireless", "silent_click"],
-        "preferences": ["delivery_first"],
+        "required_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "preferences": [
+          "delivery_first"
+        ],
         "required_color": "black",
         "preferred_shape": "symmetrical",
         "bundle_mode": "related_no_extra_cost"
@@ -40,9 +63,22 @@
       "runtime_faults": [],
       "expected": {
         "request_status": "awaiting_user",
-        "seller_statuses": {"seller_a": "offered", "seller_b": "offered", "seller_c": "offered"},
-        "eligible_offer_ids": ["offer_a_r2", "offer_b_r2", "offer_c_standalone_r2", "offer_c_bundle_r2"],
-        "recommended_offer_id": "offer_b_r2",
+        "seller_statuses": {
+          "seller_a": "offered",
+          "seller_b": "offered",
+          "seller_c": "offered",
+          "seller_d": "offered",
+          "seller_e": "offered"
+        },
+        "eligible_offer_ids": [
+          "offer_a_r5",
+          "offer_b_r5",
+          "offer_c_standalone_r5",
+          "offer_c_bundle_r5",
+          "offer_d_r3",
+          "offer_e_r1"
+        ],
+        "recommended_offer_id": "offer_b_r5",
         "reason_codes": []
       }
     },
@@ -52,8 +88,13 @@
       "intent": {
         "max_total_twd": 1000,
         "delivery_days_max": 7,
-        "required_features": ["wireless", "silent_click"],
-        "preferences": ["price_first"],
+        "required_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "preferences": [
+          "price_first"
+        ],
         "required_color": "black",
         "preferred_shape": "symmetrical",
         "bundle_mode": "disabled"
@@ -61,10 +102,24 @@
       "runtime_faults": [],
       "expected": {
         "request_status": "awaiting_user",
-        "seller_statuses": {"seller_a": "offered", "seller_b": "offered", "seller_c": "offered"},
-        "eligible_offer_ids": ["offer_a_r2", "offer_b_r2", "offer_c_standalone_r2"],
-        "recommended_offer_id": "offer_a_r2",
-        "reason_codes": ["bundle_disabled"]
+        "seller_statuses": {
+          "seller_a": "offered",
+          "seller_b": "offered",
+          "seller_c": "offered",
+          "seller_d": "offered",
+          "seller_e": "offered"
+        },
+        "eligible_offer_ids": [
+          "offer_a_r5",
+          "offer_b_r5",
+          "offer_c_standalone_r5",
+          "offer_d_r3",
+          "offer_e_r1"
+        ],
+        "recommended_offer_id": "offer_a_r5",
+        "reason_codes": [
+          "bundle_disabled"
+        ]
       }
     },
     {
@@ -73,8 +128,13 @@
       "intent": {
         "max_total_twd": 500,
         "delivery_days_max": 7,
-        "required_features": ["wireless", "silent_click"],
-        "preferences": ["price_first"],
+        "required_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "preferences": [
+          "price_first"
+        ],
         "required_color": "black",
         "preferred_shape": "symmetrical",
         "bundle_mode": "disabled"
@@ -82,10 +142,18 @@
       "runtime_faults": [],
       "expected": {
         "request_status": "no_match",
-        "seller_statuses": {"seller_a": "offered", "seller_b": "offered", "seller_c": "offered"},
+        "seller_statuses": {
+          "seller_a": "offered",
+          "seller_b": "offered",
+          "seller_c": "offered",
+          "seller_d": "offered",
+          "seller_e": "offered"
+        },
         "eligible_offer_ids": [],
         "recommended_offer_id": null,
-        "reason_codes": ["over_budget"]
+        "reason_codes": [
+          "over_budget"
+        ]
       }
     },
     {
@@ -94,8 +162,13 @@
       "intent": {
         "max_total_twd": 1000,
         "delivery_days_max": 1,
-        "required_features": ["wireless", "silent_click"],
-        "preferences": ["delivery_first"],
+        "required_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "preferences": [
+          "delivery_first"
+        ],
         "required_color": "black",
         "preferred_shape": "symmetrical",
         "bundle_mode": "disabled"
@@ -103,10 +176,20 @@
       "runtime_faults": [],
       "expected": {
         "request_status": "awaiting_user",
-        "seller_statuses": {"seller_a": "offered", "seller_b": "offered", "seller_c": "offered"},
-        "eligible_offer_ids": ["offer_b_r2"],
-        "recommended_offer_id": "offer_b_r2",
-        "reason_codes": ["delivery_too_late"]
+        "seller_statuses": {
+          "seller_a": "no_match",
+          "seller_b": "offered",
+          "seller_c": "no_match",
+          "seller_d": "no_match",
+          "seller_e": "no_match"
+        },
+        "eligible_offer_ids": [
+          "offer_b_r5"
+        ],
+        "recommended_offer_id": "offer_b_r5",
+        "reason_codes": [
+          "delivery_too_late"
+        ]
       }
     },
     {
@@ -115,19 +198,39 @@
       "intent": {
         "max_total_twd": 1000,
         "delivery_days_max": 7,
-        "required_features": ["wireless", "silent_click"],
-        "preferences": ["price_first"],
+        "required_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "preferences": [
+          "price_first"
+        ],
         "required_color": "black",
         "preferred_shape": null,
         "bundle_mode": "related_no_extra_cost"
       },
-      "runtime_faults": ["shape_symmetrical_is_required"],
+      "runtime_faults": [
+        "shape_symmetrical_is_required"
+      ],
       "expected": {
         "request_status": "awaiting_user",
-        "seller_statuses": {"seller_a": "offered", "seller_b": "offered", "seller_c": "no_match"},
-        "eligible_offer_ids": ["offer_a_r2", "offer_b_r2"],
-        "recommended_offer_id": "offer_a_r2",
-        "reason_codes": ["missing_feature"]
+        "seller_statuses": {
+          "seller_a": "offered",
+          "seller_b": "offered",
+          "seller_c": "no_match",
+          "seller_d": "offered",
+          "seller_e": "offered"
+        },
+        "eligible_offer_ids": [
+          "offer_a_r5",
+          "offer_b_r5",
+          "offer_d_r3",
+          "offer_e_r1"
+        ],
+        "recommended_offer_id": "offer_a_r5",
+        "reason_codes": [
+          "missing_feature"
+        ]
       }
     },
     {
@@ -136,18 +239,37 @@
       "intent": {
         "max_total_twd": 1000,
         "delivery_days_max": 7,
-        "required_features": ["wireless", "silent_click"],
-        "preferences": ["price_first"],
+        "required_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "preferences": [
+          "price_first"
+        ],
         "required_color": "black",
         "preferred_shape": "symmetrical",
         "bundle_mode": "related_no_extra_cost"
       },
-      "runtime_faults": ["seller_b_timeout_both_rounds"],
+      "runtime_faults": [
+        "seller_b_timeout_round_one"
+      ],
       "expected": {
         "request_status": "awaiting_user",
-        "seller_statuses": {"seller_a": "offered", "seller_b": "timeout", "seller_c": "offered"},
-        "eligible_offer_ids": ["offer_a_r2", "offer_c_standalone_r2", "offer_c_bundle_r2"],
-        "recommended_offer_id": "offer_a_r2",
+        "seller_statuses": {
+          "seller_a": "offered",
+          "seller_b": "timeout",
+          "seller_c": "offered",
+          "seller_d": "offered",
+          "seller_e": "offered"
+        },
+        "eligible_offer_ids": [
+          "offer_a_r5",
+          "offer_c_standalone_r5",
+          "offer_c_bundle_r5",
+          "offer_d_r3",
+          "offer_e_r1"
+        ],
+        "recommended_offer_id": "offer_a_r5",
         "reason_codes": []
       }
     },
@@ -157,18 +279,37 @@
       "intent": {
         "max_total_twd": 1000,
         "delivery_days_max": 7,
-        "required_features": ["wireless", "silent_click"],
-        "preferences": ["price_first"],
+        "required_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "preferences": [
+          "price_first"
+        ],
         "required_color": "black",
         "preferred_shape": "symmetrical",
         "bundle_mode": "related_no_extra_cost"
       },
-      "runtime_faults": ["seller_c_round_two_refused"],
+      "runtime_faults": [
+        "seller_c_round_two_refused"
+      ],
       "expected": {
         "request_status": "awaiting_user",
-        "seller_statuses": {"seller_a": "offered", "seller_b": "offered", "seller_c": "refused"},
-        "eligible_offer_ids": ["offer_a_r2", "offer_b_r2", "offer_c_r1"],
-        "recommended_offer_id": "offer_a_r2",
+        "seller_statuses": {
+          "seller_a": "offered",
+          "seller_b": "offered",
+          "seller_c": "refused",
+          "seller_d": "offered",
+          "seller_e": "offered"
+        },
+        "eligible_offer_ids": [
+          "offer_a_r5",
+          "offer_b_r5",
+          "offer_c_r1",
+          "offer_d_r3",
+          "offer_e_r1"
+        ],
+        "recommended_offer_id": "offer_a_r5",
         "reason_codes": []
       }
     },
@@ -178,19 +319,34 @@
       "intent": {
         "max_total_twd": 1000,
         "delivery_days_max": 7,
-        "required_features": ["wireless", "silent_click"],
-        "preferences": ["price_first"],
+        "required_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "preferences": [
+          "price_first"
+        ],
         "required_color": "black",
         "preferred_shape": "symmetrical",
         "bundle_mode": "related_no_extra_cost"
       },
-      "runtime_faults": ["clock_after_all_offer_expiry"],
+      "runtime_faults": [
+        "clock_after_all_offer_expiry"
+      ],
       "expected": {
         "request_status": "no_match",
-        "seller_statuses": {"seller_a": "offered", "seller_b": "offered", "seller_c": "offered"},
+        "seller_statuses": {
+          "seller_a": "offered",
+          "seller_b": "offered",
+          "seller_c": "offered",
+          "seller_d": "offered",
+          "seller_e": "offered"
+        },
         "eligible_offer_ids": [],
         "recommended_offer_id": null,
-        "reason_codes": ["expired"]
+        "reason_codes": [
+          "expired"
+        ]
       }
     },
     {
@@ -199,19 +355,41 @@
       "intent": {
         "max_total_twd": 1000,
         "delivery_days_max": 7,
-        "required_features": ["wireless", "silent_click"],
-        "preferences": ["price_first"],
+        "required_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "preferences": [
+          "price_first"
+        ],
         "required_color": "black",
         "preferred_shape": "symmetrical",
         "bundle_mode": "related_no_extra_cost"
       },
-      "runtime_faults": ["evaluator_invents_offer_id"],
+      "runtime_faults": [
+        "evaluator_invents_offer_id"
+      ],
       "expected": {
         "request_status": "awaiting_user",
-        "seller_statuses": {"seller_a": "offered", "seller_b": "offered", "seller_c": "offered"},
-        "eligible_offer_ids": ["offer_a_r2", "offer_b_r2", "offer_c_standalone_r2", "offer_c_bundle_r2"],
-        "recommended_offer_id": "offer_a_r2",
-        "reason_codes": ["invalid_offer"]
+        "seller_statuses": {
+          "seller_a": "offered",
+          "seller_b": "offered",
+          "seller_c": "offered",
+          "seller_d": "offered",
+          "seller_e": "offered"
+        },
+        "eligible_offer_ids": [
+          "offer_a_r5",
+          "offer_b_r5",
+          "offer_c_standalone_r5",
+          "offer_c_bundle_r5",
+          "offer_d_r3",
+          "offer_e_r1"
+        ],
+        "recommended_offer_id": "offer_a_r5",
+        "reason_codes": [
+          "invalid_offer"
+        ]
       }
     }
   ]

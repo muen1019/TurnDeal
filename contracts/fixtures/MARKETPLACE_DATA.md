@@ -36,3 +36,5 @@
 | Logitech 官方 | 尺寸、外型、連線與 SilentTouch 規格 | 規格佐證，不提供 Seller 商務條件 |
 
 完整 URL、價格與新鮮度在 `marketplace-source-snapshot.json`。下一次更新公開資料時，先新增快照，再調整 `sellers.json`，最後執行 `npm test`。
+
+Seller D／E 沿用既有 M240 的公開商品來源，分別使用獨立的模擬價格、交期、信任與提前 final 策略；新增 Seller 不代表新增真實商家或重新擷取公開價格。

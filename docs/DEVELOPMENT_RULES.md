@@ -1,16 +1,16 @@
-# 開發與驗收基準 v0.1
+# 開發與驗收基準 v0.2
 
 本文件將主辦方簡報、產品提案與團隊分工整理成可執行的工程規則。後續開發與驗收均以此文件及 `contracts/` 為準。
 
-新版目標設計已整理於 [SYSTEM_DESIGN.md](SYSTEM_DESIGN.md)。它規劃十輪議價、共享競爭資訊、Swipe 決策與長期偏好，但尚未取代本文件的 v0.1 規則；完整契約差異與 Evaluator fallback 的待決事項見該文件開頭。正式遷移時須依下方契約變更流程同步更新驗收與共同規則。
+新版目標設計已整理於 [SYSTEM_DESIGN.md](SYSTEM_DESIGN.md)。五家 Seller 各派一個 Buyer Agent、最多五輪議價與提前停止已遷移至 v0.2 契約及測資。共享競爭資訊、Swipe 決策與長期偏好仍屬目標設計；完整差異與 Evaluator fallback 的待決事項見該文件開頭。
 
 ## 主辦方評分標準
 
 | 評分面向 | 本專案的開發要求 | 可展示證據 |
 | --- | --- | --- |
-| 問題與解決方案適切性 | 清楚說明買家跨賣家比較與議價的真實成本，以及獨立排序如何降低資訊不對稱 | 一次輸入觸發三家 Seller 並取得可比較 Offer |
+| 問題與解決方案適切性 | 清楚說明買家跨賣家比較與議價的真實成本，以及獨立排序如何降低資訊不對稱 | 一次輸入觸發五家 Seller 並取得可比較 Offer |
 | 開發品質 | 主流程必須可實際運作並穩定重播，錯誤、逾時與 API 失敗均有明確結果 | 自動驗證、固定測資、timeout、fallback、idempotency |
-| 洞察與創新性 | 展示 Buyer 與 Seller Agent 隔離議價、意圖驅動商品探索、廣告與推薦分離 | 私有 RFQ、兩輪議價、Sponsored 不影響 Evaluator |
+| 洞察與創新性 | 展示 Buyer 與 Seller Agent 隔離議價、意圖驅動商品探索、廣告與推薦分離 | 私有 RFQ、最多五輪議價、Sponsored 不影響 Evaluator |
 | 實際應用價值 | Demo 必須呈現受益對象、節省的決策成本與可延伸商業價值 | 價格、交期、贈品與信任的可解釋 trade-off |
 | 開發方向契合度 | 至少充分體現「自主且具適應能力的 AI」或「AI 原生產品與營運」 | 自動格式化、編排、平行議價、獨立評估、回饋迴圈 |
 | Codex 應用深度 | 使用 Codex 產出與驗證契約、測資、程式、測試、文件及整合紀錄 | Git commit、PR、測試輸出與開發日誌 |
@@ -27,9 +27,9 @@
 ## MVP 範圍
 
 - 商品：滑鼠與滑鼠墊。
-- Seller：三家固定虛擬商家，資料與策略可重現。
+- Seller：五家固定虛擬商家，資料與策略可重現；Orchestrator 取自然排序前五家合格 Seller，不足則用實際數量，不放寬硬條件。每家建立一個 Buyer Agent，退出後不補派。
 - 流程：Request、Format、Orchestrate、Negotiate、Evaluate、Result 或 Feedback。
-- 議價：每家最多兩輪，單次 Seller 呼叫 timeout 預設 3 秒，整體議價 deadline 預設 8 秒。
+- 議價：每家最多五輪，同輪 active branches 平行、輪間同步；final／refuse／timeout／error 只停止該分支，其餘繼續。round timeout、整體 deadline 與呼叫／token 預算須在 Backend 啟動 Request 時固定；具體值待實測，不沿用舊版 8 秒作為五輪完成承諾。
 - 儲存：單一常駐 Backend 與 SQLite；不引入 Redis、訊息佇列或微服務。
 - 交易：採用後以 immutable `offer_id` 在期限內完成虛擬兌換。真實付款、ACP 與廣告計費不在本版範圍。
 
@@ -64,13 +64,13 @@ HTTP API 固定為：
 | Owner | 交付物 | 驗收條件 |
 | --- | --- | --- |
 | Tech Lead | schema、Formatter、Orchestrator、Backend、整合與部署 | 輸入需求後可取得合格 Seller 清單並啟動議價 |
-| Negotiation | 三家 Seller 資料、私有策略、兩輪議價與 Offer 草稿 | 相同輸入穩定產生三條明顯不同的議價軌跡 |
+| Negotiation | 五家 Seller 資料、私有策略、最多五輪議價與 Offer 草稿 | 相同輸入穩定產生五條明顯不同的議價軌跡 |
 | Evaluator | Structured Outputs、Validator、推薦原因與 fallback | 不可能發布不存在、過期或違反硬限制的 ID |
-| UI | 單頁 Demo、狀態、兩輪變化、Sponsored、推薦與模擬確認 | 新觀眾 30 秒內理解多賣家議價與獨立推薦 |
+| UI | 單頁 Demo、狀態、最多五輪變化、Sponsored、推薦與模擬確認 | 新觀眾 30 秒內理解多賣家議價與獨立推薦 |
 
 ## 契約變更流程
 
-- v0.1 開發期間，新增 optional 消費端能力可在不破壞既有 fixture 的前提下加入。
+- v0.2 開發期間，新增 optional 消費端能力可在不破壞既有 fixture 的前提下加入。
 - 欄位改名、刪除、型別變更、enum 收窄或狀態語意改變屬 breaking change，必須升版並同步更新所有 owner。
 - Schema、fixture、驗證器必須在同一個 PR 變更。
 - Merge 前執行 `npm run test:contracts`。
