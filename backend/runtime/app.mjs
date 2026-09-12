@@ -26,7 +26,7 @@ export function createRuntimeApp({buyerId=()=> 'demo_buyer',autoProcess=true,pur
   app.get('/api/buyer-profile',(req,res,next)=>{try{res.json({profile:store.buyerProfile(buyerId(req))});}catch(e){next(e);}});
   app.post('/api/buyer-profile',(req,res,next)=>{try{
     const body=validate('BuyerProfile',req.body),buyer=buyerId(req);
-    if(/(?:\d[ -]?){13,19}/.test(body.name+' '+body.shipping_address))throw new HttpError(400,'sensitive_payment_data','請勿輸入卡號或金融帳號；本頁只設定付款方式。');
+    if([body.name,body.shipping_address,...Object.values(body.shipping_details??{})].some(value=>/(?:\d[ -]?){13,19}/.test(value)))throw new HttpError(400,'sensitive_payment_data','請勿輸入卡號或金融帳號；本頁只設定付款方式。');
     const result=store.idempotent(buyer,'POST','/api/buyer-profile',req.header('Idempotency-Key'),body,()=>store.saveBuyerProfile(buyer,body));
     res.status(result.status).json(result.body);
   }catch(e){next(e);}});

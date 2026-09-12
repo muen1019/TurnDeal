@@ -1,6 +1,7 @@
 {
   "name": "Demo Buyer",
   "shipping_address": "示範城市・測試路 1 號（非真實地址）",
+  "shipping_details": {"email":"buyer@example.test","city":"台北市","state":"中正區","postal_code":"100","country":"TW"},
   "payment_method": "later",
   "weights": {"price": 45, "delivery": 20, "trust": 20, "color": 15},
   "colors": ["black", "blue"]

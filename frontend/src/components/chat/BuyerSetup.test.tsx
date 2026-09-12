@@ -4,11 +4,21 @@ import {BuyerSetup,defaultBuyerProfile} from './BuyerSetup';
 import type {BuyerProfile} from '../../contract.generated';
 afterEach(cleanup);
 const props=()=>({initial:null,onSave:vi.fn(async(_p:BuyerProfile)=>true),busy:false,error:'',uncertain:false,onRetry:vi.fn(),onReload:vi.fn()});
+const shipping={email:'buyer@example.test',city:'台北市',state:'中正區',postal_code:'100',country:'TW' as const};
+function fillShipping(){for(const [label,value] of [['電子郵件',shipping.email],['城市／縣市',shipping.city],['區域',shipping.state],['郵遞區號',shipping.postal_code]])fireEvent.change(screen.getByRole('textbox',{name:label}),{target:{value}});}
+it('asks legacy profiles to complete shipping before continuing',()=>{
+ const p=props();render(<BuyerSetup {...p} initial={{...defaultBuyerProfile,name:'Demo Buyer'}}/>);
+ fireEvent.click(screen.getByRole('button',{name:/下一步/}));
+ expect(screen.getByRole('alert')).toHaveTextContent('請填妥收件');
+ expect(screen.queryAllByRole('slider')).toHaveLength(0);
+ expect(p.onSave).not.toHaveBeenCalled();
+});
 it('collects basic details then four explicit weights and colors; never asks for card credentials',async()=>{
  const p=props();render(<BuyerSetup {...p}/>);
  expect(screen.getByRole('button',{name:/下一步/})).toBeDisabled();
  fireEvent.change(screen.getByRole('textbox',{name:/名稱/}),{target:{value:'Demo Buyer'}});
  fireEvent.change(screen.getByRole('textbox',{name:/運送地址/}),{target:{value:'示範地址'}});
+ fillShipping();
  fireEvent.click(screen.getByRole('button',{name:/下一步/}));
  expect(screen.getAllByRole('slider')).toHaveLength(4);expect(p.onSave).not.toHaveBeenCalled();
  fireEvent.change(screen.getByRole('slider',{name:/價格/}),{target:{value:'80'}});
@@ -18,7 +28,7 @@ it('collects basic details then four explicit weights and colors; never asks for
  expect(p.onSave.mock.calls[0][0]).toMatchObject({name:'Demo Buyer',shipping_address:'示範地址',payment_method:'later',colors:['blue'],weights:{price:80}});
 });
 it('guards sensitive input and requires active weights; back retains the draft',()=>{
- const p=props();render(<BuyerSetup {...p} initial={{...defaultBuyerProfile,name:'Demo Buyer'}}/>);
+ const p=props();render(<BuyerSetup {...p} initial={{...defaultBuyerProfile,name:'Demo Buyer',shipping_address:'測試路 1 號',shipping_details:shipping}}/>);
  fireEvent.click(screen.getByRole('button',{name:/下一步/}));
  for(const slider of screen.getAllByRole('slider'))fireEvent.change(slider,{target:{value:'0'}});
  fireEvent.click(screen.getByRole('button',{name:/儲存並開始/}));expect(p.onSave).not.toHaveBeenCalled();expect(screen.getByRole('alert')).toHaveTextContent('至少提高');

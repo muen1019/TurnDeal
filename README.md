@@ -1,5 +1,14 @@
 # TurnDeal
 
+## 手機 Demo（可跑測試結帳）
+
+安裝完成後執行 `npm run dev:mobile`，手機連同一個 Wi-Fi，開啟終端顯示的 `http://電腦IP:5174/chat`。
+基本資料 → 偏好 → 輸入需求 → 選商品 → 確認收件資料 → 測試購買完成。
+不需要 API key；使用離線規則／模擬議價與付款，不扣款、不出貨。
+每個瀏覽器使用獨立 Demo 身分，SQLite 在記憶體中，停止後清空；不讀取原本的 `data/app.sqlite`。只在可信任 Wi-Fi 使用，收件資料請填虛構資料，不是正式登入或付款系統。
+
+[手機操作截圖（10 張）](docs/screenshots/mobile/README.md) · [運送資料規格](docs/BUYER_SETUP.md)
+
 ## 最簡單啟動（Windows）
 
 先安裝 **Node.js 24 以上**。在專案根目錄開啟 PowerShell。
