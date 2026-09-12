@@ -1154,6 +1154,65 @@
           }
         }
       }
+    },
+    "/api/requests/{request_id}/improvement/clarifications": {
+      "post": {
+        "operationId": "clarifyImprovement",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/ImprovementClarification"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "One immutable clarification job queued.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/ImprovementClarificationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Not found for this buyer"
+          },
+          "409": {
+            "description": "State or idempotency conflict"
+          },
+          "500": {
+            "description": "Uncertain outcome; retry original key"
+          }
+        }
+      }
     }
   },
   "components": {

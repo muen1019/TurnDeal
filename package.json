@@ -12,7 +12,7 @@
     "test:runtime": "node --test tests/runtime.test.mjs tests/purchase.test.mjs",
     "test:purchase": "node --test tests/purchase.test.mjs",
     "test": "npm run test:contracts && npm run test:db && npm run test:orchestrator && npm run test:seller-policies && npm run test:unit && npm run test:negotiation && npm run test:evaluator && npm run test:formatter && npm run test:runtime && npm run test:improver",
-    "test:improver": "npm --prefix backend run test:improver && npm --prefix backend run build && node --test tests/improver-runtime.test.mjs tests/improver-selection.test.mjs",
+    "test:improver": "npm --prefix backend run test:improver && npm --prefix backend run build && node --test tests/improver-runtime.test.mjs tests/improver-selection.test.mjs tests/improver-followup.test.mjs",
     "demo:improver": "npm --prefix backend run build && node backend/runtime/demo-improver.mjs",
     "demo:improver:live": "npm --prefix backend run build && node backend/runtime/demo-improver.mjs --live",
     "test:formatter": "node --test tests/formatter.test.ts tests/formatter-llm.test.ts tests/document-semantics.test.ts",

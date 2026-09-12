@@ -9,7 +9,7 @@
 
 - intent 是本次商品需求，每個成功處理的 job 保存一個 ready revision 或待澄清 draft。舊 Request documents、Offer 與 decision 不改動。
 - preference 是使用者全域文件；只有明確長期原話才允許 patch。只拒絕、重複左滑或「這次」偏好都不能學成長期偏好。
-- SQLite 保存固定輸入、工作 lease、模型次數、文件版本、偏好快照與 patch 稽核。單 parent 去重；工作中斷可恢復，失效 worker 不能提交。
+- SQLite 保存固定輸入、工作 lease、模型次數、文件版本、偏好快照與 patch 稽核。每 parent 一個初始 job，澄清建立不可變 successor；工作中斷可恢復，失效 worker 不能提交。
 - 無模型、逾時或不合法輸出走固定模板，保存 needs_clarification 草稿，不把 fallback 包裝成 LLM 成功。
 
 實作位於 backend/src/improver/，新增 migration 為 db/migrations/004_buyer_request_improver.sql。Backend 使用原本單一常駐 SQLite writer，不新增外部服務。
@@ -72,13 +72,14 @@ const completed = await improver.run(buyerId, job.improvement_id);
 
 ## 前端與恢復
 
-最後一張左滑會自動提交全部拒絕；部分左滑保留在分頁，右滑時隨接受提交。沿用原 pending journal 與 idempotency key 恢復未知結果。GET /api/requests/{request_id}/improvement 提供 buyer-scoped 狀態與公開結果；前端顯示 queued/running、ready/draft、澄清問題與偏好是否更新。服務每五秒恢復既有 queued 或 lease 到期的工作，不自動重處理歷史決策。舊 legacy server 與 Result mock 不提供完整 Improver workflow。
+前端整合時，最後一張左滑應提交全部拒絕；部分左滑保留在分頁，右滑時隨接受提交。需沿用 pending journal 與 idempotency key 恢復未知結果。GET /api/requests/{request_id}/improvement 提供 buyer-scoped 狀態與公開結果；前端需串接 queued/running、ready/draft、澄清問題與偏好是否更新的顯示，本 PR 不包含 UI。服務每五秒恢復既有 queued 或 lease 到期的工作，不自動重處理歷史決策。舊 legacy server 與 Result mock 不提供完整 Improver workflow。
 
 ## 尚未整合
 
 以下工作尚未接入：
 
 - 全域 preference 編輯器與既有 user_preferences 的投影／同步契約。新 improver_global_preferences 版本庫尚未取代 Formatter 原有 user_preferences 讀取。
-- ready 結果自動建立 child、跨輪交接及澄清後重新提交。
 
-目前結果文件中的 preference 是固定版本的完整 Markdown；未來 child adapter 必須依表示層投影已管理條目並保留 snapshot，不能直接把帶標記的 Markdown 丟給只理解有限文字的 Formatter。不得宣稱目前前端已自動重跑下一輪。
+後端 ready 自動建立 child、跨輪交接及澄清後重新提交已實作。API、重送與前端串接步驟見 [後端整合指南](IMPROVER_BACKEND_INTEGRATION.md)。
+
+目前結果文件中的 preference 是固定版本的完整 Markdown；child adapter 已依表示層投影已管理條目並凍結 Formatter 結果，保留固定快照。前端仍需串接 API 與下一輪連結。

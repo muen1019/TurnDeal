@@ -1396,7 +1396,14 @@
           "$ref": "#/$defs/Id"
         },
         "parent_request_id": {
-          "type": "null"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Id"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "status": {
           "$ref": "#/$defs/Status"
@@ -1702,11 +1709,32 @@
           }
         },
         {
-          "properties": {
-            "documents": {
-              "properties": {
-                "revision": {
-                  "const": 1
+          "if": {
+            "properties": {
+              "parent_request_id": {
+                "type": "null"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "documents": {
+                "properties": {
+                  "revision": {
+                    "const": 1
+                  }
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "documents": {
+                "properties": {
+                  "revision": {
+                    "type": "integer",
+                    "minimum": 2
+                  }
                 }
               }
             }
@@ -4093,6 +4121,28 @@
                   "additionalProperties": false
                 }
               ]
+            },
+            "next_request_id": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/Id"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "workflow_error": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "can_clarify": {
+              "type": "boolean"
+            },
+            "workflow_enabled": {
+              "type": "boolean"
             }
           },
           "required": [
@@ -4101,11 +4151,55 @@
             "mode",
             "status",
             "error",
-            "result"
+            "result",
+            "next_request_id",
+            "workflow_error",
+            "can_clarify",
+            "workflow_enabled"
           ],
           "additionalProperties": false
         }
       ]
+    },
+    "ImprovementClarification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "improvement_id",
+        "feedback"
+      ],
+      "properties": {
+        "improvement_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "feedback": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "pattern": "\\S"
+        }
+      }
+    },
+    "ImprovementClarificationResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "improvement_id",
+        "status"
+      ],
+      "properties": {
+        "request_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "improvement_id": {
+          "$ref": "#/$defs/Id"
+        },
+        "status": {
+          "type": "string",
+          "const": "queued"
+        }
+      }
     }
   }
 }
