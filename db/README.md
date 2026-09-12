@@ -1,3 +1,9 @@
+# Result v0.3 migration
+
+目前 API 已使用 main 的表格與 001/002/003 migrations。003_result_decisions.sql 保留原 published_snapshot_json，新增可恢復的 result_state_json／contract_version／decisions.result_json；reject 保存 feedback 與原文件，不建立 child。過去 child／redemption 欄位保留歷史用途，不代表 API 會呼叫它們。API 自動備份並遷移舊 Result 檔案；CLI 的 db:rebuild 仍會明確重建 demo，不能用來遷移使用中資料。
+
+以下完整資料模型中的長期偏好／feedback_events／兌換是後續整合，現行略過只在前端保存。
+
 # OfferMesh SQLite
 
 SQLite 是 Backend 的唯一持久狀態來源。Agent 可以理解拒絕原因並提出 preference update，但只有 Backend 驗證後寫入這個資料庫的內容才有效。

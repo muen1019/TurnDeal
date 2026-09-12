@@ -1,0 +1,10 @@
+import {describe,it,expect,vi,afterEach} from 'vitest';
+import fixture from '../../../contracts/fixtures/result-v0.3.json';
+import {composeRequest,validateSnapshot,request,ApiFailure} from './client';
+describe('shared contract boundary',()=>{
+ it('accepts the published fixture without editing its prices or expiry',()=>{const s=structuredClone(fixture.snapshot);expect(validateSnapshot(s)).toEqual(s);});
+ it.each(['missing-seller','missing-offer','duplicate-rank','missing-rank','invalid-price'])('blocks %s instead of inventing data',(kind)=>{const s=structuredClone(fixture.snapshot);if(kind==='missing-seller')s.seller_agents=[];if(kind==='missing-offer')s.ranked_offers[0].offer_id='unknown';if(kind==='duplicate-rank')s.ranked_offers[1].rank=1;if(kind==='missing-rank')s.ranked_offers.pop();if(kind==='invalid-price')s.offers[0].total_price_twd=-1;expect(()=>validateSnapshot(s)).toThrow();});
+ it('composes only saved definitions and the explicit requirement',()=>{expect(composeRequest('# 我的意圖','不要付費配件','  滑鼠預算900  ')).toEqual({intent_md:'# 我的意圖\n\n## 本次購買需求\n滑鼠預算900',preference_md:'不要付費配件'});});
+ it('counts Unicode code points and validates the composed document',()=>{expect(()=>composeRequest('意圖','','😀'.repeat(2000))).not.toThrow();expect(()=>composeRequest('意圖','','😀'.repeat(2001))).toThrow();expect(()=>composeRequest('字'.repeat(20000),'','需求')).toThrow();expect(()=>composeRequest('','','需求')).toThrow();});
+});
+describe('transport errors',()=>{afterEach(()=>vi.unstubAllGlobals());it('does not turn an HTTP failure into a successful response',async()=>{vi.stubGlobal('fetch',vi.fn().mockResolvedValue(new Response(JSON.stringify({error:{code:'expired',message:'方案已到期',fields:[]}}),{status:410})));await expect(request('/api/requests/x')).rejects.toMatchObject({status:410,code:'expired'});});it('keeps network uncertainty distinct from validation failure',async()=>{vi.stubGlobal('fetch',vi.fn().mockRejectedValue(new TypeError('offline')));await expect(request('/api/requests/x')).rejects.toBeInstanceOf(ApiFailure);await expect(request('/api/requests/x')).rejects.toMatchObject({status:0,code:'network_error'});});});

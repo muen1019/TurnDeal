@@ -93,7 +93,7 @@ export async function evaluate({ db, requestId, buyerId, apiKey = '', model = 'g
         seller_agents: negotiation.seller_agents.map(s => ({ ...copy(s), final_offer_ids: s.final_offer_ids.filter(id => offers.some(o => o.offer_id === id)) })),
         discovery_exclusions: copy(source.orchestration.discovery_exclusions), sponsored_placement: copy(source.orchestration.sponsored_placement),
         offers, ranked_offers: ranked.output.ranked_offers, confirmation_offer_ids: confirmationIds, selected_offer_id: null,
-        next_request_id: null, error: status === 'no_match' ? { code: 'no_eligible_offers', message: '目前沒有可推薦的有效方案。', fields: [] } : null,
+        next_request_id: null, decision: null, error: status === 'no_match' ? { code: 'no_eligible_offers', message: '目前沒有可推薦的有效方案。', fields: [] } : null,
       });
       const result = { request_id: requestId, status, provider: ranked.provider, model: apiKey ? model : null,
         fallback_reason: ranked.fallback_reason, usage: ranked.usage, evaluated_at: new Date(now()).toISOString(),

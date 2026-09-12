@@ -33,7 +33,8 @@
       "confirmation_offer_ids": [],
       "selected_offer_id": null,
       "next_request_id": null,
-      "error": null
+      "error": null,
+      "decision": null
     }
   },
   "get_request": {
@@ -80,42 +81,17 @@
       "action": "reject",
       "feedback": "不要滑鼠墊，預算改成含稅運 900 元，仍需七天內到貨。"
     },
-    "expected_status_code": 202,
+    "expected_status_code": 200,
     "response": {
       "action": "reject",
       "request_id": "req_demo_001",
-      "status": "superseded",
-      "next_request_id": "req_demo_002",
-      "documents": {
-        "revision": 2,
-        "intent_md": "# 購買需求\n無線靜音滑鼠，含稅運 900 元內，7 天內到貨。",
-        "preference_md": "# 偏好\n只接受黑色，偏好小尺寸及左右對稱。價格優先，不接受配件搭售。"
+      "status": "rejected",
+      "feedback": "不要滑鼠墊，預算改成含稅運 900 元，仍需七天內到貨。",
+      "source_documents": {
+        "revision": 1,
+        "intent_md": "# 購買需求\n無線靜音滑鼠，含稅運 1000 元內，7 天內到貨。",
+        "preference_md": "# 偏好\n只接受黑色，偏好小尺寸及左右對稱。價格優先，可接受不加價且可拒絕的滑鼠墊。"
       }
-    }
-  },
-  "redeem": {
-    "http": {
-      "method": "POST",
-      "path": "/api/redemptions",
-      "headers": {
-        "Content-Type": "application/json",
-        "Idempotency-Key": "demo-redeem-001"
-      }
-    },
-    "body": {
-      "request_id": "req_demo_001",
-      "offer_id": "offer_a_r5"
-    },
-    "expected_status_code": 201,
-    "response": {
-      "redemption_id": "red_demo_001",
-      "request_id": "req_demo_001",
-      "offer_id": "offer_a_r5",
-      "seller_id": "seller_a",
-      "status": "redeemed",
-      "mode": "virtual_market",
-      "total_price_twd": 549,
-      "redeemed_at": "2026-09-12T10:05:00+08:00"
     }
   }
 }
