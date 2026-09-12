@@ -1,0 +1,23 @@
+import {fireEvent,render,screen,cleanup} from '@testing-library/react';
+import {afterEach,expect,it,vi} from 'vitest';
+import {FeedbackForm} from './FeedbackForm';
+afterEach(cleanup);
+it('retains feedback verbatim, including oversized pasted text, while validating submission',()=>{
+ const onChange=vi.fn(),onSubmit=vi.fn(),onCancel=vi.fn();
+ const props={value:'',onChange,onSubmit,onCancel};
+ const {rerender}=render(<FeedbackForm {...props}/>);
+ expect(screen.getByRole('button',{name:'送出回饋'})).toBeDisabled();
+ const oversized='😀'.repeat(2001);
+ fireEvent.change(screen.getByRole('textbox'),{target:{value:oversized}});
+ expect(onChange).toHaveBeenCalledWith(oversized);
+ rerender(<FeedbackForm {...props} value={oversized}/>);
+ expect(screen.getByRole('button',{name:'送出回饋'})).toBeDisabled();
+ const valid='😀'.repeat(1998)+'  ';
+ rerender(<FeedbackForm {...props} value={valid}/>);
+ fireEvent.click(screen.getByRole('button',{name:'送出回饋'}));
+ expect(onSubmit).toHaveBeenCalledExactlyOnceWith(valid);
+ rerender(<FeedbackForm {...props} value={valid} fieldMessage="請修正內容"/>);
+ expect(screen.getByRole('textbox')).toHaveValue(valid);
+ fireEvent.click(screen.getByRole('button',{name:'取消'}));
+ expect(onCancel).toHaveBeenCalledOnce();
+});
