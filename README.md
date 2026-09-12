@@ -2,13 +2,13 @@
 
 > Many sellers. One best deal.
 
-OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commerce MVP。使用者描述商品、預算與交期後，Buyer Agent 會將需求正規化，同時向三家互相隔離的 Seller 議價，再由獨立 Evaluator 排序通過硬限制的方案。Sponsored 曝光與推薦完全分離，最後仍由使用者決定是否採用與兌換。
+OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commerce MVP。使用者描述商品、預算與交期後，Buyer Agent 會將需求正規化，同時向五家互相隔離的 Seller 議價，再由獨立 Evaluator 排序通過硬限制的方案。Sponsored 曝光與推薦完全分離，最後仍由使用者決定是否採用與兌換。
 
 ## Demo 主線
 
 1. 解析自然語言中的硬性條件與偏好。
-2. 找出三家策略不同的 Seller，其中一家顯示 Sponsored。
-3. 平行進行兩輪議價並產生不可變的 Offer ID。
+2. 找出五家策略不同的 Seller，其中一家顯示 Sponsored。
+3. 平行進行最多五輪議價並產生不可變的 Offer ID。
 4. Backend 排除超預算、錯誤規格、錯誤交期或過期報價。
 5. Evaluator 排序全部合格方案並解釋取捨。
 6. 使用者確認後，以相同 Offer ID 進行限時虛擬兌換。
@@ -20,6 +20,8 @@ OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commer
 - Seller A：最低價格，交期較慢。
 - Seller B：價格較高，最快到貨。
 - Seller C：價格居中，可提供免費且可拒絕的滑鼠墊。
+- Seller D：價格與交期均衡，第三輪宣告 final。
+- Seller E：固定價格，第一輪宣告 final。
 - Backend：驗證預算、交期、商品、搭售授權、期限與 `offer_id`。
 - Evaluator：只排序 Backend 已確認 eligible 的 Offer，不接收廣告資訊，也不替使用者下單。
 
@@ -36,18 +38,18 @@ OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commer
 .
 ├─ AGENTS.md                         Codex 與開發者必須遵守的專案規則
 ├─ docs/
-│  ├─ DEVELOPMENT_RULES.md           現行 v0.1 黑客松標準與驗收條件
+│  ├─ DEVELOPMENT_RULES.md           現行 v0.2 黑客松標準與驗收條件
 │  ├─ SYSTEM_DESIGN.md               目標系統設計、API 草案與契約遷移差異
 │  └─ REFERENCE.md                   設計原文的參考來源待補清單
 ├─ contracts/
-│  ├─ a2a-commerce.v0.1.schema.json  共用 JSON Schema
+│  ├─ a2a-commerce.v0.2.schema.json  共用 JSON Schema
 │  ├─ openai/                        Evaluator Structured Outputs schema
 │  └─ fixtures/                      Seller、成功流程、邊界與 API 測資
 ├─ db/
 │  ├─ migrations/                    SQLite schema 與版本
 │  └─ README.md                      資料分區與初始化說明
 ├─ scripts/
-│  ├─ validate-contracts.mjs         無第三方相依的契約驗證器
+│  ├─ validate-contracts.mjs         JSON Schema 與跨物件契約驗證器
 │  └─ db.mjs                         SQLite migration、seed 與完整性檢查
 └─ package.json                      共用測試指令
 ```
@@ -57,10 +59,10 @@ OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commer
 - [目標 System Design 與 repo 整合狀態](docs/SYSTEM_DESIGN.md)
 - [開發與驗收基準](docs/DEVELOPMENT_RULES.md)
 - [共用契約說明](contracts/README.md)
-- [JSON Schema](contracts/a2a-commerce.v0.1.schema.json)
+- [JSON Schema](contracts/a2a-commerce.v0.2.schema.json)
 - [Codex／專案共同規則](AGENTS.md)
 - [Evaluator Structured Outputs schema](contracts/openai/evaluator-output.schema.json)
-- [三家 Seller 測資](contracts/fixtures/sellers.json)
+- [五家 Seller 測資](contracts/fixtures/sellers.json)
 - [Marketplace 公開資料快照](contracts/fixtures/marketplace-source-snapshot.json)
 - [Marketplace 測資來源政策](contracts/fixtures/MARKETPLACE_DATA.md)
 - [完整成功情境](contracts/fixtures/happy-path.json)
@@ -69,18 +71,18 @@ OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commer
 - [API request/response 範例](contracts/fixtures/api-examples.json)
 - [SQLite schema 與操作說明](db/README.md)
 
-`contracts/a2a-commerce.v0.1.schema.json` 是跨模組唯一資料契約。任何欄位改名、刪除、型別變更、enum 收窄或狀態語意改變，都必須先討論並升版，不能由單一模組自行修改。
+`contracts/a2a-commerce.v0.2.schema.json` 是跨模組唯一資料契約。任何欄位改名、刪除、型別變更、enum 收窄或狀態語意改變，都必須先討論並升版，不能由單一模組自行修改。
 
-`docs/SYSTEM_DESIGN.md` 已整併 HackMD 的新版目標設計，涵蓋五家 Seller 各派一個 Buyer Agent、最多五輪同步議價、Buyer Shared Context、逐張 Swipe 決策及長期偏好更新。現行 schema、fixtures 與下方 Demo 驗收仍為 v0.1；新版 payload 尚未實作，契約及 fallback 差異列在設計文件開頭。本次文件匯入不表示這些新行為已可執行。
+`docs/SYSTEM_DESIGN.md` 已整併 HackMD 的新版目標設計，涵蓋五家 Seller 各派一個 Buyer Agent、最多五輪同步議價、Buyer Shared Context、逐張 Swipe 決策及長期偏好更新。v0.2 已遷移五家 Seller、五輪上限、明確 final／停止原因，以及相關 fixtures、驗證器與 SQLite。Shared Context、逐張 Swipe 與長期偏好等仍待契約升版；完整 Backend pipeline 與同步排程器尚未實作，差異列在設計文件開頭。
 
 ## 團隊分工與交付
 
 | Owner | 建議 branch | 主要交付 | 依賴／輸出契約 |
 | --- | --- | --- | --- |
 | Tech Lead／整合 | `feat/backend-orchestrator` | Formatter、Orchestrator、Backend API、SQLite、狀態機、整合與部署 | 產生 `NormalizedIntent`、`OrchestrationResult`、`RequestSnapshot` |
-| Negotiation／Seller | `feat/negotiation-sellers` | 三家 Seller、Catalog、底價策略、兩輪議價、timeout、拒絕與 Bundle | 接收 `SellerRFQ`，回傳 `SellerNegotiationResult` |
+| Negotiation／Seller | `feat/negotiation-sellers` | 五家 Seller、Catalog、底價策略、最多五輪議價、timeout、拒絕與 Bundle | 接收 `SellerRFQ`，回傳 `SellerNegotiationResult` |
 | Evaluator／安全 | `feat/evaluator-safety` | Structured Outputs、硬限制複驗、排序驗證、理由、trade-off 與 fallback | 接收 `EvaluatorInput`，回傳 `EvaluatorOutput` |
-| UI／產品展示 | `feat/demo-ui` | 單頁 Demo、Seller 狀態、兩輪變化、Sponsored、推薦、替代方案與模擬確認 | 只依賴 `RequestSnapshot` 與 API response |
+| UI／產品展示 | `feat/demo-ui` | 單頁 Demo、Seller 狀態、最多五輪變化、Sponsored、推薦、替代方案與模擬確認 | 只依賴 `RequestSnapshot` 與 API response |
 
 Owner 只負責自己模組的內部實作。跨模組交換資料必須使用 `contracts/` 的格式；不要直接依賴另一個模組的 private class、資料表或未公開欄位。
 
@@ -180,7 +182,7 @@ git push --force-with-lease
 
 合併前至少確認：
 
-1. 相同輸入可重現三家不同的兩輪議價。
+1. 相同輸入可重現五家不同的最多五輪議價。
 2. Seller A 最便宜但較慢，Seller B 最快但較貴，Seller C 提供免費可拒絕的相關配件。
 3. 超預算、錯誤交期、錯誤規格與過期 Offer 不會進入推薦。
 4. Evaluator 無法選到不存在或不合格的 `offer_id`。
@@ -189,19 +191,20 @@ git push --force-with-lease
 
 ## 測試
 
-執行全部現有測試：
+使用 Node.js 24 以上版本，安裝鎖定相依套件後執行全部現有測試：
 
 ```bash
+npm ci
 npm test
 ```
 
-目前會檢查所有 JSON、共用 schema 邊界、三家 Seller 策略、兩輪議價、RFQ 隱私、正式 Offer 引用、硬限制、Sponsored 隔離、Evaluator ID 完整性與 API idempotency 範例。
+目前會檢查所有 JSON、共用 schema 邊界、五家 Seller 策略、最多五輪議價、RFQ 隱私、正式 Offer 引用、硬限制、Sponsored 隔離、Evaluator ID 完整性與 API idempotency 範例。
 
 ## 黑客松期間新增內容
 
 本 repository 為本次黑客松建立。第一版已完成共同開發規則、完整資料契約、OpenAI Structured Outputs 格式、三家 Seller 固定測資、兩輪議價範例、API 範例與無第三方相依的契約驗證器。
 
-已另整併新版目標 System Design 與契約遷移差異；五家 Seller／五輪議價、共享 context、Swipe session 及偏好學習仍是設計規格，未列為已完成功能。
+v0.2 已完成五家 Seller／最多五輪的契約、19 次議價交換與 6 筆最終 Offer 測資、提前 final／失敗停止驗證，以及保留舊資料的 SQLite migration。新增 Ajv／ajv-formats 驗證實際 JSON Schema。共享 context、同步排程器、Swipe session 及偏好學習仍未列為已完成功能。
 
 後續每個 PR 都要更新本節或 PR 說明，讓評審可以辨識黑客松期間完成的工作。
 

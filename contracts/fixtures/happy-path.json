@@ -1,8 +1,8 @@
 {
-  "fixture_version": "0.2",
-  "catalog_fixture_version": "0.2",
+  "fixture_version": "0.3",
+  "catalog_fixture_version": "0.3",
   "source_snapshot_id": "marketplace_snapshot_2026_09_12",
-  "scenario_id": "three_sellers_price_first",
+  "scenario_id": "five_sellers_price_first",
   "now": "2026-09-12T10:00:00+08:00",
   "request": {
     "create_request": {
@@ -18,8 +18,13 @@
       "category": "mouse",
       "max_total_twd": 1000,
       "delivery_days_max": 7,
-      "required_features": ["wireless", "silent_click"],
-      "preferences": ["price_first"],
+      "required_features": [
+        "wireless",
+        "silent_click"
+      ],
+      "preferences": [
+        "price_first"
+      ],
       "product_preferences": [
         {
           "preference_id": "pf_color_black",
@@ -27,7 +32,9 @@
           "source_text": "只接受黑色",
           "attribute": "color",
           "operator": "in",
-          "values": ["black"]
+          "values": [
+            "black"
+          ]
         },
         {
           "preference_id": "pf_size_small",
@@ -35,7 +42,9 @@
           "source_text": "偏好小尺寸",
           "attribute": "size_class",
           "operator": "in",
-          "values": ["small"]
+          "values": [
+            "small"
+          ]
         },
         {
           "preference_id": "pf_shape_symmetrical",
@@ -43,12 +52,16 @@
           "source_text": "偏好左右對稱",
           "attribute": "shape",
           "operator": "in",
-          "values": ["symmetrical"]
+          "values": [
+            "symmetrical"
+          ]
         }
       ],
       "negotiation_policy": {
         "bundle_mode": "related_no_extra_cost",
-        "allowed_addon_categories": ["mouse_pad"],
+        "allowed_addon_categories": [
+          "mouse_pad"
+        ],
         "max_addon_increment_twd": 0
       }
     }
@@ -59,16 +72,47 @@
       "seller_id": "seller_a",
       "round": 1,
       "category": "mouse",
-      "required_features": ["wireless", "silent_click"],
-      "candidate_product_ids": ["mouse_a_black_small"],
+      "required_features": [
+        "wireless",
+        "silent_click"
+      ],
+      "candidate_product_ids": [
+        "mouse_a_black_small"
+      ],
       "product_preferences": [
-        {"preference_id": "pf_color_black", "strength": "required", "attribute": "color", "operator": "in", "values": ["black"]},
-        {"preference_id": "pf_size_small", "strength": "preferred", "attribute": "size_class", "operator": "in", "values": ["small"]},
-        {"preference_id": "pf_shape_symmetrical", "strength": "preferred", "attribute": "shape", "operator": "in", "values": ["symmetrical"]}
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
       ],
       "pending_checks": [],
       "delivery_days_max": 7,
-      "allowed_addon_categories": ["mouse_pad"],
+      "allowed_addon_categories": [
+        "mouse_pad"
+      ],
       "target_total_twd": null,
       "previous_offer_ids": []
     },
@@ -77,34 +121,251 @@
       "seller_id": "seller_a",
       "round": 2,
       "category": "mouse",
-      "required_features": ["wireless", "silent_click"],
-      "candidate_product_ids": ["mouse_a_black_small"],
+      "required_features": [
+        "wireless",
+        "silent_click"
+      ],
+      "candidate_product_ids": [
+        "mouse_a_black_small"
+      ],
       "product_preferences": [
-        {"preference_id": "pf_color_black", "strength": "required", "attribute": "color", "operator": "in", "values": ["black"]},
-        {"preference_id": "pf_size_small", "strength": "preferred", "attribute": "size_class", "operator": "in", "values": ["small"]},
-        {"preference_id": "pf_shape_symmetrical", "strength": "preferred", "attribute": "shape", "operator": "in", "values": ["symmetrical"]}
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
       ],
       "pending_checks": [],
       "delivery_days_max": 7,
-      "allowed_addon_categories": ["mouse_pad"],
+      "allowed_addon_categories": [
+        "mouse_pad"
+      ],
+      "target_total_twd": 584,
+      "previous_offer_ids": [
+        "offer_a_r1"
+      ]
+    },
+    {
+      "request_id": "req_demo_001",
+      "seller_id": "seller_a",
+      "round": 3,
+      "category": "mouse",
+      "required_features": [
+        "wireless",
+        "silent_click"
+      ],
+      "candidate_product_ids": [
+        "mouse_a_black_small"
+      ],
+      "product_preferences": [
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
+      ],
+      "pending_checks": [],
+      "delivery_days_max": 7,
+      "allowed_addon_categories": [
+        "mouse_pad"
+      ],
       "target_total_twd": 569,
-      "previous_offer_ids": ["offer_a_r1"]
+      "previous_offer_ids": [
+        "offer_a_r2"
+      ]
+    },
+    {
+      "request_id": "req_demo_001",
+      "seller_id": "seller_a",
+      "round": 4,
+      "category": "mouse",
+      "required_features": [
+        "wireless",
+        "silent_click"
+      ],
+      "candidate_product_ids": [
+        "mouse_a_black_small"
+      ],
+      "product_preferences": [
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
+      ],
+      "pending_checks": [],
+      "delivery_days_max": 7,
+      "allowed_addon_categories": [
+        "mouse_pad"
+      ],
+      "target_total_twd": 559,
+      "previous_offer_ids": [
+        "offer_a_r3"
+      ]
+    },
+    {
+      "request_id": "req_demo_001",
+      "seller_id": "seller_a",
+      "round": 5,
+      "category": "mouse",
+      "required_features": [
+        "wireless",
+        "silent_click"
+      ],
+      "candidate_product_ids": [
+        "mouse_a_black_small"
+      ],
+      "product_preferences": [
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
+      ],
+      "pending_checks": [],
+      "delivery_days_max": 7,
+      "allowed_addon_categories": [
+        "mouse_pad"
+      ],
+      "target_total_twd": 549,
+      "previous_offer_ids": [
+        "offer_a_r4"
+      ]
     },
     {
       "request_id": "req_demo_001",
       "seller_id": "seller_b",
       "round": 1,
       "category": "mouse",
-      "required_features": ["wireless", "silent_click"],
-      "candidate_product_ids": ["mouse_b_black_small"],
+      "required_features": [
+        "wireless",
+        "silent_click"
+      ],
+      "candidate_product_ids": [
+        "mouse_b_black_small"
+      ],
       "product_preferences": [
-        {"preference_id": "pf_color_black", "strength": "required", "attribute": "color", "operator": "in", "values": ["black"]},
-        {"preference_id": "pf_size_small", "strength": "preferred", "attribute": "size_class", "operator": "in", "values": ["small"]},
-        {"preference_id": "pf_shape_symmetrical", "strength": "preferred", "attribute": "shape", "operator": "in", "values": ["symmetrical"]}
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
       ],
       "pending_checks": [],
       "delivery_days_max": 7,
-      "allowed_addon_categories": ["mouse_pad"],
+      "allowed_addon_categories": [
+        "mouse_pad"
+      ],
       "target_total_twd": null,
       "previous_offer_ids": []
     },
@@ -113,34 +374,251 @@
       "seller_id": "seller_b",
       "round": 2,
       "category": "mouse",
-      "required_features": ["wireless", "silent_click"],
-      "candidate_product_ids": ["mouse_b_black_small"],
+      "required_features": [
+        "wireless",
+        "silent_click"
+      ],
+      "candidate_product_ids": [
+        "mouse_b_black_small"
+      ],
       "product_preferences": [
-        {"preference_id": "pf_color_black", "strength": "required", "attribute": "color", "operator": "in", "values": ["black"]},
-        {"preference_id": "pf_size_small", "strength": "preferred", "attribute": "size_class", "operator": "in", "values": ["small"]},
-        {"preference_id": "pf_shape_symmetrical", "strength": "preferred", "attribute": "shape", "operator": "in", "values": ["symmetrical"]}
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
       ],
       "pending_checks": [],
       "delivery_days_max": 7,
-      "allowed_addon_categories": ["mouse_pad"],
+      "allowed_addon_categories": [
+        "mouse_pad"
+      ],
+      "target_total_twd": 754,
+      "previous_offer_ids": [
+        "offer_b_r1"
+      ]
+    },
+    {
+      "request_id": "req_demo_001",
+      "seller_id": "seller_b",
+      "round": 3,
+      "category": "mouse",
+      "required_features": [
+        "wireless",
+        "silent_click"
+      ],
+      "candidate_product_ids": [
+        "mouse_b_black_small"
+      ],
+      "product_preferences": [
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
+      ],
+      "pending_checks": [],
+      "delivery_days_max": 7,
+      "allowed_addon_categories": [
+        "mouse_pad"
+      ],
+      "target_total_twd": 739,
+      "previous_offer_ids": [
+        "offer_b_r2"
+      ]
+    },
+    {
+      "request_id": "req_demo_001",
+      "seller_id": "seller_b",
+      "round": 4,
+      "category": "mouse",
+      "required_features": [
+        "wireless",
+        "silent_click"
+      ],
+      "candidate_product_ids": [
+        "mouse_b_black_small"
+      ],
+      "product_preferences": [
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
+      ],
+      "pending_checks": [],
+      "delivery_days_max": 7,
+      "allowed_addon_categories": [
+        "mouse_pad"
+      ],
       "target_total_twd": 729,
-      "previous_offer_ids": ["offer_b_r1"]
+      "previous_offer_ids": [
+        "offer_b_r3"
+      ]
+    },
+    {
+      "request_id": "req_demo_001",
+      "seller_id": "seller_b",
+      "round": 5,
+      "category": "mouse",
+      "required_features": [
+        "wireless",
+        "silent_click"
+      ],
+      "candidate_product_ids": [
+        "mouse_b_black_small"
+      ],
+      "product_preferences": [
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
+      ],
+      "pending_checks": [],
+      "delivery_days_max": 7,
+      "allowed_addon_categories": [
+        "mouse_pad"
+      ],
+      "target_total_twd": 719,
+      "previous_offer_ids": [
+        "offer_b_r4"
+      ]
     },
     {
       "request_id": "req_demo_001",
       "seller_id": "seller_c",
       "round": 1,
       "category": "mouse",
-      "required_features": ["wireless", "silent_click"],
-      "candidate_product_ids": ["mouse_c_black_small"],
+      "required_features": [
+        "wireless",
+        "silent_click"
+      ],
+      "candidate_product_ids": [
+        "mouse_c_black_small"
+      ],
       "product_preferences": [
-        {"preference_id": "pf_color_black", "strength": "required", "attribute": "color", "operator": "in", "values": ["black"]},
-        {"preference_id": "pf_size_small", "strength": "preferred", "attribute": "size_class", "operator": "in", "values": ["small"]},
-        {"preference_id": "pf_shape_symmetrical", "strength": "preferred", "attribute": "shape", "operator": "in", "values": ["symmetrical"]}
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
       ],
       "pending_checks": [],
       "delivery_days_max": 7,
-      "allowed_addon_categories": ["mouse_pad"],
+      "allowed_addon_categories": [
+        "mouse_pad"
+      ],
       "target_total_twd": null,
       "previous_offer_ids": []
     },
@@ -149,18 +627,407 @@
       "seller_id": "seller_c",
       "round": 2,
       "category": "mouse",
-      "required_features": ["wireless", "silent_click"],
-      "candidate_product_ids": ["mouse_c_black_small"],
+      "required_features": [
+        "wireless",
+        "silent_click"
+      ],
+      "candidate_product_ids": [
+        "mouse_c_black_small"
+      ],
       "product_preferences": [
-        {"preference_id": "pf_color_black", "strength": "required", "attribute": "color", "operator": "in", "values": ["black"]},
-        {"preference_id": "pf_size_small", "strength": "preferred", "attribute": "size_class", "operator": "in", "values": ["small"]},
-        {"preference_id": "pf_shape_symmetrical", "strength": "preferred", "attribute": "shape", "operator": "in", "values": ["symmetrical"]}
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
       ],
       "pending_checks": [],
       "delivery_days_max": 7,
-      "allowed_addon_categories": ["mouse_pad"],
+      "allowed_addon_categories": [
+        "mouse_pad"
+      ],
+      "target_total_twd": 659,
+      "previous_offer_ids": [
+        "offer_c_r1"
+      ]
+    },
+    {
+      "request_id": "req_demo_001",
+      "seller_id": "seller_c",
+      "round": 3,
+      "category": "mouse",
+      "required_features": [
+        "wireless",
+        "silent_click"
+      ],
+      "candidate_product_ids": [
+        "mouse_c_black_small"
+      ],
+      "product_preferences": [
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
+      ],
+      "pending_checks": [],
+      "delivery_days_max": 7,
+      "allowed_addon_categories": [
+        "mouse_pad"
+      ],
+      "target_total_twd": 649,
+      "previous_offer_ids": [
+        "offer_c_standalone_r2",
+        "offer_c_bundle_r2"
+      ]
+    },
+    {
+      "request_id": "req_demo_001",
+      "seller_id": "seller_c",
+      "round": 4,
+      "category": "mouse",
+      "required_features": [
+        "wireless",
+        "silent_click"
+      ],
+      "candidate_product_ids": [
+        "mouse_c_black_small"
+      ],
+      "product_preferences": [
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
+      ],
+      "pending_checks": [],
+      "delivery_days_max": 7,
+      "allowed_addon_categories": [
+        "mouse_pad"
+      ],
+      "target_total_twd": 639,
+      "previous_offer_ids": [
+        "offer_c_standalone_r3",
+        "offer_c_bundle_r3"
+      ]
+    },
+    {
+      "request_id": "req_demo_001",
+      "seller_id": "seller_c",
+      "round": 5,
+      "category": "mouse",
+      "required_features": [
+        "wireless",
+        "silent_click"
+      ],
+      "candidate_product_ids": [
+        "mouse_c_black_small"
+      ],
+      "product_preferences": [
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
+      ],
+      "pending_checks": [],
+      "delivery_days_max": 7,
+      "allowed_addon_categories": [
+        "mouse_pad"
+      ],
       "target_total_twd": 629,
-      "previous_offer_ids": ["offer_c_r1"]
+      "previous_offer_ids": [
+        "offer_c_standalone_r4",
+        "offer_c_bundle_r4"
+      ]
+    },
+    {
+      "request_id": "req_demo_001",
+      "seller_id": "seller_d",
+      "round": 1,
+      "category": "mouse",
+      "required_features": [
+        "wireless",
+        "silent_click"
+      ],
+      "candidate_product_ids": [
+        "mouse_d_black_small"
+      ],
+      "product_preferences": [
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
+      ],
+      "pending_checks": [],
+      "delivery_days_max": 7,
+      "allowed_addon_categories": [
+        "mouse_pad"
+      ],
+      "target_total_twd": null,
+      "previous_offer_ids": []
+    },
+    {
+      "request_id": "req_demo_001",
+      "seller_id": "seller_d",
+      "round": 2,
+      "category": "mouse",
+      "required_features": [
+        "wireless",
+        "silent_click"
+      ],
+      "candidate_product_ids": [
+        "mouse_d_black_small"
+      ],
+      "product_preferences": [
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
+      ],
+      "pending_checks": [],
+      "delivery_days_max": 7,
+      "allowed_addon_categories": [
+        "mouse_pad"
+      ],
+      "target_total_twd": 659,
+      "previous_offer_ids": [
+        "offer_d_r1"
+      ]
+    },
+    {
+      "request_id": "req_demo_001",
+      "seller_id": "seller_d",
+      "round": 3,
+      "category": "mouse",
+      "required_features": [
+        "wireless",
+        "silent_click"
+      ],
+      "candidate_product_ids": [
+        "mouse_d_black_small"
+      ],
+      "product_preferences": [
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
+      ],
+      "pending_checks": [],
+      "delivery_days_max": 7,
+      "allowed_addon_categories": [
+        "mouse_pad"
+      ],
+      "target_total_twd": 639,
+      "previous_offer_ids": [
+        "offer_d_r2"
+      ]
+    },
+    {
+      "request_id": "req_demo_001",
+      "seller_id": "seller_e",
+      "round": 1,
+      "category": "mouse",
+      "required_features": [
+        "wireless",
+        "silent_click"
+      ],
+      "candidate_product_ids": [
+        "mouse_e_black_small"
+      ],
+      "product_preferences": [
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
+      ],
+      "pending_checks": [],
+      "delivery_days_max": 7,
+      "allowed_addon_categories": [
+        "mouse_pad"
+      ],
+      "target_total_twd": null,
+      "previous_offer_ids": []
     }
   ],
   "orchestration": {
@@ -181,7 +1048,11 @@
               "width_mm": 60,
               "height_mm": 39
             },
-            "matched_preference_ids": ["pf_color_black", "pf_size_small", "pf_shape_symmetrical"],
+            "matched_preference_ids": [
+              "pf_color_black",
+              "pf_size_small",
+              "pf_shape_symmetrical"
+            ],
             "unmatched_preference_ids": [],
             "pending_checks": []
           }
@@ -195,15 +1066,120 @@
         },
         "status": "offered",
         "rounds": [
-          {"round": 1, "outcome": "offered", "offer_ids": ["offer_a_r1"]},
-          {"round": 2, "outcome": "offered", "offer_ids": ["offer_a_r2"]}
+          {
+            "round": 1,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_a_r1"
+            ]
+          },
+          {
+            "round": 2,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_a_r2"
+            ]
+          },
+          {
+            "round": 3,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_a_r3"
+            ]
+          },
+          {
+            "round": 4,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_a_r4"
+            ]
+          },
+          {
+            "round": 5,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_a_r5"
+            ]
+          }
         ],
-        "final_offer_ids": ["offer_a_r2"]
+        "final_offer_ids": [
+          "offer_a_r5"
+        ],
+        "stop_reason": "max_rounds"
+      },
+      {
+        "seller_id": "seller_d",
+        "name": "SteadyShip Market",
+        "listing_rank": 2,
+        "match_reason": "黑色滑鼠符合所有必要規格並命中小尺寸與左右對稱偏好",
+        "candidate_products": [
+          {
+            "product_id": "mouse_d_black_small",
+            "attributes": {
+              "size_class": "small",
+              "color": "black",
+              "shape": "symmetrical",
+              "length_mm": 99,
+              "width_mm": 60,
+              "height_mm": 39
+            },
+            "matched_preference_ids": [
+              "pf_color_black",
+              "pf_size_small",
+              "pf_shape_symmetrical"
+            ],
+            "unmatched_preference_ids": [],
+            "pending_checks": []
+          }
+        ],
+        "trust": {
+          "personal_band": "positive",
+          "personal_rating": 4.5,
+          "personal_count": 2,
+          "marketplace_rating": 4.5,
+          "marketplace_count": 50
+        },
+        "status": "offered",
+        "rounds": [
+          {
+            "round": 1,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_d_r1"
+            ]
+          },
+          {
+            "round": 2,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_d_r2"
+            ]
+          },
+          {
+            "round": 3,
+            "outcome": "offered",
+            "is_final": true,
+            "offer_ids": [
+              "offer_d_r3"
+            ]
+          }
+        ],
+        "final_offer_ids": [
+          "offer_d_r3"
+        ],
+        "stop_reason": "seller_final"
       },
       {
         "seller_id": "seller_b",
         "name": "FlashShip Tech",
-        "listing_rank": 2,
+        "listing_rank": 3,
         "match_reason": "黑色滑鼠符合所有必要規格並提供最快到貨",
         "candidate_products": [
           {
@@ -216,7 +1192,11 @@
               "width_mm": 58.7,
               "height_mm": 26.62
             },
-            "matched_preference_ids": ["pf_color_black", "pf_size_small", "pf_shape_symmetrical"],
+            "matched_preference_ids": [
+              "pf_color_black",
+              "pf_size_small",
+              "pf_shape_symmetrical"
+            ],
             "unmatched_preference_ids": [],
             "pending_checks": []
           }
@@ -230,15 +1210,104 @@
         },
         "status": "offered",
         "rounds": [
-          {"round": 1, "outcome": "offered", "offer_ids": ["offer_b_r1"]},
-          {"round": 2, "outcome": "offered", "offer_ids": ["offer_b_r2"]}
+          {
+            "round": 1,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_b_r1"
+            ]
+          },
+          {
+            "round": 2,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_b_r2"
+            ]
+          },
+          {
+            "round": 3,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_b_r3"
+            ]
+          },
+          {
+            "round": 4,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_b_r4"
+            ]
+          },
+          {
+            "round": 5,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_b_r5"
+            ]
+          }
         ],
-        "final_offer_ids": ["offer_b_r2"]
+        "final_offer_ids": [
+          "offer_b_r5"
+        ],
+        "stop_reason": "max_rounds"
+      },
+      {
+        "seller_id": "seller_e",
+        "name": "ClearPrice Store",
+        "listing_rank": 4,
+        "match_reason": "黑色滑鼠符合所有必要規格並命中小尺寸與左右對稱偏好",
+        "candidate_products": [
+          {
+            "product_id": "mouse_e_black_small",
+            "attributes": {
+              "size_class": "small",
+              "color": "black",
+              "shape": "symmetrical",
+              "length_mm": 99,
+              "width_mm": 60,
+              "height_mm": 39
+            },
+            "matched_preference_ids": [
+              "pf_color_black",
+              "pf_size_small",
+              "pf_shape_symmetrical"
+            ],
+            "unmatched_preference_ids": [],
+            "pending_checks": []
+          }
+        ],
+        "trust": {
+          "personal_band": "neutral",
+          "personal_rating": null,
+          "personal_count": 0,
+          "marketplace_rating": 4.4,
+          "marketplace_count": 50
+        },
+        "status": "offered",
+        "rounds": [
+          {
+            "round": 1,
+            "outcome": "offered",
+            "is_final": true,
+            "offer_ids": [
+              "offer_e_r1"
+            ]
+          }
+        ],
+        "final_offer_ids": [
+          "offer_e_r1"
+        ],
+        "stop_reason": "seller_final"
       },
       {
         "seller_id": "seller_c",
         "name": "Bundle Lab",
-        "listing_rank": 3,
+        "listing_rank": 5,
         "match_reason": "黑色右手滑鼠符合必要規格，可提供免費可拒絕的滑鼠墊；未命中左右對稱偏好",
         "candidate_products": [
           {
@@ -251,8 +1320,13 @@
               "width_mm": 67.9,
               "height_mm": 38.4
             },
-            "matched_preference_ids": ["pf_color_black", "pf_size_small"],
-            "unmatched_preference_ids": ["pf_shape_symmetrical"],
+            "matched_preference_ids": [
+              "pf_color_black",
+              "pf_size_small"
+            ],
+            "unmatched_preference_ids": [
+              "pf_shape_symmetrical"
+            ],
             "pending_checks": []
           }
         ],
@@ -265,10 +1339,56 @@
         },
         "status": "offered",
         "rounds": [
-          {"round": 1, "outcome": "offered", "offer_ids": ["offer_c_r1"]},
-          {"round": 2, "outcome": "offered", "offer_ids": ["offer_c_standalone_r2", "offer_c_bundle_r2"]}
+          {
+            "round": 1,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_c_r1"
+            ]
+          },
+          {
+            "round": 2,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_c_standalone_r2",
+              "offer_c_bundle_r2"
+            ]
+          },
+          {
+            "round": 3,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_c_standalone_r3",
+              "offer_c_bundle_r3"
+            ]
+          },
+          {
+            "round": 4,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_c_standalone_r4",
+              "offer_c_bundle_r4"
+            ]
+          },
+          {
+            "round": 5,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_c_standalone_r5",
+              "offer_c_bundle_r5"
+            ]
+          }
         ],
-        "final_offer_ids": ["offer_c_standalone_r2", "offer_c_bundle_r2"]
+        "final_offer_ids": [
+          "offer_c_standalone_r5",
+          "offer_c_bundle_r5"
+        ],
+        "stop_reason": "max_rounds"
       }
     ],
     "discovery_exclusions": [],
@@ -285,7 +1405,7 @@
       "rounds": [
         {
           "buyer_message": "請提供符合條件的首次含稅運報價。",
-          "seller_message": "首次報價 599 元，五天到貨。",
+          "seller_message": "第 1 輪含稅運 599 元，5 天到貨。可繼續議價。",
           "result": {
             "request_id": "req_demo_001",
             "seller_id": "seller_a",
@@ -296,8 +1416,18 @@
                 "draft_ref": "draft_a_r1",
                 "variant": "standalone",
                 "baseline_draft_ref": null,
-                "items": [{"product_id": "mouse_a_black_small", "category": "mouse", "role": "primary", "quantity": 1}],
-                "primary_features": ["wireless", "silent_click"],
+                "items": [
+                  {
+                    "product_id": "mouse_a_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
                 "total_price_twd": 599,
                 "delivery_days": 5,
                 "terms_id": "terms_standard_v1",
@@ -305,12 +1435,13 @@
                 "expires_at": "2026-09-12T18:00:00+08:00"
               }
             ],
-            "message": "首次報價 599 元，五天到貨。"
+            "message": "第 1 輪含稅運 599 元，5 天到貨。可繼續議價。",
+            "is_final": false
           }
         },
         {
-          "buyer_message": "價格優先，請提供可接受的最後價格。",
-          "seller_message": "最後可降至 569 元，維持五天到貨。",
+          "buyer_message": "請依本分支上一輪報價，確認是否還能調整總價或條件。",
+          "seller_message": "第 2 輪含稅運 584 元，5 天到貨。可繼續議價。",
           "result": {
             "request_id": "req_demo_001",
             "seller_id": "seller_a",
@@ -321,8 +1452,54 @@
                 "draft_ref": "draft_a_r2",
                 "variant": "standalone",
                 "baseline_draft_ref": null,
-                "items": [{"product_id": "mouse_a_black_small", "category": "mouse", "role": "primary", "quantity": 1}],
-                "primary_features": ["wireless", "silent_click"],
+                "items": [
+                  {
+                    "product_id": "mouse_a_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
+                "total_price_twd": 584,
+                "delivery_days": 5,
+                "terms_id": "terms_standard_v1",
+                "optional_addons": false,
+                "expires_at": "2026-09-12T18:00:00+08:00"
+              }
+            ],
+            "message": "第 2 輪含稅運 584 元，5 天到貨。可繼續議價。",
+            "is_final": false
+          }
+        },
+        {
+          "buyer_message": "請依本分支上一輪報價，確認是否還能調整總價或條件。",
+          "seller_message": "第 3 輪含稅運 569 元，5 天到貨。可繼續議價。",
+          "result": {
+            "request_id": "req_demo_001",
+            "seller_id": "seller_a",
+            "round": 3,
+            "outcome": "offered",
+            "drafts": [
+              {
+                "draft_ref": "draft_a_r3",
+                "variant": "standalone",
+                "baseline_draft_ref": null,
+                "items": [
+                  {
+                    "product_id": "mouse_a_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
                 "total_price_twd": 569,
                 "delivery_days": 5,
                 "terms_id": "terms_standard_v1",
@@ -330,7 +1507,80 @@
                 "expires_at": "2026-09-12T18:00:00+08:00"
               }
             ],
-            "message": "最後可降至 569 元，維持五天到貨。"
+            "message": "第 3 輪含稅運 569 元，5 天到貨。可繼續議價。",
+            "is_final": false
+          }
+        },
+        {
+          "buyer_message": "請依本分支上一輪報價，確認是否還能調整總價或條件。",
+          "seller_message": "第 4 輪含稅運 559 元，5 天到貨。可繼續議價。",
+          "result": {
+            "request_id": "req_demo_001",
+            "seller_id": "seller_a",
+            "round": 4,
+            "outcome": "offered",
+            "drafts": [
+              {
+                "draft_ref": "draft_a_r4",
+                "variant": "standalone",
+                "baseline_draft_ref": null,
+                "items": [
+                  {
+                    "product_id": "mouse_a_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
+                "total_price_twd": 559,
+                "delivery_days": 5,
+                "terms_id": "terms_standard_v1",
+                "optional_addons": false,
+                "expires_at": "2026-09-12T18:00:00+08:00"
+              }
+            ],
+            "message": "第 4 輪含稅運 559 元，5 天到貨。可繼續議價。",
+            "is_final": false
+          }
+        },
+        {
+          "buyer_message": "請依本分支上一輪報價，確認是否還能調整總價或條件。",
+          "seller_message": "第 5 輪含稅運 549 元，5 天到貨。已達本次五輪上限。",
+          "result": {
+            "request_id": "req_demo_001",
+            "seller_id": "seller_a",
+            "round": 5,
+            "outcome": "offered",
+            "drafts": [
+              {
+                "draft_ref": "draft_a_r5",
+                "variant": "standalone",
+                "baseline_draft_ref": null,
+                "items": [
+                  {
+                    "product_id": "mouse_a_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
+                "total_price_twd": 549,
+                "delivery_days": 5,
+                "terms_id": "terms_standard_v1",
+                "optional_addons": false,
+                "expires_at": "2026-09-12T18:00:00+08:00"
+              }
+            ],
+            "message": "第 5 輪含稅運 549 元，5 天到貨。已達本次五輪上限。",
+            "is_final": false
           }
         }
       ]
@@ -341,7 +1591,7 @@
       "rounds": [
         {
           "buyer_message": "請提供符合條件的首次含稅運報價。",
-          "seller_message": "首次報價 769 元，保證一天到貨。",
+          "seller_message": "第 1 輪含稅運 769 元，1 天到貨。可繼續議價。",
           "result": {
             "request_id": "req_demo_001",
             "seller_id": "seller_b",
@@ -352,8 +1602,18 @@
                 "draft_ref": "draft_b_r1",
                 "variant": "standalone",
                 "baseline_draft_ref": null,
-                "items": [{"product_id": "mouse_b_black_small", "category": "mouse", "role": "primary", "quantity": 1}],
-                "primary_features": ["wireless", "silent_click"],
+                "items": [
+                  {
+                    "product_id": "mouse_b_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
                 "total_price_twd": 769,
                 "delivery_days": 1,
                 "terms_id": "terms_standard_v1",
@@ -361,12 +1621,13 @@
                 "expires_at": "2026-09-12T18:00:00+08:00"
               }
             ],
-            "message": "首次報價 769 元，保證一天到貨。"
+            "message": "第 1 輪含稅運 769 元，1 天到貨。可繼續議價。",
+            "is_final": false
           }
         },
         {
-          "buyer_message": "價格仍偏高，請在不延後交期下調整。",
-          "seller_message": "最低 729 元，仍保證一天到貨。",
+          "buyer_message": "請依本分支上一輪報價，確認是否還能調整總價或條件。",
+          "seller_message": "第 2 輪含稅運 754 元，1 天到貨。可繼續議價。",
           "result": {
             "request_id": "req_demo_001",
             "seller_id": "seller_b",
@@ -377,8 +1638,90 @@
                 "draft_ref": "draft_b_r2",
                 "variant": "standalone",
                 "baseline_draft_ref": null,
-                "items": [{"product_id": "mouse_b_black_small", "category": "mouse", "role": "primary", "quantity": 1}],
-                "primary_features": ["wireless", "silent_click"],
+                "items": [
+                  {
+                    "product_id": "mouse_b_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
+                "total_price_twd": 754,
+                "delivery_days": 1,
+                "terms_id": "terms_standard_v1",
+                "optional_addons": false,
+                "expires_at": "2026-09-12T18:00:00+08:00"
+              }
+            ],
+            "message": "第 2 輪含稅運 754 元，1 天到貨。可繼續議價。",
+            "is_final": false
+          }
+        },
+        {
+          "buyer_message": "請依本分支上一輪報價，確認是否還能調整總價或條件。",
+          "seller_message": "第 3 輪含稅運 739 元，1 天到貨。可繼續議價。",
+          "result": {
+            "request_id": "req_demo_001",
+            "seller_id": "seller_b",
+            "round": 3,
+            "outcome": "offered",
+            "drafts": [
+              {
+                "draft_ref": "draft_b_r3",
+                "variant": "standalone",
+                "baseline_draft_ref": null,
+                "items": [
+                  {
+                    "product_id": "mouse_b_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
+                "total_price_twd": 739,
+                "delivery_days": 1,
+                "terms_id": "terms_standard_v1",
+                "optional_addons": false,
+                "expires_at": "2026-09-12T18:00:00+08:00"
+              }
+            ],
+            "message": "第 3 輪含稅運 739 元，1 天到貨。可繼續議價。",
+            "is_final": false
+          }
+        },
+        {
+          "buyer_message": "請依本分支上一輪報價，確認是否還能調整總價或條件。",
+          "seller_message": "第 4 輪含稅運 729 元，1 天到貨。可繼續議價。",
+          "result": {
+            "request_id": "req_demo_001",
+            "seller_id": "seller_b",
+            "round": 4,
+            "outcome": "offered",
+            "drafts": [
+              {
+                "draft_ref": "draft_b_r4",
+                "variant": "standalone",
+                "baseline_draft_ref": null,
+                "items": [
+                  {
+                    "product_id": "mouse_b_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
                 "total_price_twd": 729,
                 "delivery_days": 1,
                 "terms_id": "terms_standard_v1",
@@ -386,7 +1729,44 @@
                 "expires_at": "2026-09-12T18:00:00+08:00"
               }
             ],
-            "message": "最低 729 元，仍保證一天到貨。"
+            "message": "第 4 輪含稅運 729 元，1 天到貨。可繼續議價。",
+            "is_final": false
+          }
+        },
+        {
+          "buyer_message": "請依本分支上一輪報價，確認是否還能調整總價或條件。",
+          "seller_message": "第 5 輪含稅運 719 元，1 天到貨。已達本次五輪上限。",
+          "result": {
+            "request_id": "req_demo_001",
+            "seller_id": "seller_b",
+            "round": 5,
+            "outcome": "offered",
+            "drafts": [
+              {
+                "draft_ref": "draft_b_r5",
+                "variant": "standalone",
+                "baseline_draft_ref": null,
+                "items": [
+                  {
+                    "product_id": "mouse_b_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
+                "total_price_twd": 719,
+                "delivery_days": 1,
+                "terms_id": "terms_standard_v1",
+                "optional_addons": false,
+                "expires_at": "2026-09-12T18:00:00+08:00"
+              }
+            ],
+            "message": "第 5 輪含稅運 719 元，1 天到貨。已達本次五輪上限。",
+            "is_final": false
           }
         }
       ]
@@ -397,7 +1777,7 @@
       "rounds": [
         {
           "buyer_message": "請提供符合條件的首次含稅運報價。",
-          "seller_message": "首次單買報價 669 元，三天到貨。",
+          "seller_message": "第 1 輪含稅運 669 元，3 天到貨。可繼續議價。",
           "result": {
             "request_id": "req_demo_001",
             "seller_id": "seller_c",
@@ -408,8 +1788,18 @@
                 "draft_ref": "draft_c_r1",
                 "variant": "standalone",
                 "baseline_draft_ref": null,
-                "items": [{"product_id": "mouse_c_black_small", "category": "mouse", "role": "primary", "quantity": 1}],
-                "primary_features": ["wireless", "silent_click"],
+                "items": [
+                  {
+                    "product_id": "mouse_c_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
                 "total_price_twd": 669,
                 "delivery_days": 3,
                 "terms_id": "terms_standard_v1",
@@ -417,12 +1807,13 @@
                 "expires_at": "2026-09-12T18:00:00+08:00"
               }
             ],
-            "message": "首次單買報價 669 元，三天到貨。"
+            "message": "第 1 輪含稅運 669 元，3 天到貨。可繼續議價。",
+            "is_final": false
           }
         },
         {
-          "buyer_message": "可接受不加價且可拒絕的相關配件，請提出最後方案。",
-          "seller_message": "最後單買 629 元，也可同價附可拒絕的滑鼠墊。",
+          "buyer_message": "請依本分支上一輪報價，確認是否還能調整總價或條件。",
+          "seller_message": "第 2 輪含稅運 659 元，3 天到貨。可繼續議價。",
           "result": {
             "request_id": "req_demo_001",
             "seller_id": "seller_c",
@@ -433,9 +1824,19 @@
                 "draft_ref": "draft_c_standalone_r2",
                 "variant": "standalone",
                 "baseline_draft_ref": null,
-                "items": [{"product_id": "mouse_c_black_small", "category": "mouse", "role": "primary", "quantity": 1}],
-                "primary_features": ["wireless", "silent_click"],
-                "total_price_twd": 629,
+                "items": [
+                  {
+                    "product_id": "mouse_c_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
+                "total_price_twd": 659,
                 "delivery_days": 3,
                 "terms_id": "terms_standard_v1",
                 "optional_addons": false,
@@ -446,10 +1847,215 @@
                 "variant": "bundle",
                 "baseline_draft_ref": "draft_c_standalone_r2",
                 "items": [
-                  {"product_id": "mouse_c_black_small", "category": "mouse", "role": "primary", "quantity": 1},
-                  {"product_id": "pad_c_black", "category": "mouse_pad", "role": "addon", "quantity": 1}
+                  {
+                    "product_id": "mouse_c_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  },
+                  {
+                    "product_id": "pad_c_black",
+                    "category": "mouse_pad",
+                    "role": "addon",
+                    "quantity": 1
+                  }
                 ],
-                "primary_features": ["wireless", "silent_click"],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
+                "total_price_twd": 659,
+                "delivery_days": 3,
+                "terms_id": "terms_standard_v1",
+                "optional_addons": true,
+                "expires_at": "2026-09-12T18:00:00+08:00"
+              }
+            ],
+            "message": "第 2 輪含稅運 659 元，3 天到貨。可繼續議價。",
+            "is_final": false
+          }
+        },
+        {
+          "buyer_message": "請依本分支上一輪報價，確認是否還能調整總價或條件。",
+          "seller_message": "第 3 輪含稅運 649 元，3 天到貨。可繼續議價。",
+          "result": {
+            "request_id": "req_demo_001",
+            "seller_id": "seller_c",
+            "round": 3,
+            "outcome": "offered",
+            "drafts": [
+              {
+                "draft_ref": "draft_c_standalone_r3",
+                "variant": "standalone",
+                "baseline_draft_ref": null,
+                "items": [
+                  {
+                    "product_id": "mouse_c_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
+                "total_price_twd": 649,
+                "delivery_days": 3,
+                "terms_id": "terms_standard_v1",
+                "optional_addons": false,
+                "expires_at": "2026-09-12T18:00:00+08:00"
+              },
+              {
+                "draft_ref": "draft_c_bundle_r3",
+                "variant": "bundle",
+                "baseline_draft_ref": "draft_c_standalone_r3",
+                "items": [
+                  {
+                    "product_id": "mouse_c_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  },
+                  {
+                    "product_id": "pad_c_black",
+                    "category": "mouse_pad",
+                    "role": "addon",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
+                "total_price_twd": 649,
+                "delivery_days": 3,
+                "terms_id": "terms_standard_v1",
+                "optional_addons": true,
+                "expires_at": "2026-09-12T18:00:00+08:00"
+              }
+            ],
+            "message": "第 3 輪含稅運 649 元，3 天到貨。可繼續議價。",
+            "is_final": false
+          }
+        },
+        {
+          "buyer_message": "請依本分支上一輪報價，確認是否還能調整總價或條件。",
+          "seller_message": "第 4 輪含稅運 639 元，3 天到貨。可繼續議價。",
+          "result": {
+            "request_id": "req_demo_001",
+            "seller_id": "seller_c",
+            "round": 4,
+            "outcome": "offered",
+            "drafts": [
+              {
+                "draft_ref": "draft_c_standalone_r4",
+                "variant": "standalone",
+                "baseline_draft_ref": null,
+                "items": [
+                  {
+                    "product_id": "mouse_c_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
+                "total_price_twd": 639,
+                "delivery_days": 3,
+                "terms_id": "terms_standard_v1",
+                "optional_addons": false,
+                "expires_at": "2026-09-12T18:00:00+08:00"
+              },
+              {
+                "draft_ref": "draft_c_bundle_r4",
+                "variant": "bundle",
+                "baseline_draft_ref": "draft_c_standalone_r4",
+                "items": [
+                  {
+                    "product_id": "mouse_c_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  },
+                  {
+                    "product_id": "pad_c_black",
+                    "category": "mouse_pad",
+                    "role": "addon",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
+                "total_price_twd": 639,
+                "delivery_days": 3,
+                "terms_id": "terms_standard_v1",
+                "optional_addons": true,
+                "expires_at": "2026-09-12T18:00:00+08:00"
+              }
+            ],
+            "message": "第 4 輪含稅運 639 元，3 天到貨。可繼續議價。",
+            "is_final": false
+          }
+        },
+        {
+          "buyer_message": "請依本分支上一輪報價，確認是否還能調整總價或條件。",
+          "seller_message": "第 5 輪含稅運 629 元，3 天到貨。已達本次五輪上限。",
+          "result": {
+            "request_id": "req_demo_001",
+            "seller_id": "seller_c",
+            "round": 5,
+            "outcome": "offered",
+            "drafts": [
+              {
+                "draft_ref": "draft_c_standalone_r5",
+                "variant": "standalone",
+                "baseline_draft_ref": null,
+                "items": [
+                  {
+                    "product_id": "mouse_c_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
+                "total_price_twd": 629,
+                "delivery_days": 3,
+                "terms_id": "terms_standard_v1",
+                "optional_addons": false,
+                "expires_at": "2026-09-12T18:00:00+08:00"
+              },
+              {
+                "draft_ref": "draft_c_bundle_r5",
+                "variant": "bundle",
+                "baseline_draft_ref": "draft_c_standalone_r5",
+                "items": [
+                  {
+                    "product_id": "mouse_c_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  },
+                  {
+                    "product_id": "pad_c_black",
+                    "category": "mouse_pad",
+                    "role": "addon",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
                 "total_price_twd": 629,
                 "delivery_days": 3,
                 "terms_id": "terms_standard_v1",
@@ -457,7 +2063,164 @@
                 "expires_at": "2026-09-12T18:00:00+08:00"
               }
             ],
-            "message": "最後單買 629 元，也可同價附可拒絕的滑鼠墊。"
+            "message": "第 5 輪含稅運 629 元，3 天到貨。已達本次五輪上限。",
+            "is_final": false
+          }
+        }
+      ]
+    },
+    {
+      "seller_id": "seller_d",
+      "strategy": "balanced_delivery",
+      "rounds": [
+        {
+          "buyer_message": "請提供符合條件的首次含稅運報價。",
+          "seller_message": "第 1 輪含稅運 679 元，2 天到貨。可繼續議價。",
+          "result": {
+            "request_id": "req_demo_001",
+            "seller_id": "seller_d",
+            "round": 1,
+            "outcome": "offered",
+            "drafts": [
+              {
+                "draft_ref": "draft_d_r1",
+                "variant": "standalone",
+                "baseline_draft_ref": null,
+                "items": [
+                  {
+                    "product_id": "mouse_d_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
+                "total_price_twd": 679,
+                "delivery_days": 2,
+                "terms_id": "terms_standard_v1",
+                "optional_addons": false,
+                "expires_at": "2026-09-12T18:00:00+08:00"
+              }
+            ],
+            "message": "第 1 輪含稅運 679 元，2 天到貨。可繼續議價。",
+            "is_final": false
+          }
+        },
+        {
+          "buyer_message": "請依本分支上一輪報價，確認是否還能調整總價或條件。",
+          "seller_message": "第 2 輪含稅運 659 元，2 天到貨。可繼續議價。",
+          "result": {
+            "request_id": "req_demo_001",
+            "seller_id": "seller_d",
+            "round": 2,
+            "outcome": "offered",
+            "drafts": [
+              {
+                "draft_ref": "draft_d_r2",
+                "variant": "standalone",
+                "baseline_draft_ref": null,
+                "items": [
+                  {
+                    "product_id": "mouse_d_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
+                "total_price_twd": 659,
+                "delivery_days": 2,
+                "terms_id": "terms_standard_v1",
+                "optional_addons": false,
+                "expires_at": "2026-09-12T18:00:00+08:00"
+              }
+            ],
+            "message": "第 2 輪含稅運 659 元，2 天到貨。可繼續議價。",
+            "is_final": false
+          }
+        },
+        {
+          "buyer_message": "請依本分支上一輪報價，確認是否還能調整總價或條件。",
+          "seller_message": "第 3 輪含稅運 639 元，2 天到貨。此為最終報價，結束本分支。",
+          "result": {
+            "request_id": "req_demo_001",
+            "seller_id": "seller_d",
+            "round": 3,
+            "outcome": "offered",
+            "drafts": [
+              {
+                "draft_ref": "draft_d_r3",
+                "variant": "standalone",
+                "baseline_draft_ref": null,
+                "items": [
+                  {
+                    "product_id": "mouse_d_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
+                "total_price_twd": 639,
+                "delivery_days": 2,
+                "terms_id": "terms_standard_v1",
+                "optional_addons": false,
+                "expires_at": "2026-09-12T18:00:00+08:00"
+              }
+            ],
+            "message": "第 3 輪含稅運 639 元，2 天到貨。此為最終報價，結束本分支。",
+            "is_final": true
+          }
+        }
+      ]
+    },
+    {
+      "seller_id": "seller_e",
+      "strategy": "firm_price",
+      "rounds": [
+        {
+          "buyer_message": "請提供符合條件的首次含稅運報價。",
+          "seller_message": "第 1 輪含稅運 679 元，4 天到貨。此為最終報價，結束本分支。",
+          "result": {
+            "request_id": "req_demo_001",
+            "seller_id": "seller_e",
+            "round": 1,
+            "outcome": "offered",
+            "drafts": [
+              {
+                "draft_ref": "draft_e_r1",
+                "variant": "standalone",
+                "baseline_draft_ref": null,
+                "items": [
+                  {
+                    "product_id": "mouse_e_black_small",
+                    "category": "mouse",
+                    "role": "primary",
+                    "quantity": 1
+                  }
+                ],
+                "primary_features": [
+                  "wireless",
+                  "silent_click"
+                ],
+                "total_price_twd": 679,
+                "delivery_days": 4,
+                "terms_id": "terms_standard_v1",
+                "optional_addons": false,
+                "expires_at": "2026-09-12T18:00:00+08:00"
+              }
+            ],
+            "message": "第 1 輪含稅運 679 元，4 天到貨。此為最終報價，結束本分支。",
+            "is_final": true
           }
         }
       ]
@@ -477,14 +2240,52 @@
       "category": "mouse",
       "max_total_twd": 1000,
       "delivery_days_max": 7,
-      "required_features": ["wireless", "silent_click"],
-      "preferences": ["price_first"],
-      "product_preferences": [
-        {"preference_id": "pf_color_black", "strength": "required", "source_text": "只接受黑色", "attribute": "color", "operator": "in", "values": ["black"]},
-        {"preference_id": "pf_size_small", "strength": "preferred", "source_text": "偏好小尺寸", "attribute": "size_class", "operator": "in", "values": ["small"]},
-        {"preference_id": "pf_shape_symmetrical", "strength": "preferred", "source_text": "偏好左右對稱", "attribute": "shape", "operator": "in", "values": ["symmetrical"]}
+      "required_features": [
+        "wireless",
+        "silent_click"
       ],
-      "negotiation_policy": {"bundle_mode": "related_no_extra_cost", "allowed_addon_categories": ["mouse_pad"], "max_addon_increment_twd": 0}
+      "preferences": [
+        "price_first"
+      ],
+      "product_preferences": [
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "source_text": "只接受黑色",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "source_text": "偏好小尺寸",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "source_text": "偏好左右對稱",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
+      ],
+      "negotiation_policy": {
+        "bundle_mode": "related_no_extra_cost",
+        "allowed_addon_categories": [
+          "mouse_pad"
+        ],
+        "max_addon_increment_twd": 0
+      }
     },
     "seller_agents": [
       {
@@ -492,107 +2293,595 @@
         "name": "Budget Mouse Co.",
         "listing_rank": 1,
         "match_reason": "黑色滑鼠符合所有必要規格並命中小尺寸與左右對稱偏好",
-        "candidate_products": [{"product_id": "mouse_a_black_small", "attributes": {"size_class": "small", "color": "black", "shape": "symmetrical", "length_mm": 99, "width_mm": 60, "height_mm": 39}, "matched_preference_ids": ["pf_color_black", "pf_size_small", "pf_shape_symmetrical"], "unmatched_preference_ids": [], "pending_checks": []}],
-        "trust": {"personal_band": "positive", "personal_rating": 4.8, "personal_count": 3, "marketplace_rating": 4.6, "marketplace_count": 128},
+        "candidate_products": [
+          {
+            "product_id": "mouse_a_black_small",
+            "attributes": {
+              "size_class": "small",
+              "color": "black",
+              "shape": "symmetrical",
+              "length_mm": 99,
+              "width_mm": 60,
+              "height_mm": 39
+            },
+            "matched_preference_ids": [
+              "pf_color_black",
+              "pf_size_small",
+              "pf_shape_symmetrical"
+            ],
+            "unmatched_preference_ids": [],
+            "pending_checks": []
+          }
+        ],
+        "trust": {
+          "personal_band": "positive",
+          "personal_rating": 4.8,
+          "personal_count": 3,
+          "marketplace_rating": 4.6,
+          "marketplace_count": 128
+        },
         "status": "offered",
-        "rounds": [{"round": 1, "outcome": "offered", "offer_ids": ["offer_a_r1"]}, {"round": 2, "outcome": "offered", "offer_ids": ["offer_a_r2"]}],
-        "final_offer_ids": ["offer_a_r2"]
+        "rounds": [
+          {
+            "round": 1,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_a_r1"
+            ]
+          },
+          {
+            "round": 2,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_a_r2"
+            ]
+          },
+          {
+            "round": 3,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_a_r3"
+            ]
+          },
+          {
+            "round": 4,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_a_r4"
+            ]
+          },
+          {
+            "round": 5,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_a_r5"
+            ]
+          }
+        ],
+        "final_offer_ids": [
+          "offer_a_r5"
+        ],
+        "stop_reason": "max_rounds"
+      },
+      {
+        "seller_id": "seller_d",
+        "name": "SteadyShip Market",
+        "listing_rank": 2,
+        "match_reason": "黑色滑鼠符合所有必要規格並命中小尺寸與左右對稱偏好",
+        "candidate_products": [
+          {
+            "product_id": "mouse_d_black_small",
+            "attributes": {
+              "size_class": "small",
+              "color": "black",
+              "shape": "symmetrical",
+              "length_mm": 99,
+              "width_mm": 60,
+              "height_mm": 39
+            },
+            "matched_preference_ids": [
+              "pf_color_black",
+              "pf_size_small",
+              "pf_shape_symmetrical"
+            ],
+            "unmatched_preference_ids": [],
+            "pending_checks": []
+          }
+        ],
+        "trust": {
+          "personal_band": "positive",
+          "personal_rating": 4.5,
+          "personal_count": 2,
+          "marketplace_rating": 4.5,
+          "marketplace_count": 50
+        },
+        "status": "offered",
+        "rounds": [
+          {
+            "round": 1,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_d_r1"
+            ]
+          },
+          {
+            "round": 2,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_d_r2"
+            ]
+          },
+          {
+            "round": 3,
+            "outcome": "offered",
+            "is_final": true,
+            "offer_ids": [
+              "offer_d_r3"
+            ]
+          }
+        ],
+        "final_offer_ids": [
+          "offer_d_r3"
+        ],
+        "stop_reason": "seller_final"
       },
       {
         "seller_id": "seller_b",
         "name": "FlashShip Tech",
-        "listing_rank": 2,
+        "listing_rank": 3,
         "match_reason": "黑色滑鼠符合所有必要規格並提供最快到貨",
-        "candidate_products": [{"product_id": "mouse_b_black_small", "attributes": {"size_class": "small", "color": "black", "shape": "symmetrical", "length_mm": 106.7, "width_mm": 58.7, "height_mm": 26.62}, "matched_preference_ids": ["pf_color_black", "pf_size_small", "pf_shape_symmetrical"], "unmatched_preference_ids": [], "pending_checks": []}],
-        "trust": {"personal_band": "neutral", "personal_rating": null, "personal_count": 0, "marketplace_rating": 4.8, "marketplace_count": 502},
+        "candidate_products": [
+          {
+            "product_id": "mouse_b_black_small",
+            "attributes": {
+              "size_class": "small",
+              "color": "black",
+              "shape": "symmetrical",
+              "length_mm": 106.7,
+              "width_mm": 58.7,
+              "height_mm": 26.62
+            },
+            "matched_preference_ids": [
+              "pf_color_black",
+              "pf_size_small",
+              "pf_shape_symmetrical"
+            ],
+            "unmatched_preference_ids": [],
+            "pending_checks": []
+          }
+        ],
+        "trust": {
+          "personal_band": "neutral",
+          "personal_rating": null,
+          "personal_count": 0,
+          "marketplace_rating": 4.8,
+          "marketplace_count": 502
+        },
         "status": "offered",
-        "rounds": [{"round": 1, "outcome": "offered", "offer_ids": ["offer_b_r1"]}, {"round": 2, "outcome": "offered", "offer_ids": ["offer_b_r2"]}],
-        "final_offer_ids": ["offer_b_r2"]
+        "rounds": [
+          {
+            "round": 1,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_b_r1"
+            ]
+          },
+          {
+            "round": 2,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_b_r2"
+            ]
+          },
+          {
+            "round": 3,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_b_r3"
+            ]
+          },
+          {
+            "round": 4,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_b_r4"
+            ]
+          },
+          {
+            "round": 5,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_b_r5"
+            ]
+          }
+        ],
+        "final_offer_ids": [
+          "offer_b_r5"
+        ],
+        "stop_reason": "max_rounds"
+      },
+      {
+        "seller_id": "seller_e",
+        "name": "ClearPrice Store",
+        "listing_rank": 4,
+        "match_reason": "黑色滑鼠符合所有必要規格並命中小尺寸與左右對稱偏好",
+        "candidate_products": [
+          {
+            "product_id": "mouse_e_black_small",
+            "attributes": {
+              "size_class": "small",
+              "color": "black",
+              "shape": "symmetrical",
+              "length_mm": 99,
+              "width_mm": 60,
+              "height_mm": 39
+            },
+            "matched_preference_ids": [
+              "pf_color_black",
+              "pf_size_small",
+              "pf_shape_symmetrical"
+            ],
+            "unmatched_preference_ids": [],
+            "pending_checks": []
+          }
+        ],
+        "trust": {
+          "personal_band": "neutral",
+          "personal_rating": null,
+          "personal_count": 0,
+          "marketplace_rating": 4.4,
+          "marketplace_count": 50
+        },
+        "status": "offered",
+        "rounds": [
+          {
+            "round": 1,
+            "outcome": "offered",
+            "is_final": true,
+            "offer_ids": [
+              "offer_e_r1"
+            ]
+          }
+        ],
+        "final_offer_ids": [
+          "offer_e_r1"
+        ],
+        "stop_reason": "seller_final"
       },
       {
         "seller_id": "seller_c",
         "name": "Bundle Lab",
-        "listing_rank": 3,
+        "listing_rank": 5,
         "match_reason": "黑色右手滑鼠符合必要規格，可提供免費可拒絕的滑鼠墊；未命中左右對稱偏好",
-        "candidate_products": [{"product_id": "mouse_c_black_small", "attributes": {"size_class": "small", "color": "black", "shape": "asymmetrical_right", "length_mm": 105.4, "width_mm": 67.9, "height_mm": 38.4}, "matched_preference_ids": ["pf_color_black", "pf_size_small"], "unmatched_preference_ids": ["pf_shape_symmetrical"], "pending_checks": []}],
-        "trust": {"personal_band": "negative", "personal_rating": 2.5, "personal_count": 2, "marketplace_rating": 4.3, "marketplace_count": 76},
+        "candidate_products": [
+          {
+            "product_id": "mouse_c_black_small",
+            "attributes": {
+              "size_class": "small",
+              "color": "black",
+              "shape": "asymmetrical_right",
+              "length_mm": 105.4,
+              "width_mm": 67.9,
+              "height_mm": 38.4
+            },
+            "matched_preference_ids": [
+              "pf_color_black",
+              "pf_size_small"
+            ],
+            "unmatched_preference_ids": [
+              "pf_shape_symmetrical"
+            ],
+            "pending_checks": []
+          }
+        ],
+        "trust": {
+          "personal_band": "negative",
+          "personal_rating": 2.5,
+          "personal_count": 2,
+          "marketplace_rating": 4.3,
+          "marketplace_count": 76
+        },
         "status": "offered",
-        "rounds": [{"round": 1, "outcome": "offered", "offer_ids": ["offer_c_r1"]}, {"round": 2, "outcome": "offered", "offer_ids": ["offer_c_standalone_r2", "offer_c_bundle_r2"]}],
-        "final_offer_ids": ["offer_c_standalone_r2", "offer_c_bundle_r2"]
+        "rounds": [
+          {
+            "round": 1,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_c_r1"
+            ]
+          },
+          {
+            "round": 2,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_c_standalone_r2",
+              "offer_c_bundle_r2"
+            ]
+          },
+          {
+            "round": 3,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_c_standalone_r3",
+              "offer_c_bundle_r3"
+            ]
+          },
+          {
+            "round": 4,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_c_standalone_r4",
+              "offer_c_bundle_r4"
+            ]
+          },
+          {
+            "round": 5,
+            "outcome": "offered",
+            "is_final": false,
+            "offer_ids": [
+              "offer_c_standalone_r5",
+              "offer_c_bundle_r5"
+            ]
+          }
+        ],
+        "final_offer_ids": [
+          "offer_c_standalone_r5",
+          "offer_c_bundle_r5"
+        ],
+        "stop_reason": "max_rounds"
       }
     ],
     "discovery_exclusions": [],
-    "sponsored_placement": {"seller_id": "seller_b", "campaign_id": "campaign_b_launch", "label": "Sponsored"},
+    "sponsored_placement": {
+      "seller_id": "seller_b",
+      "campaign_id": "campaign_b_launch",
+      "label": "Sponsored"
+    },
     "offers": [
       {
-        "offer_id": "offer_a_r2",
+        "offer_id": "offer_a_r5",
         "seller_id": "seller_a",
-        "round": 2,
+        "round": 5,
         "variant": "standalone",
-        "baseline_offer_id": null,
-        "items": [{"product_id": "mouse_a_black_small", "category": "mouse", "role": "primary", "quantity": 1}],
-        "primary_features": ["wireless", "silent_click"],
-        "total_price_twd": 569,
+        "items": [
+          {
+            "product_id": "mouse_a_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "total_price_twd": 549,
         "delivery_days": 5,
         "terms_id": "terms_standard_v1",
         "optional_addons": false,
         "expires_at": "2026-09-12T18:00:00+08:00",
-        "eligibility": {"status": "eligible", "reason_codes": []}
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
       },
       {
-        "offer_id": "offer_b_r2",
+        "offer_id": "offer_b_r5",
         "seller_id": "seller_b",
-        "round": 2,
+        "round": 5,
         "variant": "standalone",
-        "baseline_offer_id": null,
-        "items": [{"product_id": "mouse_b_black_small", "category": "mouse", "role": "primary", "quantity": 1}],
-        "primary_features": ["wireless", "silent_click"],
-        "total_price_twd": 729,
+        "items": [
+          {
+            "product_id": "mouse_b_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "total_price_twd": 719,
         "delivery_days": 1,
         "terms_id": "terms_standard_v1",
         "optional_addons": false,
         "expires_at": "2026-09-12T18:00:00+08:00",
-        "eligibility": {"status": "eligible", "reason_codes": []}
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
       },
       {
-        "offer_id": "offer_c_standalone_r2",
+        "offer_id": "offer_c_standalone_r5",
         "seller_id": "seller_c",
-        "round": 2,
+        "round": 5,
         "variant": "standalone",
-        "baseline_offer_id": null,
-        "items": [{"product_id": "mouse_c_black_small", "category": "mouse", "role": "primary", "quantity": 1}],
-        "primary_features": ["wireless", "silent_click"],
+        "items": [
+          {
+            "product_id": "mouse_c_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "silent_click"
+        ],
         "total_price_twd": 629,
         "delivery_days": 3,
         "terms_id": "terms_standard_v1",
         "optional_addons": false,
         "expires_at": "2026-09-12T18:00:00+08:00",
-        "eligibility": {"status": "eligible", "reason_codes": []}
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
       },
       {
-        "offer_id": "offer_c_bundle_r2",
+        "offer_id": "offer_c_bundle_r5",
         "seller_id": "seller_c",
-        "round": 2,
+        "round": 5,
         "variant": "bundle",
-        "baseline_offer_id": "offer_c_standalone_r2",
         "items": [
-          {"product_id": "mouse_c_black_small", "category": "mouse", "role": "primary", "quantity": 1},
-          {"product_id": "pad_c_black", "category": "mouse_pad", "role": "addon", "quantity": 1}
+          {
+            "product_id": "mouse_c_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          },
+          {
+            "product_id": "pad_c_black",
+            "category": "mouse_pad",
+            "role": "addon",
+            "quantity": 1
+          }
         ],
-        "primary_features": ["wireless", "silent_click"],
+        "primary_features": [
+          "wireless",
+          "silent_click"
+        ],
         "total_price_twd": 629,
         "delivery_days": 3,
         "terms_id": "terms_standard_v1",
         "optional_addons": true,
         "expires_at": "2026-09-12T18:00:00+08:00",
-        "eligibility": {"status": "eligible", "reason_codes": ["related_bundle", "no_extra_cost"]}
+        "baseline_offer_id": "offer_c_standalone_r5",
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": [
+            "related_bundle",
+            "no_extra_cost"
+          ]
+        }
+      },
+      {
+        "offer_id": "offer_d_r3",
+        "seller_id": "seller_d",
+        "round": 3,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_d_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "total_price_twd": 639,
+        "delivery_days": 2,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T18:00:00+08:00",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      {
+        "offer_id": "offer_e_r1",
+        "seller_id": "seller_e",
+        "round": 1,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_e_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "total_price_twd": 679,
+        "delivery_days": 4,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T18:00:00+08:00",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
       }
     ],
     "ranked_offers": [
-      {"rank": 1, "offer_id": "offer_a_r2", "reason": "含稅運 569 元為最低總價，符合價格優先。", "tradeoffs": ["五天到貨，比最快方案慢四天"]},
-      {"rank": 2, "offer_id": "offer_c_standalone_r2", "reason": "含稅運 629 元且三天到貨，價格與速度較均衡。", "tradeoffs": ["比最低價高 60 元", "右手非對稱外型未命中偏好", "個人交易評分較低"]},
-      {"rank": 3, "offer_id": "offer_c_bundle_r2", "reason": "與同款單買同價，可選擇免費滑鼠墊。", "tradeoffs": ["買家未將配件列為必要需求", "個人交易評分較低"]},
-      {"rank": 4, "offer_id": "offer_b_r2", "reason": "一天到貨為最快方案，且仍在預算內。", "tradeoffs": ["比最低價高 160 元"]}
+      {
+        "rank": 1,
+        "offer_id": "offer_a_r5",
+        "reason": "含稅運 549 元，5 天到貨，符合本次必要條件。",
+        "tradeoffs": [
+          "最低總價，五天到貨較慢"
+        ]
+      },
+      {
+        "rank": 2,
+        "offer_id": "offer_c_standalone_r5",
+        "reason": "含稅運 629 元，3 天到貨，符合本次必要條件。",
+        "tradeoffs": [
+          "右手外型未命中對稱偏好",
+          "個人交易評分較低"
+        ]
+      },
+      {
+        "rank": 3,
+        "offer_id": "offer_c_bundle_r5",
+        "reason": "含稅運 629 元，3 天到貨，符合本次必要條件。",
+        "tradeoffs": [
+          "免費滑鼠墊可拒絕，右手外型未命中對稱偏好"
+        ]
+      },
+      {
+        "rank": 4,
+        "offer_id": "offer_d_r3",
+        "reason": "含稅運 639 元，2 天到貨，符合本次必要條件。",
+        "tradeoffs": [
+          "價格與交期介於最低價與最快方案之間"
+        ]
+      },
+      {
+        "rank": 5,
+        "offer_id": "offer_e_r1",
+        "reason": "含稅運 679 元，4 天到貨，符合本次必要條件。",
+        "tradeoffs": [
+          "價格與交期介於最低價與最快方案之間"
+        ]
+      },
+      {
+        "rank": 6,
+        "offer_id": "offer_b_r5",
+        "reason": "含稅運 719 元，1 天到貨，符合本次必要條件。",
+        "tradeoffs": [
+          "一天到貨最快，總價較高"
+        ]
+      }
     ],
     "confirmation_offer_ids": [],
     "selected_offer_id": null,
@@ -606,37 +2895,347 @@
       "category": "mouse",
       "max_total_twd": 1000,
       "delivery_days_max": 7,
-      "required_features": ["wireless", "silent_click"],
-      "preferences": ["price_first"],
-      "product_preferences": [
-        {"preference_id": "pf_color_black", "strength": "required", "source_text": "只接受黑色", "attribute": "color", "operator": "in", "values": ["black"]},
-        {"preference_id": "pf_size_small", "strength": "preferred", "source_text": "偏好小尺寸", "attribute": "size_class", "operator": "in", "values": ["small"]},
-        {"preference_id": "pf_shape_symmetrical", "strength": "preferred", "source_text": "偏好左右對稱", "attribute": "shape", "operator": "in", "values": ["symmetrical"]}
+      "required_features": [
+        "wireless",
+        "silent_click"
       ],
-      "negotiation_policy": {"bundle_mode": "related_no_extra_cost", "allowed_addon_categories": ["mouse_pad"], "max_addon_increment_twd": 0}
+      "preferences": [
+        "price_first"
+      ],
+      "product_preferences": [
+        {
+          "preference_id": "pf_color_black",
+          "strength": "required",
+          "source_text": "只接受黑色",
+          "attribute": "color",
+          "operator": "in",
+          "values": [
+            "black"
+          ]
+        },
+        {
+          "preference_id": "pf_size_small",
+          "strength": "preferred",
+          "source_text": "偏好小尺寸",
+          "attribute": "size_class",
+          "operator": "in",
+          "values": [
+            "small"
+          ]
+        },
+        {
+          "preference_id": "pf_shape_symmetrical",
+          "strength": "preferred",
+          "source_text": "偏好左右對稱",
+          "attribute": "shape",
+          "operator": "in",
+          "values": [
+            "symmetrical"
+          ]
+        }
+      ],
+      "negotiation_policy": {
+        "bundle_mode": "related_no_extra_cost",
+        "allowed_addon_categories": [
+          "mouse_pad"
+        ],
+        "max_addon_increment_twd": 0
+      }
     },
     "offers": [
-      {"offer_id": "offer_a_r2", "seller_id": "seller_a", "round": 2, "variant": "standalone", "baseline_offer_id": null, "items": [{"product_id": "mouse_a_black_small", "category": "mouse", "role": "primary", "quantity": 1}], "primary_features": ["wireless", "silent_click"], "total_price_twd": 569, "delivery_days": 5, "terms_id": "terms_standard_v1", "optional_addons": false, "expires_at": "2026-09-12T18:00:00+08:00", "eligibility": {"status": "eligible", "reason_codes": []}},
-      {"offer_id": "offer_b_r2", "seller_id": "seller_b", "round": 2, "variant": "standalone", "baseline_offer_id": null, "items": [{"product_id": "mouse_b_black_small", "category": "mouse", "role": "primary", "quantity": 1}], "primary_features": ["wireless", "silent_click"], "total_price_twd": 729, "delivery_days": 1, "terms_id": "terms_standard_v1", "optional_addons": false, "expires_at": "2026-09-12T18:00:00+08:00", "eligibility": {"status": "eligible", "reason_codes": []}},
-      {"offer_id": "offer_c_standalone_r2", "seller_id": "seller_c", "round": 2, "variant": "standalone", "baseline_offer_id": null, "items": [{"product_id": "mouse_c_black_small", "category": "mouse", "role": "primary", "quantity": 1}], "primary_features": ["wireless", "silent_click"], "total_price_twd": 629, "delivery_days": 3, "terms_id": "terms_standard_v1", "optional_addons": false, "expires_at": "2026-09-12T18:00:00+08:00", "eligibility": {"status": "eligible", "reason_codes": []}},
-      {"offer_id": "offer_c_bundle_r2", "seller_id": "seller_c", "round": 2, "variant": "bundle", "baseline_offer_id": "offer_c_standalone_r2", "items": [{"product_id": "mouse_c_black_small", "category": "mouse", "role": "primary", "quantity": 1}, {"product_id": "pad_c_black", "category": "mouse_pad", "role": "addon", "quantity": 1}], "primary_features": ["wireless", "silent_click"], "total_price_twd": 629, "delivery_days": 3, "terms_id": "terms_standard_v1", "optional_addons": true, "expires_at": "2026-09-12T18:00:00+08:00", "eligibility": {"status": "eligible", "reason_codes": ["related_bundle", "no_extra_cost"]}}
+      {
+        "offer_id": "offer_a_r5",
+        "seller_id": "seller_a",
+        "round": 5,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_a_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "total_price_twd": 549,
+        "delivery_days": 5,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T18:00:00+08:00",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      {
+        "offer_id": "offer_b_r5",
+        "seller_id": "seller_b",
+        "round": 5,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_b_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "total_price_twd": 719,
+        "delivery_days": 1,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T18:00:00+08:00",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      {
+        "offer_id": "offer_c_standalone_r5",
+        "seller_id": "seller_c",
+        "round": 5,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_c_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "total_price_twd": 629,
+        "delivery_days": 3,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T18:00:00+08:00",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      {
+        "offer_id": "offer_c_bundle_r5",
+        "seller_id": "seller_c",
+        "round": 5,
+        "variant": "bundle",
+        "items": [
+          {
+            "product_id": "mouse_c_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          },
+          {
+            "product_id": "pad_c_black",
+            "category": "mouse_pad",
+            "role": "addon",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "total_price_twd": 629,
+        "delivery_days": 3,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": true,
+        "expires_at": "2026-09-12T18:00:00+08:00",
+        "baseline_offer_id": "offer_c_standalone_r5",
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": [
+            "related_bundle",
+            "no_extra_cost"
+          ]
+        }
+      },
+      {
+        "offer_id": "offer_d_r3",
+        "seller_id": "seller_d",
+        "round": 3,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_d_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "total_price_twd": 639,
+        "delivery_days": 2,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T18:00:00+08:00",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      },
+      {
+        "offer_id": "offer_e_r1",
+        "seller_id": "seller_e",
+        "round": 1,
+        "variant": "standalone",
+        "items": [
+          {
+            "product_id": "mouse_e_black_small",
+            "category": "mouse",
+            "role": "primary",
+            "quantity": 1
+          }
+        ],
+        "primary_features": [
+          "wireless",
+          "silent_click"
+        ],
+        "total_price_twd": 679,
+        "delivery_days": 4,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T18:00:00+08:00",
+        "baseline_offer_id": null,
+        "eligibility": {
+          "status": "eligible",
+          "reason_codes": []
+        }
+      }
     ],
     "seller_trust": [
-      {"seller_id": "seller_a", "trust": {"personal_band": "positive", "personal_rating": 4.8, "personal_count": 3, "marketplace_rating": 4.6, "marketplace_count": 128}},
-      {"seller_id": "seller_b", "trust": {"personal_band": "neutral", "personal_rating": null, "personal_count": 0, "marketplace_rating": 4.8, "marketplace_count": 502}},
-      {"seller_id": "seller_c", "trust": {"personal_band": "negative", "personal_rating": 2.5, "personal_count": 2, "marketplace_rating": 4.3, "marketplace_count": 76}}
+      {
+        "seller_id": "seller_a",
+        "trust": {
+          "personal_band": "positive",
+          "personal_rating": 4.8,
+          "personal_count": 3,
+          "marketplace_rating": 4.6,
+          "marketplace_count": 128
+        }
+      },
+      {
+        "seller_id": "seller_b",
+        "trust": {
+          "personal_band": "neutral",
+          "personal_rating": null,
+          "personal_count": 0,
+          "marketplace_rating": 4.8,
+          "marketplace_count": 502
+        }
+      },
+      {
+        "seller_id": "seller_c",
+        "trust": {
+          "personal_band": "negative",
+          "personal_rating": 2.5,
+          "personal_count": 2,
+          "marketplace_rating": 4.3,
+          "marketplace_count": 76
+        }
+      },
+      {
+        "seller_id": "seller_d",
+        "trust": {
+          "personal_band": "positive",
+          "personal_rating": 4.5,
+          "personal_count": 2,
+          "marketplace_rating": 4.5,
+          "marketplace_count": 50
+        }
+      },
+      {
+        "seller_id": "seller_e",
+        "trust": {
+          "personal_band": "neutral",
+          "personal_rating": null,
+          "personal_count": 0,
+          "marketplace_rating": 4.4,
+          "marketplace_count": 50
+        }
+      }
     ]
   },
   "evaluator_output": {
     "ranked_offers": [
-      {"rank": 1, "offer_id": "offer_a_r2", "reason": "含稅運 569 元為最低總價，符合價格優先。", "tradeoffs": ["五天到貨，比最快方案慢四天"]},
-      {"rank": 2, "offer_id": "offer_c_standalone_r2", "reason": "含稅運 629 元且三天到貨，價格與速度較均衡。", "tradeoffs": ["比最低價高 60 元", "右手非對稱外型未命中偏好", "個人交易評分較低"]},
-      {"rank": 3, "offer_id": "offer_c_bundle_r2", "reason": "與同款單買同價，可選擇免費滑鼠墊。", "tradeoffs": ["買家未將配件列為必要需求", "個人交易評分較低"]},
-      {"rank": 4, "offer_id": "offer_b_r2", "reason": "一天到貨為最快方案，且仍在預算內。", "tradeoffs": ["比最低價高 160 元"]}
+      {
+        "rank": 1,
+        "offer_id": "offer_a_r5",
+        "reason": "含稅運 549 元，5 天到貨，符合本次必要條件。",
+        "tradeoffs": [
+          "最低總價，五天到貨較慢"
+        ]
+      },
+      {
+        "rank": 2,
+        "offer_id": "offer_c_standalone_r5",
+        "reason": "含稅運 629 元，3 天到貨，符合本次必要條件。",
+        "tradeoffs": [
+          "右手外型未命中對稱偏好",
+          "個人交易評分較低"
+        ]
+      },
+      {
+        "rank": 3,
+        "offer_id": "offer_c_bundle_r5",
+        "reason": "含稅運 629 元，3 天到貨，符合本次必要條件。",
+        "tradeoffs": [
+          "免費滑鼠墊可拒絕，右手外型未命中對稱偏好"
+        ]
+      },
+      {
+        "rank": 4,
+        "offer_id": "offer_d_r3",
+        "reason": "含稅運 639 元，2 天到貨，符合本次必要條件。",
+        "tradeoffs": [
+          "價格與交期介於最低價與最快方案之間"
+        ]
+      },
+      {
+        "rank": 5,
+        "offer_id": "offer_e_r1",
+        "reason": "含稅運 679 元，4 天到貨，符合本次必要條件。",
+        "tradeoffs": [
+          "價格與交期介於最低價與最快方案之間"
+        ]
+      },
+      {
+        "rank": 6,
+        "offer_id": "offer_b_r5",
+        "reason": "含稅運 719 元，1 天到貨，符合本次必要條件。",
+        "tradeoffs": [
+          "一天到貨最快，總價較高"
+        ]
+      }
     ]
   },
   "fallback_output": {
     "policy": "price_asc_delivery_asc_trust_band_desc_standalone_first_offer_id_asc",
-    "ranked_offer_ids": ["offer_a_r2", "offer_c_standalone_r2", "offer_c_bundle_r2", "offer_b_r2"]
+    "ranked_offer_ids": [
+      "offer_a_r5",
+      "offer_c_standalone_r5",
+      "offer_c_bundle_r5",
+      "offer_d_r3",
+      "offer_e_r1",
+      "offer_b_r5"
+    ]
   }
 }

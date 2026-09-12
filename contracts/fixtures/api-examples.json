@@ -1,10 +1,13 @@
 {
-  "fixture_version": "0.1",
+  "fixture_version": "0.3",
   "create_request": {
     "http": {
       "method": "POST",
       "path": "/api/requests",
-      "headers": {"Content-Type": "application/json", "Idempotency-Key": "demo-create-001"}
+      "headers": {
+        "Content-Type": "application/json",
+        "Idempotency-Key": "demo-create-001"
+      }
     },
     "body": {
       "intent_md": "# 購買需求\n無線靜音滑鼠，含稅運 1000 元內，7 天內到貨。",
@@ -34,7 +37,11 @@
     }
   },
   "get_request": {
-    "http": {"method": "GET", "path": "/api/requests/req_demo_001", "headers": {}},
+    "http": {
+      "method": "GET",
+      "path": "/api/requests/req_demo_001",
+      "headers": {}
+    },
     "expected_status_code": 200,
     "response_fixture": "happy-path.json#/snapshot"
   },
@@ -42,15 +49,21 @@
     "http": {
       "method": "POST",
       "path": "/api/requests/req_demo_001/decisions",
-      "headers": {"Content-Type": "application/json", "Idempotency-Key": "demo-accept-001"}
+      "headers": {
+        "Content-Type": "application/json",
+        "Idempotency-Key": "demo-accept-001"
+      }
     },
-    "body": {"action": "accept", "offer_id": "offer_a_r2"},
+    "body": {
+      "action": "accept",
+      "offer_id": "offer_a_r5"
+    },
     "expected_status_code": 200,
     "response": {
       "action": "accept",
       "request_id": "req_demo_001",
       "status": "accepted",
-      "selected_offer_id": "offer_a_r2",
+      "selected_offer_id": "offer_a_r5",
       "expires_at": "2026-09-12T18:00:00+08:00"
     }
   },
@@ -58,9 +71,15 @@
     "http": {
       "method": "POST",
       "path": "/api/requests/req_demo_001/decisions",
-      "headers": {"Content-Type": "application/json", "Idempotency-Key": "demo-reject-001"}
+      "headers": {
+        "Content-Type": "application/json",
+        "Idempotency-Key": "demo-reject-001"
+      }
     },
-    "body": {"action": "reject", "feedback": "不要滑鼠墊，預算改成含稅運 900 元，仍需七天內到貨。"},
+    "body": {
+      "action": "reject",
+      "feedback": "不要滑鼠墊，預算改成含稅運 900 元，仍需七天內到貨。"
+    },
     "expected_status_code": 202,
     "response": {
       "action": "reject",
@@ -78,18 +97,24 @@
     "http": {
       "method": "POST",
       "path": "/api/redemptions",
-      "headers": {"Content-Type": "application/json", "Idempotency-Key": "demo-redeem-001"}
+      "headers": {
+        "Content-Type": "application/json",
+        "Idempotency-Key": "demo-redeem-001"
+      }
     },
-    "body": {"request_id": "req_demo_001", "offer_id": "offer_a_r2"},
+    "body": {
+      "request_id": "req_demo_001",
+      "offer_id": "offer_a_r5"
+    },
     "expected_status_code": 201,
     "response": {
       "redemption_id": "red_demo_001",
       "request_id": "req_demo_001",
-      "offer_id": "offer_a_r2",
+      "offer_id": "offer_a_r5",
       "seller_id": "seller_a",
       "status": "redeemed",
       "mode": "virtual_market",
-      "total_price_twd": 720,
+      "total_price_twd": 549,
       "redeemed_at": "2026-09-12T10:05:00+08:00"
     }
   }
