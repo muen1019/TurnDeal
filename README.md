@@ -8,7 +8,7 @@
 
 `npm run test:improver` 執行核心與 Node 24 runtime 內部整合測試；`npm run demo:improver` 執行離線合成案例。明示執行 `npm run demo:improver:live` 才使用 `.env` 的 `API_KEY` 呼叫模型，模型名稱由 `IMPROVER_MODEL` 控制（預設 gpt-4.1-mini）。詳見 [使用方式與接線邊界](docs/BUYER_REQUEST_IMPROVER.md) 及 [驗證紀錄](docs/IMPROVER_TEST_REPORT.md)。
 
-整合版 runtime 已接上 selection_version: 1：API 接受採用時一併提供的拒絕紀錄，或完整拒絕集合，並排入改善工作。決策與工作原子保存，API 提供進度、需求草稿與澄清問題，前端接線不在本提交內。只憑滑動不更新全域偏好；自動 child、澄清後再提交及全域偏好編輯器仍未實作。
+整合版 runtime 已接上 selection_version: 1：API 接受採用時一併提供的拒絕紀錄，或完整拒絕集合，並排入改善工作。決策與工作原子保存，API 提供進度、需求草稿與澄清問題，前端接線不在本提交內。只憑滑動不更新全域偏好；後端已支援澄清後提交與 ready 自動建立唯一 child；全域偏好編輯器尚未同步。前端串接步驟見 [Improver 後端整合指南](docs/IMPROVER_BACKEND_INTEGRATION.md)。
 
 ## 完整前後端入口（最新）
 
@@ -20,7 +20,7 @@
 
 目前前後端與 main 共用 `contracts/a2a-commerce.v0.3.schema.json`、五家／最多五輪商品資料與 db/migrations。accept/reject 保存及 Buyer Agent 原始回饋交接已整合。Root database tools 使用 Node 24，backend/frontend 使用 Node 20.19.5。
 
-backend/frontend 已支援 Chat intent → mock 商品組合 → 真實 accept/reject → SQLite 保存與 GET 恢復。reject 提供 feedback + 原始 source_documents 供 Buyer Agent 使用，不自動改寫、建立 child 或兌換。啟動見 [backend](backend/README.md) 與 [frontend](frontend/README.md)，驗證見 [Result 測試紀錄](docs/RESULT_TEST_REPORT.md)。以下產品主線是完整產品願景，不代表目前 Result 已串接真實 Agent 或兌換。
+backend/frontend 已支援 Chat intent → mock 商品組合 → 真實 accept/reject → SQLite 保存與 GET 恢復。legacy reject 提供 feedback + 原始 source_documents，不自動建立 child；整合版 selection v1 的後端改善流程見上方指南。啟動見 [backend](backend/README.md) 與 [frontend](frontend/README.md)，驗證見 [Result 測試紀錄](docs/RESULT_TEST_REPORT.md)。以下產品主線是完整產品願景，不代表目前 Result 已串接真實 Agent 或兌換。
 
 > Many sellers. One best deal.
 
