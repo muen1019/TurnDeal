@@ -1,0 +1,156 @@
+{
+  "fixture_version": "0.1",
+  "now": "2026-09-12T10:00:00+08:00",
+  "base_constraints": {
+    "max_total_twd": 1000,
+    "delivery_days_max": 7,
+    "required_features": ["wireless", "silent_click"],
+    "bundle_mode": "related_no_extra_cost",
+    "allowed_addon_categories": ["mouse_pad"],
+    "max_addon_increment_twd": 0
+  },
+  "cases": [
+    {
+      "case_id": "reject_over_budget",
+      "offer": {
+        "offer_id": "edge_over_budget",
+        "seller_id": "seller_a",
+        "round": 2,
+        "variant": "standalone",
+        "baseline_offer_id": null,
+        "items": [{"product_id": "mouse_a_black_small", "category": "mouse", "role": "primary", "quantity": 1}],
+        "primary_features": ["wireless", "silent_click"],
+        "total_price_twd": 1050,
+        "delivery_days": 5,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T18:00:00+08:00",
+        "eligibility": {"status": "rejected", "reason_codes": ["over_budget"]}
+      },
+      "expected_status": "rejected",
+      "expected_reason_codes": ["over_budget"]
+    },
+    {
+      "case_id": "reject_delivery_too_late",
+      "offer": {
+        "offer_id": "edge_late",
+        "seller_id": "seller_b",
+        "round": 2,
+        "variant": "standalone",
+        "baseline_offer_id": null,
+        "items": [{"product_id": "mouse_b_black_small", "category": "mouse", "role": "primary", "quantity": 1}],
+        "primary_features": ["wireless", "silent_click"],
+        "total_price_twd": 850,
+        "delivery_days": 9,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T18:00:00+08:00",
+        "eligibility": {"status": "rejected", "reason_codes": ["delivery_too_late"]}
+      },
+      "expected_status": "rejected",
+      "expected_reason_codes": ["delivery_too_late"]
+    },
+    {
+      "case_id": "reject_expired",
+      "offer": {
+        "offer_id": "edge_expired",
+        "seller_id": "seller_c",
+        "round": 2,
+        "variant": "standalone",
+        "baseline_offer_id": null,
+        "items": [{"product_id": "mouse_c_black_small", "category": "mouse", "role": "primary", "quantity": 1}],
+        "primary_features": ["wireless", "silent_click"],
+        "total_price_twd": 840,
+        "delivery_days": 3,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T09:59:59+08:00",
+        "eligibility": {"status": "rejected", "reason_codes": ["expired"]}
+      },
+      "expected_status": "rejected",
+      "expected_reason_codes": ["expired"]
+    },
+    {
+      "case_id": "reject_missing_feature",
+      "offer": {
+        "offer_id": "edge_wired_mouse",
+        "seller_id": "seller_c",
+        "round": 2,
+        "variant": "standalone",
+        "baseline_offer_id": null,
+        "items": [{"product_id": "mouse_wired", "category": "mouse", "role": "primary", "quantity": 1}],
+        "primary_features": ["silent_click"],
+        "total_price_twd": 600,
+        "delivery_days": 2,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": false,
+        "expires_at": "2026-09-12T18:00:00+08:00",
+        "eligibility": {"status": "rejected", "reason_codes": ["missing_feature"]}
+      },
+      "expected_status": "rejected",
+      "expected_reason_codes": ["missing_feature"]
+    },
+    {
+      "case_id": "confirm_paid_addon_without_consent",
+      "offer": {
+        "offer_id": "edge_paid_bundle",
+        "seller_id": "seller_c",
+        "round": 2,
+        "variant": "bundle",
+        "baseline_offer_id": "offer_c_standalone_r2",
+        "items": [
+          {"product_id": "mouse_c_black_small", "category": "mouse", "role": "primary", "quantity": 1},
+          {"product_id": "pad_c_black", "category": "mouse_pad", "role": "addon", "quantity": 1}
+        ],
+        "primary_features": ["wireless", "silent_click"],
+        "total_price_twd": 920,
+        "delivery_days": 3,
+        "terms_id": "terms_standard_v1",
+        "optional_addons": true,
+        "expires_at": "2026-09-12T18:00:00+08:00",
+        "eligibility": {"status": "needs_confirmation", "reason_codes": ["related_bundle", "addon_consent_required"]}
+      },
+      "baseline_total_price_twd": 840,
+      "expected_status": "needs_confirmation",
+      "expected_reason_codes": ["related_bundle", "addon_consent_required"]
+    }
+  ],
+  "evaluator_output_attacks": [
+    {
+      "case_id": "nonexistent_offer_id",
+      "eligible_offer_ids": ["offer_a_r2", "offer_b_r2"],
+      "model_output": {
+        "ranked_offers": [
+          {"rank": 1, "offer_id": "offer_does_not_exist", "reason": "不存在的方案不得發布。", "tradeoffs": []},
+          {"rank": 2, "offer_id": "offer_a_r2", "reason": "有效方案。", "tradeoffs": []}
+        ]
+      },
+      "expected_error_code": "evaluation_invalid",
+      "fallback_ranked_offer_ids": ["offer_a_r2", "offer_b_r2"]
+    },
+    {
+      "case_id": "duplicate_and_missing_offer_id",
+      "eligible_offer_ids": ["offer_a_r2", "offer_b_r2", "offer_c_standalone_r2"],
+      "model_output": {
+        "ranked_offers": [
+          {"rank": 1, "offer_id": "offer_a_r2", "reason": "有效方案。", "tradeoffs": []},
+          {"rank": 2, "offer_id": "offer_a_r2", "reason": "重複方案不得發布。", "tradeoffs": []}
+        ]
+      },
+      "expected_error_code": "evaluation_invalid",
+      "fallback_ranked_offer_ids": ["offer_a_r2", "offer_c_standalone_r2", "offer_b_r2"]
+    },
+    {
+      "case_id": "non_contiguous_rank",
+      "eligible_offer_ids": ["offer_a_r2", "offer_b_r2"],
+      "model_output": {
+        "ranked_offers": [
+          {"rank": 1, "offer_id": "offer_a_r2", "reason": "有效方案。", "tradeoffs": []},
+          {"rank": 3, "offer_id": "offer_b_r2", "reason": "排名不連續不得發布。", "tradeoffs": []}
+        ]
+      },
+      "expected_error_code": "evaluation_invalid",
+      "fallback_ranked_offer_ids": ["offer_a_r2", "offer_b_r2"]
+    }
+  ]
+}
