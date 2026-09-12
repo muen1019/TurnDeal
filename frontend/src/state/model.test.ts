@@ -1,0 +1,10 @@
+import {describe,it,expect,beforeEach} from 'vitest';
+import fixture from '../../../contracts/fixtures/result-v0.2.json';
+import {validateSnapshot} from '../api/client';
+import {freshConversation,currentRank,skipOffer,undoSkip,initialWorkspace,saveWorkspace,loadWorkspace,loadPending,pendingKey} from './model';
+beforeEach(()=>sessionStorage.clear());
+describe('local browsing never mutates a published offer',()=>{
+ it('skips in rank order, undoes only latest, and preserves all backend fields',()=>{const c={...freshConversation(),snapshot:validateSnapshot(structuredClone(fixture.snapshot))};const original=JSON.stringify(c.snapshot);const a=skipOffer(c);const b=skipOffer(a);expect(currentRank(c)?.rank).toBe(1);expect(currentRank(a)?.rank).toBe(2);expect(currentRank(undoSkip(b))?.rank).toBe(2);expect(JSON.stringify(b.snapshot)).toBe(original);});
+ it('returns an empty deck without automatically sending rejection',()=>{let c={...freshConversation(),snapshot:validateSnapshot(structuredClone(fixture.snapshot))};for(let i=0;i<fixture.snapshot.ranked_offers.length;i++)c=skipOffer(c) as typeof c;expect(currentRank(c)).toBeUndefined();expect(c.snapshot.status).toBe('awaiting_user');});
+});
+describe('tab recovery',()=>{it('retains dirty definitions and requirement drafts separately from saved values',()=>{const w=initialWorkspace();w.definitions.savedIntent='saved';w.definitions.intent='unsaved';w.conversations[0].draft='need a mouse';saveWorkspace(w);expect(loadWorkspace().workspace).toEqual(w);});it('reports corrupt local data without inventing a prior chat',()=>{sessionStorage.setItem('offermesh:demo-buyer:workspace:v1','broken');expect(loadWorkspace().error).toBeTruthy();expect(loadWorkspace().workspace.conversations[0].snapshot).toBeNull();});it('retains the exact original idempotency body after reload',()=>{const p={kind:'accept',key:'k',body:{action:'accept',offer_id:'offer_a'},path:'/api/requests/r/decisions',conversationId:'c',requestId:'r',source:'keyboard'};sessionStorage.setItem(pendingKey,JSON.stringify(p));expect(loadPending()).toEqual(p);});});

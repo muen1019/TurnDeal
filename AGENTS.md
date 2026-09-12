@@ -2,6 +2,12 @@
 
 These instructions apply to every change in this repository.
 
+## Result demo compatibility boundary
+
+The Result backend/frontend currently use `contracts/result-api.v0.2.schema.json` and `contracts/fixtures/result-sellers.v0.2.json` (three sellers, two mock rounds). This separate contract retains accept/reject=200 and the original feedback/source_documents handoff without intent rewriting, child requests, redemption, or stock mutation. It is not the five-seller contract and must not overwrite or consume the full-product fixtures accidentally.
+
+The full-product contract remains `contracts/a2a-commerce.v0.2.schema.json` with the five-seller/five-round fixtures and `db/migrations/`. Result uses its own SQLite database in backend/data; the full-product persistence and Result persistence are not interchangeable. Root database scripts require Node 24; backend/frontend continue using Node 20.19.5. Run both contract validators and the applicable database/application tests when integrating them.
+
 ## Source of truth
 
 1. Follow the Sea x OpenAI hackathon rules summarized in `docs/DEVELOPMENT_RULES.md`.

@@ -1,5 +1,11 @@
 # OfferMesh
 
+## 目前可執行：Result API v0.2
+
+Rebase 相容性：Result 使用獨立 `contracts/result-api.v0.2.schema.json` 與三家／兩輪 mock fixture；main 的 `contracts/a2a-commerce.v0.2.schema.json`、五家／五輪資料及 Node 24 資料庫工具均保留。兩套尚未串接，Result backend/frontend 仍使用 Node 20.19.5。
+
+backend/frontend 已支援 Chat intent → mock 商品組合 → 真實 accept/reject → SQLite 保存與 GET 恢復。reject 提供 feedback + 原始 source_documents 供 Buyer Agent 使用，不自動改寫、建立 child 或兌換。啟動見 [backend](backend/README.md) 與 [frontend](frontend/README.md)，驗證見 [Result 測試紀錄](docs/RESULT_TEST_REPORT.md)。以下產品主線是完整產品願景，不代表目前 Result 已串接真實 Agent 或兌換。
+
 > Many sellers. One best deal.
 
 OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commerce MVP。使用者描述商品、預算與交期後，Buyer Agent 會將需求正規化，同時向五家互相隔離的 Seller 議價，再由獨立 Evaluator 排序通過硬限制的方案。Sponsored 曝光與推薦完全分離，最後仍由使用者決定是否採用與兌換。
@@ -221,4 +227,21 @@ v0.2 已完成五家 Seller／最多五輪的契約、19 次議價交換與 6 �
 
 ## 既有專案與 OSS
 
-目前沒有沿用既有個人專案或第三方程式碼。後續加入 OSS 時，請在本節補上名稱、版本、授權與來源連結。
+應用使用 React、Vite、Express、sql.js 等 OSS，版本固定於 frontend/backend 的 package-lock.json；規格使用 [OpenSpec 1.13.0](https://github.com/Fission-AI/OpenSpec)（MIT）初始化與驗證。
+
+## UI／API OpenSpec 定義
+
+已建立 [define-offer-result-ui-api](openspec/changes/define-offer-result-ui-api/proposal.md) change，含能力規格、[技術設計](openspec/changes/define-offer-result-ui-api/design.md) 與 [分批任務](openspec/changes/define-offer-result-ui-api/tasks.md)。Result API 與 React 串接已實作，細部視覺及真機驗收仍依任務表追蹤。
+
+- [frontend/](frontend/README.md)：React＋TypeScript＋Vite，Node.js `>=20.19.0 <21`；右滑立即採用、左滑略過、兩輪狀態與 Sponsored 展示。
+- [backend/](backend/README.md)：Node.js 20＋TypeScript＋Express 5＋SQLite；三個 Result HTTP 操作、mock 組合及冪等 accept/reject。
+- [OpenAPI 3.1](backend/openapi.json)：引用共用 v0.2 schema；使用獨立 Result 契約，GET 回傳包含 decision 的 RequestSnapshot。
+
+在 repository 根目錄可執行規格檢查：
+
+```bash
+npx --yes @fission-ai/openspec@1.13.0 status --change define-offer-result-ui-api
+npx --yes @fission-ai/openspec@1.13.0 validate define-offer-result-ui-api --strict
+```
+
+change 維持未封存，尚待任務表中的完整視覺與裝置驗收。根目錄契約測試同時驗證main 共用契約與 Result v0.2。

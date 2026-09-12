@@ -1,3 +1,7 @@
+## Result API 相容邊界
+
+目前可執行的 backend/frontend 使用獨立 `contracts/result-api.v0.2.schema.json`，搭配 `contracts/fixtures/result-sellers.v0.2.json` 保留三家／兩輪 mock。accept/reject 回 200，reject 保存原始 feedback/source_documents，不自動改寫、建立 child 或兌換。main 的五家／五輪共用契約及 db migrations 原樣保留；兩者尚未串接，不共用 SQLite 檔案。根目錄資料庫工具使用 Node 24，Result backend/frontend 使用 Node 20.19.5。
+
 # 開發與驗收基準 v0.2
 
 本文件將主辦方簡報、產品提案與團隊分工整理成可執行的工程規則。後續開發與驗收均以此文件及 `contracts/` 為準。

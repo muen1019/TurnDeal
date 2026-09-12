@@ -14,7 +14,7 @@
     "db:seed:discovery": "node scripts/discovery-db.mjs",
     "demo:discovery": "node examples/discovery.ts",
     "demo:orchestrator": "node examples/orchestrator-input.ts",
-    "test:contracts": "node scripts/validate-contracts.mjs",
+    "test:contracts": "node scripts/validate-contracts.mjs && node scripts/validate-result-contracts.mjs",
     "test:db": "node scripts/db.mjs --memory",
     "db:init": "node scripts/db.mjs",
     "db:migrate": "node scripts/db.mjs --migrate",

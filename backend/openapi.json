@@ -1,0 +1,292 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OfferMesh Result API",
+    "version": "0.2.0",
+    "description": "Deterministic mock offers, durable accept/reject and recoverable Buyer Agent handoff. Fixed local demo buyer. No model rewriting or redemption."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:3001",
+      "description": "本機 backend（npm run dev）"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Requests"
+    },
+    {
+      "name": "Decisions"
+    }
+  ],
+  "security": [],
+  "paths": {
+    "/api/requests": {
+      "post": {
+        "operationId": "createRequest",
+        "tags": [
+          "Requests"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Persisted formatting snapshot; mock generation runs independently of GET.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestSnapshot"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      }
+    },
+    "/api/requests/{request_id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/RequestId"
+        }
+      ],
+      "get": {
+        "operationId": "getRequestResult",
+        "tags": [
+          "Requests"
+        ],
+        "responses": {
+          "200": {
+            "description": "Stable snapshot including persisted decision or null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestSnapshot"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/api/requests/{request_id}/decisions": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/RequestId"
+        }
+      ],
+      "post": {
+        "operationId": "submitDecision",
+        "tags": [
+          "Decisions"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/AcceptDecision"
+                  },
+                  {
+                    "$ref": "#/components/schemas/RejectDecision"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Saved accepted or rejected decision; no document rewrite or child creation.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecisionResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "410": {
+            "description": "offer_expired：伺服器時間 >= expires_at；不改價、不換方案",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          },
+          "503": {
+            "$ref": "#/components/responses/Unavailable"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "RequestId": {
+        "name": "request_id",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "$ref": "#/components/schemas/ID"
+        },
+        "description": "目前 server buyer context 所屬的 request"
+      },
+      "IdempotencyKey": {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "description": "同一次提交與重試沿用；新操作或修改 body 使用新 key。伺服器按 buyer/method/path/key 隔離。"
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "invalid_request：無效 JSON、型別、未知欄位、空白文件或缺少 key；不消耗 key",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "not_found：資源不存在或不屬於目前買家／request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "state_conflict、idempotency_conflict 或 request_in_progress；無額外副作用。request_in_progress 回 Retry-After: 1。",
+        "headers": {
+          "Retry-After": {
+            "description": "僅 request_in_progress 時提供重試等待秒數",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "internal_error：未預期錯誤；客戶端先核對可能已提交的結果",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Unavailable": {
+        "description": "processing_unavailable：提交前的服務暫時不可用；不是使用者回饋錯誤",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "ID": {
+        "$ref": "../contracts/result-api.v0.2.schema.json#/$defs/Id"
+      },
+      "CreateRequest": {
+        "$ref": "../contracts/result-api.v0.2.schema.json#/$defs/CreateRequest"
+      },
+      "DocumentBundle": {
+        "$ref": "../contracts/result-api.v0.2.schema.json#/$defs/DocumentBundle"
+      },
+      "RequestSnapshot": {
+        "$ref": "../contracts/result-api.v0.2.schema.json#/$defs/RequestSnapshot"
+      },
+      "AcceptDecision": {
+        "$ref": "../contracts/result-api.v0.2.schema.json#/$defs/AcceptDecision"
+      },
+      "RejectDecision": {
+        "$ref": "../contracts/result-api.v0.2.schema.json#/$defs/RejectDecision"
+      },
+      "AcceptedResult": {
+        "$ref": "../contracts/result-api.v0.2.schema.json#/$defs/AcceptDecisionResult"
+      },
+      "RejectedResult": {
+        "$ref": "../contracts/result-api.v0.2.schema.json#/$defs/RejectDecisionResult"
+      },
+      "ErrorResponse": {
+        "$ref": "../contracts/result-api.v0.2.schema.json#/$defs/ErrorResponse"
+      },
+      "DecisionResult": {
+        "$ref": "../contracts/result-api.v0.2.schema.json#/$defs/DecisionResult"
+      }
+    }
+  }
+}

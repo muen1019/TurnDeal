@@ -1,0 +1,87 @@
+{
+  "create_request": {
+    "http": {
+      "method": "POST",
+      "path": "/api/requests",
+      "headers": {
+        "Content-Type": "application/json",
+        "Idempotency-Key": "demo-create-001"
+      }
+    },
+    "body": {
+      "intent_md": "# Request\nWireless silent mouse under TWD 1000, delivery within 7 days.",
+      "preference_md": "# Preferences\nPrefer black, small, and symmetrical. Free related accessories are okay."
+    },
+    "expected_status_code": 202,
+    "response": {
+      "request_id": "req_demo_001",
+      "root_request_id": "req_demo_001",
+      "parent_request_id": null,
+      "status": "formatting",
+      "documents": {
+        "revision": 1,
+        "intent_md": "# Request\nWireless silent mouse under TWD 1000, delivery within 7 days.",
+        "preference_md": "# Preferences\nPrefer black, small, and symmetrical. Free related accessories are okay."
+      },
+      "intent": null,
+      "seller_agents": [],
+      "discovery_exclusions": [],
+      "sponsored_placement": null,
+      "offers": [],
+      "ranked_offers": [],
+      "confirmation_offer_ids": [],
+      "selected_offer_id": null,
+      "next_request_id": null,
+      "error": null,
+      "decision": null
+    }
+  },
+  "accept_decision": {
+    "http": {
+      "method": "POST",
+      "path": "/api/requests/req_demo_001/decisions",
+      "headers": {
+        "Content-Type": "application/json",
+        "Idempotency-Key": "demo-accept-001"
+      }
+    },
+    "body": {
+      "action": "accept",
+      "offer_id": "offer_a_r2"
+    },
+    "expected_status_code": 200,
+    "response": {
+      "action": "accept",
+      "request_id": "req_demo_001",
+      "status": "accepted",
+      "selected_offer_id": "offer_a_r2",
+      "expires_at": "2026-09-12T18:00:00+08:00"
+    }
+  },
+  "reject_decision_alternative": {
+    "http": {
+      "method": "POST",
+      "path": "/api/requests/req_demo_001/decisions",
+      "headers": {
+        "Content-Type": "application/json",
+        "Idempotency-Key": "demo-reject-001"
+      }
+    },
+    "body": {
+      "action": "reject",
+      "feedback": "ship faster next round"
+    },
+    "expected_status_code": 200,
+    "response": {
+      "action": "reject",
+      "request_id": "req_demo_001",
+      "status": "rejected",
+      "feedback": "ship faster next round",
+      "source_documents": {
+        "revision": 1,
+        "intent_md": "# Request\nWireless silent mouse under TWD 1000, delivery within 7 days.",
+        "preference_md": "# Preferences\nPrefer black, small, and symmetrical. Free related accessories are okay."
+      }
+    }
+  }
+}

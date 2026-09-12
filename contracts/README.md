@@ -1,3 +1,9 @@
+## Result API 相容邊界
+
+目前可執行的 backend/frontend 使用獨立 `contracts/result-api.v0.2.schema.json`，搭配 `contracts/fixtures/result-sellers.v0.2.json` 保留三家／兩輪 mock。accept/reject 回 200，reject 保存原始 feedback/source_documents，不自動改寫、建立 child 或兌換。main 的五家／五輪共用契約及 db migrations 原樣保留；兩者尚未串接，不共用 SQLite 檔案。根目錄資料庫工具使用 Node 24，Result backend/frontend 使用 Node 20.19.5。
+
+Result fixtures 為 `fixtures/result-v0.2.json`、`fixtures/result-api-v0.2.json`；HTTP 正本為 `../backend/openapi.json`。`npm run test:contracts` 同時驗證 full-product 與 Result 契約。以下是 main 的完整產品契約說明。
+
 # A2A Commerce shared contracts v0.2
 
 `contracts/` 是四個模組共同使用的資料邊界。API 與內部函式均傳 JSON 值，不傳 filesystem path，也不讓任一模組自行增加未定義欄位。
