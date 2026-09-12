@@ -2,13 +2,13 @@
 
 完整接線已完成：請在專案根目錄以 Node 24 執行 `npm run dev`，前端自動連到整合 API 3201。預設為離線策略模式；`npm run dev:secure` 可隱藏輸入 key 啟用模型。詳見 [完整接線說明](../docs/RUN_FULL_APP.md)。
 
-已實作 React、TypeScript、Vite 工作區。Chat 將已儲存的 intent.md、preference.md 與本次輸入合成 CreateRequest；後端產生 mock 商品組合，前端依後端排名顯示。
+已實作 React、TypeScript、Vite 工作區。Chat 可直接把本次輸入作為 CreateRequest.intent_md，不必先儲存代理設定；若有已儲存模板與偏好則一併套用。整合入口執行 Formatter、搜尋、議價與評估；legacy Result 後端仍提供 mock 商品組合，前端依後端排名顯示。
 
 UI 使用滿版水藍色背景，沒有米色底與外框。整頁不捲動，工作區依視窗可用高度調整；長對話、文件和明細只在元件內捲動。商品頁與回饋頁不顯示原始 JSON、識別碼、決策資料或交接文件。
 
 ## 啟動
 
-使用 Node 20.19.5，於 frontend 執行 `npm ci`、`npm run dev`，搭配已啟動的 3201 API。開啟 http://127.0.0.1:5173/chat，先儲存代理設定，輸入「辦公用無線滑鼠，預算 900 元含稅運，7 天內到貨。」並送出。自行啟動後端的預設 port 為 3001 時，請將前端 OFFERMESH_API_ORIGIN 設為 http://127.0.0.1:3001；不須修改程式碼。
+使用 Node 20.19.5，於 frontend 執行 `npm ci`、`npm run dev`，搭配已啟動的 3201 API。開啟 http://127.0.0.1:5173/chat，直接輸入「辦公用無線滑鼠，預算 900 元含稅運，7 天內到貨。」並送出。代理設定為選填，可只儲存偏好或清空模板，不會改寫既有需求。自行啟動後端的預設 port 為 3001 時，請將前端 OFFERMESH_API_ORIGIN 設為 http://127.0.0.1:3001；不須修改程式碼。
 
 Vite 將相對 /api 轉送到使用者提供的 http://127.0.0.1:3201。可用環境變數 OFFERMESH_API_ORIGIN 覆寫 origin（不含 /api）。API path 由 backend/openapi.json 產生，型別與執行期驗證共用 contracts/a2a-commerce.v0.3.schema.json；`npm run generate:types` 更新生成檔。
 

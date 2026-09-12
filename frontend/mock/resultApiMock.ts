@@ -80,6 +80,7 @@ export function createMockApi(options: MockApiOptions = {}) {
 
     const validBody = validate<CreateRequest>("CreateRequest", body);
     if (!validBody.ok) return validBody.error;
+    if(validBody.value.clarification||validBody.value.refinement)return error(400,'invalid_request','問答需要使用整合 runtime，固定預覽不會解析回答。',['clarification']);
 
     const bodyJson = canonicalJson(validBody.value);
     const replay = idempotency.get(idempotencyKey);

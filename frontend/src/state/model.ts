@@ -1,9 +1,11 @@
 import type { RequestSnapshot } from "../contract.generated";
+import {newId} from './id';
 
 export type View = "chat" | "offers" | "details" | "settings" | "history" | "feedback";
 export type InputSource = "keyboard" | "pointer";
 
 export interface Conversation {
+  refinementRequested?: boolean;
   id: string;
   title: string;
   requestId: string | null;
@@ -12,6 +14,7 @@ export interface Conversation {
   draft: string;
   feedback: string;
   feedbackHistory?: string[];
+  clarificationDraft?: {requestId:string;answers:Record<string,string>};
   skipped: string[];
   snapshot: RequestSnapshot | null;
   historyMissing?: boolean;
@@ -47,7 +50,7 @@ export const pendingKey = "offermesh:demo-buyer:pending:v1";
 
 export function freshConversation(): Conversation {
   return {
-    id: crypto.randomUUID(),
+    id: newId(),
     title: "新的購物需求",
     requestId: null,
     message: "",
@@ -65,9 +68,8 @@ export function initialWorkspace(): Workspace {
 
   return {
     definitions: {
-      intent: "辦公用無線滑鼠。",
-      preference:
-        "價格優先，可接受免費滑鼠墊，不接受付費加購。",
+      intent: "",
+      preference: "",
       savedIntent: "",
       savedPreference: "",
       version: 0,

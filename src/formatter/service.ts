@@ -11,11 +11,28 @@ import type { FormatResult } from './parser.ts';
 export type SubmitText = { intent_md: string; preference_md?: string; idempotency_key: string };
 type Submission = { request_id: string; result: FormatResult };
 
+export function readSavedPreferences(db:DatabaseSync,userId:string) {
+  const rows=db.prepare('SELECT * FROM user_preferences WHERE user_id=? AND active=1 ORDER BY preference_id').all(userId);
+  const preferences:ProductPreference[]=[],invalid:string[]=[];
+  for(const row of rows) {
+    try {
+      const value=JSON.parse(String(row.values_json));
+      const operator=row.operator==='prefer'?'in':row.operator==='avoid'?'not_in':row.operator;
+      const p={preference_id:String(row.preference_id),attribute:row.attribute,operator,
+        strength:row.strength==='weak'?'preferred':row.strength,source_text:`SQLite preference ${row.preference_id}`,
+        ...(operator==='range'?{min:value.min??null,max:value.max??null}:{values:value})} as ProductPreference;
+      validatePreferences([p]);preferences.push(p);
+    } catch {invalid.push(`已儲存偏好 ${row.preference_id} 的格式尚不支援，請先確認或停用該偏好。`);}
+  }
+  return {rows,preferences,invalid};
+}
+
 export function createFormatterService(options: {
   db: DatabaseSync; userId: string; registrations: SellerRegistration[]; timeoutMs: number; now?: () => Date;
   formatter?: typeof formatIntent;
   // Backend-only: complete a previously persisted HTTP formatting request.
   existingRequestId?: string;
+  rankingWeights?: {price:number;delivery:number;trust:number;color:number};
 }) {
   const {db,userId}=options;
   const now=options.now??(()=>new Date());
@@ -34,20 +51,9 @@ export function createFormatterService(options: {
         db.exec('RELEASE format_request');
         return {request_id:String(previous.request_id),result:JSON.parse(String(previous.result_json))};
       }
-      const rows=db.prepare('SELECT * FROM user_preferences WHERE user_id=? AND active=1 ORDER BY preference_id').all(userId);
-      const preferences:ProductPreference[]=[];
-      const invalid:string[]=[];
-      for(const row of rows) {
-        try {
-          const value=JSON.parse(String(row.values_json));
-          const operator=row.operator==='prefer'?'in':row.operator==='avoid'?'not_in':row.operator;
-          const p={preference_id:String(row.preference_id),attribute:row.attribute,operator,
-            strength:row.strength==='weak'?'preferred':row.strength,source_text:`SQLite preference ${row.preference_id}`,
-            ...(operator==='range'?{min:value.min??null,max:value.max??null}:{values:value})} as ProductPreference;
-          validatePreferences([p]);preferences.push(p);
-        } catch {invalid.push(`已儲存偏好 ${row.preference_id} 的格式尚不支援，請先確認或停用該偏好。`);}
-      }
+      const {rows,preferences,invalid}=readSavedPreferences(db,userId);
       const result=(options.formatter??formatIntent)(input,preferences);
+      if(options.rankingWeights&&result.normalized_intent){assertContract('RankingWeights',options.rankingWeights);result.normalized_intent.ranking_weights={...options.rankingWeights};}
       if(invalid.length) {result.status='needs_clarification';result.normalized_intent=null;result.questions.push(...invalid);}
       assertContract('FormatterResult',result);
       const requestId=options.existingRequestId??`req_${randomUUID()}`;

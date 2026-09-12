@@ -2,6 +2,33 @@
 
 /**
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "RankingWeights".
+ */
+export type RankingWeights = RankingWeights1 & {
+  price: number;
+  delivery: number;
+  trust: number;
+  color: number;
+};
+export type RankingWeights1 =
+  | {
+      price?: number;
+      [k: string]: unknown;
+    }
+  | {
+      delivery?: number;
+      [k: string]: unknown;
+    }
+  | {
+      trust?: number;
+      [k: string]: unknown;
+    }
+  | {
+      color?: number;
+      [k: string]: unknown;
+    };
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
  * via the `definition` "MoneyTwd".
  */
 export type MoneyTwd = number;
@@ -151,6 +178,9 @@ export interface A2ACommerceContracts {
   CategoricalProductPreference?: CategoricalProductPreference;
   RangeProductPreference?: RangeProductPreference;
   ProductPreference?: ProductPreference;
+  RankingWeights?: RankingWeights;
+  BuyerProfile?: BuyerProfile;
+  BuyerProfileResponse?: BuyerProfileResponse;
   NormalizedIntent?: NormalizedIntent;
   ProductAttributes?: ProductAttributes;
   ProductMatch?: ProductMatch;
@@ -167,6 +197,8 @@ export interface A2ACommerceContracts {
   RankedOffer?: RankedOffer;
   ApiError?: ApiError;
   RequestSnapshot?: RequestSnapshot;
+  FormatterSummary?: FormatterSummary;
+  ClarificationQuestion?: ClarificationQuestion;
   AcceptDecisionResult?: AcceptDecisionResult;
   RejectDecisionResult?: RejectDecisionResult;
   DecisionResult?: DecisionResult;
@@ -209,6 +241,7 @@ export interface FormatterResult {
  * via the `definition` "NormalizedIntent".
  */
 export interface NormalizedIntent {
+  ranking_weights?: RankingWeights;
   category: "mouse";
   max_total_twd: MoneyTwd;
   delivery_days_max: number;
@@ -260,6 +293,16 @@ export interface DocumentBundle {
  * via the `definition` "CreateRequest".
  */
 export interface CreateRequest {
+  refinement?: {
+    parent_request_id: Id;
+  };
+  clarification?: {
+    parent_request_id: Id;
+    answers: {
+      question_id: Id;
+      answer: string;
+    }[];
+  };
   intent_md: string;
   preference_md?: string;
 }
@@ -286,6 +329,24 @@ export interface RejectDecision {
 export interface RedeemRequest {
   request_id: Id;
   offer_id: Id;
+}
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "BuyerProfile".
+ */
+export interface BuyerProfile {
+  name: string;
+  shipping_address: string;
+  payment_method: "later" | "card" | "mobile" | "cash_on_delivery";
+  weights: RankingWeights;
+  colors: ("black" | "white" | "blue" | "red" | "rose")[];
+}
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "BuyerProfileResponse".
+ */
+export interface BuyerProfileResponse {
+  profile: BuyerProfile | null;
 }
 /**
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
@@ -451,9 +512,10 @@ export interface ApiError {
  * via the `definition` "RequestSnapshot".
  */
 export interface RequestSnapshot {
+  formatter?: FormatterSummary;
   request_id: Id;
   root_request_id: Id;
-  parent_request_id: null;
+  parent_request_id: null | Id;
   status: Status;
   documents: DocumentBundle;
   intent: NormalizedIntent | null;
@@ -467,6 +529,29 @@ export interface RequestSnapshot {
   next_request_id: null;
   error: ApiError | null;
   decision: DecisionResult | null;
+}
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "FormatterSummary".
+ */
+export interface FormatterSummary {
+  provider: "openai" | "rules";
+  model: string | null;
+  questions: ClarificationQuestion[];
+}
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "ClarificationQuestion".
+ */
+export interface ClarificationQuestion {
+  question_id: Id;
+  field: "budget" | "delivery" | "color" | "size_class" | "category" | "other";
+  text: string;
+  suggestions: {
+    label: string;
+    value: string;
+    source: "preference" | "example";
+  }[];
 }
 /**
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
@@ -609,6 +694,10 @@ export interface SellerTrustEntry {
  * via the `definition` "EvaluatorInput".
  */
 export interface EvaluatorInput {
+  color_matches?: {
+    offer_id: Id;
+    score: 0 | 100;
+  }[];
   request_id: Id;
   evaluated_at: Timestamp;
   intent: NormalizedIntent;

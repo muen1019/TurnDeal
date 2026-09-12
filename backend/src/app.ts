@@ -10,6 +10,7 @@ export async function createApp(options:CreateAppOptions={}){
  const store=await OfferStore.open({...options,dbPath:options.dbPath??resolve(backendRoot,'data/result-v02.sqlite'),now:options.now??(()=>new Date())});
  const app=express();app.locals.store=store;app.use(express.json({limit:'256kb',strict:true}));
  const buyer=(req:Request)=>options.buyerId?.(req)??'demo_buyer';
+ app.use('/api/requests',(req,_res,next)=>{if(req.method==='POST'&&(req.body?.clarification||req.body?.refinement))return next(invalidRequest('Clarification requires the integrated runtime server.'));next();});
  function key(req:Request){const value=req.header('Idempotency-Key');if(!value||[...value].length>128)throw invalidRequest('POST requires Idempotency-Key (1–128 characters).',['Idempotency-Key']);return value;}
  app.post('/api/requests',async(req,res,next)=>{try{const body=assertValid<CreateRequest>('CreateRequest',req.body);const result=await store.withIdempotency(buyer(req),'POST','/api/requests',key(req),body,()=>store.createRequest(buyer(req),{intent_md:body.intent_md,preference_md:body.preference_md??''}));res.status(result.status).json(result.body);if(result.scheduleRequestId&&options.autoProcess!==false)setImmediate(()=>{try{store.processRequest(result.scheduleRequestId!);}catch(error){console.error('Mock publication failed',error);}});}catch(error){next(error);}});
  app.get('/api/requests/:request_id',(req,res,next)=>{try{res.json(store.snapshot(req.params.request_id,buyer(req)));}catch(error){next(error);}});

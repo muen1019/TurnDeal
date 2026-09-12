@@ -1,5 +1,9 @@
 # 開發與驗收基準 v0.3
 
+使用者設定補充：依 [BUYER_SETUP.md](BUYER_SETUP.md) 增加獨立 GET／POST /api/buyer-profile、SQLite buyer_profiles、NormalizedIntent.ranking_weights 與 EvaluatorInput.color_matches。設定必須明示保存；基本資料不進任何模型。未指定權重的舊需求保留舊排序，硬限制與 Sponsored 隔離規則不變。
+
+2026-09-12 現行補充：整合 runtime 的 Formatter 問答依 [CLARIFICATION_SPEC.md](CLARIFICATION_SPEC.md) 實作，可建立 needs_clarification 的 child request（保留 parent、遞增文件 revision），並在共用 v0.3 增加 optional clarification／formatter 摘要。以下「不建立 child」僅指 reject 後的改寫與 legacy mock，不限制已明示提交的 Formatter 回答。完整模型 pipeline 現由 backend/runtime 提供，legacy backend/src 仍為 mock。
+
 目前前後端與完整產品資料使用 a2a-commerce.v0.3.schema.json。五家／最多五輪 mock 已接入 Result API；reject=200/rejected 保存原始 feedback/source_documents，不改寫、不建立 child。Buyer Agent 改寫、兌換與完整模型 pipeline 仍是後續整合。
 
 本文件將主辦方簡報、產品提案與團隊分工整理成可執行的工程規則。後續開發與驗收均以此文件及 `contracts/` 為準。

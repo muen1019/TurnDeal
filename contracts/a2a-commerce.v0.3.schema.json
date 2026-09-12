@@ -203,6 +203,22 @@
       "type": "object",
       "description": "intent_md describes this purchase and its temporary constraints/preferences. preference_md is a request-bound preference snapshot; omission/empty text does not clear active SQLite product preferences. Neither field updates the durable profile.",
       "properties": {
+        "refinement": {
+          "type": "object", "properties": {"parent_request_id": {"$ref": "#/$defs/Id"}},
+          "required": ["parent_request_id"], "additionalProperties": false
+        },
+        "clarification": {
+          "type": "object",
+          "properties": {
+            "parent_request_id": {"$ref": "#/$defs/Id"},
+            "answers": {"type": "array", "minItems": 1, "maxItems": 30, "items": {
+              "type": "object", "properties": {
+                "question_id": {"$ref": "#/$defs/Id"},
+                "answer": {"type": "string", "minLength": 1, "maxLength": 500, "pattern": "\\S"}
+              }, "required": ["question_id", "answer"], "additionalProperties": false
+            }}
+          }, "required": ["parent_request_id", "answers"], "additionalProperties": false
+        },
         "intent_md": {
           "type": "string",
           "minLength": 1,
@@ -218,6 +234,7 @@
       "required": [
         "intent_md"
       ],
+      "allOf": [{"not": {"required": ["clarification", "refinement"]}}],
       "additionalProperties": false
     },
     "AcceptDecision": {
@@ -481,9 +498,32 @@
         }
       ]
     },
+    "RankingWeights": {
+      "type": "object",
+      "properties": {
+        "price": {"type": "integer", "minimum": 0, "maximum": 100},
+        "delivery": {"type": "integer", "minimum": 0, "maximum": 100},
+        "trust": {"type": "integer", "minimum": 0, "maximum": 100},
+        "color": {"type": "integer", "minimum": 0, "maximum": 100}
+      }, "required": ["price", "delivery", "trust", "color"], "additionalProperties": false,
+      "anyOf": [{"properties": {"price": {"type": "integer", "minimum": 1}}}, {"properties": {"delivery": {"type": "integer", "minimum": 1}}}, {"properties": {"trust": {"type": "integer", "minimum": 1}}}, {"properties": {"color": {"type": "integer", "minimum": 1}}}]
+    },
+    "BuyerProfile": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string", "minLength": 1, "maxLength": 60, "pattern": "\\S"},
+        "shipping_address": {"type": "string", "maxLength": 240},
+        "payment_method": {"enum": ["later", "card", "mobile", "cash_on_delivery"]},
+        "weights": {"$ref": "#/$defs/RankingWeights"},
+        "colors": {"type": "array", "maxItems": 5, "uniqueItems": true, "items": {"enum": ["black", "white", "blue", "red", "rose"]}}
+      }, "required": ["name", "shipping_address", "payment_method", "weights", "colors"], "additionalProperties": false,
+      "allOf": [{"if": {"properties": {"colors": {"maxItems": 0}}}, "then": {"properties": {"weights": {"anyOf": [{"properties": {"price": {"minimum": 1}}}, {"properties": {"delivery": {"minimum": 1}}}, {"properties": {"trust": {"minimum": 1}}}]}}}}]
+    },
+    "BuyerProfileResponse": {"type": "object", "properties": {"profile": {"anyOf": [{"$ref": "#/$defs/BuyerProfile"}, {"type": "null"}]}}, "required": ["profile"], "additionalProperties": false},
     "NormalizedIntent": {
       "type": "object",
       "properties": {
+        "ranking_weights": {"$ref": "#/$defs/RankingWeights"},
         "category": {
           "const": "mouse"
         },
@@ -1306,6 +1346,7 @@
     "RequestSnapshot": {
       "type": "object",
       "properties": {
+        "formatter": {"$ref": "#/$defs/FormatterSummary"},
         "request_id": {
           "$ref": "#/$defs/Id"
         },
@@ -1313,7 +1354,7 @@
           "$ref": "#/$defs/Id"
         },
         "parent_request_id": {
-          "type": "null"
+          "anyOf": [{"type": "null"}, {"$ref": "#/$defs/Id"}]
         },
         "status": {
           "$ref": "#/$defs/Status"
@@ -1623,13 +1664,36 @@
             "documents": {
               "properties": {
                 "revision": {
-                  "const": 1
+                  "minimum": 1,
+                  "maximum": 9
                 }
               }
             }
           }
         }
       ]
+    },
+    "FormatterSummary": {
+      "type": "object",
+      "properties": {
+        "provider": {"enum": ["openai", "rules"]},
+        "model": {"type": ["string", "null"]},
+        "questions": {"type": "array", "maxItems": 30, "items": {"$ref": "#/$defs/ClarificationQuestion"}}
+      }, "required": ["provider", "model", "questions"], "additionalProperties": false
+    },
+    "ClarificationQuestion": {
+      "type": "object",
+      "properties": {
+        "question_id": {"$ref": "#/$defs/Id"},
+        "field": {"enum": ["budget", "delivery", "color", "size_class", "category", "other"]},
+        "text": {"type": "string", "minLength": 1},
+        "suggestions": {"type": "array", "maxItems": 3, "items": {
+          "type": "object", "properties": {
+            "label": {"type": "string"}, "value": {"type": "string", "maxLength": 500},
+            "source": {"enum": ["preference", "example"]}
+          }, "required": ["label", "value", "source"], "additionalProperties": false
+        }}
+      }, "required": ["question_id", "field", "text", "suggestions"], "additionalProperties": false
     },
     "AcceptDecisionResult": {
       "type": "object",
@@ -2164,6 +2228,7 @@
       "type": "object",
       "description": "Campaign and Sponsored data are intentionally absent.",
       "properties": {
+        "color_matches": {"type": "array", "items": {"type": "object", "properties": {"offer_id": {"$ref": "#/$defs/Id"}, "score": {"enum": [0, 100]}}, "required": ["offer_id", "score"], "additionalProperties": false}},
         "request_id": {
           "$ref": "#/$defs/Id"
         },

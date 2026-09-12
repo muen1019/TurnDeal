@@ -33,7 +33,7 @@ export function FeedbackForm({value, pending = false, fieldMessage, submitLabel 
     >
       <div className="feedback-form__header">
         <h2 id="feedback-title">補充需求</h2>
-        <p>略過不會自動送出拒絕。請寫下想調整的條件；系統會保存回饋，供 Buyer Agent 後續處理。</p>
+        <p>這批哪裡不合適？送出後 AI 會再問幾個具體問題，幫你重新篩選。略過不會自動購買或修改長期偏好。</p>
       </div>
 
       <label className="offer-form-field">

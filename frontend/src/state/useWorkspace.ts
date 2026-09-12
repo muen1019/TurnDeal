@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import {newId} from './id';
 import type { RequestSnapshot } from "../contract.generated";
 import {
   ApiFailure,
@@ -264,6 +265,7 @@ export function useWorkspace() {
         patch(byConversationId.id, {
           requestId: snapshot.request_id,
           snapshot,
+          ...(pendingValue.kind==='create'?{skipped:[],refinementRequested:false,clarificationDraft:undefined}:{}),
           draft: byConversationId.draft.trim() === byConversationId.message ? "" : byConversationId.draft,
         });
         return byConversationId.id;
@@ -389,6 +391,7 @@ export function useWorkspace() {
               if(conversation.snapshot && (result.source_documents.revision!==conversation.snapshot.documents.revision || result.source_documents.intent_md!==conversation.snapshot.documents.intent_md || result.source_documents.preference_md!==conversation.snapshot.documents.preference_md)) throw new ApiFailure(0,'invalid_response','回傳文件不符合原需求。');
               return patchConversation(workspace, conversation.id, {
                 feedback: "",
+                refinementRequested: true,
                 feedbackHistory: [
                   ...(conversation.feedbackHistory ?? []),
                   String(pendingValue.body.feedback ?? ""),
@@ -419,7 +422,7 @@ export function useWorkspace() {
 
         const definite =
           apiError &&
-          [400, 404, 410, 422, 503].includes(apiError.status) &&
+          ([400, 404, 410, 422, 503].includes(apiError.status) || apiError.code === 'clarification_conflict') &&
           apiError.code !== "invalid_response";
 
         if (definite) {
@@ -483,7 +486,7 @@ export function useWorkspace() {
 
       const journal: Pending = {
         ...pendingInput,
-        key: crypto.randomUUID(),
+        key: newId(),
         source: sourceRef.current,
       };
 
@@ -529,11 +532,10 @@ export function useWorkspace() {
 
     try {
       if (
-        !definitions.intent.trim() ||
         [...definitions.intent].length > 20000 ||
         [...definitions.preference].length > 20000
       ) {
-        throw new Error("intent.md 不可空白，兩份定義各最多 20000 個字元。");
+        throw new Error("兩份選填定義各最多 20000 個 Unicode 字元。");
       }
 
       const next = {
@@ -601,6 +603,27 @@ export function useWorkspace() {
       setError(sendError instanceof Error ? sendError.message : "需求無法送出");
     }
   };
+
+  const answerClarification = () => {
+    const conversation=live(),snapshot=conversation.snapshot;
+    if(isLocked()||verified!==conversation.requestId||snapshot?.status!=='needs_clarification'||!snapshot.formatter?.questions.length)return;
+    const draft=conversation.clarificationDraft;
+    const answers=snapshot.formatter.questions.map(q=>({question_id:q.question_id,answer:draft?.requestId===snapshot.request_id?draft.answers[q.question_id]?.trim()??'':''}));
+    if(answers.some(a=>!a.answer||[...a.answer].length>500)){setError('請回答每個問題，每題最多 500 字。');return;}
+    submit({kind:'create',path:apiPaths.createRequest,body:{intent_md:snapshot.documents.intent_md,preference_md:snapshot.documents.preference_md,
+      clarification:{parent_request_id:snapshot.request_id,answers}},conversationId:conversation.id,requestId:snapshot.request_id});
+  };
+
+  const refine = () => {
+    const conversation=live(),snapshot=conversation.snapshot;
+    if(isLocked()||verified!==conversation.requestId||snapshot?.status!=='rejected')return;
+    patch(conversation.id,{refinementRequested:false});
+    submit({kind:'create',path:apiPaths.createRequest,body:{intent_md:snapshot.documents.intent_md,preference_md:snapshot.documents.preference_md,
+      refinement:{parent_request_id:snapshot.request_id}},conversationId:conversation.id,requestId:snapshot.request_id});
+  };
+  useEffect(()=>{
+    if(active.refinementRequested&&active.snapshot?.status==='rejected'&&!busy&&!pending&&!unknown&&verified===active.requestId&&!import.meta.env.VITE_OFFERMESH_MOCK)refine();
+  },[active.refinementRequested,active.snapshot?.status,active.requestId,busy,pending,unknown,verified]);
 
   const accept = (offerId?: string) => {
     const conversation = live();
@@ -733,6 +756,8 @@ export function useWorkspace() {
     update,
     saveDefinitions,
     send,
+    answerClarification,
+    refine,
     accept,
     reject,
     skip,
@@ -740,6 +765,17 @@ export function useWorkspace() {
     review,
     newConversation,
     selectConversation,
+    deleteConversation: (id: string) => {
+      const target=ref.current.conversations.find(c=>c.id===id);
+      if(!target||isLocked()||processing(target.snapshot?.status))return;
+      const removingActive=ref.current.activeId===id;
+      const next=update(w=>{
+        const conversations=w.conversations.filter(c=>c.id!==id);
+        if(!conversations.length)conversations.push(freshConversation());
+        return {...w,conversations,activeId:removingActive?conversations[0].id:w.activeId};
+      });
+      if(removingActive){setVerified(null);setError('');navigate('chat',next.conversations[0].requestId,undefined,true);setRefresh(v=>v+1);}
+    },
     retry: () =>
       pendingRef.current && !blockedRef.current
         ? void execute(pendingRef.current)
