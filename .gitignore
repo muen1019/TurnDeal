@@ -1,5 +1,6 @@
 # Dependencies and local configuration
 node_modules/
+.local-tools/
 .env
 .env.*
 !.env.example
