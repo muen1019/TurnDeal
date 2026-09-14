@@ -58,6 +58,7 @@ export type ChatStatus =
   | "failed";
 
 export interface ChatPanelProps {
+  improvementCard?: ReactNode;
   messages: ChatMessage[];
   status: ChatStatus;
   progressStatus?: AgentProgressStatus;

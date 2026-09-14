@@ -21,16 +21,22 @@ it('collects basic details then four explicit weights and colors; never asks for
  fillShipping();
  fireEvent.click(screen.getByRole('button',{name:/下一步/}));
  expect(screen.getAllByRole('slider')).toHaveLength(4);expect(p.onSave).not.toHaveBeenCalled();
- fireEvent.change(screen.getByRole('slider',{name:/價格/}),{target:{value:'80'}});
+ const priceSlider=screen.getByRole('slider',{name:/價格/});
+ expect(priceSlider).toHaveValue('53');
+ expect(priceSlider).toHaveAttribute('step','1');
+ expect(priceSlider.closest('.weight-control')).toHaveTextContent('53%');
+ expect(screen.getByRole('slider',{name:/顏色/})).toBeDisabled();
+ fireEvent.change(priceSlider,{target:{value:'80'}});
+ expect(priceSlider).toHaveValue('80');
+ expect(priceSlider.closest('.weight-control')).toHaveTextContent('80%');
  fireEvent.click(screen.getByRole('button',{name:'冰藍'}));
  fireEvent.click(screen.getByRole('button',{name:/儲存並開始/}));
  await waitFor(()=>expect(p.onSave).toHaveBeenCalledTimes(1));
  expect(p.onSave.mock.calls[0][0]).toMatchObject({name:'Demo Buyer',shipping_address:'示範地址',payment_method:'later',colors:['blue'],weights:{price:80}});
 });
 it('guards sensitive input and requires active weights; back retains the draft',()=>{
- const p=props();render(<BuyerSetup {...p} initial={{...defaultBuyerProfile,name:'Demo Buyer',shipping_address:'測試路 1 號',shipping_details:shipping}}/>);
+ const p=props();render(<BuyerSetup {...p} initial={{...defaultBuyerProfile,name:'Demo Buyer',shipping_address:'測試路 1 號',shipping_details:shipping,weights:{price:0,delivery:0,trust:0,color:0}}}/>);
  fireEvent.click(screen.getByRole('button',{name:/下一步/}));
- for(const slider of screen.getAllByRole('slider'))fireEvent.change(slider,{target:{value:'0'}});
  fireEvent.click(screen.getByRole('button',{name:/儲存並開始/}));expect(p.onSave).not.toHaveBeenCalled();expect(screen.getByRole('alert')).toHaveTextContent('至少提高');
  fireEvent.click(screen.getByRole('button',{name:'返回基本資料'}));expect(screen.getByRole('textbox',{name:/名稱/})).toHaveValue('Demo Buyer');
  fireEvent.change(screen.getByRole('textbox',{name:/街道、門牌與樓層/}),{target:{value:'4111111111111111'}});
