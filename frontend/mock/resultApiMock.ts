@@ -8,6 +8,8 @@ import type {
   AcceptDecisionResult,
   ApiError,
   CreateRequest,
+  UserPreference,
+  UpdateUserPreference,
   DecisionResult,
   RejectDecision,
   RejectDecisionResult,
@@ -69,6 +71,19 @@ export function mockStageForElapsed(elapsedMs: number): MockStageName {
 export function createMockApi(options: MockApiOptions = {}) {
   const now = options.now ?? Date.now;
   const readyAfterMs = options.readyAfterMs ?? 10000;
+  let preference: UserPreference = {revision:0,markdown:"",entries:[]};
+  const preferenceReplay = new Map<string,{body:string;result:JsonResult}>();
+  const updatePreference = (body:unknown,key:string|null):JsonResult => {
+    if(!key || key.length>128)return error(400,"invalid_request","Idempotency-Key required",[]);
+    const valid=validate<UpdateUserPreference>("UpdateUserPreference",body);
+    if(!valid.ok)return valid.error;
+    const serialized=canonicalJson(body), replay=preferenceReplay.get(key);
+    if(replay)return replay.body===serialized?replay.result:error(409,"idempotency_conflict","Conflicting replay",[]);
+    if(valid.value.base_revision!==preference.revision)return error(409,"preference_version_conflict","Reload latest preference",[]);
+    if(valid.value.markdown!==preference.markdown)preference={revision:preference.revision+1,markdown:valid.value.markdown,entries:[]};
+    const result={status:200,body:structuredClone(preference)};
+    preferenceReplay.set(key,{body:serialized,result});return result;
+  };
   const requests = new Map<string, MockRequestRecord>();
   const idempotency = new Map<string, { bodyJson: string; requestId: string }>();
   const decisionIdempotency = new Map<string, { bodyJson: string; result: DecisionResult }>();
@@ -91,6 +106,7 @@ export function createMockApi(options: MockApiOptions = {}) {
       return { status: 202, body: requests.get(replay.requestId)!.formatting };
     }
 
+    if(preference.revision===0&&validBody.value.preference_md?.trim())preference={revision:1,markdown:validBody.value.preference_md,entries:[]};
     const requestId = `req_mock_${globalThis.crypto.randomUUID()}`;
     const formatting = validateOrThrow<RequestSnapshot>("RequestSnapshot", {
       request_id: requestId,
@@ -100,7 +116,7 @@ export function createMockApi(options: MockApiOptions = {}) {
       documents: {
         revision: 1,
         intent_md: validBody.value.intent_md,
-        preference_md: validBody.value.preference_md ?? "",
+        preference_md: preference.markdown,
       },
       intent: null,
       seller_agents: [],
@@ -218,6 +234,8 @@ export function createMockApi(options: MockApiOptions = {}) {
 
   return {
     create,
+    getPreference: ():JsonResult => ({status:200,body:structuredClone(preference)}),
+    updatePreference,
     get,
     decide,
     progress,
@@ -249,6 +267,10 @@ export function createOfferMeshMockPlugin(options: MockApiOptions = {}): Plugin 
           : (req.headers["idempotency-key"] ?? null);
 
         try {
+          if(parts.length===1&&parts[0]==="preferences") {
+            if(req.method==="GET")return send(res,api.getPreference());
+            if(req.method==="POST")return send(res,api.updatePreference(await readJson(req),idempotencyKey));
+          }
           if (req.method === "POST" && parts.length === 1 && parts[0] === "requests") {
             return send(res, api.create(await readJson(req), idempotencyKey, url));
           }
