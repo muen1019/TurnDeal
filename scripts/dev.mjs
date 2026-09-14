@@ -11,7 +11,7 @@ function stop(code=0){if(closing)return;closing=true;for(const child of children
 function run(file,env){const child=spawn(process.execPath,[file],{cwd:root,env,stdio:'inherit',windowsHide:true});children.push(child);child.on('error',error=>{console.error(`Cannot start ${file}: ${error.code}`);stop(1);});child.on('exit',(code,signal)=>{if(!closing)console.error(`${file} exited (${code??signal})`);stop(code??0);});}
 run('backend/runtime/server.mjs',{...process.env,PORT:'3201',OFFERMESH_RUNTIME_MODE:mode});
 // Frontend child never inherits credentials, including non-VITE variables.
-const frontendEnv={...process.env,OFFERMESH_DEV_MOCK:'0',OFFERMESH_API_ORIGIN:'http://127.0.0.1:3201',OFFERMESH_RUNTIME_MODE:mode};
+const frontendEnv={...process.env,OFFERMESH_API_ORIGIN:'http://127.0.0.1:3201',OFFERMESH_RUNTIME_MODE:mode};
 for(const name of Object.keys(frontendEnv))if(/KEY|TOKEN|SECRET|PASSWORD/i.test(name))delete frontendEnv[name];
 const child=spawn(process.execPath,['frontend/node_modules/vite/bin/vite.js','frontend'],{cwd:root,env:frontendEnv,stdio:'inherit',windowsHide:true});
 children.push(child);child.on('error',error=>{console.error(`Cannot start Vite: ${error.code}`);stop(1);});child.on('exit',(code,signal)=>{if(!closing)console.error(`Vite exited (${code??signal})`);stop(code??0);});
