@@ -7,6 +7,8 @@
     "node": ">=24"
   },
   "scripts": {
+    "demo:public": "node scripts/public-demo.mjs",
+    "test:public": "node --test tests/public-gateway.test.mjs",
     "dev": "node scripts/dev.mjs",
     "dev:mobile": "node scripts/mobile-preview.mjs",
     "dev:mobile:secure": "powershell -NoProfile -File scripts/run-app-secure.ps1 -Mobile",

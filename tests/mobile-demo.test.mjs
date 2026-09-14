@@ -32,35 +32,36 @@ test('live launcher isolates backend credentials and uses distinct ports',()=>{
  assert.equal(offline.frontendEnv.OFFERMESH_RUNTIME_MODE,'offline');
  assert.throws(()=>mobileConfig({},true),/dev:mobile:secure/);
 });
-test('live API requires pairing before any runtime access; rate limits guesses and blocks foreign origins',async()=>{
- const code='abc123def456',app=createMobileApp({mode:'live',apiKey:'unit-test-only',pairingCode:code,runtimeOptions:{autoProcess:false}});
+test('open live API requires no pairing, but isolates buyers and blocks cross-origin writes',async()=>{
+ const app=createMobileApp({mode:'live',apiKey:'unit-test-only',runtimeOptions:{autoProcess:false}});
+ const profile={name:'Demo A',shipping_address:'測試路 1 號',payment_method:'later',weights:{price:45,delivery:20,trust:20,color:15},colors:[]};
  try{
   const a=request.agent(app),b=request.agent(app);
-  const before=app.locals.store.db.prepare('SELECT count(*) n FROM requests').get().n;
-  assert.equal((await a.get('/api/mobile-session')).body.connected,false);
-  await a.get('/api/buyer-profile').expect(401);
-  await a.post('/api/requests').set('Idempotency-Key','unpaired').send({intent_md:'mouse'}).expect(401);
-  assert.equal(app.locals.store.db.prepare('SELECT count(*) n FROM requests').get().n,before);
-  await a.post('/api/mobile-session').set('Origin','http://foreign.test').send({code}).expect(403);
-  await a.post('/api/mobile-session').send({code:'wrong-code12'}).expect(401);
-  await a.post('/api/mobile-session').send({code}).expect(200);
-  assert.equal((await a.get('/api/mobile-session')).body.connected,true);
-  await a.get('/api/buyer-profile').expect(200);await b.get('/api/buyer-profile').expect(401);
+  const session=await a.get('/api/mobile-session').expect(200);
+  assert.deepEqual(session.body,{connected:true,mode:'live',access:'open'});
+  await a.post('/api/buyer-profile').set('Idempotency-Key','profile').send(profile).expect(200);
+  assert.deepEqual((await a.get('/api/buyer-profile')).body.profile,profile);
+  assert.equal((await b.get('/api/buyer-profile').expect(200)).body.profile,null);
+  await b.post('/api/buyer-profile').set('Idempotency-Key','foreign').set('Origin','http://foreign.test').send(profile).expect(403);
+  const cookie=session.headers['set-cookie'][0].split(';')[0];
+  const forged=cookie.slice(0,-1)+(cookie.endsWith('0')?'1':'0');
+  assert.equal((await request(app).get('/api/buyer-profile').set('Cookie',forged)).body.profile,null);
+  const created=(await a.post('/api/requests').set('Idempotency-Key','new').send({intent_md:'买無線滑鼠，最高1000元，7天內到貨'}).expect(202)).body;
+  await a.get('/api/requests/'+created.request_id).expect(200);
+  await b.get('/api/requests/'+created.request_id).expect(404);
+  await a.post('/api/mobile-session').send({code:'obsolete'}).expect(404);
   assert.equal(app.locals.store.apiKey,'unit-test-only');
-  for(let i=0;i<8;i++)await b.post('/api/mobile-session').send({code:'wrong-code12'}).expect(401);
-  await b.post('/api/mobile-session').send({code}).expect(429);
  }finally{await app.locals.store.close();}
 });
-test('paired live request invokes the LLM formatter transport and replay does not call it twice',async()=>{
+test('unpaired live request invokes the LLM formatter transport and replay does not call it twice',async()=>{
  let calls=0;
  const noNetwork=async()=>{throw Error('test: no external network');};
  const extraction={category:'mouse',max_total_twd:1000,target_total_twd:null,delivery_days_max:7,budget_evidence:'最高1000元',target_evidence:'',delivery_evidence:'7天內到貨',required_features:['wireless'],preferences:[],product_preferences:[],bundle_mode:'related_no_extra_cost',questions:[],unsupported_conditions:[]};
- const app=createMobileApp({mode:'live',apiKey:'unit-test-only',pairingCode:'abc123def456',runtimeOptions:{autoProcess:false,
+ const app=createMobileApp({mode:'live',apiKey:'unit-test-only',runtimeOptions:{autoProcess:false,
   formatterOptions:{fetch:async(url,options)=>{calls++;assert.equal(url,'https://api.openai.com/v1/responses');assert.equal(JSON.parse(options.body).model,'gpt-4.1-mini');return Response.json({status:'completed',output:[{type:'message',content:[{type:'output_text',text:JSON.stringify(extraction)}]}]});}},
   negotiationOptions:{fetchImpl:noNetwork},evaluatorOptions:{fetchImpl:noNetwork}}});
  try{
   const a=request.agent(app);
-  await a.post('/api/mobile-session').send({code:'abc123def456'}).expect(200);
   const post=()=>a.post('/api/requests').set('Idempotency-Key','same-live-request').send({intent_md:'買無線滑鼠，最高1000元，7天內到貨',model:'gpt-4.1-mini'});
   const first=(await post().expect(202)).body,id=first.request_id;
   const buyer=app.locals.store.db.prepare('SELECT user_id FROM requests WHERE request_id=?').get(id).user_id;
