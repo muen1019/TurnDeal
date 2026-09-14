@@ -36,8 +36,7 @@ export function MobileJourney(p: Props) {
       p.onReady();
     }
   }, [p.ready, p.onReady]);
-  const preview = import.meta.env.VITE_OFFERMESH_MOCK;
-  const mode = p.formatter ? p.formatter.provider==='openai'?`LLM 已解析 · ${p.formatter.model??'OpenAI'}`:'離線規則解析 · 非 LLM 成功' : preview ? '互動預覽 · 不呼叫 AI' : import.meta.env.VITE_OFFERMESH_RUNTIME_MODE === 'live' ? '使用 AI 解析 · 失敗時會標示備援' : '離線 Demo · 不呼叫 AI';
+  const mode = p.formatter ? p.formatter.provider==='openai'?`LLM 已解析 · ${p.formatter.model??'OpenAI'}`:'離線規則解析 · 非 LLM 成功' : import.meta.env.VITE_OFFERMESH_RUNTIME_MODE === 'live' ? '使用 AI 解析 · 失敗時會標示備援' : '離線 Demo · 不呼叫 AI';
   if (running || p.requestId || (p.busy && !p.ready)) {
     return <section key="processing" className="mobile-journey mobile-processing deal-processing mobile-screen-enter" data-running={running&&!p.error} aria-labelledby="journey-title">
       <span className="mobile-mode">{mode}</span>
