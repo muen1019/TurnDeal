@@ -5,6 +5,7 @@ import {formatIntent} from '../../src/formatter/parser.ts';
 import {ensureImprovementChild} from './improver-followup.mjs';
 import {assertContract} from '../../src/orchestrator/contract.ts';
 import {HttpError} from '../src/httpError.ts';
+import {effectivePreferenceText,preferenceDocument} from '../dist/src/improver/preferences.js';
 
 /** Build backend first. Live mode uses only the server-side API_KEY configuration. */
 export function createRuntimeImprover(store,{mode='offline',provider}={}) {
@@ -22,10 +23,10 @@ export function createRuntimeImprover(store,{mode='offline',provider}={}) {
     ensureBuyer:buyer=>store.ensureBuyer(buyer),
     now:()=>new Date(store.now()),
   });
-  const normalize=documents=>{
-    const result=formatIntent({intent_md:documents.intent_md,preference_md:documents.preference_md});
+  const normalize=(documents,saved=[],weights)=>{
+    const result=formatIntent({intent_md:documents.intent_md,preference_md:effectivePreferenceText(preferenceDocument(documents.preference_md,0))},saved);
     if(result.status!=='ready'||!result.normalized_intent)throw new Error('formatter_unsupported');
-    return result.normalized_intent;
+    return {...result.normalized_intent,...(weights?{ranking_weights:weights}:{})};
   };
   const liveProvider=store.apiKey?{kind:'llm',generate:(context,errors,signal)=>new OpenAIRevisionProvider(store.apiKey,store.modelFor(context.parent_request_id)).generate(context,errors,signal)}:null;
   const selected=provider===undefined?(mode==='live'?(liveProvider??configuredProvider()):deterministicProvider):provider;

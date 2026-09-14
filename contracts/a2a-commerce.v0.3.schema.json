@@ -202,7 +202,7 @@
     "LlmModel": {"type": "string", "enum": ["gpt-5.6-sol", "gpt-4.1", "gpt-4.1-mini"]},
     "CreateRequest": {
       "type": "object",
-      "description": "intent_md describes this purchase and its temporary constraints/preferences. preference_md is a request-bound preference snapshot; omission/empty text does not clear active SQLite product preferences. Neither field updates the durable profile.",
+      "description": "intent_md describes this purchase. The backend binds the current user preference version. Nonempty preference_md may initialize an absent user profile. For an existing profile the latest server revision is always used, ignoring cached client preference text; edits use POST /api/preferences. Empty or omitted preference_md inherits the current profile.",
       "properties": {
         "model": {"$ref": "#/$defs/LlmModel"},
         "refinement": {
@@ -4256,6 +4256,85 @@
           "const": "queued"
         }
       }
+    },
+    "UserPreference": {
+      "type": "object",
+      "properties": {
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "markdown": {
+          "type": "string",
+          "maxLength": 20000
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "preference_id": {
+                "type": "string"
+              },
+              "scope": {
+                "enum": [
+                  "all_categories",
+                  "category:mouse",
+                  "category:mouse_pad"
+                ]
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "preference_id",
+              "scope",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "saved_preferences": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ProductPreference"
+          }
+        },
+        "issues": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ranking_weights": {
+          "$ref": "#/$defs/RankingWeights"
+        }
+      },
+      "required": [
+        "revision",
+        "markdown",
+        "entries"
+      ],
+      "additionalProperties": false
+    },
+    "UpdateUserPreference": {
+      "type": "object",
+      "properties": {
+        "markdown": {
+          "type": "string",
+          "maxLength": 20000
+        },
+        "base_revision": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "markdown",
+        "base_revision"
+      ],
+      "additionalProperties": false
     }
   }
 }

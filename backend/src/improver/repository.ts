@@ -2,26 +2,25 @@ import {createHash,randomUUID} from 'node:crypto';
 import {assertValid} from '../schema.js';
 import {preferenceDocument} from './preferences.js';
 import {parseContext,parseResult} from './schema.js';
+import {UserPreferenceRepository} from '../user-preferences.js';
 import type {Candidate,ImprovementContext,ImprovementResult,ImprovementStorage,Job,PreferenceDocument,SqlRow} from './types.js';
 
 const terminal=(status:string)=>['ready','needs_clarification','failed'].includes(status);
 export class ImprovementRepository {
   constructor(private readonly storage:ImprovementStorage){}
+  get preferences(){return new UserPreferenceRepository(this.storage);}
   globalPreference(buyer:string):PreferenceDocument {
-    const row=this.storage.rows('SELECT revision,markdown FROM improver_global_preferences WHERE buyer_id=? ORDER BY revision DESC LIMIT 1',[buyer])[0];
-    return preferenceDocument(row?String(row.markdown):'',row?Number(row.revision):0);
+    return this.preferences.current(buyer);
   }
   /** Explicit user editor integration only; request-scoped documents never call this automatically. */
   saveGlobalPreference(buyer:string,markdown:string,baseRevision:number):PreferenceDocument {
-    const document=preferenceDocument(markdown,baseRevision+1);
     return this.storage.transaction(()=>{
       this.storage.ensureBuyer(buyer);
-      if(this.globalPreference(buyer).revision!==baseRevision)throw new Error('preference_version_conflict');
-      this.insertPreference(buyer,document);return document;
+      return this.preferences.save(buyer,markdown,baseRevision);
     });
   }
   private insertPreference(buyer:string,document:PreferenceDocument){
-    this.storage.run('INSERT INTO improver_global_preferences VALUES(?,?,?,?)',[buyer,document.revision,document.markdown,this.storage.now().toISOString()]);
+    this.preferences.insert(buyer,document);
   }
 
   /** Compatibility entry point for existing explicitly saved rejections. */
@@ -46,9 +45,10 @@ export class ImprovementRepository {
       const savedDecision=this.storage.rows('SELECT created_at FROM decisions WHERE request_id=? AND result_json IS NOT NULL',[requestId])[0];
       if(!savedDecision||offers.length!==ids.size||offers.some(o=>o.eligibility.status!=='eligible'||(!accepted&&Date.parse(o.expires_at)<=Date.parse(String(savedDecision.created_at)))))throw new Error('rejection_set_invalid_or_expired');
       const improvement_id=`imp_${randomUUID()}`;
+      const boundPreference=this.preferences.forRequest(buyer,requestId);
       const context:ImprovementContext={
         improvement_id,buyer_id:buyer,parent_request_id:requestId,root_request_id:snapshot.root_request_id,
-        source_documents:source,hard_constraints:snapshot.intent,request_preference_revision:null,
+        source_documents:source,hard_constraints:snapshot.intent,request_preference_revision:boundPreference?.revision??null,
         global_preference:this.globalPreference(buyer),
         rejected_offers:offers.map(o=>{
           const items=o.items.map(i=>({product_id:i.product_id,quantity:i.quantity})).sort((a,b)=>a.product_id.localeCompare(b.product_id));
@@ -122,9 +122,11 @@ export class ImprovementRepository {
       const job=this.assertLease(buyer,id,token);
       const current=this.globalPreference(buyer);
       if(expectedRevision===null&&candidate.status!=='needs_clarification')throw new Error('ready_requires_version_check');
+      const base=current;
+      const preferenceUpdated=candidate.status==='ready'&&candidate.preference.markdown!==base.markdown;
+      // A read-only continuation never overwrites a newer user profile. A patch uses CAS.
       if(expectedRevision!==null&&current.revision!==expectedRevision)throw new Error('preference_version_conflict');
-      const preferenceUpdated=candidate.status==='ready'&&candidate.preference.markdown!==current.markdown;
-      const effective=preferenceUpdated?preferenceDocument(candidate.preference.markdown,current.revision+1):current;
+      const effective=preferenceUpdated?{...candidate.preference,...preferenceDocument(candidate.preference.markdown,current.revision+1)}:base;
       if(preferenceUpdated)this.insertPreference(buyer,effective);
       const intent_revision_id=`ir_${randomUUID()}`;
       const result=parseResult({improvement_id:id,parent_request_id:job.context.parent_request_id,status:candidate.status,intent_revision_id,

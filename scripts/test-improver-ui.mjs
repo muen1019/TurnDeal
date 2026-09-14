@@ -1,0 +1,32 @@
+import {createRuntimeApp} from '../backend/runtime/app.mjs';
+import {createRequire} from 'node:module';
+import {spawn} from 'node:child_process';
+import {once} from 'node:events';
+import {mkdtempSync,cpSync,readFileSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join,resolve} from 'node:path';
+import assert from 'node:assert/strict';
+import {loadWorkspaceEnv} from './load-workspace-env.mjs';
+const artifacts=mkdtempSync(join(tmpdir(),'offermesh-improver-ui-'));
+cpSync(resolve('frontend/dist'),join(artifacts,'dist'),{recursive:true});
+const express=createRequire(new URL('../backend/package.json',import.meta.url))('express');
+const mode=process.argv.includes('--live')?'live':'offline';
+loadWorkspaceEnv(resolve('.'));
+const apiKey=mode==='live'?(process.env.OPENAI_API_KEY??'').trim():'';
+if(mode==='live'&&!apiKey)throw new Error('OPENAI_API_KEY is required for live browser E2E');
+const app=createRuntimeApp({dbPath:join(artifacts,'test.sqlite'),apiKey,improverOptions:{mode}});
+const web=express();web.use((req,res,next)=>req.path.startsWith('/api/')?app(req,res,next):next());
+web.use(express.static(join(artifacts,'dist')));web.use((_req,res)=>res.sendFile(join(artifacts,'dist/index.html')));
+const server=web.listen(0,'127.0.0.1');await once(server,'listening');
+try{
+  const env={...process.env,PYTHONIOENCODING:'utf-8'};
+  for(const key of Object.keys(env))if(/KEY|TOKEN|SECRET|PASSWORD/i.test(key))delete env[key];
+  const child=spawn('python',['tests/improver_ui.py',`http://127.0.0.1:${server.address().port}`,artifacts,mode],{stdio:'inherit',env,windowsHide:true});
+  const [code]=await once(child,'exit');if(code!==0)throw new Error(`browser_test_failed:${code}`);
+  const evidence=JSON.parse(readFileSync(join(artifacts,'result.json'),'utf8'));
+  const job=app.locals.improver.repository.get('demo_buyer',evidence.improvement_id);
+  assert.equal(job.result.provider,mode==='live'?'llm':'deterministic');
+  assert.equal(app.locals.store.db.prepare('SELECT count(*) n FROM requests WHERE parent_request_id=?').get(evidence.parent_request_id).n,1);
+  assert.deepEqual(app.locals.store.db.prepare('PRAGMA foreign_key_check').all(),[]);
+  console.log(JSON.stringify({mode,provider:job.result.provider,provider_attempts:job.attempts,llm_calls:mode==='live'?job.attempts:0,runtime_llm_enabled:Boolean(apiKey),child_count:1,artifacts}));
+}finally{await new Promise(resolve=>server.close(resolve));await app.locals.store.close();}

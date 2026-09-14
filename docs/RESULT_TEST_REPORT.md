@@ -16,7 +16,7 @@ backend 測試涵蓋：mock 預算／交期／配件限制、未知與矛盾輸�
 
 瀏覽器實跑：儲存代理設定、Chat 建立需求、五家賣家／六組最終方案、滑鼠右滑立即採用、重載恢復 accepted、建立另一需求、鍵盤逐張略過（沒有 POST）、明確送出帶前後空白的回饋、200/rejected、重載恢復 feedback 與原始 source_documents。每輪只有一個決策；沒有 child 或 redemption 請求，沒有 pageerror。另保存 390px rejected 畫面。
 
-可重跑的測試：[e2e_result_api.py](../frontend/tests/e2e_result_api.py)。本機產物（gitignored）：
+可重跑的正式 runtime 瀏覽器測試：`npm --prefix frontend run test:e2e`。本機產物（gitignored）：
 
 - [機器可讀結果](../frontend/test-results/result-api-e2e.json)
 - [採用畫面](../frontend/test-results/result-api-accepted.png)
@@ -27,7 +27,7 @@ backend 測試涵蓋：mock 預算／交期／配件限制、未知與矛盾輸�
 
 ## 可操作服務
 
-本次另開 http://127.0.0.1:5273/chat 與 API http://127.0.0.1:3201/api，使用 backend/data/result-preview.sqlite，以避開其他 session 的 5173/3001。已重啟新版服務並透過 5273 proxy 建立真實 request 並 GET 驗證 awaiting_user／五家賣家／六組方案。舊需求保留原報價，新需求使用五家 Seller fixture。新版快照保存在 frontend/test-results/result-v03-live.json。重啟方式：先 build backend，再於 frontend 執行 `node scripts/start-result-demo.mjs`。
+現行整合入口是 repository 根目錄的 `npm run dev`／`npm run dev:secure`，UI 固定透過 proxy 使用 `backend/runtime` 與同一份 SQLite。`npm --prefix frontend run test:e2e` 會建立隔離的暫存資料庫並驗證正式 runtime HTTP、結果 UI、Improver 與 reload 流程。
 
 ## 驗證邊界
 
@@ -35,6 +35,6 @@ backend 測試涵蓋：mock 預算／交期／配件限制、未知與矛盾輸�
 
 未把另一個 session 正在擴充的廣泛 UI E2E、真機觸控、軟鍵盤、全尺寸動畫中斷與逐幀視覺驗收宣稱為通過。OpenSpec 第 4–6 批未完整驗收的任務仍未勾選，change 未 archive。持續中的其他 session 可能使檔案晚於本次驗證；API 整合測試已獨立保存，便於重跑。
 
-最新修正驗證：正式 API 模式不發出額外進度請求；詳細模擬進度僅使用 /__mock 路徑。E2E 改測 production build，並斷言所有 HTTP API 請求皆為 OpenAPI 已定義的建立需求、取得快照或提交決策。前端 81 項、後端 36 項及雙端 build、真實 API E2E 通過。備份檔 *.bak-* 已排除版本控制。
+最新修正驗證：前端 Vite mock 與 `/__mock` sidecar 已移除，開發與 production build 都只使用 runtime API；進度直接來自正式 RequestSnapshot。E2E 斷言 HTTP API 請求皆為建立需求、取得快照或提交決策。
 
 Rebase origin/main cdce6e5 後：合併 discovery 與 handoff migrations（共 5 份）；orchestrator 共用 v0.3 schema。根目錄完整測試通過，包含 11 項 orchestrator、3 項 seller policy 測試；前後端 build 及 production API E2E 通過。

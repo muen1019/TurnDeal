@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {newId} from './id';
-import type { RequestSnapshot, LlmModel } from "../contract.generated";
+import type { RequestSnapshot, LlmModel, ImprovementClarificationResult, UserPreference } from "../contract.generated";
 import {
   ApiFailure,
   apiPaths,
@@ -8,8 +8,10 @@ import {
   composeRequest,
   decisionResponse,
   getSnapshot,
+  request,
   postJournal,
   validateSnapshot,
+  validateWire,
 } from "../api/client";
 import {
   currentRank,
@@ -63,6 +65,8 @@ export function useWorkspace(options: {model?:LlmModel;fullImprover?:boolean} = 
   const running = useRef(false);
   const retryNotBefore = useRef(0);
   const [saving, setSaving] = useState(false);
+  const preferenceRevision = useRef<number | null>(null);
+  const savingPreference = useRef(false);
   const [verified, setVerified] = useState<string | null>(null);
   const [refresh, setRefresh] = useState(0);
   const [now, setNow] = useState(Date.now());
@@ -82,6 +86,34 @@ export function useWorkspace(options: {model?:LlmModel;fullImprover?:boolean} = 
 
     return next;
   }, []);
+
+  // Local preference fields are editor drafts; the server owns the user document.
+  useEffect(() => {
+    if (blockedRef.current) return;
+    let cancelled = false;
+    const refreshPreference = async () => {
+      try {
+        const profile = validateWire<UserPreference>("UserPreference", await request(apiPaths.getUserPreference));
+        if (cancelled || savingPreference.current || profile.revision < (preferenceRevision.current ?? 0)) return;
+        const d = ref.current.definitions;
+        if (d.preference !== d.savedPreference) {
+          if (preferenceRevision.current === null) {
+            preferenceRevision.current = profile.revision;
+            update(w => ({...w,definitions:{...w.definitions,savedPreference:profile.markdown}}));
+            setError("已載入最新偏好，保留未儲存草稿；請核對後再儲存。");
+          }
+          return;
+        }
+        preferenceRevision.current = profile.revision;
+        update(w => ({...w, definitions: {...w.definitions, preference: profile.markdown, savedPreference: profile.markdown}}));
+      } catch (e) {
+        if (!cancelled) setError(e instanceof Error ? e.message : "偏好讀取失敗");
+      }
+    };
+    void refreshPreference();
+    window.addEventListener("focus", refreshPreference);
+    return () => { cancelled = true; window.removeEventListener("focus", refreshPreference); };
+  }, [update, view, refresh]);
 
   const patch = useCallback(
     (id: string, patchValue: Partial<Conversation>) =>
@@ -347,6 +379,9 @@ export function useWorkspace(options: {model?:LlmModel;fullImprover?:boolean} = 
           if (live().id === conversationId) {
             navigate("chat", snapshot.request_id, undefined, true);
           }
+        } else if (pendingValue.kind === 'clarify') {
+          const result=validateWire<ImprovementClarificationResult>('ImprovementClarificationResult',raw);
+          if(result.request_id!==pendingValue.requestId)throw new ApiFailure(0,'invalid_response','澄清回應不符合原需求。');
         } else {
           const result = decisionResponse(raw);
 
@@ -381,7 +416,7 @@ export function useWorkspace(options: {model?:LlmModel;fullImprover?:boolean} = 
             });
 
             if (live().id === pendingValue.conversationId) {
-              navigate("offers", pendingValue.requestId);
+              navigate("chat", pendingValue.requestId);
             }
           } else {
             if(result.feedback !== pendingValue.body.feedback) throw new ApiFailure(0,'invalid_response','回饋回應不符合原提交。');
@@ -524,7 +559,9 @@ export function useWorkspace(options: {model?:LlmModel;fullImprover?:boolean} = 
     }
   }, [execute, pendingBlocked]);
 
-  const saveDefinitions = () => {
+  const saveDefinitions = async () => {
+    if (savingPreference.current) return;
+    savingPreference.current = true;
     setSaving(true);
     setError("");
 
@@ -538,12 +575,21 @@ export function useWorkspace(options: {model?:LlmModel;fullImprover?:boolean} = 
         throw new Error("兩份選填定義各最多 20000 個 Unicode 字元。");
       }
 
+      if (preferenceRevision.current === null) throw new Error("請先載入最新偏好，再儲存設定。");
+      // Check local persistence before submitting the remote change.
+      saveWorkspace(ref.current);
+      const profile = validateWire<UserPreference>("UserPreference", await postJournal(
+        apiPaths.updateUserPreference,
+        {markdown: definitions.preference, base_revision: preferenceRevision.current},
+        newId(),
+      ));
+      preferenceRevision.current = profile.revision;
       const next = {
         ...ref.current,
         definitions: {
-          ...definitions,
+          ...ref.current.definitions,
           savedIntent: definitions.intent,
-          savedPreference: definitions.preference,
+          savedPreference: profile.markdown,
           version: definitions.version + 1,
         },
       };
@@ -553,6 +599,7 @@ export function useWorkspace(options: {model?:LlmModel;fullImprover?:boolean} = 
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "設定儲存失敗");
     } finally {
+      savingPreference.current = false;
       setSaving(false);
     }
   };
@@ -584,7 +631,7 @@ export function useWorkspace(options: {model?:LlmModel;fullImprover?:boolean} = 
       const definitions = ref.current.definitions;
       const body = composeRequest(
         definitions.savedIntent,
-        definitions.savedPreference,
+        "", // New sessions inherit the latest server preference atomically.
         conversation.draft,
       );
       patch(conversation.id, {
@@ -622,7 +669,7 @@ export function useWorkspace(options: {model?:LlmModel;fullImprover?:boolean} = 
       refinement:{parent_request_id:snapshot.request_id}},conversationId:conversation.id,requestId:snapshot.request_id});
   };
   useEffect(()=>{
-    if(active.refinementRequested&&active.snapshot?.status==='rejected'&&!busy&&!pending&&!unknown&&verified===active.requestId&&!import.meta.env.VITE_OFFERMESH_MOCK)refine();
+    if(active.refinementRequested&&active.snapshot?.status==='rejected'&&!busy&&!pending&&!unknown&&verified===active.requestId)refine();
   },[active.refinementRequested,active.snapshot?.status,active.requestId,busy,pending,unknown,verified]);
 
   const accept = (offerId?: string) => {
@@ -645,7 +692,7 @@ export function useWorkspace(options: {model?:LlmModel;fullImprover?:boolean} = 
     submit({
       kind: "accept",
       path: decisionPath(conversation.requestId!),
-      body: { action: "accept", offer_id: offer.offer_id,...(options.fullImprover&&!import.meta.env.VITE_OFFERMESH_MOCK?{selection_version:1,rejected_offer_ids:conversation.skipped.filter(id=>id!==offer.offer_id&&conversation.snapshot!.ranked_offers.some(r=>r.offer_id===id))}:{}) },
+      body: { action: "accept", offer_id: offer.offer_id,...(options.fullImprover?{selection_version:1,rejected_offer_ids:conversation.skipped.filter(id=>id!==offer.offer_id&&conversation.snapshot!.ranked_offers.some(r=>r.offer_id===id)),...(conversation.feedback.trim()?{feedback:conversation.feedback}:{})}:{}) },
       conversationId: conversation.id,
       requestId: conversation.requestId,
     });
@@ -674,22 +721,32 @@ export function useWorkspace(options: {model?:LlmModel;fullImprover?:boolean} = 
     submit({
       kind: "reject",
       path: decisionPath(conversation.requestId),
-      body: { action: "reject", feedback: text,...(options.fullImprover&&!import.meta.env.VITE_OFFERMESH_MOCK&&conversation.snapshot?.status==='awaiting_user'&&conversation.snapshot.ranked_offers.length?{selection_version:1,rejected_offer_ids:conversation.snapshot.ranked_offers.map(r=>r.offer_id)}:{}) },
+      body: { action: "reject", feedback: text,...(options.fullImprover&&conversation.snapshot?.status==='awaiting_user'&&conversation.snapshot.ranked_offers.length?{selection_version:1,rejected_offer_ids:conversation.snapshot.ranked_offers.map(r=>r.offer_id)}:{}) },
       conversationId: conversation.id,
       requestId: conversation.requestId,
     });
   };
 
+  const clarify = (improvementId:string,feedback:string) => {
+    const conversation=live();
+    if(isLocked()||!conversation.requestId||conversation.snapshot?.status!=='rejected')return;
+    if(!feedback.trim()||[...feedback].length>2000){setError('請輸入 1–2000 字的完整調整條件。');return;}
+    submit({kind:'clarify',path:`/api/requests/${encodeURIComponent(conversation.requestId)}/improvement/clarifications`,
+      body:{improvement_id:improvementId,feedback},conversationId:conversation.id,requestId:conversation.requestId});
+  };
+
   const skip = () => {
     const conversation = live();
-    if (isLocked() || conversation.snapshot?.status !== "awaiting_user") {
+    if (isLocked() || verified !== conversation.requestId || conversation.snapshot?.status !== "awaiting_user") {
       return;
     }
 
     const next = skipOffer(conversation);
     patch(conversation.id, { skipped: next.skipped });
     if (!currentRank(next)) {
-      navigate("feedback", conversation.requestId);
+      submit({kind: 'reject', path: decisionPath(conversation.requestId!),
+        body: {action: 'reject', selection_version: 1, rejected_offer_ids: next.skipped, feedback: conversation.feedback},
+        conversationId: conversation.id, requestId: conversation.requestId});
     }
   };
 
@@ -760,6 +817,8 @@ export function useWorkspace(options: {model?:LlmModel;fullImprover?:boolean} = 
     refine,
     accept,
     reject,
+    clarify,
+    improvementRefresh:refresh,
     skip,
     undo,
     review,

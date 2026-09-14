@@ -13,6 +13,10 @@ const object = <T extends Record<string, unknown>>(properties: T) => ({type: 'ob
 const scope = {type:'string',enum: ['all_categories', 'category:mouse', 'category:mouse_pad']};
 const change = object({target: {type:'string',const: 'intent_md'}, before: nullableText, after: text, evidence_ids: list(id)});
 const preferenceDocument = object({revision: integer, markdown: text, entries: list(object({preference_id: id, scope, value: text}))});
+Object.assign(preferenceDocument.properties,{
+  ranking_weights:{$ref:`${contractSchema.$id}#/$defs/RankingWeights`},
+  saved_preferences:list({$ref:`${contractSchema.$id}#/$defs/ProductPreference`}),issues:list(id),
+});
 const documents = object({revision: {type:'integer',minimum:1},intent_md:text,preference_md:text});
 
 export const proposalSchema = object({

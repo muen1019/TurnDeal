@@ -7,7 +7,7 @@ import { seedDiscovery } from '../../scripts/discovery-db.mjs';
 import { applySalesProfiles } from '../../scripts/lib/sales-profiles.mjs';
 import { populateNegotiationCatalog } from '../../scripts/lib/catalog-policies.mjs';
 import { createLlmFormatterService } from '../../src/formatter/llm-service.ts';
-import { createFormatterService, readSavedPreferences } from '../../src/formatter/service.ts';
+import { createFormatterService } from '../../src/formatter/service.ts';
 import { formatterSummary, contextualAnswer, answerLabels } from '../../src/formatter/questions.ts';
 import { refinementQuestions } from '../../src/formatter/refinement.mjs';
 import { NegotiationRepository } from '../../src/negotiation/repository.mjs';
@@ -17,7 +17,10 @@ import { revalidateOffers } from '../../src/evaluator/validation.mjs';
 import { assertContract } from '../../src/orchestrator/contract.ts';
 import { HttpError } from '../src/httpError.ts';
 import { prepareConfiguredHandoff } from './catalog.mjs';
+import {formatIntent} from '../../src/formatter/parser.ts';
+import {effectivePreferenceText,preferenceDocument} from '../dist/src/improver/preferences.js';
 import {selectedModel} from '../../src/models/config.mjs';
+import {UserPreferenceRepository} from '../dist/src/user-preferences.js';
 
 const active = ['formatting','orchestrating','negotiating','evaluating'];
 const fail = (status,code,message) => {throw new HttpError(status,code,message);};
@@ -42,6 +45,8 @@ export class RuntimeStore {
     }
     populateNegotiationCatalog(db);
     this.repository=new NegotiationRepository(db);
+    this.preferences=new UserPreferenceRepository({rows:(sql,args=[])=>db.prepare(sql).all(...args),
+      run:(sql,args=[])=>{db.prepare(sql).run(...args);},now:()=>new Date(this.now())});
     this.repository.recoverInterrupted();recoverInterruptedEvaluations(db);
     // Startup only: never silently repeat a paid call after a crash.
     for(const row of db.prepare('SELECT * FROM requests WHERE result_state_json IS NOT NULL').all()) {
@@ -59,10 +64,31 @@ export class RuntimeStore {
   async close(){await Promise.allSettled(this.pending.values());this.db.close();}
   transaction(work){return this.repository.transaction(work);}
   ensureBuyer(buyer){const time=new Date(this.now()).toISOString();this.db.prepare('INSERT OR IGNORE INTO users VALUES(?,?,?,?)').run(buyer,buyer,time,time);}
-  buyerProfile(buyer){const row=this.db.prepare('SELECT profile_json FROM buyer_profiles WHERE user_id=?').get(buyer);return row?JSON.parse(row.profile_json):null;}
+  buyerProfile(buyer){
+    const row=this.db.prepare('SELECT profile_json FROM buyer_profiles WHERE user_id=?').get(buyer);
+    if(!row)return null;
+    const shipping=JSON.parse(row.profile_json),preference=this.preferences.current(buyer);
+    const parsed=formatIntent({intent_md:'買無線滑鼠，預算1000元，7天內到貨。',preference_md:effectivePreferenceText(preference)},preference.saved_preferences??[]);
+    const colors=parsed.normalized_intent?.product_preferences.filter(p=>p.attribute==='color'&&p.operator==='in').flatMap(p=>p.values)??[];
+    return {...shipping,colors,weights:preference.ranking_weights??{price:50,delivery:25,trust:25,color:0}};
+  }
   saveBuyerProfile(buyer,profile){
-    this.db.prepare('INSERT INTO buyer_profiles VALUES(?,?,?) ON CONFLICT(user_id) DO UPDATE SET profile_json=excluded.profile_json,updated_at=excluded.updated_at').run(buyer,JSON.stringify(profile),new Date(this.now()).toISOString());
-    return {status:200,body:{profile}};
+    const current=this.preferences.current(buyer),previous=this.buyerProfile(buyer);
+    let markdown=current.markdown;
+    if(JSON.stringify(previous?.colors??[])!==JSON.stringify(profile.colors)){
+      const managed=/<!-- offermesh-preference:buyer_profile_color scope=category:mouse -->\n[^\n]+\n<!-- \/offermesh-preference -->\n?/g;
+      const residue=markdown.replace(managed,'');
+      if(/黑色|白色|藍色|紅色|粉色|black|white|blue|red|rose/i.test(residue)||current.saved_preferences?.some(p=>p.attribute==='color'))
+        fail(409,'preference_color_requires_editor','顏色已設定於共用偏好文字，請在偏好編輯器修改，以免覆蓋其他條件。');
+      const labels={black:'黑色',white:'白色',blue:'藍色',red:'紅色',rose:'粉色'};
+      markdown=residue+(profile.colors.length?`\n<!-- offermesh-preference:buyer_profile_color scope=category:mouse -->\n偏好${profile.colors.map(c=>labels[c]).join('或')}\n<!-- /offermesh-preference -->\n`:'');
+    }
+    if(markdown!==current.markdown||JSON.stringify(profile.weights)!==JSON.stringify(current.ranking_weights))
+      this.preferences.insert(buyer,{...current,...preferenceDocument(markdown,current.revision+1),ranking_weights:profile.weights});
+    // Shipping/payment details are separate from the single preference document.
+    const {colors,weights,...shipping}=profile;
+    this.db.prepare('INSERT INTO buyer_profiles VALUES(?,?,?) ON CONFLICT(user_id) DO UPDATE SET profile_json=excluded.profile_json,updated_at=excluded.updated_at').run(buyer,JSON.stringify(shipping),new Date(this.now()).toISOString());
+    return {status:200,body:{profile:this.buyerProfile(buyer)}};
   }
   snapshot(id,buyer){
     const r=this.db.prepare('SELECT result_state_json FROM requests WHERE request_id=? AND user_id=?').get(id,buyer);
@@ -93,15 +119,11 @@ export class RuntimeStore {
     const id=`req_${randomUUID()}`,time=new Date(this.now()).toISOString();
     const profile=this.buyerProfile(buyer);
     let weights=profile?.weights??null;
-    if(!lineage&&!clarification&&!refinement&&!documents.preference_md.trim()&&profile?.colors.length){
-      const colors={black:'黑色',white:'白色',blue:'藍色',red:'紅色',rose:'粉色'};
-      documents={...documents,preference_md:'偏好'+profile.colors.map(c=>colors[c]).join('或')};
-    }
     let parent=null;
     if(lineage){
       parent=this.snapshot(lineage.parent_request_id,buyer);
       if(parent.status!=='rejected'||parent.documents.revision>=9)fail(422,'lineage_invalid','無法建立下一輪，請開始新需求。');
-      weights=JSON.parse(this.db.prepare('SELECT ranking_weights_json FROM requests WHERE request_id=?').get(parent.request_id).ranking_weights_json??'null');
+
     }
     if(refinement){
       parent=this.snapshot(refinement.parent_request_id,buyer);
@@ -112,11 +134,11 @@ export class RuntimeStore {
       if(modelChoice&&modelChoice!==this.modelFor(parent.request_id))fail(422,'model_conflict','補充回答沿用原需求模型；更換模型請開始新需求。');
       const child=this.db.prepare('SELECT request_id FROM requests WHERE parent_request_id=? AND user_id=?').get(parent.request_id,buyer);
       if(child)return {status:202,body:this.snapshot(child.request_id,buyer)};
-      weights=JSON.parse(this.db.prepare('SELECT ranking_weights_json FROM requests WHERE request_id=?').get(parent.request_id).ranking_weights_json??'null');
+
     }
     if(clarification) {
       parent=this.snapshot(clarification.parent_request_id,buyer);
-      weights=JSON.parse(this.db.prepare('SELECT ranking_weights_json FROM requests WHERE request_id=?').get(parent.request_id).ranking_weights_json??'null');
+
       if(parent.status!=='needs_clarification'||!parent.formatter?.questions.length)fail(409,'clarification_conflict','此需求目前無法補充，請重新載入。');
       if(parent.documents.revision>=9)fail(422,'clarification_limit','補充次數已達上限，請整合條件後開始新需求。');
       if(documents.intent_md!==parent.documents.intent_md||documents.preference_md!==parent.documents.preference_md)fail(422,'clarification_documents','補充時不可覆寫原始文件。');
@@ -127,6 +149,9 @@ export class RuntimeStore {
       documents={...documents,intent_md:documents.intent_md+'\n'+extra};
       if([...documents.intent_md].length>20000)fail(422,'clarification_limit','需求內容過長，請整理後開始新需求。');
     }
+    const preference=lineage?.preference??this.preferences.forSubmission(buyer,parent?undefined:documents.preference_md);
+    documents={...documents,preference_md:preference.markdown};
+    weights=preference.ranking_weights??null;
     const model=parent?this.modelFor(parent.request_id):selectedModel(modelChoice);
     if(parent&&modelChoice&&modelChoice!==model)fail(422,'model_conflict','補充回答沿用原需求模型；更換模型請開始新需求。');
     const s={model,request_id:id,root_request_id:parent?.root_request_id??id,parent_request_id:parent?.request_id??null,status:'formatting',documents:{revision:parent?parent.documents.revision+1:1,...documents},
@@ -136,6 +161,7 @@ export class RuntimeStore {
       VALUES(?,?,?,?,?,?,'null','formatting',?,'0.3',?,?)`).run(id,buyer,s.parent_request_id,s.documents.revision,documents.intent_md,documents.preference_md,JSON.stringify(s),time,time);
     this.db.prepare('UPDATE requests SET ranking_weights_json=? WHERE request_id=?').run(weights?JSON.stringify(weights):null,id);
     this.db.prepare('UPDATE requests SET llm_model=? WHERE request_id=?').run(model,id);
+    this.preferences.bind(buyer,id,preference);
     return {status:202,body:s,scheduleRequestId:id};
   }
   process(id,buyer){
@@ -172,7 +198,7 @@ export class RuntimeStore {
         this.db.prepare('INSERT INTO formatter_runs VALUES(?,?,?,?,?,?,?)').run(id,buyer,`http:${id}`,JSON.stringify(initial.documents),'[]',JSON.stringify(result),new Date(this.now()).toISOString());
       });
     }else ({result}=await formatter.submit({intent_md:initial.documents.intent_md,preference_md:initial.documents.preference_md,idempotency_key:`http:${id}`}));
-    let s={...initial,formatter:formatterSummary(result,initial.documents.preference_md,readSavedPreferences(this.db,buyer).preferences),intent:result.normalized_intent,status:result.status==='ready'?'orchestrating':'needs_clarification',
+    let s={...initial,formatter:formatterSummary(result,initial.documents.preference_md,this.preferences.forRequest(buyer,id)?.saved_preferences??[]),intent:result.normalized_intent,status:result.status==='ready'?'orchestrating':'needs_clarification',
       error:result.status==='ready'?null:{code:'needs_clarification',message:result.questions.join(' '),fields:['intent_md']}};
     this.save(s);if(result.status!=='ready')return;
     const plan=prepareConfiguredHandoff(this.db,buyer,id,result.target_total_twd,new Date(this.now()));

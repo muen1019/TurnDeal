@@ -1,353 +1,66 @@
 # TurnDeal
 
-## 手機 Demo（可跑測試結帳）
+> Turn Your Need into a Deal
 
-**手機要呼叫真實 LLM：** 執行 `npm run dev:mobile:secure`，只有啟動者在電腦終端隱藏輸入 API key。其他人連同一個可信任 Wi-Fi，開啟終端印出的 `http://電腦IP:5176/chat` 即可使用，**不需要配對碼或自己的 key**。前後端一起啟動：5176 → loopback 3203。所有人的請求共用啟動者的 API 額度；每筆實際成功與否以畫面的「LLM 已解析」／離線備援標記為準。
+**The negotiation layer owned by the platform.**
 
-手機版已移除配對頁及 API 配對驗證。每個瀏覽器會自動取得獨立匿名 cookie，隔離設定、需求與訂單；不是正式帳號系統。key 不進前端、URL 或 SQLite。使用 HTTP，連結僅限可連到此電腦的區網，不是公開網際網路網址。能連到的人都可消耗 API 額度，勿公開轉發或直接對外部署。重啟會清空此手機版的暫存 DB；重新整理後即可使用，不影響電腦 5173 的 SQLite。
+TurnDeal is the platform-owned negotiation layer for agent-to-agent (A2A) commerce.
 
-安裝完成後執行 `npm run dev:mobile`，手機連同一個 Wi-Fi，開啟終端顯示的 `http://電腦IP:5174/chat`。
-基本資料 → 偏好 → 輸入需求 → 選商品 → 確認收件資料 → 測試購買完成。
-不需要 API key；使用離線規則／模擬議價與付款，不扣款、不出貨。
-每個瀏覽器使用獨立 Demo 身分，SQLite 在記憶體中，停止後清空；不讀取原本的 `data/app.sqlite`。只在可信任 Wi-Fi 使用，收件資料請填虛構資料，不是正式登入或付款系統。
+Tell TurnDeal what you want to buy, your budget, and your requirements. It negotiates privately with multiple candidate Seller Agents, filters out offers that do not meet your needs, and presents the options worth considering.
 
-出現「Port 5174 already in use」代表舊離線手機服務仍在運作，可直接開舊網址，或先在原終端按 Ctrl+C 再啟動。真實 LLM 版用 5176，不會和 5174 衝突；不會自動殺掉其他服務。
+You always make the final decision. TurnDeal accelerates transactions between buyers, sellers, and marketplaces—creating a win for all three.
 
-[手機操作截圖（11 張）](docs/screenshots/mobile/README.md) · [運送資料規格](docs/BUYER_SETUP.md)
+## How it works
 
-## 最簡單啟動（Windows）
+```mermaid
+flowchart LR
+    Request["Request<br/>Describe your needs"] --> Formatter["Formatter<br/>Structure requirements"]
+    Formatter --> Orchestrator["Orchestrator<br/>Coordinate negotiations"]
 
-先安裝 **Node.js 24 以上**。在專案根目錄開啟 PowerShell。
+    subgraph Sessions["Private negotiation sessions"]
+        direction TB
+        A["Buyer Agent A ↔ Seller A"]
+        B["Buyer Agent B ↔ Seller B"]
+        C["Buyer Agent C ↔ Seller C"]
+        D["Buyer Agent D ↔ Seller D"]
+        E["Buyer Agent E ↔ Seller E"]
+    end
 
-第一次下載與安裝：
+    Orchestrator --> A
+    Orchestrator --> B
+    Orchestrator --> C
+    Orchestrator --> D
+    Orchestrator --> E
+
+    A --> Evaluator["Evaluator<br/>Validate and rank"]
+    B --> Evaluator
+    C --> Evaluator
+    D --> Evaluator
+    E --> Evaluator
+
+    Evaluator --> Swipe["Swipe<br/>You decide"]
+    Swipe -->|Accept| Purchase["Purchase<br/>Confirm purchase"]
+    Swipe -.->|Reject or revise| Request
+```
+
+## What makes TurnDeal different
+
+- **Parallel negotiation** — Multiple Buyer Agents negotiate with Sellers independently, so you do not have to compare stores one by one.
+- **Private competition** — Sellers cannot access other sellers' identities, offers, or private strategies.
+- **Independent evaluation** — The Evaluator only compares valid offers that meet your budget, product, and delivery requirements.
+- **No pay-to-win recommendations** — Sponsored placement does not affect ranking, and AI never purchases without your approval.
+- **Learns what matters to you** — Your preferences and rejection reasons can inform the next request and improve future results.
+
+## Try the demo
+
+Requires Node.js 24 or later.
 
 ```powershell
 git clone https://github.com/muen1019/sea-hackathon.git
 cd sea-hackathon
+
 npm ci
 npm --prefix backend ci
 npm --prefix frontend ci
+npm run dev
 ```
-
-之後每次啟動只要：
-
-```powershell
-npm run dev:secure
-```
-
-依終端提示隱藏輸入自己的 API key，等到 `Vite ready` 後開啟 [http://127.0.0.1:5173/chat](http://127.0.0.1:5173/chat)。不要把 key 貼到聊天、程式碼或 GitHub。沒有 key 想先玩完整離線流程，改執行 `npm run dev`。
-
-SQLite 與測資會自動建立；已有資料會先備份再升級，**不必手動建立或重建 DB**。結帳是模擬付款，不會扣款或出貨。停止服務按 `Ctrl+C`；更新程式先停止，再 `git pull`、重跑上面三個 `npm ci`，最後重新啟動。若有本機未提交修改，先保存再拉取，不要強制覆蓋。
-
----
-
-目前完整流程與測試入口：[TurnDeal 購買、完整 Improver、商品顏色與新版進度畫面](docs/TURNDEAL_WORKFLOW.md)。已接上 PR #2 測試結帳與 PR #3 下一輪需求工作流；「確認測試購買」只產生模擬付款訂單，不扣真實款。
-
-最新整合：[模型選擇、歷史清除與資料庫同步](docs/MODEL_HISTORY_SYNC.md)。畫面左上可選新需求模型，預設 GPT-5.6 Sol；側欄支援單筆／全部清除本分頁歷史，保留 SQLite 稽核與個人設定。
-
-文件定義正本：[intent.md / preference.md 定義與分類](docs/INTENT_PREFERENCE_SPEC.md)。preference 是長期偏好的可讀表示，intent 是本輪購買目標／限制／例外；目前 API preference_md 是本輪快照，不是更新長期偏好的命令。前端儲存僅限分頁；Improver 已有內部偏好版本寫入，前端帳戶偏好同步尚未接入。
-
-## Buyer Request Improver
-
-已實作 Context Builder、LLM Revision Engine、語意驗證、SQLite 工作／文件版本與恢復。每次改善保存新版 intent；全域 preference 僅依明確長期表述提出並驗證 patch。既有 v0.3 reject 回應與原始快照保持不變。
-
-`npm run test:improver` 執行核心與 Node 24 runtime 內部整合測試；`npm run demo:improver` 執行離線合成案例。明示執行 `npm run demo:improver:live` 才使用 `.env` 的 `API_KEY` 呼叫模型，模型名稱由 `IMPROVER_MODEL` 控制（預設 gpt-5.6-sol；Runtime 使用本輪 UI 模型選擇）。詳見 [使用方式與接線邊界](docs/BUYER_REQUEST_IMPROVER.md) 及 [驗證紀錄](docs/IMPROVER_TEST_REPORT.md)。
-
-整合版 runtime 已接上 selection_version: 1：API 接受採用時一併提供的拒絕紀錄，或完整拒絕集合，並排入改善工作。決策與工作原子保存，API 提供進度、需求草稿與澄清問題，前端接線不在本提交內。只憑滑動不更新全域偏好；後端已支援澄清後提交與 ready 自動建立唯一 child；全域偏好編輯器尚未同步。前端串接步驟見 [Improver 後端整合指南](docs/IMPROVER_BACKEND_INTEGRATION.md)。
-
-## 完整前後端入口（最新）
-
-使用 Node 24，在根目錄執行 `npm run dev`，開啟 http://127.0.0.1:5173/chat。現已串接 Formatter → Discovery → 五家 Buyer/Seller 議價 → Evaluator → 商品卡 → 採用／拒絕保存。預設離線；隱藏輸入 key 的真實模型模式為 `npm run dev:secure`。
-
-啟動步驟、範例需求、資料庫與目前限制見 [完整接線說明](docs/RUN_FULL_APP.md)。以下舊 Result API 與同步段落保留歷史背景，以本節為準。
-
-## 目前可執行：Result API v0.3
-
-目前前後端與 main 共用 `contracts/a2a-commerce.v0.3.schema.json`、五家／最多五輪商品資料與 db/migrations。accept/reject 保存及 Buyer Agent 原始回饋交接已整合。Root database tools 使用 Node 24，backend/frontend 使用 Node 20.19.5。
-
-backend/frontend 已支援 Chat intent → mock 商品組合 → 真實 accept/reject → SQLite 保存與 GET 恢復。legacy reject 提供 feedback + 原始 source_documents，不自動建立 child；整合版 selection v1 的後端改善流程見上方指南。啟動見 [backend](backend/README.md) 與 [frontend](frontend/README.md)，驗證見 [Result 測試紀錄](docs/RESULT_TEST_REPORT.md)。以下產品主線是完整產品願景，不代表目前 Result 已串接真實 Agent 或兌換。
-
-> Many sellers. One best deal.
-
-### Formatter / 前端同步狀態
-
-LLM Formatter → Discovery 前五家 → 私有 RFQ 的函式流程已完成，與 Result API 統一使用 v0.3 契約。前端目前仍接 Result mock provider，尚未自動呼叫 LLM Formatter；下一步是串接 service、正式議價與 Evaluator，不需要重做 UI。兩端目前使用不同 SQLite runtime／預設檔案，不能視為已共用同一個運行中資料庫。
-
-既有根目錄 SQLite 請用 `npm run db:migrate` 升級（會先備份），不要為了同步執行 db:rebuild。新增相容 migration 會保留 Formatter 的不可變資料保護。
-
-OfferMesh 是 Sea × OpenAI Regional Codex Hackathon Taiwan 的一日 A2A Commerce MVP。使用者描述商品、預算與交期後，Buyer Agent 會將需求正規化，同時向五家互相隔離的 Seller 議價，再由獨立 Evaluator 排序通過硬限制的方案。Sponsored 曝光與推薦完全分離，最後仍由使用者決定是否採用與兌換。
-
-## Demo 主線
-
-1. 解析自然語言中的硬性條件與偏好。
-2. 找出五家策略不同的 Seller，其中一家顯示 Sponsored。
-3. 平行進行最多五輪議價並產生不可變的 Offer ID。
-4. Backend 排除超預算、錯誤規格、錯誤交期或過期報價。
-5. Evaluator 排序全部合格方案並解釋取捨。
-6. 使用者確認後，以相同 Offer ID 進行限時虛擬兌換。
-
-## 產品流程
-
-`Request -> Format -> Orchestrate -> Negotiate -> Evaluate -> Result / Feedback`
-
-- Seller A：最低價格，交期較慢。
-- Seller B：價格較高，最快到貨。
-- Seller C：價格居中，可提供免費且可拒絕的滑鼠墊。
-- Seller D：價格與交期均衡，第三輪宣告 final。
-- Seller E：固定價格，第一輪宣告 final。
-- Backend：驗證預算、交期、商品、搭售授權、期限與 `offer_id`。
-- Evaluator：只排序 Backend 已確認 eligible 的 Offer，不接收廣告資訊，也不替使用者下單。
-
-## Demo 可靠性
-
-- Seller 商品使用有來源與擷取時間的公開 Marketplace 快照；庫存、底價與策略是明確標示的固定模擬資料，結果可重現。
-- 規則引擎提供完整 fallback，OpenAI API 不可用時主流程仍能完成。
-- Sponsored 只影響 Discovery 顯示，不進入 Evaluator input 或分數。
-- UI 不宣稱真實付款，只在使用者確認後執行模擬兌換。
-
-## Repository 結構
-
-```text
-.
-├─ AGENTS.md                         Codex 與開發者必須遵守的專案規則
-├─ docs/
-│  ├─ DEVELOPMENT_RULES.md           現行 v0.2 黑客松標準與驗收條件
-│  ├─ SYSTEM_DESIGN.md               目標系統設計、API 草案與契約遷移差異
-│  └─ REFERENCE.md                   設計原文的參考來源待補清單
-├─ contracts/
-│  ├─ a2a-commerce.v0.3.schema.json  共用 JSON Schema
-│  ├─ openai/                        Evaluator Structured Outputs schema
-│  └─ fixtures/                      Seller、成功流程、邊界與 API 測資
-├─ db/
-│  ├─ migrations/                    SQLite schema 與版本
-│  └─ README.md                      資料分區與初始化說明
-├─ scripts/
-│  ├─ validate-contracts.mjs         JSON Schema 與跨物件契約驗證器
-│  └─ db.mjs                         SQLite migration、seed 與完整性檢查
-└─ package.json                      共用測試指令
-```
-
-## 開發前必讀
-
-- [LLM Formatter 與安全 key 設定](docs/FORMATTER_LLM.md)：預設 gpt-5.6-sol、Structured Outputs；`npm run demo:formatter:secure` 在 Windows 隱藏輸入 key，測試不使用真實 key。
-- [Formatter：中文文字到現有流程](docs/FORMATTER.md)：離線規則解析、需求澄清、使用者偏好快照、Request 儲存與 Orchestrator 接線；`npm run demo:formatter` 可跑完整文字入口示範（Seller 為測試替身）。
-- [Orchestrator 前段與 Seller 函式交接](docs/ORCHESTRATOR_HANDOFF.md)：已可執行需求快照 → 搜尋 → RFQ → 第一輪函式呼叫；`npm run demo:handoff` 使用記憶體 DB 與明確標示的測試替身。
-- [完整 Catalog 談判政策](docs/CATALOG_NEGOTIATION_POLICIES.md)：15 家／120 筆 Discovery 商品已配置，與原本五家合計 20 家／129 個 SKU 政策；底價與成本僅供 Seller/Backend 使用。舊 [待填模板](docs/SELLER_NEGOTIATION_POLICY.md) 保留為歷史格式。
-- [目標 System Design 與 repo 整合狀態](docs/SYSTEM_DESIGN.md)
-- [開發與驗收基準](docs/DEVELOPMENT_RULES.md)
-- [共用契約說明](contracts/README.md)
-- [JSON Schema](contracts/a2a-commerce.v0.3.schema.json)
-- [Codex／專案共同規則](AGENTS.md)
-- [Evaluator Structured Outputs schema](contracts/openai/evaluator-output.schema.json)
-- [五家 Seller 測資](contracts/fixtures/sellers.json)
-- [Marketplace 公開資料快照](contracts/fixtures/marketplace-source-snapshot.json)
-- [Marketplace 測資來源政策](contracts/fixtures/MARKETPLACE_DATA.md)
-- [完整成功情境](contracts/fixtures/happy-path.json)
-- [完整 Demo 情境矩陣](contracts/fixtures/demo-scenarios.json)
-- [安全與失敗情境](contracts/fixtures/edge-cases.json)
-- [API request/response 範例](contracts/fixtures/api-examples.json)
-- [SQLite schema 與操作說明](db/README.md)
-
-`contracts/a2a-commerce.v0.3.schema.json` 是跨模組唯一資料契約。任何欄位改名、刪除、型別變更、enum 收窄或狀態語意改變，都必須先討論並升版，不能由單一模組自行修改。
-
-`docs/SYSTEM_DESIGN.md` 描述新版目標設計。已實作五家 Seller 的同步協商、Buyer Shared Context、真實模型／fallback 與 SQLite 稽核紀錄，以及獨立 Evaluator 的完整 ID 排序、發布前重新驗證與不可變快照。協商入口見 [協商模組說明](docs/NEGOTIATION.md)，排序與整合測試見 [Evaluator 說明](docs/EVALUATOR.md)。
-
-本次開發新增的 `npm run test:evaluator` 驗證排序與失敗路徑；`npm run test:e2e:full`／`npm run test:e2e:full:live` 從 SQLite 已解析需求，沿用遠端 Orchestrator 的 prepare 接口，執行協商、Evaluator 與重開重播，產生五套方案報告。正式自然語言 Formatter、HTTP、Swipe 及交易端尚未包含在這條測試路徑。
-
-## 團隊分工與交付
-
-| Owner | 建議 branch | 主要交付 | 依賴／輸出契約 |
-| --- | --- | --- | --- |
-| Tech Lead／整合 | `feat/backend-orchestrator` | Formatter、Orchestrator、Backend API、SQLite、狀態機、整合與部署 | 產生 `NormalizedIntent`、`OrchestrationResult`、`RequestSnapshot` |
-| Negotiation／Seller | `feat/negotiation-sellers` | 五家 Seller、Catalog、底價策略、最多五輪議價、timeout、拒絕與 Bundle | 接收 `SellerRFQ`，回傳 `SellerNegotiationResult` |
-| Evaluator／安全 | `feat/evaluator-safety` | Structured Outputs、硬限制複驗、排序驗證、理由、trade-off 與 fallback | 接收 `EvaluatorInput`，回傳 `EvaluatorOutput` |
-| UI／產品展示 | `feat/demo-ui` | 單頁 Demo、Seller 狀態、最多五輪變化、Sponsored、推薦、替代方案與模擬確認 | 只依賴 `RequestSnapshot` 與 API response |
-
-Owner 只負責自己模組的內部實作。跨模組交換資料必須使用 `contracts/` 的格式；不要直接依賴另一個模組的 private class、資料表或未公開欄位。
-
-## 第一次加入專案
-
-先確認 GitHub 帳號已取得 repository 寫入權限，再執行：
-
-```bash
-git clone https://github.com/muen1019/sea-hackathon.git
-cd sea-hackathon
-npm test
-```
-
-目前專案使用 Node.js 內建 SQLite，需要 Node.js 24 以上，不需安裝第三方 package。
-
-## SQLite
-
-新增 [前五賣家探索／評分 v0.2](docs/DISCOVERY_SCORING.md)：120 筆合成刊登、15 家模擬賣場，固定公式評分、不需 LLM。先執行 `npm run db:seed:discovery`，再以 `npm run demo:discovery` 查看 800 元滑鼠的五筆候選。
-
-Orchestrator 已有可呼叫的 [TypeScript 資料接口](src/orchestrator/README.md)，包含需求與偏好快照、商品、Seller、評分、Campaign。執行 `npm run demo:orchestrator` 可查看真實 SQLite 回傳資料；篩選排序與 RFQ 派發尚待實作。
-
-```bash
-npm run db:init      # 第一次建立本機資料庫
-npm run db:check     # 檢查完整性、外鍵、seed 與不可變規則
-npm run db:rebuild   # 依 migration 與 fixture 重建
-```
-
-資料庫位於 `data/offermesh.sqlite` 且不會提交到 Git；團隊共同維護的是 migration、seed 程式和 fixture。
-
-## 每次開始開發
-
-不要直接在 `main` 開發。先同步主分支，再建立自己的功能分支：
-
-```bash
-git switch main
-git pull --ff-only origin main
-git switch -c feat/<你的模組名稱>
-```
-
-建議 branch 前綴：
-
-- `feat/`：新功能
-- `fix/`：錯誤修正
-- `docs/`：文件
-- `test/`：測試與測資
-- `chore/`：工具與設定
-
-## Commit 與推送
-
-一次 commit 只處理一個清楚目的。先檢查差異與測試，再推送：
-
-```bash
-git status
-git diff
-npm test
-git add <本次修改的檔案>
-git commit -m "feat: implement seller negotiation round"
-git push -u origin feat/<你的模組名稱>
-```
-
-Commit message 建議使用：`feat:`、`fix:`、`docs:`、`test:`、`refactor:`、`chore:`。
-
-不要 commit：
-
-- `.env`、API key、token 或密碼
-- 本機資料庫與執行產物
-- `node_modules/`、cache、IDE 個人設定
-- 含真實個人資料或私有交易資料的測資
-
-## Pull Request 與合併
-
-1. PR 只解決一個模組或一個整合問題。
-2. 說明改了什麼、如何測試、影響哪些 contract 與目前限制。
-3. 有 UI 變更時附截圖或短片；有流程變更時附 request／response 範例。
-4. 修改 contract 時，同一個 PR 必須更新 schema、fixture、驗證器與受影響 consumer。
-5. 至少由 Tech Lead 或受影響模組 Owner review 後再合併。
-6. 合併前確認 `npm test` 通過，並處理所有 merge conflict。
-
-需要同步 `main` 時，在自己的 branch 執行：
-
-```bash
-git fetch origin
-git rebase origin/main
-npm test
-git push --force-with-lease
-```
-
-`--force-with-lease` 只能用在自己的功能 branch，不得對共享 `main` 使用。
-
-## 共用資料安全規則
-
-- Seller 只回傳草稿，不得自行設定正式 `offer_id` 或 eligibility。
-- Backend 配置 immutable `offer_id`，並驗證價格、規格、交期、庫存、條款、搭售授權與期限。
-- Seller 只能看到去識別化且可比較的真實競爭條件；不得取得其他 Seller 的名稱／ID、逐字稿、底價、Campaign 或買家私有信任資料。
-- Sponsored 只影響 UI 曝光，不得進入 Evaluator input 或影響排序。
-- Evaluator 只能完整排序 Backend 已驗證的 eligible Offer。不存在、重複、遺漏或過期 ID 一律拒絕。
-- OpenAI API 失敗時必須使用 deterministic fallback，主 Demo 不可因此中斷。
-- 推薦不等於購買；使用者必須採用並以相同 `offer_id` 在期限內兌換。
-
-## 最小驗收流程
-
-合併前至少確認：
-
-1. 相同輸入可重現五家不同的最多五輪議價。
-2. Seller A 最便宜但較慢，Seller B 最快但較貴，Seller C 提供免費可拒絕的相關配件。
-3. 超預算、錯誤交期、錯誤規格與過期 Offer 不會進入推薦。
-4. Evaluator 無法選到不存在或不合格的 `offer_id`。
-5. Sponsored Seller 不會因廣告而自動成為第一名。
-6. 第一次看到產品的人可在 30 秒內理解「多賣家議價，再由獨立 Evaluator 推薦」。
-
-## 測試
-
-使用 Node.js 24 以上版本，安裝鎖定相依套件後執行全部現有測試：
-
-```bash
-npm ci
-npm test
-```
-
-目前會檢查所有 JSON、共用 schema 邊界、五家 Seller 策略、最多五輪議價、RFQ 隱私、正式 Offer 引用、硬限制、Sponsored 隔離、Evaluator ID 完整性與 API idempotency 範例。
-
-## 黑客松期間新增內容
-
-LLM Formatter 已加入 Responses Structured Outputs、原文 evidence 驗證、API timeout／安全 fallback、非同步 service 與 key 隱藏輸入啟動器。使用者本機已回報 live LLM → ready → 五家搜尋結果成功；新增安全診斷與明確排序優先權檢查，mock API 與離線測試通過。
-Formatter v0.1 已實作有界中文規則解析、缺值與衝突澄清、SQLite 使用者偏好合併、不可變解析紀錄與 idempotency，並串接既有搜尋／第一輪交接。不是通用 LLM 解析器；未知語意會詢問，不自動忽略或授權購買。
-前段整合已加入完整商品偏好轉換、SellerRFQ 白名單、綁定快照的函式 registry、第一輪平行派發／逾時／回應驗證、SQLite 交接計畫與重播防護。Seller 策略與後續輪次、正式 Offer 商務驗證仍待接續；這不是完整議價或付款流程。既有 DB 可用 `npm run db:migrate` 備份後非破壞性升級。
-目前新增了 SQLite-backed Orchestrator 讀取工具、15 家 Seller／120 筆合成刊登（90 滑鼠、30 滑鼠墊）、五個不同 Seller 的確定性排序與結果快照。目標價格選填，缺值時按有效指標重新分配權重，詳見 [評分標準](docs/DISCOVERY_SCORING.md)。不滿五個合格結果時可補標記替代方案，但違反硬限制者不能自動議價；不足五個可用賣家則明確回報。新增資料不是 120 筆真實爬取商品。
-
-新增 Seller 私有政策 schema、15 家待填模板、填寫說明及驗證測試；實際議價 handler、策略數值、私有政策 DB 接線、UI 與完整新流程仍待各 Owner 整合。已整合隊友的五家／五輪 canonical 測資；Discovery 刊登 ID 與 canonical 商品 ID 仍分開。
-
-本 repository 為本次黑客松建立。第一版已完成共同開發規則、完整資料契約、OpenAI Structured Outputs 格式、三家 Seller 固定測資、兩輪議價範例、API 範例與無第三方相依的契約驗證器。
-
-v0.2 已完成五家 Seller／最多五輪的契約、19 次議價交換與 6 筆最終 Offer 測資、提前 final／失敗停止驗證，以及保留舊資料的 SQLite migration。新增 Ajv／ajv-formats 驗證實際 JSON Schema。
-
-本次新增 `src/negotiation/`：五組獨立 Buyer／Seller、最多五輪同步 barrier、去識別化共享競爭條件、Responses API Structured Outputs、deterministic fallback、Backend 報價驗證、期限／成本上限與 SQLite 不可變稽核紀錄。`npm run demo:negotiate -- --offline` 可執行完整協商；填入 `.env` 的 `API_KEY` 後執行 `npm run demo:negotiate -- --live`。模型設定及整合限制見 [NEGOTIATION.md](docs/NEGOTIATION.md)。Swipe session 及偏好學習仍未實作。
-
-新增 25 組 unit tests，以及離線／真實模型 E2E：`npm run test:e2e`、`npm run test:e2e:live`。使用者確認的五套 [銷售偏好](contracts/fixtures/sales-profiles.json) 展示讓價、快速配送、免費周邊、較便宜的組合、固定價格。修正模型可繞過固定價格的問題，加入有底價保護的 bundle 折扣。E2E 會產生五張方案卡、逐輪紀錄和 14 項驗證報告；歷史資料庫重開後必須重播同一組 Offer ID。
-
-後續每個 PR 都要更新本節或 PR 說明，讓評審可以辨識黑客松期間完成的工作。
-
-## 既有專案與 OSS
-
-應用使用 React、Vite、Express、sql.js 等 OSS，版本固定於 frontend/backend 的 package-lock.json；規格使用 [OpenSpec 1.13.0](https://github.com/Fission-AI/OpenSpec)（MIT）初始化與驗證。
-
-## UI／API OpenSpec 定義
-
-已建立 [define-offer-result-ui-api](openspec/changes/define-offer-result-ui-api/proposal.md) change，含能力規格、[技術設計](openspec/changes/define-offer-result-ui-api/design.md) 與 [分批任務](openspec/changes/define-offer-result-ui-api/tasks.md)。Result API 與 React 串接已實作，細部視覺及真機驗收仍依任務表追蹤。
-
-- [frontend/](frontend/README.md)：React＋TypeScript＋Vite，Node.js `>=20.19.0 <21`；右滑立即採用、左滑略過、最多五輪狀態與 Sponsored 展示。
-- [backend/](backend/README.md)：Node.js 20＋TypeScript＋Express 5＋SQLite；三個 Result HTTP 操作、mock 組合及冪等 accept/reject。
-- [OpenAPI 3.1](backend/openapi.json)：引用共用 v0.3 schema，GET 回傳包含 decision 的 RequestSnapshot。
-
-### Frontend opt-in mock API
-
-前端預設仍把 `/api` proxy 到 `OFFERMESH_API_ORIGIN`，未設定時使用 `http://127.0.0.1:3201`。需要只跑 browser demo、不啟動 backend 時，可開啟 Vite dev mock：
-
-```bash
-cd frontend
-OFFERMESH_DEV_MOCK=1 npm run dev -- --port 5174
-```
-
-mock mode 只在 `OFFERMESH_DEV_MOCK=1` 時攔截 Vite dev server 的 `/api`，正常模式與 production build 不截流。UI 仍觀測既有 `RequestSnapshot.status` 並沿用目前 1 秒 GET polling；shared v0.3 schema 不新增 progress/stage 欄位。mock mode 另外提供 [dev-only sidecar progress API](frontend/AGENT_PROGRESS.md) 給 UI 顯示「模擬進度」；正常 backend 沒有該 sidecar 時可回 404，UI 只顯示可觀測的 RequestSnapshot status fallback。成功 mock 使用 `contracts/fixtures/happy-path.json` 與 active v0.3 schema，固定示範條件為「無線靜音滑鼠、預算 NT$1,000、7 天內送達」；POST `/api/requests` 先回 202 `formatting` 並忠實保留原始 request documents，約 10 秒後 GET `/api/requests/{request_id}` 轉為 `awaiting_user`，offers、normalized intent 與 ranking 來自 canonical fixture。邊界驗證可設定：
-
-```bash
-OFFERMESH_DEV_MOCK=1 OFFERMESH_DEV_MOCK_SCENARIO=failed npm run dev -- --port 5174
-OFFERMESH_DEV_MOCK=1 OFFERMESH_DEV_MOCK_SCENARIO=needs_clarification npm run dev -- --port 5174
-OFFERMESH_DEV_MOCK=1 OFFERMESH_DEV_MOCK_SCENARIO=needs_confirmation npm run dev -- --port 5174
-OFFERMESH_DEV_MOCK=1 OFFERMESH_DEV_MOCK_SCENARIO=no_match npm run dev -- --port 5174
-```
-
-在 repository 根目錄可執行規格檢查：
-
-```bash
-npx --yes @fission-ai/openspec@1.13.0 status --change define-offer-result-ui-api
-npx --yes @fission-ai/openspec@1.13.0 validate define-offer-result-ui-api --strict
-```
-
-change 維持未封存，尚待任務表中的完整視覺與裝置驗收。根目錄契約測試驗證統一 v0.3 共用契約與 Result fixtures。
-
-
-## Hackathon 新增：經濟 Persona 與條件交換
-
-五家 Seller 由 Catalog、私有政策與協商狀態控制，支援加贈滑鼠墊、取消贈品換折扣、回購券、物流與售後權益。權益使用 SQLite 登錄的模擬履約證據，未來券不折抵本次價格。`npm run test:e2e:full` 可產生含逐輪決策對話與五個推薦方案的 HTML 報告；真實模型使用 `npm run test:e2e:full:live`。設計、限制與測試說明見 [SELLER_PERSONAS.md](docs/SELLER_PERSONAS.md)。
-
-本次進一步將 Persona 預先綁定賣家，新增 SKU 成本／讓步政策，真實模型在 Backend 的合法範圍內選價。公開售後條件可用於 Discovery 匹配及 Evaluator 排序，Persona 名稱與私有底價不參與排名。使用 `node scripts/e2e-negotiation.mjs --live --evaluate --after-sales` 可查看售後優先的五方案報告；預設為價格優先。實作與尚未支援的通用規則見 [SELLER_POLICY_IMPLEMENTATION.md](docs/SELLER_POLICY_IMPLEMENTATION.md)。
-
-## ACP 測試購買
-
-整合 runtime 已支援購買 API → ACP HTTP 測試商家 → 模擬付款 → 持久化訂單。前端接線不在本提交內。採用不自動下單，須另提交明確確認；不會實際扣款或出貨。操作、六個 API payload 與正式付款邊界見 [ACP 購買說明](docs/ACP_PURCHASE.md)，實跑證據見 [驗證報告](docs/ACP_PURCHASE_TEST_REPORT.md)。

@@ -6,6 +6,7 @@ import { contractFile } from "./paths.js";
 import { invalidRequest } from "./httpError.js";
 
 export type ValidatorName =
+  | "ProductPreference"
   | "CreateRequest"
   | "AcceptDecision"
   | "RejectDecision"
