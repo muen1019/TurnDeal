@@ -2,7 +2,9 @@ import type {DocumentBundle, NormalizedIntent, RequestSnapshot} from '../types.j
 
 export type Scope = 'all_categories' | 'category:mouse' | 'category:mouse_pad';
 export type PreferenceEntry = {preference_id: string; scope: Scope; value: string};
-export type PreferenceDocument = {revision: number; markdown: string; entries: PreferenceEntry[]};
+export type PreferenceDocument = {revision: number; markdown: string; entries: PreferenceEntry[];
+  ranking_weights?: NonNullable<NormalizedIntent['ranking_weights']>;
+  saved_preferences?: NormalizedIntent['product_preferences']; issues?: string[]};
 export type Evidence = {evidence_id: string; text: string; kind: 'user_feedback' | 'rejection'};
 export type OfferSummary = {
   offer_id: string; items: {product_id: string; quantity: number}[];
@@ -47,7 +49,7 @@ export interface RevisionProvider {
   kind: 'llm' | 'deterministic';
   generate(context: ImprovementContext, errors: string[], signal: AbortSignal): Promise<unknown>;
 }
-export type IntentNormalizer = (documents: DocumentBundle) => NormalizedIntent;
+export type IntentNormalizer = (documents: DocumentBundle, savedPreferences?: NormalizedIntent['product_preferences'], rankingWeights?: NormalizedIntent['ranking_weights']) => NormalizedIntent;
 export type SqlValue = string | number | null;
 export type SqlRow = Record<string, SqlValue>;
 /** Internal same-process port: never expose through HTTP. Uses the store's live DB after rollback. */

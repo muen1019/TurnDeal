@@ -6,6 +6,7 @@ import type { ChatPanelProps } from "./types";
 const DRAFT_LIMIT = 2000;
 
 export function ChatPanel({
+  improvementCard,
   messages,
   status,
   progressStatus,
@@ -102,6 +103,7 @@ export function ChatPanel({
         )}
         </div>
 
+        {improvementCard}
         {progressStatus ? <AgentProgress status={progressStatus} error={progressErrorSignal} /> : null}
 
         {teaser ? (

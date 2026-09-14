@@ -36,7 +36,7 @@ export interface Workspace {
 }
 
 export interface Pending {
-  kind: "create" | "accept" | "reject";
+  kind: "create" | "accept" | "reject" | "clarify";
   path: string;
   body: Record<string, unknown>;
   key: string;
@@ -223,7 +223,7 @@ function isPending(value: Partial<Pending>): value is Pending {
     normalized.body !== null &&
     typeof normalized.body === "object" &&
     !Array.isArray(normalized.body) &&
-    ["create", "accept", "reject"].includes(String(normalized.kind)) &&
+    ["create", "accept", "reject", "clarify"].includes(String(normalized.kind)) &&
     ["keyboard", "pointer"].includes(source)
   );
 }

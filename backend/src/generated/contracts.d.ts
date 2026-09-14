@@ -306,6 +306,8 @@ export interface A2ACommerceContracts {
   ImprovementStatus?: ImprovementStatus;
   ImprovementClarification?: ImprovementClarification;
   ImprovementClarificationResult?: ImprovementClarificationResult;
+  UserPreference?: UserPreference;
+  UpdateUserPreference?: UpdateUserPreference;
 }
 /**
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
@@ -370,7 +372,7 @@ export interface DocumentBundle {
   preference_md: string;
 }
 /**
- * intent_md describes this purchase and its temporary constraints/preferences. preference_md is a request-bound preference snapshot; omission/empty text does not clear active SQLite product preferences. Neither field updates the durable profile.
+ * intent_md describes this purchase. The backend binds the current user preference version. Nonempty preference_md may initialize an absent user profile. For an existing profile the latest server revision is always used, ignoring cached client preference text; edits use POST /api/preferences. Empty or omitted preference_md inherits the current profile.
  *
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
  * via the `definition` "CreateRequest".
@@ -1136,4 +1138,28 @@ export interface ImprovementClarificationResult {
   request_id: Id;
   improvement_id: Id;
   status: "queued";
+}
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "UserPreference".
+ */
+export interface UserPreference {
+  revision: number;
+  markdown: string;
+  entries: {
+    preference_id: string;
+    scope: "all_categories" | "category:mouse" | "category:mouse_pad";
+    value: string;
+  }[];
+  saved_preferences?: ProductPreference[];
+  issues?: string[];
+  ranking_weights?: RankingWeights;
+}
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "UpdateUserPreference".
+ */
+export interface UpdateUserPreference {
+  markdown: string;
+  base_revision: number;
 }
