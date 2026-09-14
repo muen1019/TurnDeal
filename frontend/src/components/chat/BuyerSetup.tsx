@@ -67,7 +67,7 @@ export function BuyerSetup({initial,onSave,onCancel,busy,error,uncertain,onRetry
       </fieldset>
       {(error||localError)&&<div className="setup-error" role="alert">{localError||error}{error&&<button type="button" disabled={busy} onClick={uncertain?onRetry:onReload}>{uncertain?'核對原提交':'重新載入'}</button>}</div>}
       <div className="setup-actions">{step===1&&<button className="setup-back" type="button" disabled={busy||uncertain} onClick={()=>jump(0)} aria-label="返回基本資料"><ArrowLeft size={19}/></button>}<button className="setup-primary" disabled={busy||uncertain||step===0&&!draft.name.trim()} type="submit">{busy?'儲存中…':step===0?'下一步':'儲存並開始'}<ArrowRight size={18}/></button></div>
-      <p className="setup-storage">{import.meta.env.VITE_OFFERMESH_MOCK?'互動預覽 · 資料只保留於目前頁面':'儲存於本機 SQLite · 非正式付款資料庫'}</p>
+      <p className="setup-storage">儲存於本機 SQLite · 非正式付款資料庫</p>
     </form>
   </section>;
 }

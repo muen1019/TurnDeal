@@ -669,7 +669,7 @@ export function useWorkspace(options: {model?:LlmModel;fullImprover?:boolean} = 
       refinement:{parent_request_id:snapshot.request_id}},conversationId:conversation.id,requestId:snapshot.request_id});
   };
   useEffect(()=>{
-    if(active.refinementRequested&&active.snapshot?.status==='rejected'&&!busy&&!pending&&!unknown&&verified===active.requestId&&!import.meta.env.VITE_OFFERMESH_MOCK)refine();
+    if(active.refinementRequested&&active.snapshot?.status==='rejected'&&!busy&&!pending&&!unknown&&verified===active.requestId)refine();
   },[active.refinementRequested,active.snapshot?.status,active.requestId,busy,pending,unknown,verified]);
 
   const accept = (offerId?: string) => {
@@ -692,7 +692,7 @@ export function useWorkspace(options: {model?:LlmModel;fullImprover?:boolean} = 
     submit({
       kind: "accept",
       path: decisionPath(conversation.requestId!),
-      body: { action: "accept", offer_id: offer.offer_id,...(options.fullImprover&&!import.meta.env.VITE_OFFERMESH_MOCK?{selection_version:1,rejected_offer_ids:conversation.skipped.filter(id=>id!==offer.offer_id&&conversation.snapshot!.ranked_offers.some(r=>r.offer_id===id)),...(conversation.feedback.trim()?{feedback:conversation.feedback}:{})}:{}) },
+      body: { action: "accept", offer_id: offer.offer_id,...(options.fullImprover?{selection_version:1,rejected_offer_ids:conversation.skipped.filter(id=>id!==offer.offer_id&&conversation.snapshot!.ranked_offers.some(r=>r.offer_id===id)),...(conversation.feedback.trim()?{feedback:conversation.feedback}:{})}:{}) },
       conversationId: conversation.id,
       requestId: conversation.requestId,
     });
@@ -721,7 +721,7 @@ export function useWorkspace(options: {model?:LlmModel;fullImprover?:boolean} = 
     submit({
       kind: "reject",
       path: decisionPath(conversation.requestId),
-      body: { action: "reject", feedback: text,...(options.fullImprover&&!import.meta.env.VITE_OFFERMESH_MOCK&&conversation.snapshot?.status==='awaiting_user'&&conversation.snapshot.ranked_offers.length?{selection_version:1,rejected_offer_ids:conversation.snapshot.ranked_offers.map(r=>r.offer_id)}:{}) },
+      body: { action: "reject", feedback: text,...(options.fullImprover&&conversation.snapshot?.status==='awaiting_user'&&conversation.snapshot.ranked_offers.length?{selection_version:1,rejected_offer_ids:conversation.snapshot.ranked_offers.map(r=>r.offer_id)}:{}) },
       conversationId: conversation.id,
       requestId: conversation.requestId,
     });

@@ -1,5 +1,5 @@
 import type { RequestSnapshot } from "../../contract.generated";
-import type { RequestProgressStage } from "../../api/progress";
+import type { RequestProgressStage } from "../../state/useAgentProgress";
 import "./AgentProgress.css";
 
 export type AgentProgressStatus =
