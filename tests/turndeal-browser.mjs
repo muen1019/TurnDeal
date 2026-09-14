@@ -21,7 +21,7 @@ await page.route(ui+'/api/**',async route=>{
 });
 const out='frontend/test-results/turndeal';mkdirSync(out,{recursive:true});
 try{
- await page.goto(ui+'/chat');assert.match(await page.title(),/TurnDeal/);
+ await page.goto(ui+'/chat');assert.match(await page.title(),/TurnDeal/);await page.getByRole('button',{name:'開始使用'}).click();
  await page.getByRole('textbox',{name:/名稱/}).fill('測試買家');await page.getByRole('textbox',{name:'電子郵件',exact:true}).fill('buyer@example.test');await page.getByRole('combobox',{name:'縣市',exact:true}).selectOption('臺北市');await page.getByRole('combobox',{name:'鄉鎮市區',exact:true}).selectOption('中正區');await page.getByRole('textbox',{name:'街道、門牌與樓層',exact:true}).fill('測試路 1 號');await page.getByRole('button',{name:/下一步/}).click();await page.getByRole('button',{name:/儲存並開始/}).click();
  assert.equal(await page.getByRole('combobox',{name:'新需求使用的模型'}).inputValue(),'gpt-5.6-sol');
  await page.getByRole('combobox',{name:'新需求使用的模型'}).selectOption('gpt-4.1-mini');

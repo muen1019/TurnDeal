@@ -17,7 +17,7 @@ await page.route('http://127.0.0.1:5173/api/**',async route=>{
 const out='frontend/test-results/buyer-setup';mkdirSync(out,{recursive:true});
 const shot=async name=>{await page.waitForTimeout(500);await page.screenshot({path:`${out}/${name}.png`,fullPage:true});};
 try{
- await page.goto('http://127.0.0.1:5173/chat');await page.getByRole('heading',{name:'先認識一下你'}).waitFor();await shot('01-profile');
+ await page.goto('http://127.0.0.1:5173/chat');await page.getByRole('button',{name:'開始使用'}).click();await page.getByRole('heading',{name:'先認識一下你'}).waitFor();await shot('01-profile');
  await page.getByRole('textbox',{name:/名稱/}).fill('Demo Buyer');await page.getByRole('textbox',{name:/運送地址/}).fill('示範城市・測試路 1 號');
  await page.getByRole('combobox',{name:'偏好付款方式'}).selectOption('mobile');
  await page.getByRole('button',{name:/下一步/}).click();

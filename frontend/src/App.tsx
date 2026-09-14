@@ -16,6 +16,7 @@ import {useBuyerProfile} from './state/useBuyerProfile';
 import {ModelPicker,initialModel} from './components/chat/ModelPicker';
 import {PurchasePanel} from './components/offers/PurchasePanel';
 import {ImprovementPanel} from './components/chat/ImprovementPanel';
+import {WelcomeScreen} from './components/chat/WelcomeScreen';
 
 const stateCopy:Record<string,string>={formatting:'正在整理你的需求與購買限制。',orchestrating:'正在尋找符合需求的賣家。',negotiating:'各賣家正在獨立議價，完成後會一起比較。',evaluating:'正在根據預算、交期與偏好整理推薦。',needs_clarification:'需要更明確的需求才能繼續。',needs_confirmation:'有配件需要額外授權，尚未開放採用。',no_match:'目前沒有符合所有條件的方案。',failed:'這次比價未完成，請查看原因後重新開始。',accepted:'本輪已採用一個方案，決策已保存。',rejected:'你的回饋已保存。可開始新對話，繼續尋找合適的優惠。'};
 
@@ -25,6 +26,7 @@ export default function App(){
  const buyer=useBuyerProfile();const [advancedSettings,setAdvancedSettings]=useState(false);
  const agentProgress=useAgentProgress(c.requestId,snapshot?.status);
  const [tab,setTab]=useState<DefinitionTab>('intent');
+ const [intro,setIntro]=useState(()=>!new URLSearchParams(location.search).has('request_id'));const leavingIntro=useRef(false);
  const [mobile,setMobile]=useState(()=>window.matchMedia('(max-width: 767px)').matches);
  useEffect(()=>{const query=window.matchMedia('(max-width: 767px)');const change=()=>setMobile(query.matches);query.addEventListener('change',change);return()=>query.removeEventListener('change',change);},[]);
  const scrolls=useRef<Record<string,number>>({});const focusText=useRef('');const priorView=useRef<string>(s.view);
@@ -32,6 +34,8 @@ export default function App(){
  useEffect(()=>{const viewport=window.visualViewport;const resize=()=>document.documentElement.style.setProperty('--app-height',`${viewport?.height??window.innerHeight}px`);resize();viewport?.addEventListener('resize',resize);window.addEventListener('resize',resize);return()=>{viewport?.removeEventListener('resize',resize);window.removeEventListener('resize',resize);document.documentElement.style.removeProperty('--app-height');};},[]);
  const go=(view:View,id?:string|null,offerId?:string|null)=>{const el=mainRef.current?.querySelector('.workspace-content,.chat-thread');if(el)scrolls.current[s.view]=el.scrollTop;if(s.view==='offers')focusText.current=(document.activeElement?.textContent??'').trim();s.navigate(view,id,offerId);};
  useEffect(()=>{const focusScope=s.view+(snapshot&&['accepted','rejected'].includes(snapshot.status)?':'+snapshot.status:'');if(priorView.current===focusScope)return;priorView.current=focusScope;const frame=requestAnimationFrame(()=>{const root=mainRef.current;if(!root)return;let target:HTMLElement|null=null;if(s.view==='offers'&&focusText.current)target=Array.from(root.querySelectorAll<HTMLElement>('button')).find(b=>b.textContent?.trim()===focusText.current)??null;target??=root.querySelector<HTMLElement>('.chat-main-slot h1,.chat-main-slot h2,.chat-main-slot textarea');if(target){target.setAttribute('tabindex','-1');target.focus({preventScroll:true});}const sc=root.querySelector('.workspace-content,.chat-thread');if(sc)sc.scrollTop=scrolls.current[s.view]??0;});return()=>cancelAnimationFrame(frame);},[s.view,snapshot?.status]);
+ // 開始使用 always lands on the setup screen: new buyers already see it on the fresh home, returning buyers are sent to settings.
+ useEffect(()=>{if(intro||!leavingIntro.current||buyer.loading)return;leavingIntro.current=false;if(buyer.profile){setAdvancedSettings(false);go('settings');}},[intro,buyer.loading,buyer.profile]);
  const patch=(p:Parameters<typeof s.patch>[1])=>s.patch(c.id,p);
  const definitionEditor=<AgentDefinitionEditor intent={d.intent} preference={d.preference} savedIntent={d.savedIntent} savedPreference={d.savedPreference} activeTab={tab} onTabChange={setTab} onIntentChange={intent=>s.update(w=>({...w,definitions:{...w.definitions,intent}}))} onPreferenceChange={preference=>s.update(w=>({...w,definitions:{...w.definitions,preference}}))} onSave={s.saveDefinitions} onCancel={()=>s.update(w=>({...w,definitions:{...w.definitions,intent:w.definitions.savedIntent,preference:w.definitions.savedPreference}}))} saving={s.saving} error={s.error}/>;
  const ranking=currentRank(c);const offer=snapshot?.offers.find(o=>o.offer_id===ranking?.offer_id)??null;
@@ -76,6 +80,7 @@ export default function App(){
  const freshHome=s.view==='chat'&&!pending&&(!c.requestId||!new URLSearchParams(location.search).has('request_id'));
  if(freshHome&&buyer.loading)content=<div className="setup-loading" role="status">正在準備你的購物空間…</div>;
  else if((freshHome&&!buyer.profile)||(s.view==='settings'&&!advancedSettings))content=<div className="setup-container"><BuyerSetup key={buyer.profile?'saved':'new'} initial={buyer.profile} busy={buyer.busy} error={buyer.error} uncertain={buyer.uncertain} onSave={async value=>{const saved=await buyer.save(value);if(saved){if(!buyer.profile)s.newConversation();else go('chat');}return saved;}} onCancel={buyer.profile?()=>go('chat'):undefined} onRetry={()=>{void buyer.retry().then(ok=>{if(ok){if(!buyer.profile)s.newConversation();else go('chat');}});}} onReload={()=>void buyer.load()}/>{buyer.profile&&<button className="setup-advanced" onClick={()=>{setAdvancedSettings(true);go('settings');}}>進階文字偏好設定</button>}</div>;
+ if(intro)return <WelcomeScreen onStart={()=>{leavingIntro.current=true;setIntro(false);}}/>;
  return <div ref={mainRef} data-keyboard={s.source==='keyboard'}><AppShell activeView={s.view==='settings'?'definitions':s.view==='history'?'offers':s.view} recentRequests={s.workspace.conversations.map(item=>({id:item.id,title:item.title,isActive:item.id===c.id,subtitle:item.snapshot?stateCopy[item.snapshot.status]??'等待選擇':'尚未送出'}))} onChat={()=>go('chat')} onSettings={()=>{setAdvancedSettings(false);go('settings');}} onNewConversation={s.newConversation} onSelectConversation={s.selectConversation} onDeleteConversation={s.deleteConversation} onClearHistory={s.clearHistory} modelPicker={<ModelPicker value={model} onChange={value=>{setModel(value);try{sessionStorage.setItem("offermesh.model",value);}catch{}}}/>} historyLocked={pending||s.workspace.conversations.some(item=>processing(item.snapshot?.status))}>{content}</AppShell></div>;
 }
 function Status({title,text,action}:{title:string;text:string;action?:ReactNode}){return <section className="status-panel"><span className="status-icon"><MessageCircle size={26}/></span><h2>{title}</h2><p>{text}</p><div className="actions">{action}</div><p className="app-demo">Demo · 使用可重現的虛擬市場，不會產生真實付款</p></section>;}
