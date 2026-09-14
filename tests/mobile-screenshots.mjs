@@ -10,7 +10,7 @@ const page=await context.newPage();page.setDefaultTimeout(30000);
 const errors=[];page.on('pageerror',e=>errors.push(e.message));
 const shot=async name=>{await page.waitForTimeout(550);await page.screenshot({path:out+'/'+name+'.png'});};
 try{
- await page.goto(origin+'/chat');
+ await page.goto(origin+'/chat');await page.getByRole('button',{name:'開始使用'}).click();
  await page.getByRole('textbox',{name:/名稱/}).fill('Demo Buyer');
  await page.getByRole('textbox',{name:'電子郵件',exact:true}).fill('buyer@example.test');
  await page.getByRole('combobox',{name:'縣市',exact:true}).selectOption('臺北市');
