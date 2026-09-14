@@ -50,7 +50,8 @@ export class BuyerRequestImprover {
       else{
         const proposal=structuredClone(candidate.proposal);
         if(proposal.preference.action==='patch')proposal.preference.base_revision=latest.revision;
-        candidate=validateCandidate(context,proposal,candidate.provider,this.normalize);
+        try{candidate=validateCandidate(context,proposal,candidate.provider,this.normalize);}
+        catch{candidate=fallback(context,'preference_version_conflict');}
         candidate.audit.push('preference_rebased');
       }
       try{

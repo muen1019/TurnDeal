@@ -36,4 +36,4 @@ Result API 瀏覽器測試：先安裝 Python Playwright（`python -m pip instal
 
 ## 與其他 session 共用工作區
 
-可先編譯 backend，再在 frontend 執行 `node scripts/start-result-demo.mjs`，使用獨立的 5273 UI / 3201 API 與 backend/data/result-preview.sqlite。此入口避免占用另一個 session 的 5173 / 3001。
+完整服務請從 repository 根目錄執行 `npm run dev` 或 `npm run dev:secure`；前端不再提供獨立 mock Result server。隔離的正式 runtime 瀏覽器驗證可執行 `npm --prefix frontend run test:e2e`。
