@@ -1,4 +1,4 @@
-<p align="center">
+﻿<p align="center">
   <img src="src/img/TurnDeal_LOGO.png" alt="TurnDeal logo" width="240" />
 </p>
 
@@ -31,22 +31,20 @@ The product is built around a simple principle: agents can negotiate, but the bu
 
 ```mermaid
 flowchart LR
-    Need["Buyer need"] --> Formatter["Intent formatter"]
-    Formatter --> Orchestrator["Private negotiation orchestrator"]
-    Orchestrator --> S1["Seller Agent 1"]
-    Orchestrator --> S2["Seller Agent 2"]
-    Orchestrator --> S3["Seller Agent 3"]
-    Orchestrator --> S4["Seller Agent 4"]
-    Orchestrator --> S5["Seller Agent 5"]
-    S1 --> Validator["Offer validation"]
-    S2 --> Validator
-    S3 --> Validator
-    S4 --> Validator
-    S5 --> Validator
-    Validator --> Evaluator["Independent evaluation"]
-    Evaluator --> Buyer["Buyer chooses"]
-    Buyer -->|Accept| Checkout["Confirm test purchase"]
-    Buyer -.->|Revise| Need
+    Request --> Formatter --> Orchestrator
+    Orchestrator --> A["Buyer A ↔ Seller A"]
+    Orchestrator --> B["Buyer B ↔ Seller B"]
+    Orchestrator --> C["Buyer C ↔ Seller C"]
+    Orchestrator --> D["Buyer D ↔ Seller D"]
+    Orchestrator --> E["Buyer E ↔ Seller E"]
+    A --> Evaluator
+    B --> Evaluator
+    C --> Evaluator
+    D --> Evaluator
+    E --> Evaluator
+    Evaluator --> Swipe["You decide"]
+    Swipe -->|Accept| Purchase["Confirm test purchase"]
+    Swipe -.->|Reject or revise| Request
 ```
 
 ## Highlights
