@@ -32,11 +32,11 @@ The product is built around a simple principle: agents can negotiate, but the bu
 ```mermaid
 flowchart LR
     Request --> Formatter --> Orchestrator
-    Orchestrator --> A["Buyer A ↔ Seller A"]
-    Orchestrator --> B["Buyer B ↔ Seller B"]
-    Orchestrator --> C["Buyer C ↔ Seller C"]
-    Orchestrator --> D["Buyer D ↔ Seller D"]
-    Orchestrator --> E["Buyer E ↔ Seller E"]
+    Orchestrator --> A["Buyer ↔ Seller A"]
+    Orchestrator --> B["Buyer ↔ Seller B"]
+    Orchestrator --> C["Buyer ↔ Seller C"]
+    Orchestrator --> D["Buyer ↔ Seller D"]
+    Orchestrator --> E["Buyer ↔ Seller E"]
     A --> Evaluator
     B --> Evaluator
     C --> Evaluator
