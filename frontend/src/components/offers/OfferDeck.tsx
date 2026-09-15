@@ -1,17 +1,18 @@
 import {memo, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import type {PointerEvent as ReactPointerEvent} from 'react';
 import {motion, useReducedMotion} from 'motion/react';
-import {ArrowLeft, Check, RotateCcw, X} from 'lucide-react';
+import {ArrowLeft, Check, Clock, Package, RotateCcw, Sparkles, X} from 'lucide-react';
 import type {Offer, RankedOffer, RequestSnapshot} from '../../contract.generated';
 import {
   clampDeckDisplacement,
   findSeller,
+  formatDateTime,
   isInteractiveTarget,
   offerName,
   trustedOfferLabel,
 } from './offerUtils';
 import type {MotionSource} from './offerUtils';
-import {OfferButton, OfferMedia, OfferSummaryMeta, PriceBlock, StatusMessage, StatusPill} from './offerPrimitives';
+import {ItemRow, OfferButton, OfferMedia, OfferSummaryMeta, PriceBlock, StatusMessage, StatusPill} from './offerPrimitives';
 import '../../styles/offers.css';
 import '../../styles/swipe-polish.css';
 
@@ -58,7 +59,6 @@ export interface OfferDeckProps {
   onAccept: (offerId: Offer['offer_id'], offer: Offer) => void;
   onSkip: (offerId: Offer['offer_id'], offer: Offer) => void;
   onUndo: () => void;
-  onDetails: (offerId: Offer['offer_id'], offer: Offer) => void;
 }
 
 export function OfferDeck({
@@ -74,7 +74,6 @@ export function OfferDeck({
   onAccept,
   onSkip,
   onUndo,
-  onDetails,
 }: OfferDeckProps) {
   const reduceMotion = useReducedMotion();
   const cardRef = useRef<HTMLDivElement | null>(null);
@@ -95,10 +94,11 @@ export function OfferDeck({
   const [entryKey, setEntryKey] = useState(0);
   const [keyboardTransition, setKeyboardTransition] = useState(false);
   const [entering, setEntering] = useState(false);
+  const [flipped, setFlipped] = useState(false);
   const lastOfferKeyRef = useRef<string | null>(offer ? `${snapshot.request_id}:${offer.offer_id}` : null);
 
   const resolvedSellerName = sellerName ?? (offer ? findSeller(snapshot, offer.seller_id)?.name : undefined) ?? '賣家';
-  const showDetails=useCallback(()=>{if(offer)onDetails(offer.offer_id,offer);},[offer,onDetails]);
+  const toggleFlip = useCallback(() => setFlipped(f => !f), []);
   const acceptDisabled = pending || expired || !offer || offer.eligibility.status !== 'eligible' || snapshot.status !== 'awaiting_user';
   const lockKey = offer ? `${snapshot.request_id}:${offer.offer_id}` : null;
   const locallyLocked = lockKey !== null && acceptedLockRef.current === lockKey;
@@ -114,6 +114,7 @@ export function OfferDeck({
       setPhase('resting');
       setEntering(!keyboardTransition);
       setEntryKey((key) => key + 1);
+      setFlipped(false);
       lastOfferKeyRef.current = nextKey;
       if (acceptedLockRef.current && acceptedLockRef.current !== nextKey) {
         acceptedLockRef.current = null;
@@ -381,7 +382,7 @@ export function OfferDeck({
     }
 
     if (offer && !isInteractiveTarget(event.target)) {
-      onDetails(offer.offer_id, offer);
+      toggleFlip();
     }
   };
 
@@ -458,7 +459,8 @@ export function OfferDeck({
             label={label}
             pending={pending || locallyLocked}
             expired={expired}
-            onDetails={showDetails}
+            flipped={flipped}
+            onToggleFlip={toggleFlip}
           />
         </motion.div>
       </div>
@@ -483,23 +485,6 @@ export function OfferDeck({
         </OfferButton>
         <OfferButton
           type="button"
-          variant="primary"
-          icon={<Check size={18} />}
-          disabled={acceptDisabled || locallyLocked}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-              handleKeyboardIntent();
-            }
-          }}
-          onClick={() => {
-            keyboardActionRef.current = false;
-            completeAccept();
-          }}
-        >
-          立即採用
-        </OfferButton>
-        <OfferButton
-          type="button"
           variant="quiet"
           icon={<RotateCcw size={18} />}
           disabled={pending || locallyLocked || !canUndo}
@@ -515,6 +500,23 @@ export function OfferDeck({
           }}
         >
           撤回略過
+        </OfferButton>
+        <OfferButton
+          type="button"
+          variant="primary"
+          icon={<Check size={18} />}
+          disabled={acceptDisabled || locallyLocked}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              handleKeyboardIntent();
+            }
+          }}
+          onClick={() => {
+            keyboardActionRef.current = false;
+            completeAccept();
+          }}
+        >
+          立即採用
         </OfferButton>
       </div>
 
@@ -532,31 +534,71 @@ interface OfferCardProps {
   pending?: boolean;
   expired?: boolean;
   inert?: boolean;
-  onDetails?: () => void;
+  flipped?: boolean;
+  onToggleFlip?: () => void;
 }
 
-const OfferCard=memo(function OfferCard({snapshot, offer, ranking, sellerName, label, pending = false, expired = false, inert = false, onDetails}: OfferCardProps) {
+// A 3D flip card: the front is the usual summary, the back (pre-rotated 180deg, revealed only
+// when the wrapping .offer-card-flip itself rotates) holds the item list, recommendation and
+// terms that used to live on a separate details screen — tapping the card toggles between them.
+const OfferCard=memo(function OfferCard({snapshot, offer, ranking, sellerName, label, pending = false, expired = false, inert = false, flipped = false, onToggleFlip}: OfferCardProps) {
   return (
-    <article className="offer-card" inert={inert} aria-labelledby={`offer-card-${offer.offer_id}`} aria-hidden={inert ? 'true' : undefined}>
-      <OfferMedia offer={offer} />
-      <div className="offer-card__content">
-        <div>
-          <p className="offer-card__seller">{sellerName}</p>
-          <h3 id={`offer-card-${offer.offer_id}`}>{offerName(offer,snapshot)}</h3>
+    <div className="offer-card-flipper" data-flipped={flipped}>
+      <div className="offer-card-flip">
+        <article className="offer-card offer-card-face offer-card-face-front" inert={inert} aria-labelledby={`offer-card-${offer.offer_id}`} aria-hidden={inert ? 'true' : undefined}>
+          <OfferMedia offer={offer} />
+          <div className="offer-card__content">
+            <div>
+              <p className="offer-card__seller">{sellerName}</p>
+              <h3 id={`offer-card-${offer.offer_id}`}>{offerName(offer,snapshot)}</h3>
+            </div>
+            <div className="offer-card__labels">
+              {ranking ? <StatusPill>第 {ranking.rank} 名</StatusPill> : null}
+              {label ? <StatusPill tone={label === '免費配件' ? 'success' : 'neutral'}>{label}</StatusPill> : null}
+              {expired ? <StatusPill tone="danger">已過期</StatusPill> : null}
+              {pending ? <StatusPill tone="pending">提交中</StatusPill> : null}
+            </div>
+            <PriceBlock amount={offer.total_price_twd} />
+            <OfferSummaryMeta snapshot={snapshot} offer={offer} />
+            <p className="offer-card__features">{offer.primary_features.map(feature => ({wireless:'無線連接',silent_click:'靜音按鍵',bluetooth:'藍牙連接',rechargeable:'可充電'} as Record<string,string>)[feature] ?? feature.replaceAll('_',' ')).join(' · ')}</p>
+            <button className="offer-card__details" type="button" data-no-swipe aria-expanded={flipped} onClick={onToggleFlip}>
+              查看 {offer.items.length} 件商品明細 <ArrowLeft size={16} aria-hidden="true" />
+            </button>
+          </div>
+        </article>
+        <div className="offer-card offer-card-face offer-card-face-back" inert={inert || !flipped} aria-hidden={inert || !flipped ? 'true' : undefined}>
+          <div className="offer-card-back-scroll">
+            <div className="offer-card-back-head">
+              <p className="offer-card__seller">{sellerName}</p>
+              <h3>{offerName(offer,snapshot)}</h3>
+            </div>
+            <section className="offer-section">
+              <h4><span className="offer-section__icon" aria-hidden="true"><Package size={14}/></span>商品明細</h4>
+              <div className="offer-list">
+                {offer.items.map((item) => (
+                  <ItemRow key={`${item.product_id}:${item.role}`} item={item} snapshot={snapshot} />
+                ))}
+              </div>
+            </section>
+            {ranking ? (
+              <section className="offer-section">
+                <h4><span className="offer-section__icon" aria-hidden="true"><Sparkles size={14}/></span>推薦理由</h4>
+                <p>{ranking.reason || '此方案沒有提供推薦理由。'}</p>
+                {ranking.tradeoffs.length ? (
+                  <ul className="offer-bullet-list">
+                    {ranking.tradeoffs.map((tradeoff) => <li key={tradeoff}>{tradeoff}</li>)}
+                  </ul>
+                ) : null}
+              </section>
+            ) : null}
+            <section className="offer-section">
+              <h4><span className="offer-section__icon" aria-hidden="true"><Clock size={14}/></span>採用條件</h4>
+              <p>總價已含稅與運送，請在 {formatDateTime(offer.expires_at)} 前採用。</p>
+            </section>
+            <p className="offer-card-back-hint"><RotateCcw size={12} aria-hidden="true"/>再點一次卡片返回</p>
+          </div>
         </div>
-        <div className="offer-card__labels">
-          {ranking ? <StatusPill>第 {ranking.rank} 名</StatusPill> : null}
-          {label ? <StatusPill tone={label === '免費配件' ? 'success' : 'neutral'}>{label}</StatusPill> : null}
-          {expired ? <StatusPill tone="danger">已過期</StatusPill> : null}
-          {pending ? <StatusPill tone="pending">提交中</StatusPill> : null}
-        </div>
-        <PriceBlock amount={offer.total_price_twd} />
-        <OfferSummaryMeta snapshot={snapshot} offer={offer} />
-        <p className="offer-card__features">{offer.primary_features.map(feature => ({wireless:'無線連接',silent_click:'靜音按鍵',bluetooth:'藍牙連接',rechargeable:'可充電'} as Record<string,string>)[feature] ?? feature.replaceAll('_',' ')).join(' · ')}</p>
-        <button className="offer-card__details" type="button" data-no-swipe onClick={onDetails}>
-          查看 {offer.items.length} 件商品明細 <ArrowLeft size={16} aria-hidden="true" />
-        </button>
       </div>
-    </article>
+    </div>
   );
 });

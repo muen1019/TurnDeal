@@ -118,9 +118,13 @@ export function OfferSummaryMeta({snapshot, offer}: OfferSummaryMetaProps) {
 
   return (
     <div className="offer-summary-meta">
-      <ProductColor snapshot={snapshot} productId={offer.items.find(i=>i.role==='primary')?.product_id??''}/>
-      <span>預計 {offer.delivery_days} 天送達</span>
-      <span>有效至 {formatDateTime(offer.expires_at)}</span>
+      <div className="offer-summary-meta__facts">
+        <ProductColor snapshot={snapshot} productId={offer.items.find(i=>i.role==='primary')?.product_id??''}/>
+        <span className="offer-summary-meta__divider" aria-hidden="true" />
+        <span>預計 {offer.delivery_days} 天送達</span>
+        <span className="offer-summary-meta__divider" aria-hidden="true" />
+        <span>有效至 {formatDateTime(offer.expires_at)}</span>
+      </div>
       {sponsored ? <StatusPill tone="sponsored">Sponsored</StatusPill> : null}
     </div>
   );

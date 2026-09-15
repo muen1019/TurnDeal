@@ -24,7 +24,8 @@ export function ImprovementPanel({requestId,onNext,onNew,accepted=false}:{reques
   finally{locked.current=false;setBusy(false);}
  };
  if(accepted&&!loading&&!state&&!error)return null;
- return <section className="commerce-panel" aria-label="需求改善"><span className="commerce-eyebrow">TURNDEAL · REFINE</span><h2>{accepted?'你的購物偏好':'讓下一輪更接近你想要的'}</h2>
+ return <section className="commerce-panel" aria-label="需求改善"><div className="commerce-body">
+ <span className="commerce-eyebrow">TURNDEAL · REFINE</span><h2>{accepted?'你的購物偏好':'讓下一輪更接近你想要的'}</h2>
  {loading||state&&['queued','running'].includes(state.status)?<p role="status">正在根據你的回饋整理更具體的需求…</p>:null}
  {error&&<p role="alert">{error}</p>}
  {state?.result&&<><p>{state.result.preference_updated?'已根據你明確表達的長期偏好保存新版本。':'這次只調整本輪需求，未改動長期偏好。'}</p><ol className="improvement-questions">{state.result.questions.map((q,i)=><li key={i}>{q}</li>)}</ol></>}
@@ -34,5 +35,5 @@ export function ImprovementPanel({requestId,onNext,onNew,accepted=false}:{reques
  {state?.status==='failed'&&<p>這輪改善未完成，原本的需求與決策仍保留。</p>}
  {uncertain?<button className="button secondary" disabled={busy} onClick={()=>pending.current?void execute(pending.current):setRefresh(n=>n+1)}>核對原補充操作</button>:<button className="text-button" disabled={busy} onClick={()=>{setError('');setRefresh(n=>n+1);}}>重新核對改善狀態</button>}
  {!accepted&&<button className="text-button" disabled={busy||uncertain} onClick={onNew}>開始全新需求</button>}
- </section>;
+ </div></section>;
 }

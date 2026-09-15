@@ -20,5 +20,5 @@ for(const [args,env] of [[['backend/runtime/mobile-server.mjs'],backendEnv],[['f
  child.on('error',()=>stop(1));child.on('exit',code=>stop(code??0));
 }
 for(const signal of ['SIGINT','SIGTERM'])process.on(signal,()=>stop());
-console.log(`Phone demo: ${live?'LIVE LLM (API charges apply); pair your phone using the terminal code':'offline AI'}, simulated checkout, isolated temporary data. Trusted Wi-Fi only; this is HTTP, not a public deployment. Restart clears demo data.`);
+console.log(`Phone demo: ${live?'LIVE LLM (API charges apply); open access, NO pairing; everyone with network access shares your backend API quota':'offline AI'}, simulated checkout, isolated temporary data. Trusted Wi-Fi only; this is HTTP, not a public deployment. Restart clears demo data.`);
 for(const entries of Object.values(networkInterfaces()))for(const item of entries??[])if(item.family==='IPv4'&&!item.internal)console.log(`Phone: http://${item.address}:${uiPort}/chat`);

@@ -153,6 +153,7 @@ export function ChatPanel({
         </span>
         <textarea
           id="buyer-requirement"
+          data-tour="chat-input"
           value={draft}
           onChange={handleDraftChange}
           onKeyDown={handleComposerKeyDown}
@@ -162,6 +163,7 @@ export function ChatPanel({
         />
         <button
           className="icon-button chat-send-button"
+          data-tour="send-button"
           type="submit"
           disabled={!canSend}
           aria-label={sending ? "送出中" : "送出需求"}

@@ -1,0 +1,43 @@
+/* Color preference picker: a bottom sheet on phones, a centered dialog on wider screens. */
+.color-modal-backdrop{position:fixed;inset:0;z-index:200;background:rgba(18,42,82,.42);backdrop-filter:blur(3px);display:flex;align-items:flex-end;justify-content:center;animation:color-modal-fade 200ms ease;}
+.color-modal{width:100%;max-width:440px;max-height:88dvh;overflow-y:auto;box-sizing:border-box;background:#fff;border-radius:28px 28px 0 0;padding:22px 22px max(22px,env(safe-area-inset-bottom));box-shadow:0 -20px 60px rgba(18,42,82,.25);animation:color-modal-rise 260ms cubic-bezier(.22,1,.36,1);}
+
+.color-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.color-modal-kicker{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.06em;color:#0f766e;text-transform:uppercase;}
+.color-modal-head h2{margin:6px 0 0;font-size:21px;font-weight:750;letter-spacing:-.02em;color:#122952;}
+.color-modal-hint{margin:12px 0 18px;font-size:12px;line-height:1.7;color:#787f7f;}
+
+.color-modal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:10px;}
+.color-modal-swatch{position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;padding:10px 4px;border:1px solid transparent;border-radius:16px;background:transparent;cursor:pointer;transition:background 160ms ease,transform 160ms ease;}
+.color-modal-swatch:active:not(:disabled){transform:scale(.95);}
+.color-modal-swatch[data-selected=true]{background:#f6f7f7;border-color:#e1e3e3;}
+.color-modal-swatch:disabled{opacity:.4;cursor:default;}
+.color-modal-dot{position:relative;display:grid;place-items:center;width:42px;height:42px;border-radius:50%;border:1px solid #172b4d14;box-shadow:inset 0 0 0 2px #ffffffb3;}
+.color-modal-swatch[data-selected=true] .color-modal-dot{box-shadow:0 0 0 2px #fff,0 0 0 4px #139c8f;}
+.color-modal-dot em{position:absolute;top:-4px;right:-4px;display:grid;place-items:center;width:19px;height:19px;border-radius:50%;background:#0f766e;color:#fff;font-size:10px;font-style:normal;font-weight:700;box-shadow:0 2px 6px rgba(13,143,132,.4);}
+.color-modal-swatch>span:last-child{font-size:10px;font-weight:600;color:#737b7a;}
+.color-modal-swatch[data-selected=true]>span:last-child{color:#0b5a53;}
+
+.color-modal-ranked{margin-top:20px;padding-top:16px;border-top:1px solid #eeefef;}
+.color-modal-ranked>p{margin:0 0 10px;font-size:11px;font-weight:700;letter-spacing:.04em;color:#a4a9a9;text-transform:uppercase;}
+.color-modal-ranked ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;}
+.color-modal-ranked li{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:12px;background:#fafafa;}
+.color-modal-ranked-dot{width:14px;height:14px;border-radius:50%;flex:none;border:1px solid #172b4d14;}
+.color-modal-ranked-label{flex:1;font-size:13px;font-weight:600;color:#1d3257;}
+.color-modal-ranked-actions{display:flex;gap:2px;}
+.color-modal-ranked-actions button{width:28px;height:28px;border:0;border-radius:8px;background:transparent;color:#8b9191;display:grid;place-items:center;cursor:pointer;}
+.color-modal-ranked-actions button:disabled{opacity:.3;cursor:default;}
+.color-modal-ranked-actions button:not(:disabled):hover{background:#f4f4f4;color:#0f766e;}
+
+.color-modal-done{width:100%;min-height:52px;margin-top:22px;border:0;border-radius:14px;background:linear-gradient(155deg,#139c8f,#0f766e 60%,#0b5a53);color:#fff;font:inherit;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 12px 26px -8px rgba(13,143,132,.5);transition:transform 160ms cubic-bezier(.23,1,.32,1);}
+.color-modal-done:active{transform:scale(.98);}
+
+@keyframes color-modal-fade{from{opacity:0}to{opacity:1}}
+@keyframes color-modal-rise{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+@media(min-width:640px){
+  .color-modal-backdrop{align-items:center;padding:24px;}
+  .color-modal{border-radius:26px;max-height:80dvh;animation-name:color-modal-rise-center;}
+  @keyframes color-modal-rise-center{from{transform:translateY(12px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+}
+@media(prefers-reduced-motion:reduce){.color-modal-backdrop,.color-modal{animation:none;}.color-modal-swatch,.color-modal-done{transition:none;}}

@@ -25,12 +25,18 @@ import {UserPreferenceRepository} from '../dist/src/user-preferences.js';
 const active = ['formatting','orchestrating','negotiating','evaluating'];
 const fail = (status,code,message) => {throw new HttpError(status,code,message);};
 const canonical = v => Array.isArray(v)?v.map(canonical):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,canonical(v[k])])):v;
+const sleep = ms => new Promise(resolve=>setTimeout(resolve,ms));
 
 export class RuntimeStore {
   pending = new Map();
-  constructor({dbPath=':memory:',apiKey='',now=()=>Date.now(),formatterOptions={},negotiationOptions={},evaluatorOptions={}}={}) {
+  constructor({dbPath=':memory:',apiKey='',now=()=>Date.now(),formatterOptions={},negotiationOptions={},evaluatorOptions={},negotiationDelayMs=0,evaluationDelayMs=0}={}) {
     this.now=now;this.apiKey=apiKey;this.formatterOptions=formatterOptions;
     this.negotiationOptions=negotiationOptions;this.evaluatorOptions=evaluatorOptions;
+    // Offline demo only: a real LLM negotiation takes visible time, but the local rule-based
+    // negotiator/evaluator finish instantly, so the frontend's progress bar never has anything to
+    // show. Interactive dev servers opt into a simulated wait; automated tests never pass these,
+    // so they stay fast.
+    this.negotiationDelayMs=negotiationDelayMs;this.evaluationDelayMs=evaluationDelayMs;
     if(dbPath!==':memory:')mkdirSync(dirname(dbPath),{recursive:true});
     const existing=dbPath!==':memory:'&&existsSync(dbPath);
     this.db=new DatabaseSync(dbPath);const db=this.db;
@@ -205,6 +211,7 @@ export class RuntimeStore {
     s={...s,...plan.orchestration};
     if(!s.seller_agents.length){this.save({...s,status:'no_match',error:{code:'no_eligible_sellers',message:'已設定議價策略的賣家沒有符合硬條件的商品；未放寬預算或交期。',fields:[]}});return;}
     s={...s,status:'negotiating'};this.save(s);
+    if(!this.apiKey&&this.negotiationDelayMs)await sleep(this.negotiationDelayMs);
     await negotiate({requestId:id,buyerId:buyer,orchestration:plan.orchestration,repository:this.repository,
       apiKey:this.apiKey,now:this.now,...this.negotiationOptions,model,onEvent:event=>{
         if(event.type==='round_committed') {
@@ -215,6 +222,7 @@ export class RuntimeStore {
         }
       }});
     this.save({...s,status:'evaluating'});
+    if(!this.apiKey&&this.evaluationDelayMs)await sleep(this.evaluationDelayMs);
     const evaluated=await evaluate({db:this.db,requestId:id,buyerId:buyer,apiKey:this.apiKey,now:this.now,...this.evaluatorOptions,model});
     this.transaction(()=>{this.projectOffers(evaluated.snapshot);this.save({...evaluated.snapshot,formatter:s.formatter,model});});
   }

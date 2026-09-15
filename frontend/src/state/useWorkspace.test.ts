@@ -463,6 +463,14 @@ describe("useWorkspace decision guards", () => {
   });
 
   it("locks opposite actions after the first decision submit", async () => {
+    const firstOffer = fixture.snapshot.offers.find(
+      (offer) => offer.offer_id === "offer_a_r5",
+    );
+    expect(firstOffer).toBeDefined();
+    vi.spyOn(Date, "now").mockReturnValue(
+      Date.parse(firstOffer!.expires_at) - 1_000,
+    );
+
     sessionStorage.setItem(
       storageKey,
       JSON.stringify(workspaceWithRequest(validateSnapshot(structuredClone(fixture.snapshot)))),
