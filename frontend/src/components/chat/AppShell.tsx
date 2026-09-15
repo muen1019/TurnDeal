@@ -1,6 +1,5 @@
 import {
   MessageCircle,
-  MousePointer2,
   PanelLeft,
   Settings,
   UserRound,
@@ -9,6 +8,7 @@ import {
 } from "lucide-react";
 import type { AppShellProps, AppShellView } from "./types";
 import { useEffect, useRef, useState } from 'react';
+import { TurnDealMark } from './TurnDealMark';
 import '../../styles/history.css';
 
 const viewLabel: Record<AppShellView, string> = {
@@ -59,19 +59,19 @@ export function AppShell({
       <header className="chat-shell-header" aria-label="TurnDeal workspace" inert={mobile&&navigationOpen}>
         <div className="chat-brand">
           <span className="chat-brand-mark" aria-hidden="true">
-            <MousePointer2 size={18} />
+            <TurnDealMark size={20} />
           </span>
-          <div className="brand-with-model"><span>TurnDeal</span>{modelPicker}</div>
+          <div className="brand-with-model" data-tour="model-picker"><span><em>Turn</em>Deal</span>{modelPicker}</div>
         </div>
-        <div className="chat-header-actions">
-          <button ref={toggle} className="icon-button mobile-navigation-toggle" type="button" onClick={()=>setNavigationOpen(v=>!v)} aria-label="切換導覽" aria-controls="history-sidebar" aria-expanded={navigationOpen}><PanelLeft size={20}/></button>
+        <div className="chat-header-actions" data-tour="header-actions">
+          <button ref={toggle} className="icon-button mobile-navigation-toggle" type="button" onClick={()=>setNavigationOpen(v=>!v)} aria-label="切換導覽" aria-controls="history-sidebar" aria-expanded={navigationOpen}><PanelLeft size={18} strokeWidth={1.75}/></button>
           <button
             className="icon-button"
             type="button"
             onClick={onSettings}
             aria-label="開啟設定"
           >
-            <Settings size={20} aria-hidden="true" />
+            <Settings size={18} strokeWidth={1.75} aria-hidden="true" />
           </button>
           <span className="chat-avatar" aria-label="我的 Buyer Agent" role="img">
             <UserRound size={20} aria-hidden="true" />
@@ -89,20 +89,6 @@ export function AppShell({
             已啟用
           </p>
         </div>
-
-        <nav className="chat-primary-nav" aria-label="主要功能">
-          <button
-            className="chat-nav-button"
-            data-active={activeView === "chat"}
-            type="button"
-            onClick={()=>choose(onChat)}
-            aria-label="AI 對話"
-            aria-current={activeView === "chat" ? "page" : undefined}
-          >
-            <MessageCircle size={21} aria-hidden="true" />
-            <span>AI 對話</span>
-          </button>
-        </nav>
 
         <section className="chat-recents" aria-labelledby="chat-recents-title">
           <div className="chat-recents-heading">
