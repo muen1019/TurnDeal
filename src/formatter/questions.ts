@@ -40,7 +40,7 @@ export function formatterSummary(result:FormatResult,preferenceMd:string,saved:P
     } else if(field==='category')suggestions=[{label:'無線滑鼠',value:'買一隻無線滑鼠',source:'example'}];
     // One actionable amount question instead of yes/no + a second budget question.
     const text=field==='budget'&&!texts.some(t=>/衝突|高於|不支援|多個|不同/.test(t))
-      ?`${result.target_total_twd?`你提到 ${result.target_total_twd} 元，`:''}含運的最高預算是多少元？請輸入金額或選擇下方選項。`
+      ?`${result.target_total_twd?`你提到 ${result.target_total_twd} 元，`:''}含運的最高預算是多少元？請滑動選擇金額。`
       :texts.join(' ');
     return {question_id:`q_${i}`,field,text,suggestions};
   });

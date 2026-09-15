@@ -1,0 +1,139 @@
+/* Entry screen: centered brand stack on phones, split hero + need→deal preview on desktop. */
+.welcome-screen{--w-ink:#0d2b52;--w-muted:#5f7598;--w-line:#dee0e0;--w-accent:#0f766e;position:relative;isolation:isolate;height:var(--app-height,100dvh);display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;background:linear-gradient(165deg,#fafafa 0%,#f2f2f2 55%,#e9eaea 100%);color:var(--w-ink);font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans TC',sans-serif;}
+.welcome-backdrop{position:absolute;inset:0;z-index:-1;pointer-events:none;}
+.welcome-backdrop i{position:absolute;border-radius:50%;}
+.welcome-backdrop i:nth-child(1){width:620px;height:620px;left:50%;top:-180px;transform:translateX(-50%);background:radial-gradient(circle,#c4c7c780 0%,#c4c7c700 68%);animation:welcome-blob-drift-a 9s ease-in-out infinite;}
+.welcome-backdrop i:nth-child(2){width:420px;height:420px;right:-160px;bottom:-140px;background:radial-gradient(circle,#ffcbb066 0%,#ffcbb000 70%);animation:welcome-blob-drift-b 11s ease-in-out infinite 1.4s;}
+@keyframes welcome-blob-drift-a{0%,100%{transform:translateX(-50%) scale(1);opacity:1;}50%{transform:translateX(-50%) scale(1.06);opacity:.85;}}
+@keyframes welcome-blob-drift-b{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.08);opacity:.8;}}
+.welcome-backdrop i:nth-child(3){inset:0;border-radius:0;background-image:linear-gradient(#0f766e0a 1px,transparent 1px),linear-gradient(90deg,#0f766e0a 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse at 50% 35%,#000 10%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse at 50% 35%,#000 10%,transparent 70%);}
+
+.welcome-main{flex:1;display:flex;flex-direction:column;justify-content:center;width:100%;box-sizing:border-box;padding:max(28px,env(safe-area-inset-top)) 24px max(28px,env(safe-area-inset-bottom));}
+.welcome-hero{display:flex;flex-direction:column;align-items:center;text-align:center;max-width:440px;width:100%;margin:0 auto;}
+
+.welcome-logo{position:relative;display:grid;place-items:center;width:128px;height:128px;margin:0 0 18px;}
+.welcome-logo-halo{position:absolute;inset:0;border-radius:50%;border:1px solid #c1c5c466;background:radial-gradient(circle,#ffffff 0%,#eceeed99 55%,#eceeed00 72%);animation:welcome-logo-breathe 4.6s ease-in-out infinite;}
+.welcome-logo-halo:after{content:'';position:absolute;inset:22px;border-radius:50%;border:1px solid #cccfce80;}
+.welcome-logo-halo:before{content:'';position:absolute;inset:-9px;border-radius:50%;background:conic-gradient(from 0deg,transparent 0deg,#139c8f30 100deg,transparent 200deg);animation:welcome-logo-spin 6.5s linear infinite;}
+.welcome-logo .turndeal-mark{position:relative;filter:drop-shadow(0 14px 22px #01275433);}
+@keyframes welcome-logo-breathe{0%,100%{transform:scale(1);}50%{transform:scale(1.035);}}
+@keyframes welcome-logo-spin{to{transform:rotate(360deg);}}
+
+.welcome-wordmark{margin:0 0 6px;font-size:clamp(44px,13vw,56px);line-height:1.05;font-weight:780;letter-spacing:-.045em;color:var(--w-ink);}
+.welcome-wordmark-primary{color:var(--w-ink);}
+.welcome-wordmark-accent{color:var(--w-accent);}
+.welcome-slogan{margin:0;font-size:clamp(20px,5.6vw,24px);line-height:1.35;font-weight:600;letter-spacing:-.01em;}
+.welcome-slogan-primary{color:var(--w-ink);}
+.welcome-slogan-accent{color:var(--w-accent);}
+.welcome-lede{margin:16px 0 0;max-width:340px;text-wrap:balance;word-break:keep-all;overflow-wrap:anywhere;font-size:14px;line-height:1.8;color:var(--w-muted);}
+
+.welcome-auth{display:flex;flex-direction:column;gap:12px;width:100%;margin-top:32px;}
+.welcome-auth-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:52px;border-radius:14px;font:inherit;font-size:15px;font-weight:650;letter-spacing:.01em;cursor:pointer;transition:transform 160ms cubic-bezier(.23,1,.32,1),box-shadow 200ms ease,border-color 160ms ease,opacity 160ms ease;}
+.welcome-auth-btn svg{flex:none;}
+.welcome-auth-btn:disabled{cursor:default;}
+.welcome-auth-btn:disabled:not(.is-connecting){opacity:.5;}
+.welcome-auth-btn.is-connecting{opacity:1;}
+.welcome-auth-btn:not(:disabled):active{transform:scale(.98);}
+.welcome-auth-google{background:#fff;border:1px solid #dadce0;color:#232a35;box-shadow:0 1px 2px rgba(16,24,40,.05);}
+.welcome-auth-spin{animation:welcome-spin 850ms linear infinite;}
+@keyframes welcome-spin{to{transform:rotate(360deg);}}
+.welcome-auth-divider{display:flex;align-items:center;gap:12px;width:100%;margin:18px 0 12px;color:#9ba09f;font-size:11px;font-weight:600;letter-spacing:.04em;}
+.welcome-auth-divider span{flex:1;height:1px;background:#e7e8e8;}
+.welcome-auth-divider em{font-style:normal;}
+.welcome-guest{display:inline-flex;align-items:center;gap:6px;background:transparent;border:0;color:#606564;font:inherit;font-size:13px;font-weight:650;cursor:pointer;padding:8px 12px;border-radius:10px;transition:color 160ms ease,background 160ms ease,opacity 160ms ease;}
+.welcome-guest:disabled{opacity:.5;cursor:default;}
+
+/* Need → deal preview: desktop only. */
+.welcome-preview{display:none;}
+.welcome-card{background:#fff;border:1px solid var(--w-line);border-radius:22px;padding:20px 22px;box-shadow:0 18px 44px #1f45850f;}
+.welcome-card-label{display:block;font-size:11px;font-weight:650;letter-spacing:1.2px;color:#6f86a8;margin-bottom:10px;}
+.welcome-card-need p{margin:0;font-size:16px;line-height:1.7;color:#424547;}
+.welcome-card-deal{border-color:#c5c9c8;box-shadow:0 24px 54px #0f766e1f;}
+.welcome-card-deal .welcome-card-label{color:#0f766e;}
+.welcome-deal-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;}
+.welcome-deal-row strong{font-size:34px;font-weight:720;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--w-ink);}
+.welcome-deal-row em{font-style:normal;font-size:12px;font-weight:650;color:#4a4f4d;background:#e3f6ec;padding:5px 10px;border-radius:999px;}
+.welcome-card-deal ul{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:14px 0 0;padding:0;}
+.welcome-card-deal li{font-size:12px;color:#545a59;background:#efefef;border-radius:999px;padding:5px 10px;}
+.welcome-flow{display:flex;flex-direction:column;align-items:center;gap:7px;padding:14px 0;}
+.welcome-flow span{width:6px;height:6px;border-radius:50%;background:#7fbfb3;animation:welcome-pulse 1.6s ease-in-out infinite;}
+.welcome-flow span:nth-child(2){animation-delay:.2s;}.welcome-flow span:nth-child(3){animation-delay:.4s;}
+
+/* Entrance: the logo spins into place first. Then the brand reveals in two beats instead of
+   a word-by-word cascade — the navy half (wordmark "Turn" + "Turn Your Need") lands together,
+   then the teal half ("Deal" + "into a Deal") lands together, so the two-tone brand split reads
+   as two deliberate beats rather than noise. The lede and sign-in options settle in behind it. */
+.welcome-hero>*,.welcome-preview>*{opacity:0;animation:welcome-rise 620ms cubic-bezier(.2,.7,.2,1) both;}
+.welcome-logo{animation:welcome-logo-in 820ms cubic-bezier(.16,.8,.2,1) both;}
+.welcome-wordmark{opacity:1;animation:none;}
+.welcome-slogan{opacity:1;animation:none;}
+.welcome-wordmark-primary,.welcome-wordmark-accent,.welcome-slogan-primary,.welcome-slogan-accent{display:inline-block;opacity:0;animation:welcome-rise 520ms cubic-bezier(.2,.7,.2,1) both;}
+.welcome-wordmark-primary{animation-delay:340ms;}
+.welcome-slogan-primary{animation-delay:400ms;}
+.welcome-wordmark-accent{animation-delay:620ms;}
+.welcome-slogan-accent{animation-delay:680ms;}
+.welcome-lede{animation-delay:820ms;}
+.welcome-auth{animation-delay:900ms;}
+.welcome-auth-divider{animation-delay:960ms;}
+.welcome-guest{animation-delay:960ms;}
+.welcome-preview>:nth-child(1){animation-delay:260ms}.welcome-preview>:nth-child(2){animation-delay:380ms}.welcome-preview>:nth-child(3){animation-delay:480ms}
+@keyframes welcome-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes welcome-logo-in{from{opacity:0;transform:rotate(-360deg) scale(.6)}to{opacity:1;transform:none}}
+@keyframes welcome-pulse{0%,100%{opacity:.35;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+
+/* Full-screen takeover shown for ~680ms after any sign-in choice, before onStart fires. */
+.welcome-transition{position:fixed;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;overflow:hidden;background:radial-gradient(circle at 50% 42%,#f7f7f7 0%,#e8eae9 55%,#dbdddc 100%);animation:welcome-transition-in 380ms cubic-bezier(.2,.7,.2,1) both;}
+@keyframes welcome-transition-in{from{opacity:0}to{opacity:1}}
+.welcome-transition-glow{position:absolute;width:64vmax;height:64vmax;border-radius:50%;background:radial-gradient(circle,#ffffff 0%,#c4c7c75c 42%,transparent 72%);animation:welcome-transition-pulse 1.7s ease-in-out infinite;pointer-events:none;}
+@keyframes welcome-transition-pulse{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.14);opacity:1}}
+.welcome-transition-mark{position:relative;display:grid;place-items:center;width:72px;height:72px;animation:welcome-transition-mark-in 640ms cubic-bezier(.2,.8,.2,1) both;}
+@keyframes welcome-transition-mark-in{from{opacity:0;transform:scale(.55) rotate(-18deg)}to{opacity:1;transform:none}}
+.welcome-transition-mark i{position:absolute;border-radius:50%;}
+.welcome-transition-mark i:nth-child(1){inset:-14px;border:1px solid #ffffffb0;}
+.welcome-transition-mark i:nth-child(2){inset:-26px;background:conic-gradient(from 0deg,transparent,#139c8f35 100deg,transparent 200deg);animation:welcome-transition-spin 2.2s linear infinite;}
+.welcome-transition-mark i:nth-child(3){inset:-40px;border:1px solid #139c8f30;animation:welcome-transition-ring 1.7s ease-out infinite;}
+@keyframes welcome-transition-spin{to{transform:rotate(360deg)}}
+@keyframes welcome-transition-ring{from{transform:scale(.82);opacity:.9}to{transform:scale(1.3);opacity:0}}
+.welcome-transition-mark .turndeal-mark{position:relative;z-index:1;filter:drop-shadow(0 16px 26px #01275440);}
+.welcome-transition-text{position:relative;margin:0;font-size:14px;font-weight:650;color:#424547;letter-spacing:.01em;animation:welcome-rise 420ms cubic-bezier(.2,.7,.2,1) 140ms both;}
+@media(prefers-reduced-motion:reduce){.welcome-transition,.welcome-transition-glow,.welcome-transition-mark,.welcome-transition-mark i,.welcome-transition-text{animation:none!important;opacity:1!important;}}
+
+@media(hover:hover) and (pointer:fine){
+  .welcome-auth-google:not(:disabled):hover{border-color:#b8c0cc;box-shadow:0 6px 16px -4px rgba(16,24,40,.14);}
+  .welcome-auth-btn:not(:disabled):hover{transform:translateY(-1px);}
+  .welcome-guest:not(:disabled):hover{background:#f0f0f0;color:#0f766e;}
+}
+.welcome-auth-btn:focus-visible,.welcome-guest:focus-visible{outline:2px solid #7fbfb3;outline-offset:2px;}
+
+/* Only the desktop hero tells the "what it does" story inline; phones jump straight to sign-in. */
+@media(max-width:767px){.welcome-lede{display:none;}}
+
+@media(max-width:767px) and (max-height:700px){.welcome-logo{width:96px;height:96px;margin-bottom:14px}.welcome-logo .turndeal-mark{width:64px;height:64px}.welcome-wordmark{font-size:38px;margin-top:8px}.welcome-slogan{font-size:18px}.welcome-auth{margin-top:22px;gap:10px}.welcome-auth-btn{min-height:48px}}
+@media(max-width:767px) and (max-height:560px){.welcome-logo{width:72px;height:72px;margin-bottom:8px}.welcome-logo .turndeal-mark{width:50px;height:50px}.welcome-wordmark{font-size:30px;margin-top:4px}.welcome-auth{margin-top:14px}.welcome-auth-divider{margin:10px 0}}
+
+@media(min-width:768px){
+  .welcome-main{padding:48px 56px;}
+  .welcome-hero{flex:none;max-width:440px;}
+  .welcome-logo{margin:0 0 22px;}
+  .welcome-wordmark{font-size:64px;}
+  .welcome-slogan{font-size:28px;}
+  .welcome-lede{max-width:420px;font-size:15px;}
+  .welcome-auth{margin-top:36px;}
+}
+
+@media(min-width:1024px){
+  .welcome-main{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);align-items:center;gap:72px;max-width:1180px;margin:0 auto;padding:56px 64px;}
+  .welcome-hero{align-items:flex-start;text-align:left;max-width:400px;margin:0;}
+  .welcome-logo{width:auto;height:auto;margin:0 0 28px;}
+  .welcome-logo-halo{inset:-36px;border:0;background:radial-gradient(circle,#ffffffd9 0%,#eceeed80 45%,#eceeed00 70%);}.welcome-logo-halo:after{display:none;}.welcome-logo-halo:before{inset:-14px;}
+  .welcome-wordmark{font-size:76px;margin-top:18px;}
+  .welcome-slogan{font-size:32px;}
+  .welcome-lede{max-width:400px;font-size:16px;margin-top:20px;}
+  .welcome-auth{margin-top:40px;}
+  .welcome-preview{display:flex;flex-direction:column;align-items:stretch;max-width:420px;width:100%;justify-self:center;}
+  .welcome-card-need{margin-right:48px;border-bottom-left-radius:8px;}
+  .welcome-card-deal{margin-left:48px;border-top-right-radius:8px;}
+  .welcome-backdrop i:nth-child(1){left:30%;top:-220px;width:760px;height:760px;}
+}
+
+@media(prefers-reduced-motion:reduce){.welcome-hero>*,.welcome-preview>*,.welcome-flow span,.welcome-wordmark-primary,.welcome-wordmark-accent,.welcome-slogan-primary,.welcome-slogan-accent,.welcome-logo,.welcome-logo-halo,.welcome-logo-halo:before,.welcome-backdrop i{animation:none!important;opacity:1!important;}.welcome-auth-btn,.welcome-guest{transition:none;}}

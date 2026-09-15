@@ -21,7 +21,7 @@ await page.route(ui+'/api/**',async route=>{
 });
 const out='frontend/test-results/turndeal';mkdirSync(out,{recursive:true});
 try{
- await page.goto(ui+'/chat');assert.match(await page.title(),/TurnDeal/);
+ await page.goto(ui+'/chat');assert.match(await page.title(),/TurnDeal/);await page.getByRole('button',{name:/以訪客身份繼續/}).click();
  await page.getByRole('textbox',{name:/名稱/}).fill('測試買家');await page.getByRole('textbox',{name:'電子郵件',exact:true}).fill('buyer@example.test');await page.getByRole('combobox',{name:'縣市',exact:true}).selectOption('臺北市');await page.getByRole('combobox',{name:'鄉鎮市區',exact:true}).selectOption('中正區');await page.getByRole('textbox',{name:'街道、門牌與樓層',exact:true}).fill('測試路 1 號');await page.getByRole('button',{name:/下一步/}).click();await page.getByRole('button',{name:/儲存並開始/}).click();
  assert.equal(await page.getByRole('combobox',{name:'新需求使用的模型'}).inputValue(),'gpt-5.6-sol');
  await page.getByRole('combobox',{name:'新需求使用的模型'}).selectOption('gpt-4.1-mini');
@@ -45,18 +45,18 @@ try{
  assert.equal(app.locals.store.db.prepare('SELECT count(*) n FROM requests WHERE parent_request_id=?').get(parent).n,1);
  await page.getByRole('button',{name:/略過/}).first().click();
  await page.getByRole('button',{name:'立即採用',exact:true}).click();
- await page.getByRole('button',{name:'前往測試結帳'}).click();
+ await page.getByRole('button',{name:'前往結帳'}).click();
  await page.getByRole('textbox',{name:'收件人姓名',exact:true}).fill('測試買家');
  await page.getByRole('textbox',{name:'電子郵件',exact:true}).fill('buyer@example.test');
  await page.getByRole('textbox',{name:'街道、門牌與樓層',exact:true}).fill('測試路 1 號');
  await page.getByRole('combobox',{name:'縣市',exact:true}).selectOption('臺北市');
  await page.getByRole('combobox',{name:'鄉鎮市區',exact:true}).selectOption('中正區');
 
- await page.getByRole('button',{name:'儲存並確認資料'}).click();await page.getByRole('button',{name:/確認測試購買 ·/}).waitFor();
+ await page.getByRole('button',{name:'儲存並確認資料'}).click();await page.getByRole('button',{name:/確認購買 ·/}).waitFor();
  await page.screenshot({path:`${out}/03-checkout.png`,fullPage:true});
- await page.getByRole('button',{name:/確認測試購買 ·/}).click();await page.getByRole('button',{name:'核對原購買操作'}).waitFor();
+ await page.getByRole('button',{name:/確認購買 ·/}).click();await page.getByRole('button',{name:'核對原購買操作'}).waitFor();
  await page.reload();await page.getByRole('button',{name:'核對原購買操作'}).click();
- await page.getByRole('heading',{name:'測試購買完成'}).waitFor();
+ await page.getByRole('heading',{name:'購買完成'}).waitFor();
  assert.equal(completeKeys.length,2);assert.equal(completeKeys[0],completeKeys[1]);
  assert.equal(app.locals.store.db.prepare('SELECT count(*) n FROM purchases').get().n,1);
  const purchase=app.locals.store.db.prepare('SELECT data_json FROM purchases').get();assert.equal(JSON.parse(purchase.data_json).status,'completed');

@@ -30,14 +30,16 @@ try {
   assert.ok(!parentState.formatter.questions.some(q=>q.field==='color'),'known preference must not be asked again');
   assert.deepEqual(new Set(parentState.formatter.questions.map(q=>q.field)),new Set(['budget','delivery']));
   await shot('02-questions');
-  await page.getByRole('button',{name:'NT$1,000 以內',exact:true}).click();
-  await page.getByRole('button',{name:'7 天內',exact:true}).click();
-  await page.reload();
-  await page.getByRole('heading',{name:'再確認一下',exact:true}).waitFor();
-  assert.ok((await page.locator('textarea').evaluateAll(els=>els.map(e=>e.value))).includes('含運最高預算1000元'));
-  await shot('03-answers');
+  // Questions are answered one at a time now; walk them in whatever order the formatter returned.
   const continued=page.waitForResponse(r=>r.request().method()==='POST'&&r.url().endsWith('/api/requests'));
-  await page.getByRole('button',{name:'繼續',exact:true}).click();
+  for(let i=0;i<parentState.formatter.questions.length;i++){
+    const field=parentState.formatter.questions[i].field;
+    if(field==='budget')await page.getByRole('slider').evaluate(el=>{el.value='1000';el.dispatchEvent(new Event('input',{bubbles:true}));});
+    else if(field==='delivery')await page.getByRole('button',{name:'7 天內',exact:true}).click();
+    const isLast=i===parentState.formatter.questions.length-1;
+    if(isLast)await shot('03-answers');
+    await page.getByRole('button',{name:isLast?'送出':'下一題',exact:true}).click();
+  }
   const child=await(await continued).json();console.log('Created child:',child.request_id);
   assert.equal(child.parent_request_id,parent.request_id);
   await page.getByRole('progressbar').waitFor();await shot('04-processing');
