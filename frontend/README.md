@@ -1,39 +1,57 @@
-# OfferMesh Chat 與商品滑卡
+# TurnDeal frontend
 
-完整接線已完成：請在專案根目錄以 Node 24 執行 `npm run dev`，前端自動連到整合 API 3201。預設為離線策略模式；`npm run dev:secure` 可隱藏輸入 key 啟用模型。詳見 [完整接線說明](../docs/RUN_FULL_APP.md)。
-
-已實作 React、TypeScript、Vite 工作區。Chat 可直接把本次輸入作為 CreateRequest.intent_md，不必先儲存代理設定；若有已儲存模板與偏好則一併套用。整合入口執行 Formatter、搜尋、議價與評估；legacy Result 後端仍提供 mock 商品組合，前端依後端排名顯示。
-
-UI 使用滿版水藍色背景，沒有米色底與外框。整頁不捲動，工作區依視窗可用高度調整；長對話、文件和明細只在元件內捲動。商品頁與回饋頁不顯示原始 JSON、識別碼、決策資料或交接文件。
+React／TypeScript／Vite 單頁介面，包含初次 Buyer 設定、直接需求輸入、模型選擇、Formatter 問答、Agent 進度、Seller／輪次狀態、Offer swipe、versioned Improver、歷史紀錄與 ACP 測試結帳。
 
 ## 啟動
 
-使用 Node 20.19.5，於 frontend 執行 `npm ci`、`npm run dev`，搭配已啟動的 3201 API。開啟 http://127.0.0.1:5173/chat，直接輸入「辦公用無線滑鼠，預算 900 元含稅運，7 天內到貨。」並送出。代理設定為選填，可只儲存偏好或清空模板，不會改寫既有需求。自行啟動後端的預設 port 為 3001 時，請將前端 OFFERMESH_API_ORIGIN 設為 http://127.0.0.1:3001；不須修改程式碼。
+完整應用從 repository root 使用 Node 24：
 
-Vite 將相對 /api 轉送到使用者提供的 http://127.0.0.1:3201。可用環境變數 OFFERMESH_API_ORIGIN 覆寫 origin（不含 /api）。API path 由 backend/openapi.json 產生，型別與執行期驗證共用 contracts/a2a-commerce.v0.3.schema.json；`npm run generate:types` 更新生成檔。
+```powershell
+npm run dev
+```
 
-## 決策行為
+開啟 <http://127.0.0.1:5173/chat>；`/api` 代理到 integrated runtime 3201。Live model 使用 root `npm run dev:secure`，API key 不得進入 Vite environment。
 
-- 右滑或「立即採用」送出 accept；保存成功後顯示決策摘要。
-- 左滑／略過只改本機狀態；全部略過後可填回饋，明確送出才呼叫 reject。
-- reject 回 200/rejected，保存 feedback 原文與原始文件，不改寫 intent 或自動開始下一輪。
-- GET snapshot.decision 恢復 accept/reject。POST journal 保存原 key/body，逾時後核對原提交；未知結果時鎖定新操作。
-- Buyer Agent 尚未接入；沒有付款、兌換或庫存扣減 API。
+Frontend package 使用 Node 20.19.5。若單獨啟動：
 
-HTTP 詳細輸入輸出見 [backend README](../backend/README.md) 與 [OpenAPI](../backend/openapi.json)。
+```powershell
+npm ci
+$env:OFFERMESH_API_ORIGIN = 'http://127.0.0.1:3201'
+npm run dev
+```
+
+`OFFERMESH_API_ORIGIN` 不含 `/api`。HTTP 定義來自 [OpenAPI](../backend/openapi.json)，型別與 runtime validation 使用 [v0.3 contract](../contracts/a2a-commerce.v0.3.schema.json)；`npm run generate:types` 更新生成檔。
+
+## UI workflow
+
+- 首次進入明示保存 Buyer profile、收件資料、偏好權重與顏色；基本資料不進模型。
+- Chat 可直接提交本次需求，不必先儲存 intent template。已儲存 template／preference 才會套用。
+- UI 依 `RequestSnapshot.status` 顯示 formatting、orchestrating、negotiating、evaluating 與結果，不用假計時器推測完成。
+- `needs_clarification` 顯示 Backend 問題與可編輯快捷答案，回答後建立 linked child Request。
+- 左滑保存在本機 skipped state；右滑或按鈕提交 versioned accept。全部拒絕可啟動 Improver，但不能同時建立 legacy refinement child。
+- `next_request_id` 非空才開啟改善後的新一輪。
+- Accepted Offer 可進入測試結帳，保存收件資料、明確確認或取消，並從權威 Purchase state 恢復。
+- POST recovery journal 保存 stable key／exact body；未知結果鎖定重複操作並核對原提交。
+- 歷史清除只刪除本分頁 sessionStorage，不刪 SQLite Request、Offer、decision 或 purchase audit。
+
+## Progress
+
+正式 UI 只投影 `GET /api/requests/{request_id}` 的 snapshot status，不發出額外 `/progress` request。Vite mock 與 `/__mock` sidecar 已移除；development 與 production 使用相同 runtime API。
+
+百分比是階段估算，只有 `awaiting_user` 才顯示完成。失敗、待澄清或結果未知時不得顯示成功。
+
+## Mobile
+
+`npm run dev:mobile` 提供 isolated offline mobile flow；`npm run dev:mobile:secure` 提供配對後的 live-model development flow。兩者都不是正式公開服務。操作與安全限制見 [mobile UI](../docs/MOBILE_UI.md) 和 [mobile live mode](../docs/MOBILE_LIVE.md)。
 
 ## 驗證
 
-正式模式進度來自共用 RequestSnapshot，不呼叫額外的 `/progress` API。詳細開發 mock 進度與啟用方式見 [AGENT_PROGRESS.md](AGENT_PROGRESS.md)。
+```powershell
+npm test
+npm run typecheck
+npm run build
+```
 
-`npm test`、`npm run typecheck`、`npm run build`。
+Browser suites 從 root 執行，完整命令見 [測試指南](../docs/TESTING.md)。輸出位於被 Git 忽略的 `test-results/`。
 
-Result API 瀏覽器測試：先安裝 Python Playwright（`python -m pip install playwright`、`python -m playwright install chromium`），再執行 `npm run test:api:e2e`。runner 編譯前後端，啟動獨立 backend（隨機可用 port）、production build 的 Vite preview 5188 與暫存 SQLite，避免開發熱更新干擾；測試結束自動關閉。截圖與 result-api-e2e.json 在 test-results/。測試涵蓋建立需求、右滑採用、鍵盤略過、拒絕、重載恢復與原始 handoff，並斷言僅呼叫三個已定義的 API 路由。
-
-`npm run test:e2e` 執行 UI／視覺驗收：真實 Chat 送出、左右拖曳、撤回、完整明細、採用／拒絕及重載，並量測滿版背景、同尺寸工作區、窄螢幕、低高度與 reduced-motion。預設使用隔離的暫存資料庫及 5187 → 3101 測試服務；設定 OFFERMESH_E2E_EXTERNAL_URL=http://127.0.0.1:5173 可測試目前服務。詳見 [UI 驗證紀錄](UI_VALIDATION.md)。
-
-設計參考：[img/design](img/design/)。[OpenSpec tasks](../openspec/changes/define-offer-result-ui-api/tasks.md) 保留尚未驗收的細部動畫與真機觸控項目。
-
-## 與其他 session 共用工作區
-
-完整服務請從 repository 根目錄執行 `npm run dev` 或 `npm run dev:secure`；前端不再提供獨立 mock Result server。隔離的正式 runtime 瀏覽器驗證可執行 `npm --prefix frontend run test:e2e`。
+設計參考位於 `img/design/`；curated mobile screenshots 位於 [docs/screenshots/mobile](../docs/screenshots/mobile/README.md)。尚未完成的細部驗收保留在 [OpenSpec tasks](../openspec/changes/define-offer-result-ui-api/tasks.md)。

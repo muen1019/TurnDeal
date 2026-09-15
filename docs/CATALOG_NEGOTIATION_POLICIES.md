@@ -1,6 +1,6 @@
-# 完整 Catalog 談判政策
+# Catalog negotiation policies
 
-2026-09-12 在 hackathon 期間完成。前一版本已合併並推送 main（a69ce8f）；本次接續補資料庫與完整 runtime 的候選來源。
+本文件說明 integrated runtime 使用的 20 家 Seller、129 筆 SKU policy，以及不可覆寫歷史資料的 versioned seed。
 
 ## 實際覆蓋
 
@@ -54,4 +54,4 @@ npm run test:e2e:catalog -- --live --after-sales
 
 同一 seed 版本重跑不改價格、不补庫存、不重設權益額度。相同版本內容改動會拒絕；新的賣家 ID 若碰到既有資料也會拒絕並 rollback，不覆寫既有策略。既有商家的政策更新應另寫明確更新 migration；不能只改版本號來覆蓋現場設定。重新產生初版示範 fixture 的維護指令為 node scripts/generate-catalog-policies.mjs，執行後仍須 review 差異，已套用同版本的 DB 不會自動接受內容改動。
 
-尚未實作任意物流地區／截單時間引擎、新舊客分層點數規則、跨請求贈品／券額度預留。這些限制沿用既有設計，不因補齊資料而宣稱已支援。HTTP Result 與 ACP 模擬購買路徑由已合入的遠端程式提供，本次保留並執行回歸測試。
+尚未實作任意物流地區／截單時間引擎、新舊客分層點數規則、跨請求贈品／券額度預留。這些限制不因補齊資料而宣稱已支援。HTTP Result 與 ACP 模擬購買使用同一套 persisted policy／Offer 驗證邊界。

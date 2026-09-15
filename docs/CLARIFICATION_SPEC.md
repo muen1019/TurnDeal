@@ -12,7 +12,7 @@
 - 建立新的 child request，保留 parent 與 formatter_runs 不變；parent_request_id 現可為 ID，documents.revision 遞增，root_request_id 保留原根。最多 8 次補充、完整 intent_md 最多 20,000 字。
 - 同一 parent 只建立一個 child；同 key 同內容重播，不再呼叫模型。不同 key 重複補充回 409。
 - 回答會連同欄位標籤附加到 child 的 intent_md；歷史 question/answer 保存在 parent 快照與 idempotency payload。長期 user_preferences 不會被修改。
-- reject 後可透過 `refinement` 建立 AI 追問子請求，再用 clarification 回答重新篩選；不改寫原父請求。見 [HISTORY_REFINEMENT.md](HISTORY_REFINEMENT.md)。legacy mock 明確拒絕 clarification/refinement，不假裝已處理。
+- Reject 後的新版 UI 使用 versioned Improver 建立追問與唯一 child，再用回答重新篩選；不改寫原父請求。見 [IMPROVER.md](IMPROVER.md)。Legacy refinement API 僅供相容測試，新 UI 不會同時觸發兩套 workflow。
 
 ## 快捷答案
 

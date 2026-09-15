@@ -6,7 +6,7 @@ ACP 是商家與 client 間的交易協定。使用協定不等於呼叫 OpenAI 
 
 ## What Changes
 
-本提交僅含後端、契約、資料庫與測試；前端實作及 UI OpenSpec 不在本提交內。以下測試交易範圍已於 2026-09-12 接入整合 runtime；驗證結果見 docs/ACP_PURCHASE_TEST_REPORT.md。正式商家／PSP 付款仍未實作。
+本 change 僅含後端、契約、資料庫與測試；前端實作及 UI OpenSpec 不在範圍內。測試交易已接入整合 runtime；可重跑驗證見 docs/TESTING.md。正式商家／PSP 付款仍未實作。
 
 - 定義自有 UI → PurchaseService → ACP HTTP client → 商家測試端 → 模擬付款／訂單的完整流程。
 - 定義 ACP create、update、get、complete、cancel 的角色、payload、版本固定、認證與訂單核對。

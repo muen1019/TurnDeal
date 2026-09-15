@@ -4,7 +4,7 @@
 
 2026-09-12 手機改版覆蓋：767px 以下改依 docs/MOBILE_UI.md 與 buyer-chat-ui 的 Mobile-first purchase journey，採獨立進度頁、明示階段估算百分比、處理完成自動進入已驗證滑卡與小幅位移淡入。本文件舊有「不顯示百分比／不自動導航／零位移」僅保留於桌面；共享滑卡新增最大 9 度傾斜。資料契約、冪等與採用安全規則不變。
 
-本 change 聚焦 Result 階段：使用者輸入 intent／preference，後端用 mock 產生優惠組合，前端用真實 API 提交 accept／reject，再將決策提供 Buyer Agent。Chat／卡片視覺保留，第 8–11 節只同步此生命週期。Result API 與前端串接已實作；驗證範圍與剩餘視覺工作見 tasks.md 及 docs/RESULT_TEST_REPORT.md。
+本 change 聚焦 Result 階段：使用者輸入 intent／preference，後端用 mock 產生優惠組合，前端用真實 API 提交 accept／reject，再將決策提供 Buyer Agent。Chat／卡片視覺保留，第 8–11 節只同步此生命週期。Result API 與前端串接已實作；驗證方式與剩餘視覺工作見 docs/TESTING.md 及 tasks.md。
 
 ## Goals / Non-Goals
 

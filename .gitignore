@@ -4,7 +4,6 @@ node_modules/
 .env
 .env.*
 !.env.example
-!.env.expamle
 
 # Local SQLite runtime files (rebuild with npm run db:init)
 data/*.sqlite
@@ -27,10 +26,7 @@ data/backups/
 **/__pycache__/
 *.pyc
 **/playwright-report/
+/reports/
 **/*.sqlite
 **/*.sqlite-*
 **/data/
-.env
-.env.*
-!.env.example
-!.env.expamle
