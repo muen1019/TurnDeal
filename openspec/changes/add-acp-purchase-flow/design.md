@@ -1,6 +1,6 @@
 ## Context
 
-此 ACP 後端測試購買已於 2026-09-12 實作並驗證。decisions 保持只保存 accept／reject，獨立 purchase 端點經 HTTP 呼叫 ACP 測試商家，保存模擬付款及訂單；證據見 docs/ACP_PURCHASE_TEST_REPORT.md。
+此 ACP 後端測試購買已實作並驗證。decisions 保持只保存 accept／reject，獨立 purchase 端點經 HTTP 呼叫 ACP 測試商家，保存模擬付款及訂單；可重跑驗證見 docs/TESTING.md。
 
 現有 A–E 為虛擬賣家，所以第一版須同時建置 ACP client 與 merchant test service。ACP 不自動提供可購買商品、商家 endpoint、存取憑證或付款帳號。
 
@@ -9,7 +9,7 @@
 - [Agentic Checkout Spec](https://developers.openai.com/commerce/specs/checkout)：商家提供 checkout REST 介面；協定公開，ChatGPT Instant Checkout 則有合作准入要求。
 - [Delegated Payment Spec](https://developers.openai.com/commerce/specs/payment)：付款由商家與 PSP 執行；ChatGPT 委託付款的 token 不能由一般 OpenAI API key 或外部 UI 自行取得。
 
-先前背景草案位於 `docs/superpowers/specs/2026-09-12-acp-purchase-api-design.md`；此 change 的 specs 是本次需求與驗收依據，API payload 的明確定義以 `purchase-api/spec.md` 為準。
+此 change 的 specs 是本次需求與驗收依據，API payload 的明確定義以 `purchase-api/spec.md` 為準。
 
 ## Goals / Non-Goals
 

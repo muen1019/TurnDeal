@@ -1,101 +1,52 @@
-# Formatter v0.1：中文文字到搜尋與 Seller 交接
+# Formatter
 
-**LLM 入口已新增**：使用 `createLlmFormatterService`，預設 gpt-4.1-mini，見 [FORMATTER_LLM.md](FORMATTER_LLM.md)。本文保留同步規則版說明，現在作為離線測試及 LLM 失敗 fallback。
+Formatter 把本輪 `intent_md`、request-bound `preference_md` 與可用的 SQLite preferences 合併成 `NormalizedIntent`。它不會生成或覆寫長期 preference 文件；完整語意見 [intent／preference 規格](INTENT_PREFERENCE_SPEC.md)。
 
-## 範圍
+## 行為
 
-文件定義、分類、來源優先順序與目前／待辦的界線以 [INTENT_PREFERENCE_SPEC.md](INTENT_PREFERENCE_SPEC.md) 為準。本輪解析不更新長期偏好，不自動生成新的 Markdown 文件。
+- 支援無線滑鼠、至多一張相關滑鼠墊、含稅運最高預算、目標價格、交期、顏色／尺寸／外型／功能、排序優先權與配件授權。
+- 本輪明示條件優先於 request preference snapshot，再優先於 SQLite active preferences。
+- 最高預算與交期是硬限制；「800 元左右」只是軟目標，不能推論成最高預算或價格優先。
+- 缺少契約要求的預算／交期、同來源矛盾、付費配件未授權或未知必要條件時回 `needs_clarification`。
+- 原始文件、採用的偏好來源、解析結果與 warnings 保存於 SQLite；相同 idempotency key 重播同一結果。
 
-本版為可離線重現的 **中文規則 Formatter**，不是 LLM，也不宣稱理解任意自然語言。已串接：
+## 離線與模型模式
 
-文字 → 解析與驗證 → 合併使用者偏好 → SQLite Request／Formatter 快照 → Discovery → RFQ → 第一輪 Seller 函式。
+離線 parser 是預設及安全 fallback：
 
-FormatterResult 使用共用 v0.3 schema；根目錄完整服務已接上 HTTP、五家議價與 Evaluator，見 [RUN_FULL_APP.md](RUN_FULL_APP.md)。本文件的 formatter 單獨 demo 仍使用 Seller 測試替身，不代表完整服務也使用替身。
-
-## 支援的輸入例子
-
-```text
-想買800元左右的無線靜音滑鼠，最高1000元，7天內到貨，
-只接受黑色，偏好小尺寸、左右對稱，價格優先
-```
-
-| 中文表達 | 解析結果 |
-| --- | --- |
-| 800元左右／800左右／約800元 | 搜尋目標價 800；不是硬預算上限 |
-| 最高1000元／預算1000元／1000元以內 | 含稅運費的 max_total_twd=1000 |
-| 7天內到貨／一週內 | delivery_days_max=7 |
-| 無線／靜音／藍牙 | wireless / silent_click / bluetooth |
-| 黑色、白色、粉色／粉紅色、紅色、藍色 | color 條件 |
-| 白色或粉色 | 同一條件的多值選項 |
-| 不要黑色／排除黑色 | required + not_in |
-| 小尺寸／中尺寸／大尺寸、左右對稱／右手型 | size_class / shape 條件 |
-| 偏好／喜歡 + 商品屬性 | 軟偏好；一般直接指定屬性或只接受／必須則為硬條件 |
-| 價格優先／交期優先／評分優先 | price_first / delivery_first / trust_first |
-| 不要配件／不要贈品／不要滑鼠墊 | disabled 搭售政策 |
-
-預設商品範圍是無線滑鼠；原文沒提無線時會在 warnings 明示套用範圍。預設只允許可拒絕的免費相關配件，絕不推定付費加購授權。
-
-品牌、DPI、重量、任意數字範圍、日期、英文、條件式、複雜語意、付費加購目前不做猜測；未被規則理解的剩餘文字會進 questions，阻止議價。請用逗號分開條件、數字使用阿拉伯數字；一週是特別支援的例外。這是有界 MVP，不是一般購物語言理解器。
-
-## 缺少價格時
-
-「搜尋目標價格」仍選填：`買滑鼠，最高1000元，7天內到貨` 可直接往下跑，不會把 1000 偷當目標價。
-
-現有 NormalizedIntent 契約仍要求最高預算及交期；`買800左右的滑鼠` 會回 needs_clarification，詢問最高預算及交期，normalized_intent=null，也不呼叫 Seller。純 Discovery 的無價格搜尋功能保持可用，但本 Formatter 不捏造一筆可議價需求。
-
-兩個不同硬上限、必要顏色互相排斥、目標高於上限也要求澄清。規則未理解或輸入矛盾時，不拿部分猜測結果冒充 ready。
-
-## 偏好順序與儲存
-
-同一商品屬性：本次 intent_md > 本次 preference_md > SQLite active user_preferences。當下明確指定可取代同屬性的歷史偏好；當下本身的衝突仍需澄清。
-
-只讀取 Backend 綁定 userId 的偏好，不從呼叫參數接受 userId。支援 DB in / not_in，prefer / avoid 轉為 in / not_in；weak 轉成 preferred，required 保留。range 的 values_json 使用 `{ "min": 90, "max": 120 }`，類別選項使用字串陣列。無效／不支援的已啟用紀錄會阻止提交 ready，不靜默丟掉。
-
-`formatter_runs` 保存原始輸入、當時完整偏好列與解析結果。Request 保存原文、合併後 NormalizedIntent 與 orchestrating／needs_clarification 狀態。已儲存的格式化結果與需求欄位不可更新；長期偏好之後改變不會改寫舊結果。
-
-目前補充需求方式是重送完整、修正後的文字並使用新 idempotency_key，建立新 Request；尚未實作多回合對話澄清或 child revision UI。published_snapshot_json 仍保留 null，沒有把 Formatter 的局部結果冒充完整 RequestSnapshot。
-
-## 直接呼叫
-
-```ts
-import { createFormatterService } from './src/formatter/service.ts';
-
-const service = createFormatterService({
-  db, userId: authenticatedUserId,
-  registrations, // 已實作 Seller 的函式 registry；沿用 Orchestrator 介面
-  timeoutMs: 3000,
-});
-const result = service.prepare_from_text({
-  intent_md: '買800元左右的滑鼠，最高1000元，7天內到貨，只接受黑色',
-  preference_md: '偏好小尺寸',
-  idempotency_key: 'new-request-001',
-  snapshot_id: 'discovery_demo_v02',
-});
-if (result.handoff) {
-  // 明確另行啟動；格式化與準備本身不呼叫 Seller。
-  const untrustedResults = await service.dispatch_first_round({
-    handoff_id: result.handoff.handoff_id,
-  });
-}
-```
-
-- `formatIntent(input, savedPreferences?)`：純函式，只解析，不讀寫 DB。
-- `service.submit(input)`：解析、存 Request 與稽核紀錄，不搜尋。
-- `service.prepare_from_text(input + snapshot_id)`：submit 後，ready 才接現有 handoff.prepare。
-- `service.dispatch_first_round(...)`：沿用既有所有權檢查、逾時、重播保護。Seller 仍只收到 RFQ，不收到原文、最高預算或使用者歷史。
-
-同 user + key + 相同原文重播同 Request／同偏好快照；同 key 改文字拒絕。搜尋快照更換須新 key；prepare 失敗時已保存的 Formatter 結果保留，可用同輸入重試，不重建 Request。
-
-這仍是 TypeScript 函式接口，沒有新增 HTTP endpoint、LLM provider 或真實交易功能。
-
-## 執行
-
-```bash
-npm run db:migrate  # 既有 DB：先備份再套用 004_formatter，不重建舊資料
+```powershell
 npm run test:formatter
 npm run demo:formatter
-npm run demo:formatter -- "買800左右的滑鼠"
-npm test
 ```
 
-Demo 在記憶體 SQLite 執行，不寫入本地 DB。主要檔案：`src/formatter/parser.ts`、`src/formatter/service.ts`、`contracts/fixtures/formatter-scenarios.json`、`tests/formatter.test.ts`。
+LLM formatter 使用 OpenAI Responses API、strict Structured Outputs 與 `contracts/openai/formatter-output.schema.json`。模型只負責抽取，Backend 仍驗證 evidence、數字、語意和共用 contract。
+
+```powershell
+npm run demo:formatter:secure
+```
+
+已有受保護的 server environment 時可用 `npm run demo:formatter:llm`。預設模型是 `gpt-4.1-mini`，可用 `OPENAI_FORMATTER_MODEL` 覆寫，但須重新確認 Structured Outputs 相容性與成本。
+
+## 資料與安全
+
+- API key 只從後端 process environment 讀取，不放入業務參數、SQLite、log 或前端 child environment。
+- 模型只收到本輪文件，不收到 Seller catalog、底價、Campaign、buyer ID 或完整 SQLite。
+- 固定官方 HTTPS endpoint、`store:false`、拒絕 redirect；不記錄 Authorization、provider error body 或原始 exception。
+- 每次首次提交最多一個 request，不自動 retry；timeout、refusal、截斷、HTTP 或語意驗證失敗時使用帶 warning 的規則 fallback。
+- 缺 key 是設定錯誤；secure diagnostic 模式不得把 fallback 偽裝成 live 成功。
+- 本地原始需求仍會依產品需求保存；不要把密碼、API key 或不必要個資寫入購物文字。
+
+## 內部接口
+
+`src/formatter/service.ts` 提供規則版 service，`src/formatter/llm-service.ts` 提供 async LLM 版。兩者都可提交 Request、準備 Orchestrator handoff，並只在 intent ready 時繼續。
+
+```ts
+const result = await service.prepare_from_text({
+  intent_md: '想找安靜的無線滑鼠，預算一千元含稅運，七天內到貨',
+  preference_md: '價格優先，可接受免費滑鼠墊',
+  idempotency_key: 'request-001',
+  snapshot_id: 'discovery_demo_v02',
+});
+```
+
+完整 HTTP 流程由 root runtime 提供；獨立 formatter demo 的 Seller 是測試替身。

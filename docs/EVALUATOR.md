@@ -1,33 +1,42 @@
 # Independent Evaluator
 
-`src/evaluator/index.mjs` exports `evaluate({ db, requestId, buyerId, apiKey, model, fetchImpl, now, options })`.
-It consumes a completed persisted negotiation run. Caller-supplied offers, campaigns, prompts and floor prices are not accepted as ranking input.
+`src/evaluator/index.mjs` 的 `evaluate` 只讀取已完成且持久化的 negotiation run。呼叫端不能直接提供 Offers、Campaign、prompt、floor price 或排名。
 
-1. Check buyer ownership and the immutable negotiation input/Offer provenance in SQLite.
-2. Recheck hard constraints, live inventory, seller availability, terms, expiry and bundle consent.
-3. Project only the existing `EvaluatorInput` contract into a new independent Responses call (`store: false`). The exact Structured Outputs format is loaded from `contracts/openai/evaluator-output.schema.json` without changing it.
-4. Validate a complete permutation of eligible IDs, consecutive ranks, explanations and explicit preference order. Invalid output, API errors, refusal, truncation, missing key or timeout trigger deterministic ranking.
-5. Within a short SQLite transaction, recheck current eligibility and publish the immutable `RequestSnapshot`. If the set changed during inference, rebuild ranking and explanations for the remaining set without another model call.
-6. Rank all eligible Offer IDs, then group by Seller using its highest-ranked Offer. The other variant remains an alternative with its own ID. Five Sellers can therefore produce seven ranked Offers and five display groups.
+## 流程
 
-Ranking uses the ordered `intent.preferences` lexicographically: lower price, faster delivery, or higher trust. Trust compares personal band, personal rating, then marketplace rating; missing ratings use a neutral value of 3, not a fabricated transaction. With no explicit ordering, the fallback uses price, delivery, trust. Remaining ties use delivery, trust, standalone before bundle, then stable Offer ID. Free gifts do not receive an automatic ranking bonus. A cheaper authorized bundle retains its price advantage. Backend sends offers in this canonical order to reduce Discovery order bias; the real model explains and returns the ranking under these rules. Backend still checks the complete returned order. Ranking weights and priorities are not left to the model to invent.
+1. 驗證 buyer ownership、Request 與不可變 negotiation provenance。
+2. 重新檢查硬限制、庫存、Seller、terms、expiry 與 bundle consent。
+3. 將既有 `EvaluatorInput` 白名單投影送入獨立 Responses call。
+4. 驗證回傳是全部 eligible IDs 的完整 permutation、連續 rank、理由與偏好順序。
+5. 發布前再次檢查資格；若 inference 期間集合變動，以當下集合重建 deterministic ranking，不再呼叫模型。
+6. 保存不可變 `RequestSnapshot`，並按 Seller 以最高順位 Offer 分組；其他 variant 保留為 alternative。
 
-The current shared `EvaluatorInput` includes Offer IDs and features, but not product attributes or full warranty terms. The model is explicitly forbidden to infer shape/size/color from SKU IDs or warranty from a terms ID. Required attributes are checked by Backend; soft attribute-based ranking awaits a reviewed input-contract extension.
+Campaign 與私有 Seller policy 永遠不進入 Evaluator input。Structured Outputs 唯一允許的格式是 `contracts/openai/evaluator-output.schema.json`。
 
-Default Evaluator model: `gpt-4.1-2025-04-14` ([official model documentation](https://developers.openai.com/api/docs/models/gpt-4.1)). Buyer/Seller defaults remain `gpt-4.1-mini-2025-04-14`. One call, 20-second timeout, 2,500 maximum output tokens and 60,000 conservative total-token reservation. The existing `API_KEY` field is shared with negotiation. `EVALUATOR_MODEL` is an optional E2E CLI override. Private credentials are never returned or written to reports.
+## 排名
 
-`evaluation_runs` claims prevent concurrent paid calls. Completed results replay from SQLite, including after expiry, as historical snapshots. Replay does not refresh expiry or grant permission to buy. Acceptance and redemption must perform their own live checks. `recoverInterruptedEvaluations(db)` is startup-only: interrupted jobs become failed, never silently issue another paid call.
+Deterministic fallback 依 `intent.preferences` 的明示順序逐項比較：
 
-`006_evaluation_audit.sql` retains the independent prompt, response, model usage and validation evidence locally. Public reports omit raw audit data and credentials.
+- `price_first`：較低含稅運總價；
+- `delivery_first`：較快到貨；
+- `trust_first`：個人 band／rating，再比較 marketplace rating；
+- `after_sales_first`：Backend 已驗證並出現在 Offer 的售後條件。
 
-`npm run test:evaluator` covers schema/set attacks, preference ordering, timeout and API failure, ad isolation, complete seven-Offer/five-group output, live stock/expiry changes, replay, ownership, concurrency and restart recovery. This is a Backend module; HTTP, swipe interactions and redemption are separate integrations.
+未明示順序時使用 price、delivery、trust。其餘 tie-break 依 delivery、trust、standalone before bundle、stable Offer ID。免費贈品不自動加分；已授權且更便宜的 bundle 保留價格優勢。
 
-## Combined E2E
+Evaluator 不從 SKU ID 推測顏色／尺寸，也不從 terms ID 推測保固。Required attributes 由 Backend 先驗證；要新增 soft attribute ranking 必須先審查並升版 input contract。
 
-`npm run test:e2e:full` runs offline; `npm run test:e2e:full:live` uses `.env`'s `API_KEY` for Buyer, Seller and Evaluator. Reports are written to `reports/full-e2e/` as JSON, Markdown and HTML.
+## 模型與失敗
 
-The test harness starts from a parsed request fixture in SQLite, feeds the configured canonical Seller catalog into upstream `createOrchestratorHandoff().prepare()`, and gives its unchanged `OrchestrationResult` to the full-round negotiation manager. Real registered Seller functions handle all rounds; the upstream first-round-only dispatcher is not called a second time. Its dispatch behavior remains covered by upstream handoff tests. No new production Formatter or orchestration implementation is introduced.
+預設 Evaluator model 為 `gpt-4.1-2025-04-14`，可用 `EVALUATOR_MODEL` 覆寫。單次 call、20 秒 timeout、2,500 max output tokens，無自動 retry。缺 key、HTTP failure、timeout、refusal、截斷、schema 或 set validation 失敗都使用 deterministic fallback。
 
-The canonical A–E policies are explicitly configured demonstration policies; the separate imported 15-Seller draft policy template remains inactive. Natural-language formatting, HTTP/UI and purchase/redemption are outside this E2E's boundary.
+`evaluation_runs` 防止並行重複付費。完成結果從 SQLite 重播；重播歷史 snapshot 不會刷新 Offer expiry 或授權購買。中斷 evaluation 在啟動時標為 failed，不自動發出新的 paid call。
 
-Explanation validation checks own price/delivery, supported numeric comparison values and common false fastest/lowest claims. It is a guard against observed errors, not a proof of every natural-language assertion; the final E2E report is also reviewed against actual offers.
+## 驗證
+
+```powershell
+npm run test:evaluator
+npm run test:e2e:full
+```
+
+Live full E2E 需明確提供 server-side key：`npm run test:e2e:full:live`。產生式報告只留在本機；政策見 [測試指南](TESTING.md)。

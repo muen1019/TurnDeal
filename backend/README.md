@@ -1,4 +1,4 @@
-# OfferMesh Result Backend
+# TurnDeal legacy Result Backend
 
 **完整服務請改用根目錄 `npm run dev`（Node 24）**：backend/runtime/ 已串接 Formatter、Discovery、Negotiation、Evaluator 與決策保存，詳見 [完整接線說明](../docs/RUN_FULL_APP.md)。下方 Node 20 / sql.js 指的是保留的 legacy mock server，不是最新完整入口。
 

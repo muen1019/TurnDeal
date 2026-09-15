@@ -1,8 +1,8 @@
 # intent.md / preference.md 定義與分類
 
-狀態：2026-09-12 團隊開發基準。本文定義文件語意；「目前實作」與「待實作目標」分開列示。共用 API 欄位仍為 v0.3，不新增或改名。
+本文是現行文件語意基準；「目前實作」與「待實作目標」分開列示。共用 API 欄位仍為 v0.3，不新增或改名。
 
-更新：Buyer Request Improver 已接上整合版 Result API 的 selection_version: 1 決策與前端進度，见 [BUYER_REQUEST_IMPROVER.md](BUYER_REQUEST_IMPROVER.md)。只有明確長期表述可更新 improver_global_preferences；既有 user_preferences 的 Formatter 讀取及 sessionStorage 編輯器尚未與該版本庫同步。
+更新：Buyer Request Improver 已接上整合版 Result API 的 selection_version: 1 決策與前端進度，見 [IMPROVER.md](IMPROVER.md)。只有明確長期表述可更新 improver_global_preferences；既有 user_preferences 的 Formatter 讀取及 sessionStorage 編輯器尚未與該版本庫同步。
 
 ## 1. 三層資料，不是三份互相覆寫的文件
 

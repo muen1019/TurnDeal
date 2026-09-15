@@ -1,6 +1,6 @@
 ## Context
 
-本 change 聚焦 Result 階段：使用者輸入 intent／preference，後端用 mock 產生優惠組合，前端用真實 API 提交 accept／reject，再將決策提供 Buyer Agent。Chat／卡片視覺保留，第 8–11 節只同步此生命週期。Result API 與前端串接已實作；驗證範圍與剩餘視覺工作見 tasks.md 及 docs/RESULT_TEST_REPORT.md。
+本 change 聚焦 Result 階段：使用者輸入 intent／preference，後端用 mock 產生優惠組合，前端用真實 API 提交 accept／reject，再將決策提供 Buyer Agent。Chat／卡片視覺保留，第 8–11 節只同步此生命週期。Result API 與前端串接已實作；驗證方式與剩餘視覺工作見 docs/TESTING.md 及 tasks.md。
 
 ## Goals / Non-Goals
 

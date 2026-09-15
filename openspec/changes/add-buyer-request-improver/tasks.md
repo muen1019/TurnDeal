@@ -1,10 +1,10 @@
-## 1. 內部契約與資料前置條件（已實作；證據見 docs/IMPROVER_TEST_REPORT.md）
+## 1. 內部契約與資料前置條件（已實作；驗證見 docs/TESTING.md）
 
 - [x] 1.1 建立 ImprovementContext、RevisionProposal、ImprovementResult 嚴格 schema 與型別；拒絕 extra fields、壞 evidence IDs 及超長文件。
 - [x] 1.2 實作全域偏好正本 repository、revision 與穩定 preference_id 表示層；round-trip 保留無關 Markdown，無法定位時 keep。
 - [x] 1.3 建立 additive migrations：工作、intent revisions、全域 preference revisions 與變更稽核；驗證舊資料、decision 與發布快照不變。
 
-## 2. Improver 核心（已實作；支援句型與限制見 docs/BUYER_REQUEST_IMPROVER.md）
+## 2. Improver 核心（已實作；支援句型與限制見 docs/IMPROVER.md）
 
 - [x] 2.1 實作 Context Builder，驗證 buyer scope、固定拒絕證據與全域版本差異；測試跨 buyer 及價格變更。
 - [x] 2.2 實作 deterministic provider 與可選 LLM provider 介面，輸出必填 intent 與 preference keep/patch，模型不具工具權限。
@@ -24,7 +24,7 @@
 ## 4. 外層整合（selection v1 已接線；後续工作獨立列出）
 
 - [x] 4.1 以 selection_version: 1 擴充接受／全部拒絕提交、unknown-outcome 恢復與狀態查詢；同步 Schema/OpenAPI/fixtures/型別及 OpenSpec，不修改舊保存回應。
-- [x] 4.2 定義後端澄清提交與後續 request 契約；驗證 buyer scope、不可變 successor 與重送衝突。前端串接方式見 docs/IMPROVER_BACKEND_INTEGRATION.md，本次不含 UI。
+- [x] 4.2 定義後端澄清提交與後續 request 契約；驗證 buyer scope、不可變 successor 與重送衝突。串接方式見 docs/IMPROVER.md，本次不含 UI。
 - [ ] 4.5 全域偏好編輯器與一般新對話的權威全域來源同步。
 - [x] 4.3 接上原子接受／拒絕＋工作提交 adapter；測試完整非空排名集合、expiry、accept race 及無回饋事件，不捏造 feedback。
 - [x] 4.4 接上後端 ready → child workflow，以 durable workflow 去重；驗證 root/parent/revision、交易回滾、重啟恢復及每次拒絕最多一輪。不回填歷史 jobs。

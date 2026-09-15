@@ -2,7 +2,7 @@
 
 ## 最快啟動
 
-整合入口使用 **Node 24**（本次以 24.15 驗證）。第一次在根目錄安裝依賴：
+整合入口使用 **Node 24**。第一次在根目錄安裝依賴：
 
 ```powershell
 npm ci
@@ -41,7 +41,7 @@ npm run dev:secure
 6. 前端透過原 GET /api/requests/{id} 輪詢狀態並呈現商品卡。
 7. POST /api/requests/{id}/decisions 保存採用或拒絕。採用時重新驗證 provenance、庫存、價格、規格、交期、條款、期限與配件授權。拒絕保存原始 feedback/source_documents；尚未自動更新長期偏好。
 
-共用契約新增 orchestrating、negotiating、evaluating 三個 Status 值；生成型別與前端進度判斷同步更新。採用後可呼叫購買 API 建立 ACP 測試 checkout，提交明確確認後完成模擬訂單；本提交未含購買 UI 接線；六個購買端點、payload 與模式邊界見 [ACP_PURCHASE.md](ACP_PURCHASE.md)。沒有真實扣款或 redemption endpoint。
+共用契約包含 orchestrating、negotiating、evaluating 三個 processing Status；生成型別與前端進度判斷保持同步。採用後可呼叫購買 API 建立 ACP 測試 checkout，提交明確確認後完成模擬訂單；目前尚未提供購買 UI。六個購買端點、payload 與模式邊界見 [ACP_PURCHASE.md](ACP_PURCHASE.md)。沒有真實扣款或 redemption endpoint。
 
 ## 資料與既有模組
 
@@ -68,4 +68,4 @@ node tests/runtime-browser.mjs
 
 瀏覽器測試在本地展示 DB 新建測試需求並模擬採用，沒有付款；輸出截圖到 frontend/test-results/runtime/。可用 OFFERMESH_BROWSER_CHANNEL=chrome 改用已安裝的 Chrome。
 
-本次完成離線 HTTP／SQLite／瀏覽器端到端驗證；真實模型的 Formatter 接線另以 mock transport 回歸測試，沒有使用或保存使用者 key，也沒有宣稱本次已跑完真實模型 E2E。
+離線 HTTP／SQLite／瀏覽器端到端及 live adapter 的 mock transport 都有可重跑測試；範圍與 live 成功判定見 [測試指南](TESTING.md)。
