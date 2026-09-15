@@ -1,12 +1,12 @@
 # ACP 測試購買 API
 
-2026-09-12 已實作於 Node 24 整合 runtime。本提交僅交付後端 API，前端接線另行交付。後端透過真正 HTTP 呼叫本地 ACP 測試商家，保存 checkout、模擬付款與訂單。採用只保存選擇；按「確認測試購買」才提交交易。略過不建立購買。
+ACP 測試購買實作於 Node 24 整合 runtime。後端透過 HTTP 呼叫本地 ACP 測試商家，保存 checkout、模擬付款與訂單。採用只保存選擇；另行按「確認測試購買」才提交交易。略過不建立購買。目前尚未提供購買 UI。
 
 這是測試交易，不會實際扣款或出貨，也不是 ChatGPT Instant Checkout。OpenAI API key 僅用於另行啟用的模型功能，不能用來取得商家交易權限或 ChatGPT 儲存的付款資料。
 
 ## 啟動與 API 操作
 
-根目錄執行 `npm run dev` 可啟動整合 API 與 SQLite。透過下列 API 建立結帳、更新資料及提交確認；本提交未提供購買 UI。取消只適用於尚未提交的結帳。
+根目錄執行 `npm run dev` 可啟動整合 API 與 SQLite。透過下列 API 建立結帳、更新資料及提交確認。取消只適用於尚未提交的結帳。
 
 目前 demo buyer 沒有正式登入，服務僅綁定 loopback。
 
@@ -62,4 +62,4 @@ Migration 005 保存 purchase、操作日誌、商家 session／order、HTTP 冪
 
 ## 驗證
 
-`npm run test:purchase` 驗證真實 HTTP ACP、契約、隔離、冪等、競爭、回應遺失與重啟恢復。驗證範圍見 [報告](ACP_PURCHASE_TEST_REPORT.md)。本提交不包含前端或瀏覽器 UI 測試。
+`npm run test:purchase` 驗證 HTTP ACP、契約、隔離、冪等、競爭、回應遺失與重啟恢復。完整命令與報告政策見 [測試指南](TESTING.md)。

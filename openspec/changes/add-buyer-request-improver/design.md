@@ -5,7 +5,7 @@
 
 ### 實作進度（2026-09-12）
 
-內部核心、SQLite revision/job 儲存、Node 20 legacy adapter 與 Node 24 runtime 內部 adapter 已實作；真實 LLM 合成案例及回歸測試見 docs/IMPROVER_TEST_REPORT.md。公開決策擴充、最後左滑事件、接受後背景改善及前端進度已接線；全域編輯器同步、澄清後提交及 child 編排仍未接線。本文件以下架構要求持續適用，不能把內部核心完成當成完整前端回饋循環完成。
+內部核心、SQLite revision/job 儲存、Node 20 legacy adapter 與 Node 24 runtime 內部 adapter 已實作；可重跑驗證見 docs/TESTING.md。公開決策擴充、最後左滑事件、接受後背景改善及前端進度已接線；全域編輯器同步仍未接線。本文件以下架構要求持續適用，不能把內部核心完成當成完整前端回饋循環完成。
 
 開發期間主程式已整合到 backend/runtime（Node 24），實作提供可注入的純 Formatter adapter；legacy backend/src（Node 20）保留相容測試。實際 provider 預設 gpt-4.1-mini，明示 live 時從 .env 的 API_KEY 讀取，IMPROVER_MODEL 可覆寫；不修改其他模組啟動器的金鑰政策。
 

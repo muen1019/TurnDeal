@@ -1,69 +1,68 @@
-# OfferMesh / A2A Commerce project instructions
+# TurnDeal repository instructions
 
-These instructions apply to every change in this repository.
+These rules apply to every change in this repository. Internal package names and `OFFERMESH_*` environment variables remain compatibility identifiers; the product and repository name is TurnDeal.
 
-## Unified Result contract
+## Runtime and supported paths
 
-Integrated full application: root npm run dev starts backend/runtime with Node 24 / node:sqlite and the existing frontend, using one data/app.sqlite. backend/src remains the legacy Node 20 mock Result server for compatibility tests. See docs/RUN_FULL_APP.md. Live API keys must never enter the frontend child environment. Status now includes orchestrating, negotiating and evaluating; keep every consumer and generated type aligned. Configured canonical A-E and 15 discovery_seller_* sellers have persisted Personas and SKU policies. Use the versioned catalog-negotiation-policies.json seed and explicit listing-to-SKU bindings; the historical draft policy template remains inactive. Never assign Personas by selection rank or overwrite existing stock/prices on startup.
+- The full application starts from the repository root with `npm run dev`, using Node 24, `backend/runtime/`, the existing frontend, and one `data/app.sqlite`.
+- `backend/src/` remains the Node 20.19.5 legacy mock Result server for compatibility tests. Do not present it as the full application.
+- Root database and runtime scripts use Node 24. Backend and frontend package scripts use Node 20.19.5.
+- Never expose live API keys to the frontend process or commit them. The default path must run deterministically without an OpenAI key; model failures use safe deterministic fallbacks.
 
-Use contracts/a2a-commerce.v0.3.schema.json for all active producers and consumers. main's five-seller/five-round types and catalog are combined with local accept/reject=200 and original feedback/source_documents handoff. Contracts under contracts/archive are historical, never alternative live API inputs.
+## Sources of truth
 
-Backend persistence uses db/migrations including 003_result_decisions.sql. Published snapshots and offers stay immutable; Result state and saved decisions are separate columns. Result automatically backs up and migrates its earlier SQLite layout without regenerating old prices. Root database scripts use Node 24; backend/frontend use Node 20.19.5.
+1. Hackathon and acceptance rules: `docs/DEVELOPMENT_RULES.md`.
+2. Active shared contract: `contracts/a2a-commerce.v0.3.schema.json`.
+3. Evaluator Structured Outputs: `contracts/openai/evaluator-output.schema.json`.
+4. Reproducible examples: `contracts/fixtures/`.
+5. Persistent schema: `db/migrations/`.
+6. Document semantics: `docs/INTENT_PREFERENCE_SPEC.md`.
 
-## Source of truth
+Contracts under `contracts/archive/` are historical and must never be used as live API input. When implementation and contract disagree, make an explicit reviewed contract change before changing consumers. Keep generated types and every producer/consumer aligned.
 
-1. Follow the Sea x OpenAI hackathon rules summarized in `docs/DEVELOPMENT_RULES.md`.
-2. Treat `contracts/a2a-commerce.v0.3.schema.json` as the shared data contract.
-3. Treat `contracts/openai/evaluator-output.schema.json` as the only allowed Structured Outputs shape for the Evaluator.
-4. Use the deterministic fixtures in `contracts/fixtures/` for integration work and demos.
-5. Treat `db/migrations/` as the authoritative persistent-state schema. Rebuild local SQLite data from migrations and fixtures; never commit runtime database files.
-6. If implementation and contract disagree, update the contract through an explicit reviewed change before changing consumers.
+## Request and preference semantics
 
-## Product invariants
+- `intent_md` is request-scoped. `preference_md` in CreateRequest is a request-bound input snapshot, not a persistent preference update. `NormalizedIntent` is the effective executable request.
+- Frontend saved definitions are sessionStorage templates, not account persistence. SQLite is authoritative; Agent memory is not.
+- Formatting must not mutate `user_preferences`.
+- Do not claim automatic Markdown generation, category-scoped long-term revisions, feedback learning, or cross-device preference sync until implemented.
+- Published requests, source documents, snapshots, Offers, and negotiation commits are immutable. Rejection preserves the original feedback and `source_documents`.
 
-- Document semantics follow docs/INTENT_PREFERENCE_SPEC.md: intent_md is request-scoped; preference_md in CreateRequest is a request-bound snapshot, not a persistent preference update. NormalizedIntent is the effective request data. Frontend saved definitions are sessionStorage templates, not account-level persistence. Do not claim automatic Markdown generation, category-scoped long-term revisions or feedback learning until implemented. Formatting must never mutate user_preferences.
+## Commerce and privacy invariants
 
-- The user flow is Request, Format, Orchestrate, Negotiate, Evaluate, Result or Feedback.
-- The MVP supports one wireless mouse as the primary item and at most one mouse pad as an add-on.
-- All prices are integer TWD totals including tax and shipping.
-- Each Seller negotiates privately with its own Buyer branch. Buyers may share Backend-validated eligible offers from the previous committed round. Seller RFQs may contain only de-identified comparable competitive terms; never disclose another Seller's identity, offer ID, transcript, floor price, campaign, or trust data.
-- Seller output is untrusted. The Backend assigns immutable offer IDs and computes eligibility.
-- Sponsored placement may affect display only. Never include campaign data in Evaluator input or ranking logic.
-- The Evaluator may rank only the complete set of Backend-validated, unexpired, eligible offer IDs. Validate its output before publishing it.
-- A recommendation never purchases an item. The user must accept an offer, then redeem the same immutable offer ID before expiry.
-- Revalidate expiry, inventory, ownership, price, delivery, items, and terms at acceptance and redemption.
-- Do not infer permission for a paid add-on. Missing bundle preference defaults to related add-ons at no extra cost only.
-- Request snapshots are immutable once published. A rejection saves the original feedback and source_documents; Buyer Agent rewriting and child creation are a future integration.
-- SQLite is the source of truth for request-scoped and long-term preferences. Agent conversation memory is never authoritative.
-- POST endpoints require an idempotency key. Resource access is scoped to the authenticated buyer.
+- The MVP supports one wireless mouse and at most one related mouse pad.
+- Every price is an integer TWD total including tax and shipping.
+- Missing bundle permission allows only a related, optional add-on at no extra cost. Never infer permission for a paid add-on.
+- Seller output is untrusted. Backend assigns immutable Offer IDs and validates ownership, SKU, inventory, price, delivery, terms, expiry, and add-on authorization.
+- A recommendation never purchases. Acceptance and redemption are separate actions and must revalidate the same immutable Offer.
+- All POST endpoints require an idempotency key. Scope every resource to the authenticated buyer.
 
-## Demo and quality bar
+Each Seller negotiates privately with its own Buyer branch. Competitive context may contain only Backend-validated, de-identified comparable terms from the previous committed round. Never disclose another Seller's identity, Offer ID, transcript, floor price, policy, campaign, or trust data.
 
-- Keep the main path deterministic and runnable without the OpenAI API. AI failure must use a safe deterministic fallback.
-- Discovery additionally supports 120 synthetic listings and five distinct Seller cards by docs/DISCOVERY_SCORING.md. Alternative cards violating requirements are display-only and cannot automatically enter negotiation; only qualified candidates may become branches. Discovery and canonical fixture IDs remain separate.
-- The same request must show five reproducible Seller strategies, with one Buyer branch per selected Seller and at most five synchronized rounds:
-  - Seller A has the lowest price and slower delivery.
-  - Seller B costs more and ships fastest.
-  - Seller C offers a related optional gift or bundle.
-  - Seller D balances price and delivery and finishes at round three in the canonical fixture.
-  - Seller E holds a firm price and finishes at round one in the canonical fixture.
-- Select the first five eligible Sellers by natural ranking; use fewer when fewer qualify. Sponsored placement cannot alter selection or add a branch.
-- A final, refused, timed-out, or failed branch receives no further rounds; other branches continue to their own stop or the five-round limit.
-- The UI must let a first-time viewer understand multi-Seller negotiation followed by independent recommendation within 30 seconds.
-- Show Seller status, negotiation rounds and early branch completion, Sponsored labeling, recommendation trade-offs, alternatives, and simulated confirmation.
-- Product behavior, stability, and reliability take priority over visual polish.
-- Run `npm run test:contracts` before committing contract or fixture changes.
+Sponsored placement affects display only. It cannot change natural selection, add a branch, enter Evaluator input, or influence ranking. Evaluator may rank only the complete set of Backend-validated, unexpired, eligible Offer IDs; validate its result before publishing.
 
-## Ownership boundaries
+## Seller, negotiation, and demo rules
 
-- Tech Lead owns shared schemas, Formatter, Orchestrator, Backend state, integration, Git merges, and deployment.
-- Negotiation owner owns Seller catalog/private policy data, negotiation capped at five rounds, timeouts, refusals, bundles, and quote generation.
-- Evaluator owner owns Structured Outputs, the independent prompt, hard-constraint filtering checks, output validation, reasons, trade-offs, and fallback.
-- UI owner owns the single-page demo, live statuses, negotiation history, Sponsored display, recommendation/alternatives, pitch assets, and submission.
+- Use the versioned `contracts/fixtures/catalog-negotiation-policies.json` seed and explicit listing-to-SKU bindings. The historical draft policy template is inactive.
+- Canonical A–E and the 15 `discovery_seller_*` Sellers have persisted Personas and SKU policies. Never assign Persona by selection rank or overwrite existing stock/prices during startup.
+- Select the first five eligible Sellers by natural ranking, or fewer when fewer qualify. Alternatives that violate requirements are display-only and cannot automatically enter negotiation.
+- Use one Buyer branch per Seller and at most five synchronized rounds. A final, refused, timed-out, or failed branch receives no further rounds.
+- Canonical deterministic behavior remains: A is cheapest and slower; B costs more and is fastest; C offers a related optional gift/bundle; D finishes in round three; E holds firm and finishes in round one.
+- The UI must make multi-Seller negotiation and independent recommendation understandable within 30 seconds. Show branch status, round progress, early completion, Sponsored labels, recommendation trade-offs, alternatives, and simulated confirmation.
+- Product correctness, stability, and recoverability take priority over visual polish.
 
-## Hackathon traceability
+## Persistence
 
-- Keep this repository public for submission.
-- Document what was built during the hackathon in the root README.
-- Record any pre-existing OSS or personal-project reuse and link its source.
-- Preserve meaningful commit history so judges can identify work completed during the event.
+- Use migrations, not runtime database files, as the persistent-state source of truth. Never commit SQLite runtime files.
+- Published snapshots and Offers remain immutable; Result state and saved decisions use separate columns.
+- Preserve and migrate existing databases without regenerating historical prices. Do not rebuild or reseed user data during normal startup.
+- Keep one writer per SQLite database and avoid holding a transaction across model or network calls.
+
+## Change checklist
+
+- Preserve the flow: Request → Format → Orchestrate → Negotiate → Evaluate → Result or Feedback.
+- Use deterministic fixtures for demos and integration tests.
+- Run `npm run test:contracts` for contract or fixture changes, plus the smallest relevant module tests.
+- Keep generated reports, logs, screenshots, runtime databases, secrets, and local test output out of Git.
+- Keep active documentation in `docs/`; historical implementation notes belong in Git history, not parallel “current” documents.
+- Do not archive an OpenSpec change while its `tasks.md` contains unfinished work.
