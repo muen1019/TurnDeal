@@ -5,7 +5,6 @@ import type {ComponentProps, CSSProperties, ReactNode} from 'react';
 import type {Offer, RankedOffer, RequestSnapshot} from '../../contract.generated';
 import fixture from '../../../../contracts/fixtures/result-v0.3.json';
 import {OfferDeck} from './OfferDeck';
-import {OfferDetails} from './OfferDetails';
 
 const motionState = vi.hoisted(() => ({reduceMotion: false}));
 
@@ -60,7 +59,6 @@ function renderDeck(overrides: Partial<ComponentProps<typeof OfferDeck>> = {}) {
     onAccept: vi.fn(),
     onSkip: vi.fn(),
     onUndo: vi.fn(),
-    onDetails: vi.fn(),
     ...overrides,
   };
   const result = render(<OfferDeck {...props} />);
@@ -172,16 +170,16 @@ describe('OfferDeck gestures', () => {
     expect(shell).toHaveStyle({transform: 'translateX(0px)'});
   });
 
-  it('does not let a card click fire after a recognized drag', () => {
-    const onDetails = vi.fn();
-    const {shell} = renderDeck({onDetails});
+  it('does not flip the card after a recognized drag', () => {
+    const {shell} = renderDeck();
+    const detailsButton = screen.getByRole('button', {name: /商品明細/});
 
     pointer(shell, 'pointerdown', {pointerId: 1, clientX: 0, clientY: 0});
     pointer(shell, 'pointermove', {pointerId: 1, clientX: 40, clientY: 0});
     pointer(shell, 'pointerup', {pointerId: 1, clientX: 40, clientY: 0});
     fireEvent.click(shell);
 
-    expect(onDetails).not.toHaveBeenCalled();
+    expect(detailsButton).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('still acquires drag intent from the card body', () => {
@@ -208,18 +206,18 @@ describe('OfferDeck interaction state', () => {
     expect(screen.getByRole('button', {name: /撤回略過/})).not.toBeDisabled();
   });
 
-  it('lets expired offers be skipped and inspected but not accepted', () => {
+  it('lets expired offers be flipped for details and skipped but not accepted', () => {
     const onAccept = vi.fn();
     const onSkip = vi.fn();
-    const onDetails = vi.fn();
-    const {shell} = renderDeck({expired: true, onAccept, onSkip, onDetails});
+    const {shell} = renderDeck({expired: true, onAccept, onSkip});
 
     expect(screen.getByRole('button', {name: /立即採用/})).toBeDisabled();
-    fireEvent.click(screen.getByRole('button', {name: /商品明細/}));
+    const detailsButton = screen.getByRole('button', {name: /商品明細/});
+    fireEvent.click(detailsButton);
+    expect(detailsButton).toHaveAttribute('aria-expanded', 'true');
     drag(shell, -160);
     drag(shell, 160);
 
-    expect(onDetails).toHaveBeenCalledOnce();
     expect(onSkip).toHaveBeenCalledOnce();
     expect(onAccept).not.toHaveBeenCalled();
   });
@@ -267,14 +265,47 @@ describe('OfferDeck interaction state', () => {
   });
 });
 
-describe('OfferDetails adoption', () => {
-  it('requires an awaiting_user snapshot before adoption', () => {
-    const data = current();
-    const onAccept = vi.fn();
-    const acceptedSnapshot = {...data.snapshot, status: 'accepted'} satisfies RequestSnapshot;
+describe('OfferDeck card flip', () => {
+  it('flips the card open and closed when the details button is toggled twice', () => {
+    renderDeck();
+    const detailsButton = screen.getByRole('button', {name: /商品明細/});
+    // Both faces stay in the DOM at all times (the 3D flip needs them there); the back's
+    // aria-hidden state is what actually tracks whether it's the one facing the viewer.
+    const backFace = screen.getByText('推薦理由').closest('.offer-card-face-back')!;
 
-    render(<OfferDetails snapshot={acceptedSnapshot} offer={data.offer} ranking={data.ranking} onBack={vi.fn()} onAccept={onAccept} />);
+    expect(detailsButton).toHaveAttribute('aria-expanded', 'false');
+    expect(backFace).toHaveAttribute('aria-hidden', 'true');
 
-    expect(screen.getByRole('button', {name: /立即採用/})).toBeDisabled();
+    fireEvent.click(detailsButton);
+    expect(detailsButton).toHaveAttribute('aria-expanded', 'true');
+    expect(backFace).not.toHaveAttribute('aria-hidden');
+
+    fireEvent.click(detailsButton);
+    expect(detailsButton).toHaveAttribute('aria-expanded', 'false');
+    expect(backFace).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('also flips back when the card itself is tapped again, not just the details button', () => {
+    const {shell} = renderDeck();
+    const detailsButton = screen.getByRole('button', {name: /商品明細/});
+
+    fireEvent.click(detailsButton);
+    expect(detailsButton).toHaveAttribute('aria-expanded', 'true');
+
+    fireEvent.click(shell);
+    expect(detailsButton).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('resets to the front face when the offer changes', () => {
+    const {rerender, props} = renderDeck();
+    const detailsButton = () => screen.getByRole('button', {name: /商品明細/});
+    fireEvent.click(detailsButton());
+    expect(detailsButton()).toHaveAttribute('aria-expanded', 'true');
+
+    const nextOffer = props.snapshot.offers.find((candidate) => candidate.offer_id !== props.offer?.offer_id)!;
+    const nextRanking = props.snapshot.ranked_offers.find((r) => r.offer_id === nextOffer.offer_id) ?? null;
+    rerender(<OfferDeck {...props} offer={nextOffer} ranking={nextRanking} />);
+
+    expect(detailsButton()).toHaveAttribute('aria-expanded', 'false');
   });
 });

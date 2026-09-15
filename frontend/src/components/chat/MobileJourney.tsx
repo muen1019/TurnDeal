@@ -1,7 +1,7 @@
 import {useEffect, useRef} from 'react';
-import {ArrowUpRight, Check, ShieldCheck, Sparkles} from 'lucide-react';
-import type {FormatterSummary} from '../../contract.generated';
+import {ArrowUpRight, Check, MessageSquareText, Send, ShieldCheck} from 'lucide-react';
 import type {AgentProgressStatus} from './AgentProgress';
+import {TurnDealMark} from './TurnDealMark';
 import '../../styles/deal-progress.css';
 
 const steps = ['讀懂需求', '尋找賣家', '幫你議價', '比較推薦'];
@@ -22,7 +22,7 @@ interface Props {
   status?: AgentProgressStatus; ready: boolean; requestId: string | null;
   busy: boolean; retrying?: boolean; error?: string; onReady: () => void; onNew: () => void;
   onRetry: () => void; unsaved: boolean; message: string;
-  formatter?: FormatterSummary;
+  buyerName?: string;
 }
 export function MobileJourney(p: Props) {
   const watching = useRef(false);
@@ -36,12 +36,10 @@ export function MobileJourney(p: Props) {
       p.onReady();
     }
   }, [p.ready, p.onReady]);
-  const mode = p.formatter ? p.formatter.provider==='openai'?`LLM 已解析 · ${p.formatter.model??'OpenAI'}`:'離線規則解析 · 非 LLM 成功' : import.meta.env.VITE_OFFERMESH_RUNTIME_MODE === 'live' ? '使用 AI 解析 · 失敗時會標示備援' : '離線 Demo · 不呼叫 AI';
   if (running || p.requestId || (p.busy && !p.ready)) {
     return <section key="processing" className="mobile-journey mobile-processing deal-processing mobile-screen-enter" data-running={running&&!p.error} aria-labelledby="journey-title">
-      <span className="mobile-mode">{mode}</span>
-      <div className="deal-processing-mark" aria-hidden="true"><Sparkles size={25}/><i/></div>
-      <p className="mobile-eyebrow">TURNDEAL · WORKING FOR YOU</p>
+      <div className="deal-processing-mark" aria-hidden="true"><i/><i/><span><TurnDealMark size={36}/></span></div>
+      <p className="mobile-eyebrow"><span className="deal-live-dot" aria-hidden="true"/>TURNDEAL · WORKING FOR YOU</p>
       <h1 id="journey-title">{p.ready ? '推薦已準備完成' : running ? '正在為你尋找好選擇' : p.status==='failed'?'這次比價中斷了':p.status==='no_match'?'目前沒有合適方案':'需要再確認需求'}</h1>
       <p className="journey-description" aria-live="polite">{p.error || progress?.text || '這輪已結束或需要補充條件，請開始新需求。'}</p>
       {progress && <div className="journey-progress">
@@ -58,13 +56,20 @@ export function MobileJourney(p: Props) {
   }
   const valid = !!p.draft.trim() && [...p.draft.trim()].length <= 2000 && !p.busy;
   const send = () => { if (valid) { watching.current=true; p.onSend(); } };
+  const name=p.buyerName?.trim();
   return <section key="home" className="mobile-journey mobile-home mobile-home-minimal mobile-screen-enter" aria-label="輸入購物需求">
-    <div className="home-signal" aria-hidden="true"><i/><i/><span><Sparkles size={28}/></span></div>
-    <form className="mobile-prompt" onSubmit={e=>{e.preventDefault();send();}}><label className="sr-only" htmlFor="mobile-prompt">輸入購物需求</label><textarea id="mobile-prompt" aria-label="輸入購物需求" placeholder="想買一隻安靜的無線滑鼠，800 元左右…" value={p.draft} onChange={e=>p.onDraft(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing){e.preventDefault();send();}}}/><button className="mobile-primary" type="submit" aria-label="送出需求" disabled={!valid}>開始 <ArrowUpRight size={21}/></button></form>
-    <span className="mobile-mode">{mode}</span>
+    <div className="home-signal" aria-hidden="true"><span><TurnDealMark size={30}/></span></div>
+    <h1 className="mobile-greeting">{name?<>{name} 您好，<span>今天想要買什麼商品呢？</span></>:'今天想要買什麼商品呢？'}</h1>
+    <form className="mobile-prompt" onSubmit={e=>{e.preventDefault();send();}}>
+      <div className="mobile-prompt-field" data-tour="chat-input">
+        <div className="mobile-prompt-head"><MessageSquareText size={14}/><span>描述你的購物需求</span></div>
+        <label className="sr-only" htmlFor="mobile-prompt">輸入購物需求</label>
+        <textarea id="mobile-prompt" aria-label="輸入購物需求" placeholder="想買一隻安靜的無線滑鼠，800 元左右…" value={p.draft} onChange={e=>p.onDraft(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent.isComposing){e.preventDefault();send();}}}/>
+      </div>
+      <button className="mobile-primary" data-tour="send-button" type="submit" disabled={!valid}><span className="mobile-primary-shine" aria-hidden="true"/><span>送出需求</span><Send size={18}/></button>
+    </form>
     {p.unsaved && <p className="mobile-inline-note">未儲存的代理設定不會套用；可以直接送出。</p>}
     {[...p.draft.trim()].length>2000 && <p role="alert">需求最多 2,000 個字元。</p>}
     {p.error && <p role="alert">{p.error}</p>}
-    <p className="mobile-safety"><ShieldCheck size={14}/> Demo · 不會自動付款</p>
   </section>;
 }

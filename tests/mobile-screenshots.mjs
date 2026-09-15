@@ -10,7 +10,7 @@ const page=await context.newPage();page.setDefaultTimeout(30000);
 const errors=[];page.on('pageerror',e=>errors.push(e.message));
 const shot=async name=>{await page.waitForTimeout(550);await page.screenshot({path:out+'/'+name+'.png'});};
 try{
- await page.goto(origin+'/chat');await page.getByRole('button',{name:'開始使用'}).click();
+ await page.goto(origin+'/chat');await page.getByRole('button',{name:/以訪客身份繼續/}).click();
  await page.getByRole('textbox',{name:/名稱/}).fill('Demo Buyer');
  await page.getByRole('textbox',{name:'電子郵件',exact:true}).fill('buyer@example.test');
  await page.getByRole('combobox',{name:'縣市',exact:true}).selectOption('臺北市');
@@ -40,17 +40,17 @@ try{
  await page.getByRole('button',{name:'撤回略過',exact:true}).click();await page.waitForTimeout(400);
  assert.equal(await page.locator('.offer-card__content h3').innerText(),firstTitle);
  await swipe(100,285);
- await page.getByRole('button',{name:'前往測試結帳'}).click();
+ await page.getByRole('button',{name:'前往結帳'}).click();
  assert.equal(await page.getByRole('textbox',{name:'電子郵件',exact:true}).inputValue(),'buyer@example.test');
  assert.equal(await page.getByRole('textbox',{name:'街道、門牌與樓層',exact:true}).inputValue(),'測試路 1 號（虛構地址）');
  assert.equal(await page.getByRole('combobox',{name:'縣市',exact:true}).inputValue(),'臺北市');
  await page.locator('.commerce-panel').evaluate(el=>el.scrollIntoView({block:'start'}));await shot('07-checkout-address');
  await page.getByRole('button',{name:'儲存並確認資料'}).click();
- await page.getByRole('button',{name:/確認測試購買 ·/}).scrollIntoViewIfNeeded();await shot('08-checkout-confirm');
- await page.getByRole('button',{name:/確認測試購買 ·/}).click();
- await page.getByRole('heading',{name:'測試購買完成'}).waitFor();
+ await page.getByRole('button',{name:/確認購買 ·/}).scrollIntoViewIfNeeded();await shot('08-checkout-confirm');
+ await page.getByRole('button',{name:/確認購買 ·/}).click();
+ await page.getByRole('heading',{name:'購買完成'}).waitFor();
  await page.locator('.purchase-receipt').scrollIntoViewIfNeeded();await shot('09-receipt');
- await page.reload();await page.getByRole('heading',{name:'測試購買完成'}).waitFor();
+ await page.reload();await page.getByRole('heading',{name:'購買完成'}).waitFor();
  await page.getByRole('button',{name:'切換導覽'}).click();await shot('10-history');
  // Capture the real progress UI with polling held on its initial server snapshot.
  await page.getByRole('button',{name:'關閉歷史紀錄'}).click();

@@ -11,7 +11,7 @@ page.setDefaultTimeout(15000);
 const shot=async name=>{await page.waitForTimeout(550);await page.screenshot({path:fileURLToPath(new URL(name+'.png',out)),fullPage:true});};
 const noOverflow=async()=>assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth&&document.documentElement.scrollHeight<=innerHeight),'document overflow');
 try {
-  await page.goto(base+'/chat');await page.getByRole('button',{name:'開始使用'}).click();
+  await page.goto(base+'/chat');await page.getByRole('button',{name:/以訪客身份繼續/}).click();
   await page.getByRole('textbox').first().waitFor();
   if(await page.getByRole('heading',{name:'先認識一下你'}).count()){
     await page.getByRole('textbox',{name:/名稱/}).fill('Demo Buyer');

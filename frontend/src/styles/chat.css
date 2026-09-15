@@ -1,8 +1,8 @@
 :root {
   --canvas: #f2eee6;
-  --shell: #e8f1f8;
+  --shell: #e8f8f6;
   --surface: #ffffff;
-  --subtle: #f5f8fc;
+  --subtle: #f5fcfb;
   --accent: #dfecef;
   --ink: #252a28;
   --muted: #566361;
@@ -55,7 +55,7 @@
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.46), rgba(255, 255, 255, 0)),
     var(--shell);
-  border: 1px solid rgba(113, 155, 179, 0.28);
+  border: 1px solid rgba(94, 178, 168, 0.28);
   border-radius: 32px;
   box-shadow: var(--shadow-panel);
 }
@@ -86,10 +86,14 @@
 
 .chat-brand {
   gap: 10px;
-  color: #142027;
+  color: #0f766e;
   font-size: 26px;
   font-weight: 750;
   letter-spacing: 0;
+}
+.chat-brand em {
+  color: #0f1a2c;
+  font-style: normal;
 }
 
 .chat-brand-mark {
@@ -97,13 +101,24 @@
   height: 34px;
   display: grid;
   place-items: center;
-  border-radius: 12px;
-  color: var(--focus);
-  background: rgba(255, 255, 255, 0.72);
+}
+.chat-brand-mark .turndeal-mark {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 3px 6px rgba(10, 114, 104, 0.3));
 }
 
 .chat-header-actions {
   gap: 12px;
+}
+
+.chat-header-actions .icon-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 2px 6px rgba(18, 42, 82, 0.06);
 }
 
 .chat-avatar {
@@ -113,7 +128,7 @@
   place-items: center;
   flex: 0 0 auto;
   color: var(--focus);
-  background: linear-gradient(180deg, #d5e8f7, #bdd5ec);
+  background: linear-gradient(180deg, #e5e7e7, #d3d6d6);
   border: 1px solid rgba(49, 94, 104, 0.14);
   border-radius: 999px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
@@ -189,7 +204,7 @@
 
 .chat-nav-button[data-active="true"],
 .chat-recent-item[data-active="true"] {
-  background: linear-gradient(135deg, #d9eafa, #cfe3f5);
+  background: linear-gradient(135deg, #e9eaea, #e1e3e3);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62);
 }
 
@@ -328,7 +343,7 @@
 .chat-panel-heading h1,
 .agent-editor-heading h2 {
   margin: 0;
-  color: #142027;
+  color: #0f1a2c;
   letter-spacing: 0;
 }
 
@@ -375,6 +390,8 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
   padding: 0 2px 14px;
   scrollbar-gutter: stable;
 }
@@ -395,8 +412,8 @@
 .chat-agent-icon {
   display: grid;
   place-items: center;
-  color: #163f91;
-  background: #d9eafa;
+  color: #0b5a53;
+  background: #e9eaea;
   border: 1px solid rgba(49, 94, 104, 0.13);
   border-radius: 999px;
 }
@@ -427,7 +444,7 @@
 
 .chat-bubble {
   padding: 14px 16px;
-  color: #172338;
+  color: #14223b;
   background: var(--surface);
   border: 1px solid var(--border-soft);
   border-radius: 18px;
@@ -435,8 +452,8 @@
 }
 
 .chat-message[data-role="user"] .chat-bubble {
-  background: #dcecff;
-  border-color: rgba(71, 126, 171, 0.16);
+  background: #edeeee;
+  border-color: rgba(58, 156, 145, 0.16);
 }
 
 .chat-message[data-role="system"] {
@@ -477,7 +494,7 @@
 
 .chat-chip-list li {
   padding: 7px 12px;
-  color: #18303b;
+  color: #15243e;
   background: var(--subtle);
   border: 1px solid var(--border-soft);
   border-radius: 999px;
@@ -491,8 +508,8 @@
   max-width: 720px;
   margin: 8px 0 18px 48px;
   padding: 12px 24px 12px 12px;
-  background: #e8f3ff;
-  border: 1px solid rgba(71, 126, 171, 0.16);
+  background: #f3f4f4;
+  border: 1px solid rgba(58, 156, 145, 0.16);
   border-radius: 20px;
 }
 
@@ -632,7 +649,7 @@
 
 .button.primary {
   color: #ffffff;
-  background: linear-gradient(180deg, #263431, #17211f);
+  background: linear-gradient(180deg, #2c2e2e, #1b1d1d);
   box-shadow: 0 12px 28px rgba(37, 42, 40, 0.18);
 }
 
@@ -654,7 +671,7 @@
   width: 48px;
   height: 48px;
   color: #ffffff;
-  background: #1d2926;
+  background: #222424;
 }
 
 .button:disabled,
@@ -688,7 +705,7 @@
 
 .agent-tab[data-active="true"] {
   color: var(--ink);
-  background: #e7f0f9;
+  background: #e8f8f6;
   box-shadow: inset 0 -2px 0 var(--ink);
 }
 
@@ -718,7 +735,7 @@
   align-content: start;
   gap: 0;
   padding: 16px 0;
-  color: #60758d;
+  color: #737a79;
   background: var(--subtle);
   border-right: 1px solid var(--border-soft);
   font-size: 13px;
@@ -732,7 +749,7 @@
   min-height: 100%;
   resize: none;
   padding: 16px 18px;
-  color: #142027;
+  color: #0f1a2c;
   background: transparent;
   border: 0;
   outline: 0;
@@ -884,7 +901,6 @@
   .chat-brand-mark {
     width: 30px;
     height: 30px;
-    border-radius: 10px;
   }
 
   .chat-sidebar {

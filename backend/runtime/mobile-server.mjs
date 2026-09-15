@@ -2,7 +2,7 @@ import {createMobileApp} from './mobile-app.mjs';
 const mode=process.env.OFFERMESH_RUNTIME_MODE==='live'?'live':'offline';
 const apiKey=mode==='live'?process.env.OPENAI_API_KEY??'':'';
 const port=mode==='live'?3203:3202;
-const app=createMobileApp({mode,apiKey}),server=app.listen(port,'127.0.0.1',()=>{
+const app=createMobileApp({mode,apiKey,runtimeOptions:{negotiationDelayMs:2800,evaluationDelayMs:1000}}),server=app.listen(port,'127.0.0.1',()=>{
  console.log(`Mobile API: ${mode}; isolated in-memory SQLite; simulated checkout.`);
  if(mode==='live')console.log('Open LAN access: no pairing. Anyone who can reach the URL can use your backend LLM quota.');
 });
