@@ -15,13 +15,17 @@ for(const [name,item] of Object.entries(examples))if(item?.http)assert.deepEqual
 const ajv=new Ajv({strict:false,allErrors:true});formats(ajv);ajv.addSchema(schema);
 function valid(name,value){const check=ajv.compile({$ref:`${schema.$id}#/$defs/${name}`});assert.ok(check(value),`${name}: ${JSON.stringify(check.errors)}`);}
 valid('RequestSnapshot',fixture.snapshot);
+valid('BuyerProfile',await read('contracts/fixtures/buyer-profile.json'));
+const clarification=await read('contracts/fixtures/clarification-v0.3.json');
+valid('FormatterSummary',clarification.summary);valid('CreateRequest',clarification.create_child);
+valid('RequestSnapshot',{...examples.create_request.response,request_id:'req_clarify_child',root_request_id:'req_clarify_parent',parent_request_id:'req_clarify_parent',documents:{...examples.create_request.response.documents,revision:2}});
 for(const [name,item] of Object.entries(examples)){
  if(!item?.http)continue;
  const create=name==='create_request';valid(create?'CreateRequest':name==='accept_decision'?'AcceptDecision':'RejectDecision',item.body);
  valid(create?'RequestSnapshot':'DecisionResult',item.response);
  assert.equal(item.expected_status_code,create?202:200);
 }
-assert.deepEqual(Object.keys(openapi.paths).filter(p=>!p.includes('purchase')&&!p.includes('/improvement')).sort(),['/api/requests','/api/requests/{request_id}','/api/requests/{request_id}/decisions']);
+assert.deepEqual(Object.keys(openapi.paths).filter(p=>!p.includes('purchase')&&!p.includes('/improvement')).sort(),['/api/buyer-profile','/api/preferences','/api/requests','/api/requests/{request_id}','/api/requests/{request_id}/decisions']);
 assert.deepEqual(Object.keys(openapi.paths['/api/requests/{request_id}/decisions'].post.responses).sort(),['200','400','404','409','410','500']);
 function refs(value){if(!value||typeof value!=='object')return;for(const [key,v] of Object.entries(value)){
  if(key==='$ref'){

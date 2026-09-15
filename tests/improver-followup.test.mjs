@@ -45,6 +45,18 @@ test('ready creates exactly one frozen child with full pipeline and immutable pa
     assert.equal(f.store.db.prepare('SELECT count(*) n FROM requests WHERE parent_request_id=?').get(f.id).n,1);
   }finally{await f.store.close();}
 });
+test('follow-up preserves account weights and product colors without mutating original catalog',async()=>{
+ const f=await setup();try{
+  const weights={price:45,delivery:20,trust:20,color:15};
+  f.store.db.prepare('UPDATE requests SET ranking_weights_json=? WHERE request_id=?').run(JSON.stringify(weights),f.id);
+  const stock=f.store.db.prepare('SELECT * FROM seller_inventory').all();
+  const r=await reject(f,'這次預算改成 800 元。');assert.ok(r.next_request_id);
+  await f.store.process(r.next_request_id,'followup');const child=f.store.snapshot(r.next_request_id,'followup');
+  assert.deepEqual(child.intent.ranking_weights,weights);assert.equal(child.model,f.s.model);
+  assert.ok(child.product_details.length);for(const p of child.product_details){const stored=f.store.db.prepare('SELECT * FROM product_catalog_display WHERE product_id=?').get(p.product_id);assert.equal(p.color,stored.color);assert.equal(p.name,stored.name);}
+  assert.deepEqual(f.store.db.prepare('SELECT * FROM seller_inventory').all(),stock);
+ }finally{await f.store.close();}
+});
 
 test('clarification creates immutable successor; exact replay, stale keys and buyer scope',async()=>{
   const f=await setup();try{

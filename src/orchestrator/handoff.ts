@@ -41,6 +41,7 @@ export function toDiscoveryQuery(intent: NormalizedIntent, target?: number): Dis
     delivery_days_max: intent.delivery_days_max, required_features: [...intent.required_features],
     product_preferences: structuredClone(intent.product_preferences),
     priorities: [...intent.preferences],
+    ...(intent.ranking_weights?{ranking_weights:{...intent.ranking_weights}}:{}),
     ...(target === undefined ? {} : { target_total_twd: target }),
   };
 }

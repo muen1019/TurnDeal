@@ -1,4 +1,5 @@
 import { objectSchema } from './contracts.mjs';
+import {modelParameters} from '../models/config.mjs';
 
 export const buyerOutput = objectSchema({
   action: { type: 'string', enum: ['negotiate', 'stop'] },
@@ -45,7 +46,7 @@ export class ModelGateway {
   async decide({ role, input, schema, format, instructions, signal, audit, promptVersion = 'negotiation-1' }) {
     signal.throwIfAborted();
     if (!this.apiKey.trim()) throw new Error('model_unconfigured');
-    const body = { model: this.model, store: false, instructions,
+    const body = { model: this.model, ...modelParameters(this.model), store: false, instructions,
       input: [{ role: 'user', content: JSON.stringify(input) }],
       max_output_tokens: this.maxOutputTokens,
       text: { format: format ?? { type: 'json_schema', name: `${role}_decision`, strict: true, schema } } };

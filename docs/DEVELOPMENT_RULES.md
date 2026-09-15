@@ -2,6 +2,8 @@
 
 本文件把 hackathon 交付要求轉成 TurnDeal 的工程規則。詳細不變量同時記錄於根目錄 `AGENTS.md`；實作、文件與測試不得互相矛盾。
 
+Buyer profile 是明示 SQLite 更新；新 Request 凍結 ranking weights、模型、文件與偏好。Formatter clarification 與 versioned Improver 以 linked child／revision 接續，不改寫 parent。基本資料、地址與付款偏好不進模型。
+
 ## Hackathon 評分對應
 
 | 面向 | TurnDeal 的展示重點 |
@@ -54,6 +56,7 @@ Request processing 依序為 `formatting`、`orchestrating`、`negotiating`、`e
 - `POST /api/requests`
 - `GET /api/requests/{request_id}`
 - `POST /api/requests/{request_id}/decisions`
+- `GET /api/preferences` and `POST /api/preferences`
 - Improver status／clarification endpoints
 - Accepted Offer 的 Purchase endpoints
 

@@ -1,0 +1,18 @@
+.clarification-panel{width:100%;max-width:660px;margin:0 auto;padding:28px 24px max(28px,env(safe-area-inset-bottom));height:100%;overflow-y:auto;box-sizing:border-box;color:#172b28;}
+.formatter-source{display:inline-block;font-size:11px;color:#61766b;line-height:1.5;}
+.clarification-panel h1{font-size:30px;letter-spacing:-1px;margin:22px 0 10px;}
+.clarification-intro{font-size:13px;color:#66786e;line-height:1.7;margin:0 0 20px;}
+.clarification-request{font-size:13px;line-height:1.7;background:#eaf0e7;border-radius:16px;padding:14px 16px;margin:0 0 24px;overflow-wrap:anywhere;}
+.clarification-question{border:0;border-top:1px solid #dfe6dd;padding:20px 0 24px;margin:0;min-width:0;}
+.clarification-question legend{float:left;width:100%;font-size:15px;font-weight:600;line-height:1.7;margin-bottom:14px;overflow-wrap:anywhere;}
+.clarification-question legend>span{color:#819287;font-size:11px;margin-right:10px;font-variant-numeric:tabular-nums;}
+.quick-help{clear:both;font-size:10px;color:#738377;margin:0 0 10px;}
+.quick-answers{clear:both;display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+.quick-answers button{min-height:44px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #dce5d8;border-radius:24px;background:white;padding:8px;color:#45624f;font:inherit;font-size:13px;cursor:pointer;}
+.quick-answers button[aria-pressed=true]{background:#d5f4df;border-color:#669879;color:#1b5234;}
+.clarification-question textarea{clear:both;display:block;width:100%;box-sizing:border-box;font:inherit;font-size:16px;line-height:1.6;border:1px solid #dce5d8;border-radius:16px;background:#fff;padding:14px;color:#172b28;resize:vertical;min-height:60px;}
+.clarification-question textarea:focus-visible,.quick-answers button:focus-visible{outline:2px solid #42836a;outline-offset:3px;}
+.clarification-submit{display:flex;width:100%;align-items:center;justify-content:center;gap:16px;min-height:54px;border:0;border-radius:17px;background:#172b28;color:white;font:inherit;font-weight:600;cursor:pointer;}
+.clarification-submit:disabled{background:#e6ece2;color:#839180;cursor:default;}
+.clarification-footnote{font-size:10px;color:#738377;text-align:center;line-height:1.7;margin:14px 0 0;}
+.clarification-shell{grid-column:1/-1;height:100%;min-height:0;overflow-y:auto;}.clarification-shell>.clarification-panel{height:auto;min-height:100%;}

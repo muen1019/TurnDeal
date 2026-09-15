@@ -30,7 +30,7 @@ export function OfferDetails({snapshot, offer, ranking, pending = false, expired
         <OfferMedia offer={offer} compact />
         <div className="offer-details__summary">
           <p>{seller?.name ?? '賣家'}</p>
-          <h2 id="offer-details-title">{offerName(offer)}</h2>
+          <h2 id="offer-details-title">{offerName(offer,snapshot)}</h2>
           <div className="offer-card__labels">
             {ranking ? <StatusPill>第 {ranking.rank} 名</StatusPill> : null}
             {label ? <StatusPill tone={label === '免費配件' ? 'success' : 'neutral'}>{label}</StatusPill> : null}
@@ -50,7 +50,7 @@ export function OfferDetails({snapshot, offer, ranking, pending = false, expired
           <h3 id="offer-items-title">商品明細</h3>
           <div className="offer-list">
             {offer.items.map((item) => (
-              <ItemRow key={`${item.product_id}:${item.role}`} item={item} />
+              <ItemRow key={`${item.product_id}:${item.role}`} item={item} snapshot={snapshot} />
             ))}
           </div>
         </section>

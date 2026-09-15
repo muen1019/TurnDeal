@@ -26,7 +26,7 @@ Integrated Runtime API
 
 | 元件 | 責任 | 不負責 |
 | --- | --- | --- |
-| Frontend | 輸入、狀態輪詢、Seller／輪次呈現、Offer 採用或拒絕 | 保存權威狀態、排名、付款或商務驗證 |
+| Frontend | Buyer 設定、輸入、問答、狀態輪詢、Offer 決策、Improver 與測試結帳 | 保存權威狀態、排名、付款或商務驗證 |
 | Formatter | 合併本輪文件與固定偏好來源，產生可驗證的 `NormalizedIntent` | 更新長期偏好、捏造缺少的硬限制 |
 | Discovery | 硬條件篩選、公開資料評分、自然排名與 Sponsored display selection | 議價、使用私有底價排名 |
 | Orchestrator | 凍結需求／Catalog 來源、選擇合格 Seller、建立隔離分支 | 把完整 Backend context 傳給 Seller |
@@ -40,7 +40,7 @@ Integrated Runtime API
 
 ## Request 與文件
 
-`intent_md` 是本次交易文字；CreateRequest 的 `preference_md` 是本次固定輸入快照。Formatter 依本輪 intent、該快照及可用 SQLite preference 產生 `NormalizedIntent`，但不覆寫長期資料。詳細優先順序與尚未交付能力見 [文件語意](INTENT_PREFERENCE_SPEC.md)。
+`intent_md` 是本次交易文字；CreateRequest 的 `preference_md` 是本次固定輸入快照。Buyer profile／versioned preference 只能由明示設定或受驗證的 Improver patch 更新。Formatter 依本輪 intent、該快照及固定的 SQLite preference binding 產生 `NormalizedIntent`，但不自行學習。詳細優先順序見 [文件語意](INTENT_PREFERENCE_SPEC.md)。
 
 Request 發布後，原文、Formatter result、Discovery snapshot、Orchestration plan、每輪 commit、Offer、Evaluator result 與 decision 都以 request／revision 關聯。晚到或重送結果不得覆蓋終態。
 
@@ -72,9 +72,11 @@ Backend 為合法版本建立不可變 Offer ID。Evaluator 輸入不含 Campaig
 
 採用或拒絕使用獨立 decision 欄位，不修改已發布 snapshot。採用時重新驗證同一 Offer；拒絕保存原始 feedback 與 source documents。
 
-`selection_version: 1` 可把已拒絕 ID 集合交給 Improver。Improver 的 revision 與工作狀態獨立保存，不改寫父 Request 或已採用 Offer。只有明確且受支援的長期表述才可能建立 preference patch。
+`selection_version: 1` 可把已拒絕 ID 集合交給 Improver。Improver 的 revision 與工作狀態獨立保存，不改寫父 Request 或已採用 Offer。只有明確且受支援的長期表述才可能建立 preference patch；child 使用提交時凍結的文件、權重與模型。
 
-採用不會自動購買。Purchase API 只會為已接受且重新驗證成功的 Offer 建立 ACP test checkout；使用者還需提交 confirmation token 才完成模擬訂單。
+採用不會自動購買。Frontend 只會為已接受且重新驗證成功的 Offer 呼叫 Purchase API 建立 ACP test checkout；使用者還需檢查資料並提交 confirmation token 才完成模擬訂單。
+
+Desktop runtime 使用持久化 `data/app.sqlite`。Mobile preview／paired live mode 使用獨立 runtime 與每個瀏覽器的 demo buyer；它不是正式帳號或跨裝置資料同步。
 
 ## 持久化與恢復
 

@@ -17,7 +17,6 @@ function renderChat(overrides: Partial<ChatPanelProps> = {}) {
     onOpenOffers: vi.fn(),
     sending: false,
     unsavedDefinitions: false,
-    savedDefinitionValid: true,
     ...overrides,
   };
 
@@ -59,20 +58,23 @@ describe("ChatPanel composer", () => {
     expect(screen.getByRole("button", { name: /送出需求/ })).toBeDisabled();
   });
 
-  it("still sends with dirty saved definitions, but blocks when no saved intent is valid", () => {
+  it("allows submission with optional dirty definitions, but blocks empty drafts and pending sends", () => {
     const { props, rerender } = renderChat({
       unsavedDefinitions: true,
-      savedDefinitionValid: true,
     });
 
     fireEvent.keyDown(screen.getByRole("textbox"), { key: "Enter", code: "Enter" });
     expect(props.onSend).toHaveBeenCalledTimes(1);
 
     vi.mocked(props.onSend).mockClear();
-    rerender(<ChatPanel {...props} savedDefinitionValid={false} />);
+    rerender(<ChatPanel {...props} draft="   " />);
     fireEvent.keyDown(screen.getByRole("textbox"), { key: "Enter", code: "Enter" });
 
     expect(props.onSend).not.toHaveBeenCalled();
     expect(screen.getByRole("button", { name: /送出需求/ })).toBeDisabled();
+    rerender(<ChatPanel {...props} sending={true} />);
+    fireEvent.keyDown(screen.getByRole("textbox"), { key: "Enter" });
+    expect(props.onSend).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: /送出中/ })).toBeDisabled();
   });
 });

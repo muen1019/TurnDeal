@@ -18,6 +18,7 @@
 ## 執行模組
 
 - [Formatter](FORMATTER.md)
+- [Formatter clarification](CLARIFICATION_SPEC.md)
 - [Discovery scoring](DISCOVERY_SCORING.md)
 - [Orchestrator](ORCHESTRATOR.md)
 - [Negotiation](NEGOTIATION.md)
@@ -25,6 +26,9 @@
 - [Evaluator](EVALUATOR.md)
 - [Buyer Request Improver](IMPROVER.md)
 - [ACP 測試購買](ACP_PURCHASE.md)
+- [Buyer 初次設定](BUYER_SETUP.md)
+- [Mobile UI](MOBILE_UI.md)
+- [Mobile live mode](MOBILE_LIVE.md)
 
 ## 開發中規格
 

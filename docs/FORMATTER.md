@@ -9,6 +9,13 @@ Formatter 把本輪 `intent_md`、request-bound `preference_md` 與可用的 SQL
 - 最高預算與交期是硬限制；「800 元左右」只是軟目標，不能推論成最高預算或價格優先。
 - 缺少契約要求的預算／交期、同來源矛盾、付費配件未授權或未知必要條件時回 `needs_clarification`。
 - 原始文件、採用的偏好來源、解析結果與 warnings 保存於 SQLite；相同 idempotency key 重播同一結果。
+- Buyer profile 的顏色與 ranking weights 透過統一的 versioned preference repository 讀取；新 Request 會凍結當下版本。
+
+## 補充問答
+
+`needs_clarification` 可由前端提交完整答案。Backend 只接受同一 buyer、問題 ID 完整且不重複、原始文件相符的 parent，並建立 linked child Request；parent、原 formatter run 與問題保持不可變。
+
+快捷答案優先來自 request preference 與已保存 SQLite preference，沒有可靠來源時只能標為參考選項。目標價不能冒充預算上限，選項也不能冒充付費配件授權。
 
 ## 離線與模型模式
 
@@ -25,7 +32,7 @@ LLM formatter 使用 OpenAI Responses API、strict Structured Outputs 與 `contr
 npm run demo:formatter:secure
 ```
 
-已有受保護的 server environment 時可用 `npm run demo:formatter:llm`。預設模型是 `gpt-4.1-mini`，可用 `OPENAI_FORMATTER_MODEL` 覆寫，但須重新確認 Structured Outputs 相容性與成本。
+已有受保護的 server environment 時可用 `npm run demo:formatter:llm`。Integrated runtime 的新 Request 可從 Backend allowlist 選擇模型並凍結於 Request；獨立 Formatter demo 預設 `gpt-4.1-mini`，可用 `OPENAI_FORMATTER_MODEL` 覆寫。
 
 ## 資料與安全
 

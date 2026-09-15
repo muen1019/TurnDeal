@@ -30,6 +30,7 @@
 | `POST /api/requests` | 202 RequestSnapshot，初始 `formatting` |
 | `GET /api/requests/{request_id}` | 200 RequestSnapshot，可能包含 decision |
 | `POST /api/requests/{request_id}/decisions` | 200 accepted 或 rejected result |
+| `GET /api/preferences`／`POST /api/preferences` | 讀取或明示更新 versioned user preference |
 
 所有 POST 使用 `Idempotency-Key`。Reject 保存原始 feedback 與 source documents，不改寫 Request。Accept 保存同一個 immutable Offer；購買需另外呼叫 Purchase API。
 
@@ -43,6 +44,8 @@
 | `fixtures/marketplace-source-snapshot.json` | 公開來源快照與 synthetic 商務資料 |
 | `fixtures/happy-path.json` | 完整可重現流程 |
 | `fixtures/document-semantics.json` | Intent／preference precedence |
+| `fixtures/buyer-profile.json` | Buyer profile、ranking weights 與 request binding |
+| `fixtures/clarification-v0.3.json` | Formatter clarification／child lineage |
 | `fixtures/edge-cases.json`、`fixtures/demo-scenarios.json` | 限制、失敗與攻擊情境 |
 | `fixtures/api-examples.json` | HTTP request／response 範例 |
 

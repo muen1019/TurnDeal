@@ -69,7 +69,14 @@ describe('Improver revisions and evidence',()=>{
   });
   it('cannot drop source preference hard requirements when committing the new global snapshot',async()=>{
     const {job}=await setup('這次預算改成 800 元',{preference:'只接受黑色'});
-    expect(()=>validateCandidate(job.context,patchProposal(job.context),'llm')).toThrow('unauthorized_intent_change');
+    const valid=patchProposal(job.context);
+    expect(validateCandidate(job.context,valid,'deterministic').status).toBe('ready');
+    const dropped=structuredClone(valid);dropped.intent.markdown=dropped.intent.markdown.replace('只接受黑色','');dropped.intent.changes[0].after=dropped.intent.markdown;
+    expect(()=>validateCandidate(job.context,dropped,'llm')).toThrow('unauthorized_intent_change');
+  });
+  it('account ranking weights do not falsely invalidate a verified budget change',async()=>{
+    const {job}=await setup();job.context.hard_constraints.ranking_weights={price:70,delivery:40,trust:50,color:30};
+    expect(validateCandidate(job.context,patchProposal(job.context),'deterministic').status).toBe('ready');
   });
   it('protects required constraints inherited from SQLite even when absent from Markdown',async()=>{
     const {job}=await setup();

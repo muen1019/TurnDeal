@@ -15,19 +15,22 @@ const colors: Record<string,string> = {黑色:'black',白色:'white',粉色:'ros
 const sizes: Record<string,string> = {小尺寸:'small',中尺寸:'medium',大尺寸:'large'};
 const shapes: Record<string,string> = {左右對稱:'symmetrical',右手型:'asymmetrical_right'};
 
-function parseText(input: string, prefix: string): Parsed {
+export function parseText(input: string, prefix: string): Parsed {
+  input=input.replace(/^補充回答（[^\n）]+）：/gm,'');
   const result: Parsed = {category:false,max:[],target:[],days:[],features:[],priorities:[],products:[],questions:[],bundleDisabled:false,bundleMentioned:false};
   const normalized=input.normalize('NFKC').replace(/(?<=\d),(?=\d{3}(?:\D|$))/g,'')
     .replace(/^## 本次購買需求\s*$/gm,''); // Exact structural heading emitted by the UI, not arbitrary user headings.
   let productIndex=0;
   for (const source of normalized.split(/[，,。；;\n]/).map(s=>s.trim()).filter(Boolean)) {
-    let rest=source;
+    let rest=source==='維持原有其他條件'?'':source;
     const take=(regex:RegExp, fn:(...m:string[])=>void)=>{rest=rest.replace(regex,(...args)=>{fn(...args.slice(0,-2));return ' ';});};
     // Every unrecognized remainder blocks dispatch; negation/conditionals cannot disappear silently.
     take(/(?:最高(?:預算)?|預算上限|上限|不超過|最多|預算)\s*(?:是|為|:)?\s*(\d+)\s*(?:元|塊|TWD)?/gi,(_,n)=>result.max.push(Number(n)));
     take(/(\d+)\s*(?:元|塊)\s*(?:以內|以下)/g,(_,n)=>result.max.push(Number(n)));
     take(/(?:目標(?:價格|價)?\s*(?:是|為|:)?\s*)?(\d+)\s*(?:元|塊)?\s*(?:左右|上下)/g,(_,n)=>result.target.push(Number(n)));
     take(/(?:大約|約|目標(?:價格|價)?)\s*(\d+)\s*(?:元|塊)/g,(_,n)=>result.target.push(Number(n)));
+    // Unqualified prices are targets, not authorization to spend that maximum.
+    take(/(\d+)\s*(?:元|塊)/g,(_,n)=>result.target.push(Number(n)));
     take(/(\d+)\s*天(?:以)?內(?:到貨|送達|收到)?/g,(_,n)=>result.days.push(Number(n)));
     take(/一(?:週|周)(?:以)?內(?:到貨|送達|收到)?/g,()=>result.days.push(7));
     take(/不要(?:任何)?(?:贈品|配件|加購|滑鼠墊)/g,()=>{result.bundleDisabled=true;result.bundleMentioned=true;});

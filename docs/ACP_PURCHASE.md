@@ -1,6 +1,6 @@
 # ACP 測試購買 API
 
-ACP 測試購買實作於 Node 24 整合 runtime。後端透過 HTTP 呼叫本地 ACP 測試商家，保存 checkout、模擬付款與訂單。採用只保存選擇；另行按「確認測試購買」才提交交易。略過不建立購買。目前尚未提供購買 UI。
+ACP 測試購買實作於 Node 24 integrated runtime，前端已接入 checkout 建立、收件資料、確認、取消與訂單恢復。後端透過 HTTP 呼叫本地 ACP 測試商家並保存 checkout、模擬付款與訂單。採用只保存選擇；另行按「確認測試購買」才提交交易。略過不建立購買。
 
 這是測試交易，不會實際扣款或出貨，也不是 ChatGPT Instant Checkout。OpenAI API key 僅用於另行啟用的模型功能，不能用來取得商家交易權限或 ChatGPT 儲存的付款資料。
 

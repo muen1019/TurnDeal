@@ -9,13 +9,14 @@ page.on('pageerror',e=>errors.push(e.message));
 const out=new URL('../frontend/test-results/runtime/',import.meta.url);mkdirSync(out,{recursive:true});
 try {
   await page.goto(base+'/chat');
-  await page.getByRole('button',{name:'開啟代理設定',exact:true}).click();
-  await page.getByRole('button',{name:'儲存設定',exact:true}).click();
-  await page.getByRole('button',{name:'AI 對話',exact:true}).click();
+  // Fresh browser storage: sending must work without opening or saving settings.
   await page.getByRole('textbox',{name:'輸入購物需求',exact:true}).fill('滑鼠800元左右，預算1000元含稅運，7天內到貨。');
   const response=page.waitForResponse(r=>r.request().method()==='POST'&&r.url().endsWith('/api/requests'));
   await page.getByRole('button',{name:'送出需求',exact:true}).click();
-  const initial=await (await response).json();assert.equal(initial.status,'formatting');
+  const createdResponse=await response;
+  assert.equal(createdResponse.status(),202);
+  assert.deepEqual(createdResponse.request().postDataJSON(),{intent_md:'滑鼠800元左右，預算1000元含稅運，7天內到貨。',preference_md:''});
+  const initial=await createdResponse.json();assert.equal(initial.status,'formatting');
   await page.getByRole('button',{name:/查看.*組優惠/}).click({timeout:20000});
   await page.getByRole('heading',{name:'為你找到的優惠'}).waitFor();
   const result=await (await page.request.get(`${base}/api/requests/${initial.request_id}`)).json();

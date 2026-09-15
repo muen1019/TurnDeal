@@ -8,6 +8,8 @@ import { applySalesProfiles } from '../../scripts/lib/sales-profiles.mjs';
 import { populateNegotiationCatalog } from '../../scripts/lib/catalog-policies.mjs';
 import { createLlmFormatterService } from '../../src/formatter/llm-service.ts';
 import { createFormatterService } from '../../src/formatter/service.ts';
+import { formatterSummary, contextualAnswer, answerLabels } from '../../src/formatter/questions.ts';
+import { refinementQuestions } from '../../src/formatter/refinement.mjs';
 import { NegotiationRepository } from '../../src/negotiation/repository.mjs';
 import { negotiate } from '../../src/negotiation/manager.mjs';
 import { evaluate, recoverInterruptedEvaluations } from '../../src/evaluator/index.mjs';
@@ -15,6 +17,10 @@ import { revalidateOffers } from '../../src/evaluator/validation.mjs';
 import { assertContract } from '../../src/orchestrator/contract.ts';
 import { HttpError } from '../src/httpError.ts';
 import { prepareConfiguredHandoff } from './catalog.mjs';
+import {formatIntent} from '../../src/formatter/parser.ts';
+import {effectivePreferenceText,preferenceDocument} from '../dist/src/improver/preferences.js';
+import {selectedModel} from '../../src/models/config.mjs';
+import {UserPreferenceRepository} from '../dist/src/user-preferences.js';
 
 const active = ['formatting','orchestrating','negotiating','evaluating'];
 const fail = (status,code,message) => {throw new HttpError(status,code,message);};
@@ -39,6 +45,8 @@ export class RuntimeStore {
     }
     populateNegotiationCatalog(db);
     this.repository=new NegotiationRepository(db);
+    this.preferences=new UserPreferenceRepository({rows:(sql,args=[])=>db.prepare(sql).all(...args),
+      run:(sql,args=[])=>{db.prepare(sql).run(...args);},now:()=>new Date(this.now())});
     this.repository.recoverInterrupted();recoverInterruptedEvaluations(db);
     // Startup only: never silently repeat a paid call after a crash.
     for(const row of db.prepare('SELECT * FROM requests WHERE result_state_json IS NOT NULL').all()) {
@@ -56,6 +64,32 @@ export class RuntimeStore {
   async close(){await Promise.allSettled(this.pending.values());this.db.close();}
   transaction(work){return this.repository.transaction(work);}
   ensureBuyer(buyer){const time=new Date(this.now()).toISOString();this.db.prepare('INSERT OR IGNORE INTO users VALUES(?,?,?,?)').run(buyer,buyer,time,time);}
+  buyerProfile(buyer){
+    const row=this.db.prepare('SELECT profile_json FROM buyer_profiles WHERE user_id=?').get(buyer);
+    if(!row)return null;
+    const shipping=JSON.parse(row.profile_json),preference=this.preferences.current(buyer);
+    const parsed=formatIntent({intent_md:'買無線滑鼠，預算1000元，7天內到貨。',preference_md:effectivePreferenceText(preference)},preference.saved_preferences??[]);
+    const colors=parsed.normalized_intent?.product_preferences.filter(p=>p.attribute==='color'&&p.operator==='in').flatMap(p=>p.values)??[];
+    return {...shipping,colors,weights:preference.ranking_weights??{price:50,delivery:25,trust:25,color:0}};
+  }
+  saveBuyerProfile(buyer,profile){
+    const current=this.preferences.current(buyer),previous=this.buyerProfile(buyer);
+    let markdown=current.markdown;
+    if(JSON.stringify(previous?.colors??[])!==JSON.stringify(profile.colors)){
+      const managed=/<!-- offermesh-preference:buyer_profile_color scope=category:mouse -->\n[^\n]+\n<!-- \/offermesh-preference -->\n?/g;
+      const residue=markdown.replace(managed,'');
+      if(/黑色|白色|藍色|紅色|粉色|black|white|blue|red|rose/i.test(residue)||current.saved_preferences?.some(p=>p.attribute==='color'))
+        fail(409,'preference_color_requires_editor','顏色已設定於共用偏好文字，請在偏好編輯器修改，以免覆蓋其他條件。');
+      const labels={black:'黑色',white:'白色',blue:'藍色',red:'紅色',rose:'粉色'};
+      markdown=residue+(profile.colors.length?`\n<!-- offermesh-preference:buyer_profile_color scope=category:mouse -->\n偏好${profile.colors.map(c=>labels[c]).join('或')}\n<!-- /offermesh-preference -->\n`:'');
+    }
+    if(markdown!==current.markdown||JSON.stringify(profile.weights)!==JSON.stringify(current.ranking_weights))
+      this.preferences.insert(buyer,{...current,...preferenceDocument(markdown,current.revision+1),ranking_weights:profile.weights});
+    // Shipping/payment details are separate from the single preference document.
+    const {colors,weights,...shipping}=profile;
+    this.db.prepare('INSERT INTO buyer_profiles VALUES(?,?,?) ON CONFLICT(user_id) DO UPDATE SET profile_json=excluded.profile_json,updated_at=excluded.updated_at').run(buyer,JSON.stringify(shipping),new Date(this.now()).toISOString());
+    return {status:200,body:{profile:this.buyerProfile(buyer)}};
+  }
   snapshot(id,buyer){
     const r=this.db.prepare('SELECT result_state_json FROM requests WHERE request_id=? AND user_id=?').get(id,buyer);
     if(!r?.result_state_json)fail(404,'not_found','找不到這筆需求。');
@@ -80,13 +114,54 @@ export class RuntimeStore {
       return result;
     });
   }
-  create(buyer,documents,lineage){
+  modelFor(id){return selectedModel(this.db.prepare('SELECT llm_model FROM requests WHERE request_id=?').get(id)?.llm_model??undefined);}
+  create(buyer,documents,clarification,refinement,modelChoice,lineage){
     const id=`req_${randomUUID()}`,time=new Date(this.now()).toISOString();
-    const s={request_id:id,root_request_id:lineage?.root_request_id??id,parent_request_id:lineage?.parent_request_id??null,status:'formatting',documents:{revision:lineage?.revision??1,intent_md:documents.intent_md,preference_md:documents.preference_md},
+    const profile=this.buyerProfile(buyer);
+    let weights=profile?.weights??null;
+    let parent=null;
+    if(lineage){
+      parent=this.snapshot(lineage.parent_request_id,buyer);
+      if(parent.status!=='rejected'||parent.documents.revision>=9)fail(422,'lineage_invalid','無法建立下一輪，請開始新需求。');
+
+    }
+    if(refinement){
+      parent=this.snapshot(refinement.parent_request_id,buyer);
+      if(parent.status!=='rejected'||parent.decision?.action!=='reject')fail(409,'clarification_conflict','請先送出不適合的原因，再調整需求。');
+      if(parent.documents.revision>=8)fail(422,'clarification_limit','已達調整上限，請整合條件開始新需求。');
+      if(documents.intent_md!==parent.documents.intent_md||documents.preference_md!==parent.documents.preference_md)fail(422,'clarification_documents','不可覆寫原始文件。');
+      // Retries/reloads reuse the same durable child, never repeat a paid question call.
+      if(modelChoice&&modelChoice!==this.modelFor(parent.request_id))fail(422,'model_conflict','補充回答沿用原需求模型；更換模型請開始新需求。');
+      const child=this.db.prepare('SELECT request_id FROM requests WHERE parent_request_id=? AND user_id=?').get(parent.request_id,buyer);
+      if(child)return {status:202,body:this.snapshot(child.request_id,buyer)};
+
+    }
+    if(clarification) {
+      parent=this.snapshot(clarification.parent_request_id,buyer);
+
+      if(parent.status!=='needs_clarification'||!parent.formatter?.questions.length)fail(409,'clarification_conflict','此需求目前無法補充，請重新載入。');
+      if(parent.documents.revision>=9)fail(422,'clarification_limit','補充次數已達上限，請整合條件後開始新需求。');
+      if(documents.intent_md!==parent.documents.intent_md||documents.preference_md!==parent.documents.preference_md)fail(422,'clarification_documents','補充時不可覆寫原始文件。');
+      if(this.db.prepare('SELECT 1 FROM requests WHERE parent_request_id=?').get(parent.request_id))fail(409,'clarification_conflict','這輪已有補充結果，請回到最新的需求。');
+      const answers=clarification.answers,questions=parent.formatter.questions;
+      if(answers.length!==questions.length||new Set(answers.map(a=>a.question_id)).size!==questions.length||answers.some(a=>!questions.some(q=>q.question_id===a.question_id)))fail(422,'clarification_answers','請回答本輪所有問題，勿使用其他輪的問題 ID。');
+      const extra=questions.map(q=>`補充回答（${answerLabels[q.field]}）：${contextualAnswer(q.field,answers.find(a=>a.question_id===q.question_id).answer)}`).join('\n');
+      documents={...documents,intent_md:documents.intent_md+'\n'+extra};
+      if([...documents.intent_md].length>20000)fail(422,'clarification_limit','需求內容過長，請整理後開始新需求。');
+    }
+    const preference=lineage?.preference??this.preferences.forSubmission(buyer,parent?undefined:documents.preference_md);
+    documents={...documents,preference_md:preference.markdown};
+    weights=preference.ranking_weights??null;
+    const model=parent?this.modelFor(parent.request_id):selectedModel(modelChoice);
+    if(parent&&modelChoice&&modelChoice!==model)fail(422,'model_conflict','補充回答沿用原需求模型；更換模型請開始新需求。');
+    const s={model,request_id:id,root_request_id:parent?.root_request_id??id,parent_request_id:parent?.request_id??null,status:'formatting',documents:{revision:parent?parent.documents.revision+1:1,...documents},
       intent:null,seller_agents:[],discovery_exclusions:[],sponsored_placement:null,offers:[],ranked_offers:[],confirmation_offer_ids:[],selected_offer_id:null,next_request_id:null,error:null,decision:null};
     assertContract('RequestSnapshot',s);
     this.db.prepare(`INSERT INTO requests(request_id,user_id,parent_request_id,revision,intent_md,preference_md,normalized_intent_json,status,result_state_json,contract_version,created_at,updated_at)
       VALUES(?,?,?,?,?,?,'null','formatting',?,'0.3',?,?)`).run(id,buyer,s.parent_request_id,s.documents.revision,documents.intent_md,documents.preference_md,JSON.stringify(s),time,time);
+    this.db.prepare('UPDATE requests SET ranking_weights_json=? WHERE request_id=?').run(weights?JSON.stringify(weights):null,id);
+    this.db.prepare('UPDATE requests SET llm_model=? WHERE request_id=?').run(model,id);
+    this.preferences.bind(buyer,id,preference);
     return {status:202,body:s,scheduleRequestId:id};
   }
   process(id,buyer){
@@ -94,24 +169,36 @@ export class RuntimeStore {
     if(this.snapshot(id,buyer).status!=='formatting')return Promise.resolve();
     const promise=this.run(id,buyer).catch(()=>{
       const s=this.snapshot(id,buyer);
-      this.save({...s,status:'failed',error:{code:'processing_unavailable',message:'流程未完成。未採用任何商品，請確認服務設定後建立新需求。',fields:[]}});
+      const stage={formatting:'需求解析',orchestrating:'商品篩選',negotiating:'賣家議價',evaluating:'推薦排序'}[s.status]??'後端處理';
+      this.save({...s,status:'failed',error:{code:`processing_${active.includes(s.status)?s.status:'unavailable'}`,message:`${stage}未完成${s.offers.length?'，已有報價但尚未通過最終驗證':''}。未採用或付款，請開始新需求再試。`,fields:[]}});
     }).finally(()=>this.pending.delete(id));
     this.pending.set(id,promise);return promise;
   }
   async run(id,buyer){
     const initial=this.snapshot(id,buyer);
-    const formatterConfig={db:this.db,userId:buyer,registrations:[],timeoutMs:30000,existingRequestId:id,now:()=>new Date(this.now())};
-    const formatter=this.apiKey?createLlmFormatterService(formatterConfig,{apiKey:this.apiKey,...this.formatterOptions}):createFormatterService(formatterConfig);
+    const model=this.modelFor(id);
     const frozen=this.db.prepare('SELECT formatter_json FROM improver_workflows WHERE next_request_id=? AND buyer_id=?').get(id,buyer);
+    if(initial.parent_request_id&&!frozen){
+      const parent=this.snapshot(initial.parent_request_id,buyer);
+      if(parent.status==='rejected'){
+        const formatter=await refinementQuestions(parent,{apiKey:this.apiKey,...this.formatterOptions,model});
+        this.save({...initial,status:'needs_clarification',formatter,error:{code:'refinement_questions',message:'根據這次回饋，補充更具體的條件後重新比價；原有預算與交期仍保留。',fields:[]}});
+        return;
+      }
+    }
+    const weights=JSON.parse(this.db.prepare('SELECT ranking_weights_json FROM requests WHERE request_id=?').get(id).ranking_weights_json??'null');
+    const formatterConfig={db:this.db,userId:buyer,registrations:[],timeoutMs:30000,existingRequestId:id,now:()=>new Date(this.now()),rankingWeights:weights??undefined};
+    const formatter=this.apiKey?createLlmFormatterService(formatterConfig,{apiKey:this.apiKey,...this.formatterOptions,model}):createFormatterService(formatterConfig);
     let result;
     if(frozen){
       result=JSON.parse(frozen.formatter_json);assertContract('FormatterResult',result);
+      if(weights)result.normalized_intent={...result.normalized_intent,ranking_weights:weights};
       this.transaction(()=>{
         this.db.prepare('UPDATE requests SET normalized_intent_json=? WHERE request_id=? AND user_id=?').run(JSON.stringify(result.normalized_intent),id,buyer);
         this.db.prepare('INSERT INTO formatter_runs VALUES(?,?,?,?,?,?,?)').run(id,buyer,`http:${id}`,JSON.stringify(initial.documents),'[]',JSON.stringify(result),new Date(this.now()).toISOString());
       });
     }else ({result}=await formatter.submit({intent_md:initial.documents.intent_md,preference_md:initial.documents.preference_md,idempotency_key:`http:${id}`}));
-    let s={...initial,intent:result.normalized_intent,status:result.status==='ready'?'orchestrating':'needs_clarification',
+    let s={...initial,formatter:formatterSummary(result,initial.documents.preference_md,this.preferences.forRequest(buyer,id)?.saved_preferences??[]),intent:result.normalized_intent,status:result.status==='ready'?'orchestrating':'needs_clarification',
       error:result.status==='ready'?null:{code:'needs_clarification',message:result.questions.join(' '),fields:['intent_md']}};
     this.save(s);if(result.status!=='ready')return;
     const plan=prepareConfiguredHandoff(this.db,buyer,id,result.target_total_twd,new Date(this.now()));
@@ -119,7 +206,7 @@ export class RuntimeStore {
     if(!s.seller_agents.length){this.save({...s,status:'no_match',error:{code:'no_eligible_sellers',message:'已設定議價策略的賣家沒有符合硬條件的商品；未放寬預算或交期。',fields:[]}});return;}
     s={...s,status:'negotiating'};this.save(s);
     await negotiate({requestId:id,buyerId:buyer,orchestration:plan.orchestration,repository:this.repository,
-      apiKey:this.apiKey,now:this.now,...this.negotiationOptions,onEvent:event=>{
+      apiKey:this.apiKey,now:this.now,...this.negotiationOptions,model,onEvent:event=>{
         if(event.type==='round_committed') {
           const row=this.db.prepare('SELECT state_json FROM negotiation_commits WHERE request_id=? ORDER BY revision DESC LIMIT 1').get(id);
           const state=JSON.parse(row.state_json);
@@ -128,8 +215,8 @@ export class RuntimeStore {
         }
       }});
     this.save({...s,status:'evaluating'});
-    const evaluated=await evaluate({db:this.db,requestId:id,buyerId:buyer,apiKey:this.apiKey,now:this.now,...this.evaluatorOptions});
-    this.transaction(()=>{this.projectOffers(evaluated.snapshot);this.save(evaluated.snapshot);});
+    const evaluated=await evaluate({db:this.db,requestId:id,buyerId:buyer,apiKey:this.apiKey,now:this.now,...this.evaluatorOptions,model});
+    this.transaction(()=>{this.projectOffers(evaluated.snapshot);this.save({...evaluated.snapshot,formatter:s.formatter,model});});
   }
   projectOffers(s){
     for(const b of s.seller_agents)this.db.prepare(`INSERT OR IGNORE INTO request_sellers(request_id,seller_id,listing_rank,match_reason,candidate_products_json,status,final_offer_ids_json,stop_reason)

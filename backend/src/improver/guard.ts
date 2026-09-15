@@ -1,7 +1,7 @@
 import {normalizeIntent} from '../mockResultProvider.js';
 import type {NormalizedIntent} from '../types.js';
 import type {Candidate, ImprovementContext, IntentNormalizer, PreferenceDocument, RevisionProposal} from './types.js';
-import {applyPreferencePatch, supportedStatements} from './preferences.js';
+import {applyPreferencePatch, supportedStatements, effectivePreferenceText} from './preferences.js';
 import {parseProposal} from './schema.js';
 
 export const clarificationQuestion = '請說明這次哪些條件需要改變，例如新的預算上限、交期或商品偏好；未明示的硬條件會保留。';
@@ -21,6 +21,7 @@ export function fallback(context: ImprovementContext, reason: string): Candidate
 /** Deliberately bounded directives. Unrecognized language does not authorize a hard-constraint change. */
 export function authorizedIntent(context: ImprovementContext): {markdown:string;recognized:boolean} {
   let markdown=context.source_documents.intent_md;
+  if(context.request_preference_revision===null&&context.global_preference.revision===0&&context.source_documents.preference_md.trim())markdown+='\n'+context.source_documents.preference_md.trim();
   let recognized=true;
   const feedback=context.evidence.find(e=>e.kind==='user_feedback');
   const statements=supportedStatements(context.evidence);
@@ -46,21 +47,14 @@ export function authorizedIntent(context: ImprovementContext): {markdown:string;
 }
 
 function semantic(intent: NormalizedIntent): string {
-  return JSON.stringify({...intent,required_features:[...intent.required_features].sort(),
+  // Ranking weights are a separately frozen account setting, never a text-authorized hard constraint.
+  const {ranking_weights:_weights,...purchaseIntent}=intent;
+  return JSON.stringify({...purchaseIntent,required_features:[...intent.required_features].sort(),
     product_preferences:intent.product_preferences.map(({source_text,preference_id,...p})=>p).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b)))});
 }
 function hardSemantic(intent:NormalizedIntent):string {
   return semantic({...intent,preferences:[],product_preferences:intent.product_preferences.filter(p=>p.strength==='required')});
 }
-function effectivePreferenceSupported(preference: PreferenceDocument): boolean {
-  const unmanaged=preference.markdown.replace(/<!-- offermesh-preference:[\s\S]*?<!-- \/offermesh-preference -->/g,'').replace(/^\s*#{1,6}[^\n]*$/gm,'').trim();
-  return !unmanaged && preference.entries.every(e=>e.scope==='category:mouse_pad' || ['偏好小尺寸','價格優先'].includes(e.value));
-}
-
-function effectivePreferenceText(preference: PreferenceDocument): string {
-  return preference.entries.filter(e=>e.scope==='all_categories'||e.scope==='category:mouse').map(e=>e.value).join('\n');
-}
-
 export function validateCandidate(context: ImprovementContext, value: unknown, provider: Candidate['provider'],normalize:IntentNormalizer=normalizeIntent): Candidate {
   const proposal=parseProposal(value);
   const evidenceIds=new Set(context.evidence.map(e=>e.evidence_id));
@@ -72,20 +66,24 @@ export function validateCandidate(context: ImprovementContext, value: unknown, p
   const audit:string[]=[];
   if(proposal.preference.action==='patch'){
     if(proposal.preference.base_revision!==preference.revision)throw new Error('preference_base_revision_invalid');
-    const applied=applyPreferencePatch(preference,proposal.preference.operations,context.evidence);
+    let validatedProse=false;
+    try{normalize({...context.source_documents,preference_md:effectivePreferenceText(preference)},preference.saved_preferences,preference.ranking_weights);validatedProse=!preference.issues?.length;}catch{ /* Unknown prose remains protected. */ }
+    const applied=applyPreferencePatch(preference,proposal.preference.operations,context.evidence,validatedProse);
     preference=applied.document;audit.push(...applied.audit);
   }
   const authorized=authorizedIntent(context);
   let ready=false;
   try{
-    const expected=normalize({...context.source_documents,intent_md:authorized.markdown});
-    // Validate the actual effective documents, not the obsolete request preference snapshot.
-    const candidate=normalize({...context.source_documents,intent_md:proposal.intent.markdown,preference_md:effectivePreferenceText(preference)});
+    if(preference.issues?.length)throw new Error('formatter_unsupported');
+    const baseline=normalize({...context.source_documents,preference_md:effectivePreferenceText(context.global_preference)},context.global_preference.saved_preferences,context.global_preference.ranking_weights);
+    const expected=normalize({...context.source_documents,intent_md:authorized.markdown,preference_md:effectivePreferenceText(preference)},preference.saved_preferences,preference.ranking_weights);
+    const candidate=normalize({...context.source_documents,intent_md:proposal.intent.markdown,preference_md:effectivePreferenceText(preference)},preference.saved_preferences,preference.ranking_weights);
     if(semantic(candidate)!==semantic(expected))throw new Error('unauthorized_intent_change');
     // Also protect inherited constraints that were normalized from SQLite, not visible in source Markdown.
-    const permittedHard={...context.hard_constraints,max_total_twd:expected.max_total_twd,delivery_days_max:expected.delivery_days_max};
+    const inherited=context.request_preference_revision!==context.global_preference.revision&&(context.request_preference_revision!==null||context.global_preference.revision>0)?baseline:context.hard_constraints;
+    const permittedHard={...inherited,max_total_twd:expected.max_total_twd,delivery_days_max:expected.delivery_days_max};
     if(hardSemantic(candidate)!==hardSemantic(permittedHard))throw new Error('unauthorized_intent_change');
-    ready=authorized.recognized && semantic(expected)!==semantic(context.hard_constraints) && effectivePreferenceSupported(preference);
+    ready=authorized.recognized && (semantic(expected)!==semantic(baseline)||preference.markdown!==context.global_preference.markdown);
     // A dropped preference patch cannot authorize an unrelated intent change: expected derives only from user evidence.
   }catch(error){
     if(error instanceof Error && error.message==='unauthorized_intent_change')throw error;

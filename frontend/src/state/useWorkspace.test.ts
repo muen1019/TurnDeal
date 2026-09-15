@@ -1,4 +1,4 @@
-import { act, renderHook, waitFor } from "@testing-library/react";
+import { act, cleanup, renderHook, waitFor } from "@testing-library/react";
 import { createElement, StrictMode, type ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import apiExamples from "../../../contracts/fixtures/result-api-v0.3.json";
@@ -18,11 +18,81 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  cleanup();
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 });
 
 describe("useWorkspace pending recovery", () => {
+  it('clears every local draft, preserves settings and blocks clearing processing requests',()=>{
+    const {result}=renderHook(()=>useWorkspace());
+    act(()=>result.current.patch(result.current.active.id,{draft:'private draft'}));
+    act(()=>result.current.newConversation());
+    const definitions=result.current.workspace.definitions;
+    act(()=>result.current.clearHistory());
+    expect(result.current.workspace.conversations).toHaveLength(1);
+    expect(result.current.workspace.definitions).toEqual(definitions);
+    expect(sessionStorage.getItem(storageKey)).not.toContain('private draft');
+    act(()=>result.current.patch(result.current.active.id,{snapshot:validateSnapshot(createResponse)}));
+    const frozen=result.current.workspace;
+    act(()=>result.current.clearHistory());expect(result.current.workspace).toBe(frozen);
+  });
+  it('deletes one local conversation, preserves others, and replaces the last with a fresh draft',()=>{
+    const {result}=renderHook(()=>useWorkspace());
+    const first=result.current.active.id;
+    act(()=>result.current.patch(first,{draft:'temporary'}));
+    act(()=>result.current.newConversation());const second=result.current.active.id;
+    act(()=>result.current.deleteConversation(first));
+    expect(result.current.workspace.conversations.map(c=>c.id)).toEqual([second]);
+    expect(sessionStorage.getItem(storageKey)).not.toContain('temporary');
+    act(()=>result.current.deleteConversation(second));
+    expect(result.current.workspace.conversations).toHaveLength(1);expect(result.current.active.requestId).toBeNull();expect(result.current.active.id).not.toBe(second);
+  });
+  it('preserves parent documents and answer drafts while creating a clarification child',async()=>{
+    const parent={...createResponse,status:'needs_clarification',formatter:{provider:'rules',model:null,questions:[{question_id:'q_0',field:'budget',text:'最高預算？',suggestions:[]}]}};
+    const child={...createResponse,request_id:'req_child',root_request_id:parent.request_id,parent_request_id:parent.request_id,documents:{...parent.documents,revision:2}};
+    const workspace=workspaceWithRequest(validateSnapshot(parent));
+    workspace.conversations[0].snapshot=validateSnapshot(parent);
+    sessionStorage.setItem(storageKey,JSON.stringify(workspace));
+    const fetchMock=mockFetch((url,init)=>init?.method==='POST'?jsonResponse(child,202):jsonResponse(String(url).includes('req_child')?{...child,status:'failed'}:parent));
+    const {result}=renderHook(()=>useWorkspace());
+    await waitFor(()=>expect(result.current.verified).toBe(parent.request_id));
+    act(()=>result.current.patch(result.current.active.id,{clarificationDraft:{requestId:parent.request_id,answers:{q_0:'1000'}}}));
+    expect(JSON.parse(sessionStorage.getItem(storageKey)!).conversations[0].clarificationDraft.answers.q_0).toBe('1000');
+    act(()=>{result.current.answerClarification();result.current.answerClarification();});
+    await waitFor(()=>expect(result.current.active.requestId).toBe('req_child'));
+    expect(postCalls(fetchMock)).toHaveLength(1);
+    expect(JSON.parse(String(postCalls(fetchMock)[0][1]?.body))).toEqual({intent_md:parent.documents.intent_md,preference_md:parent.documents.preference_md,clarification:{parent_request_id:parent.request_id,answers:[{question_id:'q_0',answer:'1000'}]}});
+  });
+  it("submits in a fresh workspace without saving or injecting optional definitions", async () => {
+    const fetchMock = mockFetch((_, init) => init?.method === 'POST'
+      ? jsonResponse(createResponse, 202) : jsonResponse(fixture.snapshot));
+    const {result} = renderHook(() => useWorkspace());
+    expect(result.current.workspace.definitions).toEqual({intent:'',preference:'',savedIntent:'',savedPreference:'',version:0});
+    act(() => {
+      result.current.patch(result.current.active.id, {draft:'  買滑鼠，預算1000元，7天內到貨。  '});
+      result.current.send();
+    });
+    await waitFor(() => expect(result.current.active.requestId).toBe(createResponse.request_id));
+    expect(postCalls(fetchMock)).toHaveLength(1);
+    expect(JSON.parse(String(postCalls(fetchMock)[0][1]?.body))).toEqual({intent_md:'買滑鼠，預算1000元，7天內到貨。',preference_md:''});
+  });
+
+  it("saves preference-only settings and allows clearing them without changing requests", () => {
+    const {result} = renderHook(() => useWorkspace());
+    act(() => result.current.update(w => ({...w,definitions:{...w.definitions,preference:'喜歡黑色'}})));
+    act(() => result.current.saveDefinitions());
+    expect(result.current.error).toBe('');
+    expect(result.current.workspace.definitions.savedIntent).toBe('');
+    expect(result.current.workspace.definitions.savedPreference).toBe('喜歡黑色');
+    act(() => result.current.update(w => ({...w,definitions:{...w.definitions,preference:''}})));
+    act(() => result.current.saveDefinitions());
+    expect(result.current.workspace.definitions.savedPreference).toBe('');
+    expect(result.current.workspace.definitions.version).toBe(2);
+    expect(result.current.active.requestId).toBeNull();
+    expect(JSON.parse(sessionStorage.getItem(storageKey)!).definitions.savedPreference).toBe('');
+  });
+
   it("keeps the old saved definitions and draft when saveDefinitions cannot write storage", () => {
     const workspace = workspaceWithRequest(null);
     workspace.definitions = {
@@ -424,7 +494,7 @@ describe("useWorkspace decision guards", () => {
     );
   });
 
-  it("keeps the original requirement and records feedback after a successful reject", async () => {
+  it("keeps original feedback and starts exactly one refinement child after reject", async () => {
     sessionStorage.setItem(
       storageKey,
       JSON.stringify(workspaceWithRequest(validateSnapshot(structuredClone(fixture.snapshot)))),
@@ -432,6 +502,7 @@ describe("useWorkspace decision guards", () => {
 
     let committed=false;
     const fetchMock = mockFetch((path, init) => {
+      if(init?.method==='POST'&&path==='/api/requests')return new Promise<Response>(()=>{});
       if (init?.method === "POST") {
         committed=true;
         return jsonResponse(rejectResponse, 200);
@@ -458,7 +529,9 @@ describe("useWorkspace decision guards", () => {
     expect(result.current.active.message).toBe("quiet mouse");
     expect(result.current.active.feedbackHistory).toEqual([rejectResponse.feedback]);
     expect(result.current.active.snapshot?.decision).toEqual(rejectResponse);
-    expect(postCalls(fetchMock)).toHaveLength(1);
+    await waitFor(()=>expect(postCalls(fetchMock)).toHaveLength(2));
+    expect(JSON.parse(String(postCalls(fetchMock)[1][1]?.body))).toEqual({intent_md:fixture.snapshot.documents.intent_md,preference_md:fixture.snapshot.documents.preference_md,refinement:{parent_request_id:'req_demo_001'}});
+    expect(result.current.active.refinementRequested).toBe(false);
   });
 
   it("clears a reject HTTP 400 journal while preserving feedback and the published snapshot", async () => {

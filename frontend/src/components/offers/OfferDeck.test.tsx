@@ -105,6 +105,25 @@ beforeEach(() => {
 afterEach(() => cleanup());
 
 describe('OfferDeck gestures', () => {
+  it('keeps dragging when touch capture transfers from a child to the shell', () => {
+    const {shell, props} = renderDeck();
+    const child = shell.querySelector('figure')!;
+    pointer(child, 'pointerdown', {pointerId: 7, clientX: 250, clientY: 50});
+    pointer(child, 'pointermove', {pointerId: 7, clientX: 230, clientY: 50});
+    pointer(child, 'lostpointercapture', {pointerId: 7, clientX: 230, clientY: 50});
+    pointer(shell, 'pointermove', {pointerId: 7, clientX: 50, clientY: 50});
+    pointer(shell, 'pointerup', {pointerId: 7, clientX: 50, clientY: 50});
+    expect(props.onSkip).toHaveBeenCalledOnce();
+  });
+
+  it('cancels if the shell itself actually loses pointer capture', () => {
+    const {shell, props} = renderDeck();
+    pointer(shell, 'pointerdown', {pointerId: 7, clientX: 250, clientY: 50});
+    pointer(shell, 'pointermove', {pointerId: 7, clientX: 50, clientY: 50});
+    pointer(shell, 'lostpointercapture', {pointerId: 7, clientX: 50, clientY: 50});
+    pointer(shell, 'pointerup', {pointerId: 7, clientX: 50, clientY: 50});
+    expect(props.onSkip).not.toHaveBeenCalled();
+  });
   it('accepts at exactly 25 percent of pointerdown width', () => {
     const onAccept = vi.fn();
     const {shell, props} = renderDeck({onAccept});

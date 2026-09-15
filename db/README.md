@@ -35,7 +35,8 @@ npm run db:seed:policies
 ## 資料區域
 
 - Catalog／Seller：sources、products、inventory、terms、campaigns、Persona、SKU policies、benefits 與 listing bindings。
-- Request／Formatter：documents、NormalizedIntent、formatter runs 與固定偏好來源。
+- Buyer／preferences：shipping profile、versioned Markdown／product preferences／ranking weights 與 request bindings。
+- Request／Formatter：documents、selected model、NormalizedIntent、formatter runs 與固定偏好來源。
 - Discovery／Orchestrator：Catalog snapshots、ranking runs 與 handoff plans。
 - Negotiation：runs、round commits、Offer versions 與 shared context。
 - Evaluation／Result：evaluation runs、published snapshots 與獨立 decision state。
@@ -53,4 +54,4 @@ npm run db:seed:policies
 - 啟動只恢復有明確 durable semantics 的工作；不能重送結果未知且可能已有副作用的操作。
 - 舊 layout 以 migration 升級並保留歷史價格；不要透過重新 seed 偽造遷移。
 
-Preference 欄位存在不代表 UI、Formatter 與 Improver 的所有版本庫已完全同步。現行界線見 [intent／preference 規格](../docs/INTENT_PREFERENCE_SPEC.md)。
+Buyer profile、Formatter 與 Improver 共用 versioned preference repository；每個 Request 另存固定 binding。Browser chat drafts 仍不屬於這個持久層。現行界線見 [intent／preference 規格](../docs/INTENT_PREFERENCE_SPEC.md)。

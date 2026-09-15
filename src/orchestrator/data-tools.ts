@@ -12,6 +12,7 @@ export type ProductPreference = {
 } & ({ attribute: 'size_class' | 'color' | 'shape'; operator: 'in' | 'not_in'; values: string[] }
   | { attribute: 'length_mm' | 'width_mm' | 'height_mm'; operator: 'range'; min: number | null; max: number | null });
 export type NormalizedIntent = {
+  ranking_weights?: {price:number;delivery:number;trust:number;color:number};
   category: 'mouse'; max_total_twd: number; delivery_days_max: number;
   required_features: string[]; preferences: ('price_first' | 'delivery_first' | 'trust_first' | 'after_sales_first')[];
   product_preferences: ProductPreference[];

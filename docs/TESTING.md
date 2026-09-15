@@ -56,9 +56,11 @@ npm run test:e2e:full:live
 
 ```powershell
 node tests/runtime-browser.mjs
+node tests/turndeal-browser.mjs
+node tests/mobile-browser.mjs
 ```
 
-可用 `OFFERMESH_BROWSER_CHANNEL=chrome` 改用 Chrome。瀏覽器測試建立隔離需求並模擬採用，不會付款。輸出只供本地除錯，不提交 Git。
+可用 `OFFERMESH_BROWSER_CHANNEL=chrome` 改用 Chrome。TurnDeal browser suite 覆蓋 clarification → Improver child → accept → simulated checkout → reload recovery；mobile suite 覆蓋 responsive journey。它們使用隔離資料與模擬付款，輸出只供本地除錯。
 
 ## 驗收原則
 
