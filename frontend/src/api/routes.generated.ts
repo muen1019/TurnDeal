@@ -1,5 +1,7 @@
 /* Generated from backend/openapi.json. */
 export const apiPaths = {
+  "getBuyerProfile": "/api/buyer-profile",
+  "saveBuyerProfile": "/api/buyer-profile",
   "createRequest": "/api/requests",
   "getRequestResult": "/api/requests/{request_id}",
   "submitDecision": "/api/requests/{request_id}/decisions",
@@ -9,5 +11,8 @@ export const apiPaths = {
   "updatePurchase": "/api/purchases/{purchase_id}/checkout",
   "completePurchase": "/api/purchases/{purchase_id}/complete",
   "cancelPurchase": "/api/purchases/{purchase_id}/cancel",
-  "getRequestImprovement": "/api/requests/{request_id}/improvement"
+  "getRequestImprovement": "/api/requests/{request_id}/improvement",
+  "clarifyImprovement": "/api/requests/{request_id}/improvement/clarifications",
+  "getUserPreference": "/api/preferences",
+  "updateUserPreference": "/api/preferences"
 } as const;

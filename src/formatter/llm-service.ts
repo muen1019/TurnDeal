@@ -2,6 +2,8 @@ import { createFormatterService } from './service.ts';
 import type { SubmitText } from './service.ts';
 import { createLlmFormatter,mergeSaved } from './llm.ts';
 import { assertContract } from '../orchestrator/contract.ts';
+import {preferenceStore} from './preference-store.ts';
+import {effectivePreferenceText,preferenceDocument} from '../../backend/dist/src/improver/preferences.js';
 
 export function createLlmFormatterService(options:Parameters<typeof createFormatterService>[0],
   providerOptions:Parameters<typeof createLlmFormatter>[0]={}) {
@@ -10,8 +12,11 @@ export function createLlmFormatterService(options:Parameters<typeof createFormat
   const pending=new Map<string,{input:string;promise:ReturnType<typeof execute>}>();
   async function execute(args:SubmitText) {
     const input={intent_md:args.intent_md,preference_md:args.preference_md??''};
-    const result=await extract(input); // No SQLite transaction held over network await.
-    return createFormatterService({...options,formatter:(_,saved)=>mergeSaved(result,saved)}).submit(args);
+    const profiles=preferenceStore(options.db,options.now);
+    const profile=(options.existingRequestId?profiles.forRequest(options.userId,options.existingRequestId):null)??profiles.current(options.userId);
+    const projected=profile.revision===0?preferenceDocument(input.preference_md,0):profile;
+    const result=await extract({...input,preference_md:effectivePreferenceText(projected)},profile.saved_preferences??[]); // No SQLite transaction held over network await.
+    return createFormatterService({...options,preferenceSnapshot:profile,formatter:(_,saved)=>mergeSaved(result,saved)}).submit(args);
   }
   async function submit(args:SubmitText) {
     const input={intent_md:args.intent_md,preference_md:args.preference_md??''};

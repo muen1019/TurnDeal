@@ -3,9 +3,13 @@
   "info": {
     "title": "OfferMesh Result API",
     "version": "0.3.0",
-    "description": "Deterministic mock offers, durable accept/reject and recoverable Buyer Agent handoff. Fixed local demo buyer. No model rewriting or redemption."
+    "description": "Integrated runtime: Formatter, negotiation, evaluation and durable decisions. POST requests optionally accepts clarification (answers) OR refinement (questions after rejection) to create an immutable parent-linked child. See docs/HISTORY_REFINEMENT.md. Legacy mock rejects both extensions. Fixed local demo buyer; no payment or redemption."
   },
   "servers": [
+    {
+      "url": "http://127.0.0.1:3201",
+      "description": "整合 runtime（專案根目錄 npm run dev:secure）"
+    },
     {
       "url": "http://127.0.0.1:3001",
       "description": "本機 backend（npm run dev）"
@@ -21,6 +25,63 @@
   ],
   "security": [],
   "paths": {
+    "/api/buyer-profile": {
+      "description": "Local integrated runtime only (3201). Fixed demo buyer; no authentication or payment processing. Basic details never enter model inputs.",
+      "get": {
+        "operationId": "getBuyerProfile",
+        "responses": {
+          "200": {
+            "description": "Saved buyer profile or null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/BuyerProfileResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "saveBuyerProfile",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/BuyerProfile"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Persisted profile; same key and body replays unchanged.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/BuyerProfileResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
     "/api/requests": {
       "post": {
         "operationId": "createRequest",
@@ -44,7 +105,7 @@
         },
         "responses": {
           "202": {
-            "description": "Persisted formatting snapshot; mock generation runs independently of GET.",
+            "description": "Persisted formatting snapshot; processing runs independently of GET. Clarification creates a parent-linked child without modifying the parent.",
             "content": {
               "application/json": {
                 "schema": {
@@ -56,8 +117,21 @@
           "400": {
             "$ref": "#/components/responses/BadRequest"
           },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
           "409": {
             "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "description": "Clarification answers, original documents or revision/length limit are invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           },
           "500": {
             "$ref": "#/components/responses/InternalError"
@@ -1213,6 +1287,65 @@
           }
         }
       }
+    },
+    "/api/preferences": {
+      "get": {
+        "operationId": "getUserPreference",
+        "responses": {
+          "200": {
+            "description": "The authenticated user's current preference version.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPreference"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "operationId": "updateUserPreference",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserPreference"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The authenticated user's current preference version.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPreference"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1319,6 +1452,12 @@
       },
       "DecisionResult": {
         "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/DecisionResult"
+      },
+      "UserPreference": {
+        "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/UserPreference"
+      },
+      "UpdateUserPreference": {
+        "$ref": "../contracts/a2a-commerce.v0.3.schema.json#/$defs/UpdateUserPreference"
       }
     }
   }

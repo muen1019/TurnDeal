@@ -2,12 +2,15 @@ import { randomUUID } from 'node:crypto';
 import type { DatabaseSync } from 'node:sqlite';
 import type { ProductPreference } from './data-tools.ts';
 import { matchesPreference, validatePreferences } from './preferences.ts';
+import {assertContract} from './contract.ts';
+import type {RankingWeights} from './weighted.ts';
 import { serviceScore, includedServices } from './service-score.mjs';
 
 export type PublicService = { benefit_id:string; kind:string; duration_days:number; conditions:string;
   evidence_id:string; simulation:boolean; commitment:'included'|'negotiable'; valid_until:string|null };
 
 export type DiscoveryQuery = {
+  ranking_weights?: RankingWeights;
   category: 'mouse'; target_total_twd?: number; max_total_twd?: number;
   required_features?: string[]; required_attributes?: Record<string, string>;
   preferred_attributes?: Record<string, string>; delivery_days_max?: number;
@@ -37,6 +40,7 @@ export const ratingScore = (rating: number | null, count: number) =>
   (((rating ?? 4) * (rating === null ? 0 : count) + 4 * 20) / ((rating === null ? 0 : count) + 20)) * 20;
 
 function validate(q: DiscoveryQuery, now: string) {
+  if(q?.ranking_weights)assertContract('RankingWeights',q.ranking_weights);
   if (!q || q.category !== 'mouse')
     throw new Error('invalid_argument: category=mouse required');
   if (q.product_preferences !== undefined) validatePreferences(q.product_preferences);
@@ -64,8 +68,10 @@ export function rankCandidates(catalog: Catalog, query: DiscoveryQuery, now: str
   const productPreferences = query.product_preferences ?? [];
   const soft = productPreferences.filter(p => p.strength === 'preferred');
   const preferenceCount = preferred.length + soft.length;
+  const custom=query.ranking_weights&&!query.priorities?.length?query.ranking_weights:null;
+  const colors=soft.filter(p=>p.attribute==='color');
   const lowestPrice = query.priorities?.includes('price_first');
-  const base = { price: query.target_total_twd === undefined && !lowestPrice ? 0 : .45,
+  const base = custom?{price:custom.price,delivery:custom.delivery,seller_rating:custom.trust,product_rating:0,preference:colors.length?custom.color:0,after_sales:0}:{ price: query.target_total_twd === undefined && !lowestPrice ? 0 : .45,
     preference: preferenceCount ? .25 : 0, product_rating: .15, seller_rating: .10, delivery: .05,
     after_sales: query.priorities?.includes('after_sales_first') ? .60 : 0 };
   // Named trade priorities double their active weight before normalization.
@@ -73,7 +79,7 @@ export function rankCandidates(catalog: Catalog, query: DiscoveryQuery, now: str
   if (query.priorities?.includes('delivery_first')) base.delivery *= 2;
   if (query.priorities?.includes('trust_first')) base.seller_rating *= 2;
   const activeWeight = Object.values(base).reduce((sum, value) => sum + value, 0);
-  const weights = Object.fromEntries(Object.entries(base).map(([key, value]) => [key, value / activeWeight])) as typeof base;
+  const weights = Object.fromEntries(Object.entries(base).map(([key, value]) => [key, activeWeight?value / activeWeight:0])) as typeof base;
   const excluded: { listing_id: string; reasons: string[] }[] = [];
   const scored = catalog.listings.flatMap(listing => {
     const seller = catalog.sellers.find(s => s.seller_id === listing.seller_id);
@@ -100,6 +106,12 @@ export function rankCandidates(catalog: Catalog, query: DiscoveryQuery, now: str
       delivery: clamp(100 * (8 - listing.delivery_days) / 7),
       after_sales: serviceScore(includedServices(listing.public_services,now)),
     };
+    if(custom){
+      if(query.target_total_twd===undefined)scores.price=total===null||!query.max_total_twd?0:clamp(100*(1-total/query.max_total_twd));
+      scores.delivery=clamp(100*(1-(listing.delivery_days-1)/(query.delivery_days_max??7)));
+      scores.seller_rating=(seller.rating??3)/5*100;
+      scores.preference=colors.length&&colors.every(p=>matchesPreference(listing.attributes,p))?100:0;
+    }
     const score = Object.entries(weights).reduce((sum,[k,w]) => sum + scores[k as keyof typeof scores] * w, 0);
     return [{ listing, seller, total_price_twd: total, scores, score, violations,
       candidate_status: violations.length ? 'alternative_requires_confirmation' as const : 'qualified' as const,
@@ -107,7 +119,7 @@ export function rankCandidates(catalog: Catalog, query: DiscoveryQuery, now: str
       pending_checks: total === null ? ['total_price_unknown'] : [],
       price_difference_twd: total === null || query.target_total_twd === undefined ? null : total - query.target_total_twd,
       selection_reasons: [...(query.priorities?.includes('after_sales_first') ? [includedServices(listing.public_services,now).length ? `已登錄售後條件分數 ${scores.after_sales.toFixed(2)}` : '售後資料未知，未推定服務能力'] : []), `偏好命中 ${matchCount}/${preferenceCount}`, total === null ? '含稅運總價待確認' : `含稅運 ${total} 元`,
-        lowestPrice ? '明確偏好低價：含稅運越低，價格分數越高' : query.target_total_twd === undefined ? '未設定目標價格，價格不參與評分' : `目標 ${query.target_total_twd} 元`],
+        custom ? '套用已儲存偏好權重' : lowestPrice ? '明確偏好低價：含稅運越低，價格分數越高' : query.target_total_twd === undefined ? '未設定目標價格，價格不參與評分' : `目標 ${query.target_total_twd} 元`],
     }];
   });
   // Hard-constraint compliant candidates always precede explicitly labelled alternatives.

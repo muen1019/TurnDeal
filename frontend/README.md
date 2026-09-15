@@ -1,18 +1,18 @@
 # TurnDeal frontend
 
-React／TypeScript／Vite 單頁介面，提供 Chat、request-bound 設定、Agent 階段、Seller／輪次狀態、Offer cards、details、accept／reject 與 reload recovery。
+React／TypeScript／Vite 單頁介面，包含初次 Buyer 設定、直接需求輸入、模型選擇、Formatter 問答、Agent 進度、Seller／輪次狀態、Offer swipe、versioned Improver、歷史紀錄與 ACP 測試結帳。
 
-完整應用請從 repository root 使用 Node 24 啟動：
+## 啟動
+
+完整應用從 repository root 使用 Node 24：
 
 ```powershell
 npm run dev
 ```
 
-前端會在 <http://127.0.0.1:5173/chat> 開啟，並把 `/api` 代理到 integrated runtime 的 3201 port。Live model 模式使用 root 的 `npm run dev:secure`；API key 不得進入 Vite environment。
+開啟 <http://127.0.0.1:5173/chat>；`/api` 代理到 integrated runtime 3201。Live model 使用 root `npm run dev:secure`，API key 不得進入 Vite environment。
 
-## 獨立啟動
-
-Frontend package 使用 Node 20.19.5：
+Frontend package 使用 Node 20.19.5。若單獨啟動：
 
 ```powershell
 npm ci
@@ -20,32 +20,29 @@ $env:OFFERMESH_API_ORIGIN = 'http://127.0.0.1:3201'
 npm run dev
 ```
 
-`OFFERMESH_API_ORIGIN` 不含 `/api`。HTTP 定義來自 [OpenAPI](../backend/openapi.json)，資料型別與 runtime validation 使用 [v0.3 contract](../contracts/a2a-commerce.v0.3.schema.json)；`npm run generate:types` 更新生成檔。
+`OFFERMESH_API_ORIGIN` 不含 `/api`。HTTP 定義來自 [OpenAPI](../backend/openapi.json)，型別與 runtime validation 使用 [v0.3 contract](../contracts/a2a-commerce.v0.3.schema.json)；`npm run generate:types` 更新生成檔。
 
-程式碼中的 `OFFERMESH_*` 是相容性環境變數名稱。
+## UI workflow
 
-## UI 行為
+- 首次進入明示保存 Buyer profile、收件資料、偏好權重與顏色；基本資料不進模型。
+- Chat 可直接提交本次需求，不必先儲存 intent template。已儲存 template／preference 才會套用。
+- UI 依 `RequestSnapshot.status` 顯示 formatting、orchestrating、negotiating、evaluating 與結果，不用假計時器推測完成。
+- `needs_clarification` 顯示 Backend 問題與可編輯快捷答案，回答後建立 linked child Request。
+- 左滑保存在本機 skipped state；右滑或按鈕提交 versioned accept。全部拒絕可啟動 Improver，但不能同時建立 legacy refinement child。
+- `next_request_id` 非空才開啟改善後的新一輪。
+- Accepted Offer 可進入測試結帳，保存收件資料、明確確認或取消，並從權威 Purchase state 恢復。
+- POST recovery journal 保存 stable key／exact body；未知結果鎖定重複操作並核對原提交。
+- 歷史清除只刪除本分頁 sessionStorage，不刪 SQLite Request、Offer、decision 或 purchase audit。
 
-- Chat 把已儲存的 session template 與本次輸入組成 CreateRequest；它不是帳戶長期偏好。
-- UI 依 `RequestSnapshot.status` 顯示 formatting、orchestrating、negotiating、evaluating 與結果。
-- 左滑只保存在本機 skipped state；全部略過並明確送出才建立 reject decision。
-- 右滑或「立即採用」提交 accept；成功後顯示 decision summary。
-- POST journal 保存 exact key／body，未知結果時先用同 key 重試或 GET 核對，不能建立重複 decision。
-- GET snapshot 恢復 Request、Offer 與 decision。UI 不顯示 private prompt、raw audit、底價或 Campaign ranking data。
-- 採用不是購買；目前 purchase API 尚未接入 UI。
+## Progress
 
-## Progress 與開發 mock
+正式 UI 只投影 `GET /api/requests/{request_id}` 的 snapshot status，不發出額外 `/progress` request。Vite mock 與 `/__mock` sidecar 已移除；development 與 production 使用相同 runtime API。
 
-正式模式只輪詢 `GET /api/requests/{request_id}`，不呼叫額外 progress endpoint，也不用計時器猜測完成狀態。
+百分比是階段估算，只有 `awaiting_user` 才顯示完成。失敗、待澄清或結果未知時不得顯示成功。
 
-只有 Vite dev 且 `OFFERMESH_DEV_MOCK=1` 時，UI 才查詢 dev-only `GET /__mock/requests/{request_id}/progress`。這個 sidecar 不屬於 OpenAPI 或共用 contract；production build 會停用。較舊 sequence、錯誤 request ID 或非法 stage 不覆蓋 snapshot，404 則退回正式 status。
+## Mobile
 
-```powershell
-$env:OFFERMESH_DEV_MOCK = '1'
-npm run dev -- --port 5174
-```
-
-Mock 只用於檢視固定流程，不執行 Agent、購買或付款。
+`npm run dev:mobile` 提供 isolated offline mobile flow；`npm run dev:mobile:secure` 提供配對後的 live-model development flow。兩者都不是正式公開服務。操作與安全限制見 [mobile UI](../docs/MOBILE_UI.md) 和 [mobile live mode](../docs/MOBILE_LIVE.md)。
 
 ## 驗證
 
@@ -53,10 +50,8 @@ Mock 只用於檢視固定流程，不執行 Agent、購買或付款。
 npm test
 npm run typecheck
 npm run build
-npm run test:e2e
-npm run test:api:e2e
 ```
 
-E2E 使用隔離 SQLite 與測試 services，涵蓋 Chat submit、drag／keyboard、undo、details、accept／reject、reload、窄螢幕、低高度與 reduced motion。輸出位於被 Git 忽略的 `test-results/`；完整政策見 [測試指南](../docs/TESTING.md)。
+Browser suites 從 root 執行，完整命令見 [測試指南](../docs/TESTING.md)。輸出位於被 Git 忽略的 `test-results/`。
 
-設計參考位於 `img/design/`。尚未完成的逐幀動畫與真機觸控驗收保留在 [OpenSpec tasks](../openspec/changes/define-offer-result-ui-api/tasks.md)。
+設計參考位於 `img/design/`；curated mobile screenshots 位於 [docs/screenshots/mobile](../docs/screenshots/mobile/README.md)。尚未完成的細部驗收保留在 [OpenSpec tasks](../openspec/changes/define-offer-result-ui-api/tasks.md)。

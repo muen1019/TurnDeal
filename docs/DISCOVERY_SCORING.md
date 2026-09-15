@@ -1,6 +1,6 @@
 # Discovery scoring
 
-現行政策為 `discovery-score-v0.5`：新增已驗證公開售後條件，並將明確 `price_first` 與目標價接近度分開。Persona 隔離、公開權益與缺資料處理見 [SELLER_POLICIES.md](SELLER_POLICIES.md)。歷史執行紀錄保留原 policy version，不重新計算。
+現行政策為 `discovery-score-v0.5`。傳入 `ranking_weights` 且沒有明示 priorities 時，依 [Buyer setup](BUYER_SETUP.md) 的價格、速度、Seller rating 與顏色權重評分；沒有目標價時可依最高預算計算價格分數。全部硬限制優先，Sponsored 不計分。Persona 隔離、公開權益與缺資料處理見 [Seller policies](SELLER_POLICIES.md)。歷史執行紀錄保留原 policy version，不重新計算。
 
 已實作 TypeScript service、固定測資、SQLite 快照與執行紀錄。Discovery 不需要 LLM；輸入為已解析條件，自然語言解析交給 Formatter。
 

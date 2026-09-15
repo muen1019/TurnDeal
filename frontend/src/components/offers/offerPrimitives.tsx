@@ -87,16 +87,18 @@ export function OfferMedia({offer, compact = false}: OfferMediaProps) {
 
 export interface ItemRowProps {
   item: Offer['items'][number];
+  snapshot?:RequestSnapshot;
 }
 
-export function ItemRow({item}: ItemRowProps) {
+export function ItemRow({item,snapshot}: ItemRowProps) {
   return (
     <div className="offer-item-row">
       <div className="offer-item-row__icon" aria-hidden="true">
         <Tag size={18} />
       </div>
       <div className="offer-item-row__body">
-        <strong>{categoryLabel(item.category)}</strong>
+        <strong>{snapshot?.product_details?.find(p=>p.product_id===item.product_id)?.name??categoryLabel(item.category)}</strong>
+        {snapshot&&<ProductColor snapshot={snapshot} productId={item.product_id}/>}
         <span>{roleLabel(item.role)}</span>
       </div>
       <div className="offer-item-row__meta">
@@ -116,9 +118,16 @@ export function OfferSummaryMeta({snapshot, offer}: OfferSummaryMetaProps) {
 
   return (
     <div className="offer-summary-meta">
+      <ProductColor snapshot={snapshot} productId={offer.items.find(i=>i.role==='primary')?.product_id??''}/>
       <span>預計 {offer.delivery_days} 天送達</span>
       <span>有效至 {formatDateTime(offer.expires_at)}</span>
       {sponsored ? <StatusPill tone="sponsored">Sponsored</StatusPill> : null}
     </div>
   );
+}
+export function ProductColor({snapshot,productId}:{snapshot:RequestSnapshot;productId:string}){
+ const color=snapshot.product_details?.find(p=>p.product_id===productId)?.color;
+ const palette:Record<string,[string,string]>={black:['黑色','#303744'],white:['白色','#fafafa'],blue:['藍色','#5785c8'],red:['紅色','#c96872'],rose:['粉色','#e0a4b7']};
+ if(!color)return <span className="product-color">顏色未提供</span>;
+ const label=palette[color];return <span className="product-color">{label&&<i style={{background:label[1]}} aria-hidden="true"/>}{label?.[0]??color}</span>;
 }

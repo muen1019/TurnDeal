@@ -197,10 +197,70 @@
       ],
       "additionalProperties": false
     },
+    "SharedLlmModel": {
+      "type": "string",
+      "enum": [
+        "gpt-5.6-sol",
+        "gpt-4.1",
+        "gpt-4.1-mini"
+      ]
+    },
     "SharedCreateRequest": {
       "type": "object",
       "description": "intent_md describes this purchase and its temporary constraints/preferences. preference_md is a request-bound preference snapshot; omission/empty text does not clear active SQLite product preferences. Neither field updates the durable profile.",
       "properties": {
+        "model": {
+          "$ref": "#/$defs/SharedLlmModel"
+        },
+        "refinement": {
+          "type": "object",
+          "properties": {
+            "parent_request_id": {
+              "$ref": "#/$defs/SharedId"
+            }
+          },
+          "required": [
+            "parent_request_id"
+          ],
+          "additionalProperties": false
+        },
+        "clarification": {
+          "type": "object",
+          "properties": {
+            "parent_request_id": {
+              "$ref": "#/$defs/SharedId"
+            },
+            "answers": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 30,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "question_id": {
+                    "$ref": "#/$defs/SharedId"
+                  },
+                  "answer": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 500,
+                    "pattern": "\\S"
+                  }
+                },
+                "required": [
+                  "question_id",
+                  "answer"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "parent_request_id",
+            "answers"
+          ],
+          "additionalProperties": false
+        },
         "intent_md": {
           "type": "string",
           "minLength": 1,
@@ -215,6 +275,16 @@
       },
       "required": [
         "intent_md"
+      ],
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "clarification",
+              "refinement"
+            ]
+          }
+        }
       ],
       "additionalProperties": false
     },
@@ -554,9 +624,222 @@
         }
       ]
     },
+    "SharedRankingWeights": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "delivery": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "trust": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "color": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "price",
+        "delivery",
+        "trust",
+        "color"
+      ],
+      "additionalProperties": false,
+      "anyOf": [
+        {
+          "properties": {
+            "price": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        {
+          "properties": {
+            "delivery": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        {
+          "properties": {
+            "trust": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        {
+          "properties": {
+            "color": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      ]
+    },
+    "SharedBuyerProfile": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60,
+          "pattern": "\\S"
+        },
+        "shipping_address": {
+          "type": "string",
+          "maxLength": 240
+        },
+        "shipping_details": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "email": {
+              "type": "string",
+              "format": "email",
+              "maxLength": 100
+            },
+            "city": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "\\S"
+            },
+            "state": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "\\S"
+            },
+            "postal_code": {
+              "type": "string",
+              "pattern": "^[0-9]{3}([0-9]{2,3})?$"
+            },
+            "country": {
+              "const": "TW"
+            }
+          },
+          "required": [
+            "email",
+            "city",
+            "state",
+            "postal_code",
+            "country"
+          ]
+        },
+        "payment_method": {
+          "enum": [
+            "later",
+            "card",
+            "mobile",
+            "cash_on_delivery"
+          ]
+        },
+        "weights": {
+          "$ref": "#/$defs/SharedRankingWeights"
+        },
+        "colors": {
+          "type": "array",
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "black",
+              "white",
+              "blue",
+              "red",
+              "rose"
+            ]
+          }
+        }
+      },
+      "required": [
+        "name",
+        "shipping_address",
+        "payment_method",
+        "weights",
+        "colors"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "colors": {
+                "maxItems": 0
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "weights": {
+                "anyOf": [
+                  {
+                    "properties": {
+                      "price": {
+                        "minimum": 1
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "delivery": {
+                        "minimum": 1
+                      }
+                    }
+                  },
+                  {
+                    "properties": {
+                      "trust": {
+                        "minimum": 1
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "SharedBuyerProfileResponse": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SharedBuyerProfile"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "profile"
+      ],
+      "additionalProperties": false
+    },
     "SharedNormalizedIntent": {
       "type": "object",
       "properties": {
+        "ranking_weights": {
+          "$ref": "#/$defs/SharedRankingWeights"
+        },
         "category": {
           "const": "mouse"
         },
@@ -1387,6 +1670,40 @@
     "SharedRequestSnapshot": {
       "type": "object",
       "properties": {
+        "product_details": {
+          "description": "Backend-snapshotted public SKU display data; optional for historical snapshots. No private seller policies.",
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "properties": {
+              "product_id": {
+                "$ref": "#/$defs/SharedId"
+              },
+              "name": {
+                "type": "string"
+              },
+              "color": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "product_id",
+              "name",
+              "color"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "formatter": {
+          "$ref": "#/$defs/SharedFormatterSummary"
+        },
+        "model": {
+          "$ref": "#/$defs/SharedLlmModel"
+        },
         "request_id": {
           "$ref": "#/$defs/SharedId"
         },
@@ -1394,7 +1711,14 @@
           "$ref": "#/$defs/SharedId"
         },
         "parent_request_id": {
-          "type": "null"
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/SharedId"
+            }
+          ]
         },
         "status": {
           "$ref": "#/$defs/SharedStatus"
@@ -1704,13 +2028,101 @@
             "documents": {
               "properties": {
                 "revision": {
-                  "const": 1
+                  "minimum": 1,
+                  "maximum": 9
                 }
               }
             }
           }
         }
       ]
+    },
+    "SharedFormatterSummary": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "enum": [
+            "openai",
+            "rules"
+          ]
+        },
+        "model": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "questions": {
+          "type": "array",
+          "maxItems": 30,
+          "items": {
+            "$ref": "#/$defs/SharedClarificationQuestion"
+          }
+        }
+      },
+      "required": [
+        "provider",
+        "model",
+        "questions"
+      ],
+      "additionalProperties": false
+    },
+    "SharedClarificationQuestion": {
+      "type": "object",
+      "properties": {
+        "question_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "field": {
+          "enum": [
+            "budget",
+            "delivery",
+            "color",
+            "size_class",
+            "category",
+            "other"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "suggestions": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string",
+                "maxLength": 500
+              },
+              "source": {
+                "enum": [
+                  "preference",
+                  "example"
+                ]
+              }
+            },
+            "required": [
+              "label",
+              "value",
+              "source"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "question_id",
+        "field",
+        "text",
+        "suggestions"
+      ],
+      "additionalProperties": false
     },
     "SharedAcceptDecisionResult": {
       "type": "object",
@@ -2333,6 +2745,28 @@
       "type": "object",
       "description": "Campaign and Sponsored data are intentionally absent.",
       "properties": {
+        "color_matches": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "offer_id": {
+                "$ref": "#/$defs/SharedId"
+              },
+              "score": {
+                "enum": [
+                  0,
+                  100
+                ]
+              }
+            },
+            "required": [
+              "offer_id",
+              "score"
+            ],
+            "additionalProperties": false
+          }
+        },
         "request_id": {
           "$ref": "#/$defs/SharedId"
         },
@@ -4091,6 +4525,28 @@
                   "additionalProperties": false
                 }
               ]
+            },
+            "next_request_id": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/SharedId"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "workflow_error": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "can_clarify": {
+              "type": "boolean"
+            },
+            "workflow_enabled": {
+              "type": "boolean"
             }
           },
           "required": [
@@ -4099,11 +4555,55 @@
             "mode",
             "status",
             "error",
-            "result"
+            "result",
+            "next_request_id",
+            "workflow_error",
+            "can_clarify",
+            "workflow_enabled"
           ],
           "additionalProperties": false
         }
       ]
+    },
+    "SharedImprovementClarification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "improvement_id",
+        "feedback"
+      ],
+      "properties": {
+        "improvement_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "feedback": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000,
+          "pattern": "\\S"
+        }
+      }
+    },
+    "SharedImprovementClarificationResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "improvement_id",
+        "status"
+      ],
+      "properties": {
+        "request_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "improvement_id": {
+          "$ref": "#/$defs/SharedId"
+        },
+        "status": {
+          "type": "string",
+          "const": "queued"
+        }
+      }
     },
     "AcpAddress": {
       "type": "object",

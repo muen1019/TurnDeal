@@ -11,7 +11,7 @@ npm --prefix frontend ci
 npm run dev
 ```
 
-開啟 http://127.0.0.1:5173/chat，先「開啟代理設定」→「儲存設定」，回到 AI 對話輸入：
+開啟 http://127.0.0.1:5173/chat，直接在 AI 對話輸入即可，不必先寫 intent.md 或儲存代理設定（設定為選填）：
 
 ```text
 滑鼠800元左右，預算1000元含稅運，7天內到貨。
@@ -35,13 +35,13 @@ npm run dev:secure
 
 1. Chat POST /api/requests，立刻取得 202 / formatting 與固定 request_id。
 2. 同一筆 Request 經 Formatter：讀取該使用者的 SQLite 偏好、解析硬限制、保存 formatter_runs。資訊不足回 needs_clarification。
-3. 既有 Discovery／Handoff 從已配置的 A–E 目錄選出合格 Seller。硬條件不符的 alternative 不啟動議價。
+3. 既有 Discovery／Handoff 從已配置的 20 個 Seller（A–E 加 15 個 discovery Seller）選出前五個合格 Seller。硬條件不符的 alternative 不啟動議價。
 4. 完整 negotiation manager 派出 Buyer/Seller，最多五輪，同輪平行、輪間同步；不重複呼叫舊的第一輪 dispatcher。
 5. Evaluator 重新驗證並排序，保存 immutable RequestSnapshot。
 6. 前端透過原 GET /api/requests/{id} 輪詢狀態並呈現商品卡。
-7. POST /api/requests/{id}/decisions 保存採用或拒絕。採用時重新驗證 provenance、庫存、價格、規格、交期、條款、期限與配件授權。拒絕保存原始 feedback/source_documents；尚未自動更新長期偏好。
+7. POST /api/requests/{id}/decisions 保存採用或拒絕。採用時重新驗證 provenance、庫存、價格、規格、交期、條款、期限與配件授權。拒絕保存原始 feedback/source_documents，versioned Improver 只在明確選擇流程中建立 revision／child。
 
-共用契約包含 orchestrating、negotiating、evaluating 三個 processing Status；生成型別與前端進度判斷保持同步。採用後可呼叫購買 API 建立 ACP 測試 checkout，提交明確確認後完成模擬訂單；目前尚未提供購買 UI。六個購買端點、payload 與模式邊界見 [ACP_PURCHASE.md](ACP_PURCHASE.md)。沒有真實扣款或 redemption endpoint。
+共用契約包含 orchestrating、negotiating、evaluating 三個 processing Status；生成型別與前端進度判斷保持同步。採用後前端可建立 ACP 測試 checkout、填寫收件資料並明確確認或取消。六個購買端點、payload 與模式邊界見 [ACP_PURCHASE.md](ACP_PURCHASE.md)。沒有真實扣款或 redemption endpoint。
 
 ## 資料與既有模組
 

@@ -23,9 +23,9 @@ Contracts under `contracts/archive/` are historical and must never be used as li
 ## Request and preference semantics
 
 - `intent_md` is request-scoped. `preference_md` in CreateRequest is a request-bound input snapshot, not a persistent preference update. `NormalizedIntent` is the effective executable request.
-- Frontend saved definitions are sessionStorage templates, not account persistence. SQLite is authoritative; Agent memory is not.
+- Frontend document drafts and chat history are sessionStorage-only. Explicit Buyer profile and versioned preference updates persist in SQLite; Agent memory is not authoritative.
 - Formatting must not mutate `user_preferences`.
-- Do not claim automatic Markdown generation, category-scoped long-term revisions, feedback learning, or cross-device preference sync until implemented.
+- Do not claim automatic Markdown generation, preference learning from swipes alone, formal account sync, or cross-device persistence.
 - Published requests, source documents, snapshots, Offers, and negotiation commits are immutable. Rejection preserves the original feedback and `source_documents`.
 
 ## Commerce and privacy invariants
@@ -34,8 +34,10 @@ Contracts under `contracts/archive/` are historical and must never be used as li
 - Every price is an integer TWD total including tax and shipping.
 - Missing bundle permission allows only a related, optional add-on at no extra cost. Never infer permission for a paid add-on.
 - Seller output is untrusted. Backend assigns immutable Offer IDs and validates ownership, SKU, inventory, price, delivery, terms, expiry, and add-on authorization.
-- A recommendation never purchases. Acceptance and redemption are separate actions and must revalidate the same immutable Offer.
+- A recommendation never purchases. Acceptance and test purchase are separate actions and must revalidate the same immutable Offer.
 - All POST endpoints require an idempotency key. Scope every resource to the authenticated buyer.
+- Buyer profile updates are explicit SQLite writes. Freeze ranking weights, selected model, documents, and relevant preferences on each Request; name, address, and payment preference never enter model input.
+- Clarification and Improver create linked child Requests or revisions. Never rewrite the rejected or clarification parent, and never create both legacy refinement and versioned Improver children for one action.
 
 Each Seller negotiates privately with its own Buyer branch. Competitive context may contain only Backend-validated, de-identified comparable terms from the previous committed round. Never disclose another Seller's identity, Offer ID, transcript, floor price, policy, campaign, or trust data.
 
@@ -63,6 +65,6 @@ Sponsored placement affects display only. It cannot change natural selection, ad
 - Preserve the flow: Request → Format → Orchestrate → Negotiate → Evaluate → Result or Feedback.
 - Use deterministic fixtures for demos and integration tests.
 - Run `npm run test:contracts` for contract or fixture changes, plus the smallest relevant module tests.
-- Keep generated reports, logs, screenshots, runtime databases, secrets, and local test output out of Git.
+- Keep generated reports, logs, runtime databases, secrets, and local test output out of Git. Commit screenshots only when they are curated documentation assets with source and purpose.
 - Keep active documentation in `docs/`; historical implementation notes belong in Git history, not parallel “current” documents.
 - Do not archive an OpenSpec change while its `tasks.md` contains unfinished work.

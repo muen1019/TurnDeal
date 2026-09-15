@@ -24,6 +24,10 @@ export interface AppShellProps {
   onSettings: () => void;
   onNewConversation: () => void;
   onSelectConversation: (requestId: string) => void;
+  onDeleteConversation?: (id: string) => void;
+  historyLocked?: boolean;
+  onClearHistory?: () => void;
+  modelPicker?: React.ReactNode;
 }
 
 export type ChatMessageRole = "user" | "assistant" | "system";
@@ -54,6 +58,7 @@ export type ChatStatus =
   | "failed";
 
 export interface ChatPanelProps {
+  improvementCard?: ReactNode;
   messages: ChatMessage[];
   status: ChatStatus;
   progressStatus?: AgentProgressStatus;
@@ -66,7 +71,6 @@ export interface ChatPanelProps {
   error?: string;
   progressError?: string;
   unsavedDefinitions: boolean;
-  savedDefinitionValid: boolean;
   onEditDefinitions?: () => void;
 }
 

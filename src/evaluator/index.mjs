@@ -2,13 +2,16 @@ import { randomUUID } from 'node:crypto';
 import { check, copy, immutable } from '../negotiation/contracts.mjs';
 import { NegotiationRepository } from '../negotiation/repository.mjs';
 import { ModelGateway } from '../negotiation/model.mjs';
-import { buildEvaluatorInput, deterministicRanking, evaluatorFormat, groupSolutions, instructionsFor, validateRanking } from './ranking.mjs';
+import { buildEvaluatorInput, compareOffers, deterministicRanking, evaluatorFormat, groupSolutions, instructionsFor, validateRanking } from './ranking.mjs';
 import { revalidateOffers } from './validation.mjs';
 
 export async function rankOffers({ input, gateway, now = Date.now }) {
   check('EvaluatorInput', input);
-  input = buildEvaluatorInput({ requestId: input.request_id, intent: input.intent, offers: input.offers,
-    sellerTrust: input.seller_trust, now: Date.parse(input.evaluated_at) });
+  // This is already a validated backend projection. Re-projecting without the
+  // private catalog silently erased color_matches and changed weighted ranking.
+  input = copy(input);
+  input.offers.sort((a,b)=>compareOffers(input,a,b));
+  input = immutable(input);
   const audit = [];
   let output, provider = 'openai', fallbackReason = null;
   try {
@@ -51,7 +54,7 @@ export async function evaluate({ db, requestId, buyerId, apiKey = '', model = 'g
   let offers = validate();
   const eligible = offers.filter(o => o.eligibility.status === 'eligible');
   const input = eligible.length ? buildEvaluatorInput({ requestId, intent, offers: eligible,
-    sellerTrust: source.orchestration.seller_agents, now: now() }) : null;
+    sellerTrust: source.orchestration.seller_agents, now: now(),catalog:source.catalog }) : null;
   // A persisted claim rejects concurrent invocations before either can make a paid call.
   db.prepare("INSERT INTO evaluation_runs (request_id, status, input_json, result_json, started_at, completed_at) VALUES (?, 'running', ?, NULL, ?, NULL)")
     .run(requestId, input ? JSON.stringify(input) : null, new Date(now()).toISOString());
@@ -72,10 +75,10 @@ export async function evaluate({ db, requestId, buyerId, apiKey = '', model = 'g
       if (input && (ids.size !== input.offers.length || input.offers.some(o => !ids.has(o.offer_id)))) {
         ranked = { ...ranked, provider: 'deterministic_fallback', fallback_reason: 'eligible_set_changed',
           output: eligibleNow.length ? deterministicRanking(buildEvaluatorInput({ requestId, intent, offers: eligibleNow,
-            sellerTrust: source.orchestration.seller_agents, now: now() })) : { ranked_offers: [] } };
+            sellerTrust: source.orchestration.seller_agents, now: now(),catalog:source.catalog })) : { ranked_offers: [] } };
       }
       const finalInput = eligibleNow.length ? buildEvaluatorInput({ requestId, intent, offers: eligibleNow,
-        sellerTrust: source.orchestration.seller_agents, now: now() }) : null;
+        sellerTrust: source.orchestration.seller_agents, now: now(),catalog:source.catalog }) : null;
       if (finalInput) validateRanking(ranked.output, finalInput, now());
       const confirmationIds = offers.filter(o => o.eligibility.status === 'needs_confirmation').map(o => o.offer_id);
       const status = eligibleNow.length ? 'awaiting_user' : confirmationIds.length ? 'needs_confirmation' : 'no_match';
@@ -88,6 +91,11 @@ export async function evaluate({ db, requestId, buyerId, apiKey = '', model = 'g
         if (!root) throw new Error('request_ancestry_invalid');
       }
       const snapshot = check('RequestSnapshot', {
+        product_details: [...new Map(offers.flatMap(o=>o.items.map(i=>{
+          const p=source.catalog.sellers.find(s=>s.seller_id===o.seller_id)?.products.find(p=>p.product_id===i.product_id);
+          return [i.product_id,{product_id:i.product_id,name:p?.name??i.product_id,color:p?.attributes?.color??null}];
+        }))).values()],
+        ...(request.llm_model?{model:request.llm_model}:{}),
         request_id: requestId, root_request_id: root.request_id, parent_request_id: request.parent_request_id, status,
         documents: { revision: request.revision, intent_md: request.intent_md, preference_md: request.preference_md }, intent: copy(intent),
         seller_agents: negotiation.seller_agents.map(s => ({ ...copy(s), final_offer_ids: s.final_offer_ids.filter(id => offers.some(o => o.offer_id === id)) })),

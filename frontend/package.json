@@ -12,11 +12,11 @@
     "typecheck": "tsc --noEmit",
     "build": "npm run typecheck && vite build",
     "test": "vitest run",
-    "test:e2e": "node scripts/run-e2e.mjs",
+    "test:e2e": "npm --prefix ../backend run build && npm run build && cd .. && node scripts/test-improver-ui.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "prebuild": "npm run generate:types",
     "pretest": "npm run generate:types",
-    "test:api:e2e": "npm run build && npm --prefix ../backend run build && node scripts/run-result-api-e2e.mjs"
+    "test:api:e2e": "npm --prefix ../backend run build && node --test ../tests/runtime.test.mjs"
   },
   "dependencies": {
     "ajv": "8.20.0",

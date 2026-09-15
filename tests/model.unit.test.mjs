@@ -26,6 +26,15 @@ test('no key and zero budgets make no HTTP request', async () => {
     await assert.rejects(gateway.decide(args()), message); assert.equal(gateway.calls, 0);
   }
 });
+test('Sol uses explicit no-reasoning mode; other model requests omit reasoning',async()=>{
+ for(const model of ['gpt-5.6-sol','gpt-4.1','gpt-4.1-mini']){
+  const gateway=new ModelGateway({apiKey:'test',model,fetchImpl:async(_url,init)=>{
+   const body=JSON.parse(init.body);assert.equal(body.model,model);
+   assert.deepEqual(body.reasoning,model==='gpt-5.6-sol'?{effort:'none'}:undefined);
+   return {ok:true,json:async()=>success};
+  }});await gateway.decide(args());
+ }
+});
 
 test('refusals, truncated output, malformed JSON and HTTP failure never become a decision', async () => {
   for (const transport of [

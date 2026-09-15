@@ -7,7 +7,7 @@ import { applySalesProfiles } from '../scripts/lib/sales-profiles.mjs';
 import { negotiate } from '../src/negotiation/manager.mjs';
 import { NegotiationRepository } from '../src/negotiation/repository.mjs';
 import { evaluate, rankOffers, recoverInterruptedEvaluations } from '../src/evaluator/index.mjs';
-import { buildEvaluatorInput, deterministicRanking, evaluatorFormat, groupSolutions, validateRanking, validateExplanation } from '../src/evaluator/ranking.mjs';
+import { buildEvaluatorInput, deterministicRanking, evaluatorFormat, groupSolutions, instructionsFor, validateRanking, validateExplanation } from '../src/evaluator/ranking.mjs';
 import { revalidateOffers } from '../src/evaluator/validation.mjs';
 import { ModelGateway } from '../src/negotiation/model.mjs';
 import { check } from '../src/negotiation/contracts.mjs';
@@ -66,6 +66,13 @@ test('explanations cannot round money or falsely claim fastest delivery', () => 
   assert.throws(() => validateExplanation({ reason: `交貨最快${offer.delivery_days}天`, tradeoffs: [] }, offer, input), /unsupported/);
   assert.throws(() => validateExplanation({ reason: '符合預算', tradeoffs: ['比最低價格高999元'] }, offer, input), /wrong_comparison/);
   assert.doesNotThrow(() => validateExplanation({ reason: `NT$${offer.total_price_twd}，配送 ${offer.delivery_days} 天`, tradeoffs: [`比最快配送慢 ${offer.delivery_days - 1} 天`] }, offer, input));
+});
+
+test('Evaluator prompt constrains live explanations to validator-safe facts', () => {
+  const prompt = instructionsFor(pureInput());
+  assert.match(prompt, /reason MUST use only this Traditional Chinese template/);
+  assert.match(prompt, /Set tradeoffs to an empty array/);
+  assert.match(prompt, /Do not add superlatives/);
 });
 
 test('Responses sends the exact approved output schema and independent prompt', async () => {

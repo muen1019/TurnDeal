@@ -8,6 +8,8 @@ const root={title:'CommerceTypes',type:'object',properties:Object.fromEntries(Ob
 const text=await compile(root,'CommerceTypes',{bannerComment:'/* Generated from contracts/a2a-commerce.v0.3.schema.json. Run npm run generate:types; do not edit. */',style:{singleQuote:true},additionalProperties:false});
 await writeFile(new URL('../src/contract.generated.ts',import.meta.url),text);
 console.log('Generated frontend/src/contract.generated.ts from shared schema');
+const purchase=JSON.parse(await readFile(new URL('../../contracts/purchase.v1.schema.json',import.meta.url),'utf8'));
+await writeFile(new URL('../src/purchase.generated.ts',import.meta.url),await compile(simplify(purchase),'PurchaseTypes',{bannerComment:'/* Generated from purchase.v1.schema.json; do not edit. */',style:{singleQuote:true}}));
 const api=JSON.parse(await readFile(new URL('../../backend/openapi.json',import.meta.url),'utf8'));
 const paths=Object.fromEntries(Object.entries(api.paths).flatMap(([path,methods])=>Object.entries(methods).filter(([method,op])=>['get','post'].includes(method)&&op.operationId).map(([,op])=>[op.operationId,path])));
 await writeFile(new URL('../src/api/routes.generated.ts',import.meta.url),'/* Generated from backend/openapi.json. */\nexport const apiPaths = '+JSON.stringify(paths,null,2)+' as const;\n');

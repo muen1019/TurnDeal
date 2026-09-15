@@ -50,13 +50,13 @@ describe("AgentDefinitionEditor actions", () => {
     expect(props.onCancel).toHaveBeenCalledTimes(1);
   });
 
-  it("blocks save for empty intent and documents over 20000 Unicode code points", () => {
+  it("allows empty intent for preference-only settings but blocks oversized documents", () => {
     const { props: empty, rerender } = renderEditor({ intent: "   ", dirty: true });
     const emptySave = screen.getByRole("button", { name: /儲存設定/ });
 
-    expect(emptySave).toBeDisabled();
+    expect(emptySave).toBeEnabled();
     fireEvent.click(emptySave);
-    expect(empty.onSave).not.toHaveBeenCalled();
+    expect(empty.onSave).toHaveBeenCalledTimes(1);
 
     const tooLong = baseProps({ intent: "🐭".repeat(20001), dirty: true });
     rerender(<AgentDefinitionEditor {...tooLong} />);

@@ -63,7 +63,9 @@ feedback 是完整替代調整指示，不會把多次澄清文字暗中串接�
 <!-- /offermesh-preference -->
 ```
 
-目前 `improver_global_preferences` 尚未取代 Formatter 的 `user_preferences`，一般新對話與 account-level preference editor 也尚未同步。不要宣稱改善結果已成為所有未來 Request 的權威偏好。
+`improver_global_preferences` 現在是 Formatter、Buyer profile 與 Improver 共用的 versioned preference repository。Profile 的顏色／ranking weights 會寫入新 revision；每個 Request 另存固定 binding，所以後續 profile 修改不會改變舊 Request 或 child 的執行條件。
+
+舊 `user_preferences` 會以相容資料載入；無效或來源衝突的 legacy preference 必須要求確認，不能靜默覆蓋。改善仍只接受具有明確 evidence 的支援句型，不能把左滑本身當作長期偏好。
 
 ## 執行
 
@@ -73,4 +75,4 @@ npm run demo:improver
 npm run demo:improver:live
 ```
 
-前兩者不需要 key。Live mode 預設使用 `gpt-4.1-mini`，以 server-side `API_KEY`／`IMPROVER_MODEL` 設定；key 不得注入 Vite 或寫入 log。Integrated runtime 每五秒恢復既有 queued 或 lease 到期的 job，不掃描歷史 decision 補建工作。
+前兩者不需要 key。Live mode 使用該 Request 凍結的 allowlisted model；獨立 demo 可由 server-side `OPENAI_API_KEY`／`IMPROVER_MODEL` 設定。Key 不得注入 Vite 或寫入 log。Integrated runtime 每五秒恢復既有 queued 或 lease 到期的 job，不掃描歷史 decision 補建工作。

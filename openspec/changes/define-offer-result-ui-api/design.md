@@ -1,5 +1,9 @@
 ## Context
 
+2026-09-12 問答擴充：整合 runtime 以 docs/CLARIFICATION_SPEC.md 為準。POST /api/requests 接受 optional clarification，建立保存原文的 parent-linked child；RequestSnapshot 增加 optional formatter 摘要，parent_request_id 可為 ID、revision 可遞增（1–9）。舊 mock 不支援補充，回 400；reject 後的 child 改寫仍未實作。以下「固定 parent=null、revision=1、不建立 child」只適用首次建立／legacy mock，不適用本擴充。
+
+2026-09-12 手機改版覆蓋：767px 以下改依 docs/MOBILE_UI.md 與 buyer-chat-ui 的 Mobile-first purchase journey，採獨立進度頁、明示階段估算百分比、處理完成自動進入已驗證滑卡與小幅位移淡入。本文件舊有「不顯示百分比／不自動導航／零位移」僅保留於桌面；共享滑卡新增最大 9 度傾斜。資料契約、冪等與採用安全規則不變。
+
 本 change 聚焦 Result 階段：使用者輸入 intent／preference，後端用 mock 產生優惠組合，前端用真實 API 提交 accept／reject，再將決策提供 Buyer Agent。Chat／卡片視覺保留，第 8–11 節只同步此生命週期。Result API 與前端串接已實作；驗證方式與剩餘視覺工作見 docs/TESTING.md 及 tasks.md。
 
 ## Goals / Non-Goals
@@ -200,13 +204,13 @@ M7 workspace transition：點「查看優惠」、返回 Chat 或開／關 edito
 
 新增 [buyer-chat-ui](specs/buyer-chat-ui/spec.md)。Chat 是 Buyer Agent 的購物入口，不擴展成任意工具或檔案存取介面。左欄提供對話、代理設定與本分頁最近需求；中央為訊息及需求輸入；右欄在桌面編輯 intent.md 與 preference.md，對應共用 CreateRequest 的 intent_md、preference_md。不存在的其他檔案不顯示為可編輯文件；概念圖的「其他定義」實作為 preference.md。
 
-MVP DefinitionDraftRepository 採 buyer scope 的 sessionStorage，保存兩份草稿、兩份已儲存文字及本機設定版本。顯示「已儲存於此分頁／儲存後套用於下一次需求」，不宣稱已写入 repo、伺服器檔案或跨裝置同步。儲存成功才替換已儲存版本；失敗保留 dirty 草稿及錯誤；取消變更只恢復已儲存內容，不改既有 RequestSnapshot。初始未配置時以編輯器要求至少填寫非空 intent.md；preference.md 允許空字串。
+MVP DefinitionDraftRepository 採 buyer scope 的 sessionStorage，保存兩份草稿、兩份已儲存文字及本機設定版本。顯示「已儲存於此分頁／儲存後套用於下一次需求」，不宣稱已写入 repo、伺服器檔案或跨裝置同步。儲存成功才替換已儲存版本；失敗保留 dirty 草稿及錯誤；取消變更只恢復已儲存內容，不改既有 RequestSnapshot。代理設定為選填；初始兩份草稿與已儲存文字皆為空，可只儲存 preference.md，也可清空先前模板後儲存。保留既有分頁資料，不自動覆寫。
 
 對話及編輯器草稿在同分頁切 view／重載時恢復。敏感內容不拼進 URL；清除儲存或更換分頁時提示本地內容不可恢復，可仍以 request_id 讀後端快照，不捏造聊天歷史。編輯器 clean → dirty → saving → clean／save_error；saving 時禁止送出新需求，避免拿到半套設定；可編輯未完成文字但保存版本與新輸入分開。
 
-Chat 狀態為 empty／draft／sending／processing／ready／failed。需求限制 1–2000 Unicode code points（trim 後不可空）；Enter 送出、Shift+Enter 換行，IME composing 的 Enter 不送出。尚未儲存的設定不自動套用；送出處明示「使用已儲存設定，尚未儲存的變更不會套用」。若没有已儲存的有效 intent，送出停用並導向設定欄位。
+Chat 狀態為 empty／draft／sending／processing／ready／failed。需求限制 1–2000 Unicode code points（trim 後不可空）；Enter 送出、Shift+Enter 換行，IME composing 的 Enter 不送出。尚未儲存的設定不自動套用；送出處明示設定選填與已儲存設定會套用，若有未儲存變更則另行提示。沒有已儲存 intent 也能直接送出有效需求；送出中與未知提交的鎖定規則保持不變。
 
-新對話第一次需求使用 deterministic RequestComposer：intent_md 為已儲存 intent 文字、兩個換行、`## 本次購買需求`、換行、需求原文；preference_md 原樣取已儲存內容。不得在 UI 用模型擅自改預算或加入授權。組合後 intent_md 及 preference_md 各依共用契約檢查最多 20000 Unicode code points，再呼叫既有 POST /api/requests；不送出額外 message、filename、definition_version 或 conversation_id 欄位。本機設定版本及送出時文字快照只記在本分頁，以利追溯。
+新對話第一次需求使用 deterministic RequestComposer：若已儲存 intent 非空白，intent_md 為已儲存 intent 文字、兩個換行、`## 本次購買需求`、換行、trim 後需求；若沒有模板或模板僅有空白，intent_md 直接為 trim 後需求，不加標題。preference_md 原樣取已儲存內容，預設空字串。不得在 UI 用模型擅自改預算或加入授權。組合後 intent_md 及 preference_md 各依共用契約檢查最多 20000 Unicode code points，intent_md 仍不可空白，再呼叫既有 POST /api/requests；不送出額外 message、filename、definition_version 或 conversation_id 欄位。本機設定版本及送出時文字快照只記在本分頁，以利追溯。
 
 發送前保存 request-creation journal（key＋exact body＋本機對話識別），sending 期間防止重複 Enter／click。202 回來記住 request_id，依既有 GET 輪詢顯示真實階段；逾時以同 key／body 重試，不因返回 Chat 或重新整理而產生新工作。未配置 AI adapter 時以明示 demo 的 deterministic 狀態訊息呈現，不假稱模型對話或議價已完成。
 

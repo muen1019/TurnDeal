@@ -4,6 +4,27 @@
 
 ## ADDED Requirements
 
+### Requirement: Mobile-first purchase journey
+For viewports at most 767px, the updated mobile presentation SHALL follow docs/MOBILE_UI.md. This explicitly supersedes the conversation-only progress, no-percentage, manual-result-navigation and zero-translation presentation clauses below **on mobile only**. Desktop behavior and all business safety boundaries remain unchanged; swipe tilt is a shared visual enhancement.
+
+#### Scenario: Submit on a phone
+- **WHEN** the user submits a valid prompt
+- **THEN** a dedicated processing view replaces the input, showing plain-language stage copy, a progressbar and an explicitly labeled stage estimate (3 / 12 / 30 / 60 / 88 percent)
+- **AND** only an authoritative awaiting_user result can reach 100 percent; no timer fabricates progress
+- **AND** a newly submitted or observed in-flight request automatically opens its verified, unexpired ranked cards, but revisiting historical Chat does not redirect
+- **AND** error and clarification states retain safe recovery without pretending completion
+
+#### Scenario: Swipe and resize
+- **WHEN** the phone user swipes horizontally
+- **THEN** existing intent thresholds, vertical scrolling, pointer cancellation, pending locks, expiry checks and equivalent action buttons remain in effect
+- **AND** cards track displacement with a bounded tilt and spring back or transition to the next card; screen transitions use opacity and a small translation, with no transform animation under reduced motion
+- **AND** safe areas and an internally scrollable main view keep controls reachable at 320px width and with a software keyboard
+
+#### Scenario: Share a mobile design preview
+- **WHEN** dev:mobile is started
+- **THEN** port 5174 serves clearly labeled mock fixtures over the trusted LAN, with no paid backend proxy or inherited credentials
+- **AND** port 5173 live operation remains localhost-only; this is not public deployment or verified native iOS support
+
 ### Requirement: Distinguish request intent from durable preferences
 The document semantics SHALL follow docs/INTENT_PREFERENCE_SPEC.md. intent_md SHALL describe one purchase, its hard constraints and temporary preferences. CreateRequest.preference_md SHALL be a request-bound snapshot of preference text, not a write command for durable preferences. NormalizedIntent SHALL be the merged execution representation, not a newly generated preference.md. The current editor SHALL identify saved definitions as sessionStorage templates; it SHALL NOT claim account synchronization or automatic Markdown generation.
 
@@ -100,7 +121,7 @@ The UI SHALL expose editable intent.md and preference.md, mapped to the shared c
 
 #### Scenario: Edit and save a valid definition
 - **WHEN** the user changes intent.md or preference.md and activates 儲存設定
-- **THEN** the editor validates nonempty intent and the shared 20000-code-point maximum for each document, allowing an empty preference
+- **THEN** the editor validates the shared 20000-code-point maximum for each document, allowing either or both optional templates to be empty, including preference-only saves and clearing previously saved templates
 - **AND** saving succeeds only after both saved texts and a local version have been stored atomically by the definition repository
 - **AND** the UI displays 已儲存於此分頁 and 儲存後套用於下一次需求, without changing existing offers or requests
 
@@ -115,10 +136,16 @@ The UI SHALL expose editable intent.md and preference.md, mapped to the shared c
 - **AND** storage failure is reported visibly without claiming persistence, and unavailable local history is not fabricated from a backend snapshot
 - **AND** document text is never encoded into navigation URLs
 
-### Requirement: Submit explicit text with a saved definition snapshot
+### Requirement: Submit explicit text with optional saved definitions
 The UI SHALL accept a trimmed nonempty requirement of at most 2000 Unicode code points and compose it with the saved buyer definitions using the deterministic mapping in design.md section 11. It SHALL use the existing CreateRequest contract and SHALL NOT send additional unrecognized fields.
 
-#### Scenario: Submit a new requirement
+#### Scenario: Submit without configuring the agent
+- **WHEN** a user in a fresh tab sends a valid requirement without opening or saving definitions
+- **THEN** intent_md is exactly the trimmed requirement and preference_md is an empty string
+- **AND** no template-save prerequisite or default product/preference text is injected
+- **AND** backend validation and clarification of missing hard limits still apply
+
+#### Scenario: Submit a new requirement with a saved template
 - **WHEN** the user sends a valid requirement from a new conversation with valid saved definitions
 - **THEN** the frontend snapshots the saved definition version and exact text, forms intent_md as saved intent plus two newlines, ## 本次購買需求, one newline and the requirement text, and preserves preference_md unchanged
 - **AND** it validates the composed documents against the shared contract before POST /api/requests with an idempotency key
@@ -127,7 +154,7 @@ The UI SHALL accept a trimmed nonempty requirement of at most 2000 Unicode code 
 #### Scenario: Send while definitions have unsaved changes
 - **WHEN** the editor is dirty and an older valid saved definition exists
 - **THEN** the send area clearly states that unsaved changes will not be used, and sending uses only the saved version
-- **AND** if there is no valid saved intent, sending is disabled with a direct path to the required editor field
+- **AND** if there is no nonblank saved intent, sending uses the requirement directly; unsaved edits never become an implicit template or block an otherwise valid submission
 - **AND** invalid or oversized composed content preserves all drafts and sends no request
 
 #### Scenario: Type Chinese and multiline requirements

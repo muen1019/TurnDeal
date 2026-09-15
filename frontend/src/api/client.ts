@@ -172,12 +172,8 @@ export function composeRequest(
     throw new Error("需求必須為 1–2000 個 Unicode 字元。");
   }
 
-  if (!intent.trim()) {
-    throw new Error("請先儲存有效的 intent.md 再送出。");
-  }
-
   return validateWire<CreateRequest>("CreateRequest", {
-    intent_md: `${intent}\n\n## 本次購買需求\n${text}`,
+    intent_md: intent.trim() ? `${intent}\n\n## 本次購買需求\n${text}` : text,
     preference_md: preference,
   });
 }

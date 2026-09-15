@@ -14,6 +14,13 @@ export function preferenceDocument(markdown: string, revision: number): Preferen
   return {revision,markdown,entries};
 }
 
+/** The same projection is used in initial formatting, validation and child formatting.
+ * Plain user prose remains visible to the strict parser; unsupported text cannot disappear. */
+export function effectivePreferenceText(preference:PreferenceDocument):string {
+  const prose=preference.markdown.replace(marker,'').replace(/^\s*#{1,6}[^\n]*$/gm,'').trim();
+  return [prose,...preference.entries.filter(e=>e.scope==='all_categories'||e.scope==='category:mouse').map(e=>e.value)].filter(Boolean).join('\n');
+}
+
 /** Conservative whole-sentence whitelist, not an arbitrary-language classifier. */
 export function explicitLongTermMeaning(quote: string): {scope: Scope; value: string} | null {
   const sentence = quote.trim().replace(/[。.!！]$/,'');
@@ -42,7 +49,7 @@ function explicitRevocation(operation:PreferenceOperation,evidence:Evidence[]):b
   return operation.operation==='replace'&&!!replacement&&operation.before===replacement[1]&&operation.value===replacement[2];
 }
 
-export function applyPreferencePatch(document: PreferenceDocument, operations: PreferenceOperation[], evidence: Evidence[]): {document:PreferenceDocument;audit:string[]} {
+export function applyPreferencePatch(document: PreferenceDocument, operations: PreferenceOperation[], evidence: Evidence[], validatedProse=false): {document:PreferenceDocument;audit:string[]} {
   // Conflicting operations are treated as a single dependent group.
   if (new Set(operations.map(o=>o.preference_id)).size!==operations.length) return {document,audit:['conflicting_preference_operations']};
   const statements=supportedStatements(evidence);
@@ -59,7 +66,7 @@ export function applyPreferencePatch(document: PreferenceDocument, operations: P
     if(operation.operation==='add'){
       // Legacy prose cannot be searched-and-replaced or contradicted safely.
       const unmanaged=markdown.replace(marker,'').replace(/^\s*#{1,6}[^\n]*$/gm,'').trim();
-      if(entry || operation.before!==null || unmanaged || current.entries.some(e=>e.scope===operation.scope && e.value===operation.value)){audit.push('preference_unaddressable_or_duplicate');continue;}
+      if(entry || operation.before!==null || (unmanaged && !validatedProse) || current.entries.some(e=>e.scope===operation.scope && e.value===operation.value)){audit.push('preference_unaddressable_or_duplicate');continue;}
       markdown += `${markdown && !markdown.endsWith('\n')?'\n':''}${block({preference_id:operation.preference_id,scope:operation.scope,value:operation.value!})}\n`;
     }else{
       if(!entry || entry.value!==operation.before || entry.scope!==operation.scope || !revocation){audit.push('preference_replacement_requires_explicit_revocation');continue;}
@@ -67,5 +74,5 @@ export function applyPreferencePatch(document: PreferenceDocument, operations: P
     }
   }
   if([...markdown].length>20000)return {document,audit:[...audit,'preference_too_long']};
-  return {document:preferenceDocument(markdown,document.revision),audit};
+  return {document:{...document,...preferenceDocument(markdown,document.revision)},audit};
 }

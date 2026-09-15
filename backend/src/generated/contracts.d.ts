@@ -2,6 +2,33 @@
 
 /**
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "RankingWeights".
+ */
+export type RankingWeights = RankingWeights1 & {
+  price: number;
+  delivery: number;
+  trust: number;
+  color: number;
+};
+export type RankingWeights1 =
+  | {
+      price?: number;
+      [k: string]: unknown;
+    }
+  | {
+      delivery?: number;
+      [k: string]: unknown;
+    }
+  | {
+      trust?: number;
+      [k: string]: unknown;
+    }
+  | {
+      color?: number;
+      [k: string]: unknown;
+    };
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
  * via the `definition` "MoneyTwd".
  */
 export type MoneyTwd = number;
@@ -101,6 +128,11 @@ export type EligibilityReasonCode =
   | "bundle_disabled"
   | "terms_changed"
   | "addon_not_optional";
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "LlmModel".
+ */
+export type LlmModel = "gpt-5.6-sol" | "gpt-4.1" | "gpt-4.1-mini";
 /**
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
  * via the `definition` "RejectDecision".
@@ -212,6 +244,7 @@ export interface A2ACommerceContracts {
   Status?: Status;
   EligibilityReasonCode?: EligibilityReasonCode;
   DocumentBundle?: DocumentBundle;
+  LlmModel?: LlmModel;
   CreateRequest?: CreateRequest;
   AcceptDecision?: AcceptDecision;
   RejectDecision?: RejectDecision;
@@ -220,6 +253,9 @@ export interface A2ACommerceContracts {
   CategoricalProductPreference?: CategoricalProductPreference;
   RangeProductPreference?: RangeProductPreference;
   ProductPreference?: ProductPreference;
+  RankingWeights?: RankingWeights;
+  BuyerProfile?: BuyerProfile;
+  BuyerProfileResponse?: BuyerProfileResponse;
   NormalizedIntent?: NormalizedIntent;
   ProductAttributes?: ProductAttributes;
   ProductMatch?: ProductMatch;
@@ -236,6 +272,8 @@ export interface A2ACommerceContracts {
   RankedOffer?: RankedOffer;
   ApiError?: ApiError;
   RequestSnapshot?: RequestSnapshot;
+  FormatterSummary?: FormatterSummary;
+  ClarificationQuestion?: ClarificationQuestion;
   AcceptDecisionResult?: AcceptDecisionResult;
   RejectDecisionResult?: RejectDecisionResult;
   DecisionResult?: DecisionResult;
@@ -268,6 +306,8 @@ export interface A2ACommerceContracts {
   ImprovementStatus?: ImprovementStatus;
   ImprovementClarification?: ImprovementClarification;
   ImprovementClarificationResult?: ImprovementClarificationResult;
+  UserPreference?: UserPreference;
+  UpdateUserPreference?: UpdateUserPreference;
 }
 /**
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
@@ -286,6 +326,7 @@ export interface FormatterResult {
  * via the `definition` "NormalizedIntent".
  */
 export interface NormalizedIntent {
+  ranking_weights?: RankingWeights;
   category: "mouse";
   max_total_twd: MoneyTwd;
   delivery_days_max: number;
@@ -331,12 +372,23 @@ export interface DocumentBundle {
   preference_md: string;
 }
 /**
- * intent_md describes this purchase and its temporary constraints/preferences. preference_md is a request-bound preference snapshot; omission/empty text does not clear active SQLite product preferences. Neither field updates the durable profile.
+ * intent_md describes this purchase. The backend binds the current user preference version. Nonempty preference_md may initialize an absent user profile. For an existing profile the latest server revision is always used, ignoring cached client preference text; edits use POST /api/preferences. Empty or omitted preference_md inherits the current profile.
  *
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
  * via the `definition` "CreateRequest".
  */
 export interface CreateRequest {
+  model?: LlmModel;
+  refinement?: {
+    parent_request_id: Id;
+  };
+  clarification?: {
+    parent_request_id: Id;
+    answers: {
+      question_id: Id;
+      answer: string;
+    }[];
+  };
   intent_md: string;
   preference_md?: string;
 }
@@ -358,6 +410,31 @@ export interface AcceptDecision {
 export interface RedeemRequest {
   request_id: Id;
   offer_id: Id;
+}
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "BuyerProfile".
+ */
+export interface BuyerProfile {
+  name: string;
+  shipping_address: string;
+  shipping_details?: {
+    email: string;
+    city: string;
+    state: string;
+    postal_code: string;
+    country: "TW";
+  };
+  payment_method: "later" | "card" | "mobile" | "cash_on_delivery";
+  weights: RankingWeights;
+  colors: ("black" | "white" | "blue" | "red" | "rose")[];
+}
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "BuyerProfileResponse".
+ */
+export interface BuyerProfileResponse {
+  profile: BuyerProfile | null;
 }
 /**
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
@@ -547,9 +624,19 @@ export interface ApiError {
  * via the `definition` "RequestSnapshot".
  */
 export interface RequestSnapshot {
+  /**
+   * Backend-snapshotted public SKU display data; optional for historical snapshots. No private seller policies.
+   */
+  product_details?: {
+    product_id: Id;
+    name: string;
+    color: string | null;
+  }[];
+  formatter?: FormatterSummary;
+  model?: LlmModel;
   request_id: Id;
   root_request_id: Id;
-  parent_request_id: Id | null;
+  parent_request_id: null | Id;
   status: Status;
   documents: DocumentBundle;
   intent: NormalizedIntent | null;
@@ -563,6 +650,29 @@ export interface RequestSnapshot {
   next_request_id: null;
   error: ApiError | null;
   decision: DecisionResult | null;
+}
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "FormatterSummary".
+ */
+export interface FormatterSummary {
+  provider: "openai" | "rules";
+  model: string | null;
+  questions: ClarificationQuestion[];
+}
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "ClarificationQuestion".
+ */
+export interface ClarificationQuestion {
+  question_id: Id;
+  field: "budget" | "delivery" | "color" | "size_class" | "category" | "other";
+  text: string;
+  suggestions: {
+    label: string;
+    value: string;
+    source: "preference" | "example";
+  }[];
 }
 /**
  * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
@@ -727,6 +837,10 @@ export interface SellerTrustEntry {
  * via the `definition` "EvaluatorInput".
  */
 export interface EvaluatorInput {
+  color_matches?: {
+    offer_id: Id;
+    score: 0 | 100;
+  }[];
   request_id: Id;
   evaluated_at: Timestamp;
   intent: NormalizedIntent;
@@ -1024,4 +1138,28 @@ export interface ImprovementClarificationResult {
   request_id: Id;
   improvement_id: Id;
   status: "queued";
+}
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "UserPreference".
+ */
+export interface UserPreference {
+  revision: number;
+  markdown: string;
+  entries: {
+    preference_id: string;
+    scope: "all_categories" | "category:mouse" | "category:mouse_pad";
+    value: string;
+  }[];
+  saved_preferences?: ProductPreference[];
+  issues?: string[];
+  ranking_weights?: RankingWeights;
+}
+/**
+ * This interface was referenced by `A2ACommerceContracts`'s JSON-Schema
+ * via the `definition` "UpdateUserPreference".
+ */
+export interface UpdateUserPreference {
+  markdown: string;
+  base_revision: number;
 }
