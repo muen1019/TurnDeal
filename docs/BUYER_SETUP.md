@@ -8,7 +8,7 @@
 
 基本資料：收件人名稱、電子郵件、縣市、區域、郵遞區號（台灣 3／5／6 碼）、街道地址均在設定頁填妥，配送國家固定 TW。付款方式為偏好，不代表付款授權；不收卡號、CVV 或金融帳戶。請用虛構資料展示。資料自動帶入結帳，已儲存的 checkout 資料優先；仍需明確按「確認測試購買」才建立模擬訂單。不放入 intent、RFQ 或模型。
 
-契約：BuyerProfile 保留 name、shipping_address；新增 optional shipping_details {email, city, state, postal_code, country}，存在時內部欄位必填。舊版 profile 仍可讀，重新編輯時補齊運送資訊。完整物件存入既有 buyer_profiles.profile_json，不需新增 migration 或重建資料庫。個資不寫入瀏覽器的 sessionStorage 結帳重試紀錄。
+契約：BuyerProfile 保留 name、shipping_address；optional shipping_details 包含 email、city、state、postal_code、country，存在時內部欄位必填。基本與配送資料存入 `buyer_profiles.profile_json`；顏色與 ranking weights 經 `013_unified_profile_preferences.sql` 存入共用 versioned preference repository。舊版 profile 仍可讀並由 migration 保留。個資不寫入瀏覽器的 sessionStorage 結帳重試紀錄。
 
 5173 本機版使用原 SQLite 與固定 demo buyer；5174 手機版使用獨立記憶體 SQLite 與每瀏覽器簽名 cookie，重啟清空。兩者皆非正式登入系統，勿公開部署或輸入真實敏感資料。
 
@@ -16,7 +16,7 @@
 
 新增 GET／POST `/api/buyer-profile`，共用 BuyerProfile／BuyerProfileResponse schema；POST 需 Idempotency-Key、同 buyer 作用域。SQLite 用 007_buyer_profiles.sql 加表和 requests.ranking_weights_json 欄位。設定儲存是明示持久更新，不由 Formatter 學習或改寫 user_preferences。
 
-建立 Request 時凍結權重；如果沒有自訂 preference_md，使用 profile 顏色生成本輪偏好文字。自訂 preference_md 優先。clarification child 繼承 parent 的偏好文字／權重，不受途中更改設定影響。姓名、地址、付款方式永遠不進購物文件。舊需求沒有權重時沿用既有排序。
+建立 Request 時綁定當下的 versioned preference、顏色與權重。Clarification／Improver child 繼承 parent 綁定版本，不受途中更改設定影響。姓名、地址、付款方式永遠不進購物文件。舊需求沒有權重時沿用既有排序。
 
 NormalizedIntent 新增 optional ranking_weights。沒有明示 price_first／delivery_first／trust_first 時，Discovery 與 Evaluator 使用四項加權：價格 100×(1−總價/預算上限)、速度 100×(1−(到貨天數−1)/交期上限)、賣家評分/5×100（無評分採中性值3）、顏色符合為100／不符合或未知為0。每項限制在0–100。Discovery 的目標價若有提供則沿用目標接近程度。權重只影響軟排序，不能突破預算／交期等硬限制；本輪明示優先順序高於設定權重。Sponsored 永遠不入分數。
 

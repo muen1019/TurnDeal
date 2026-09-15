@@ -25,7 +25,7 @@ for(const [name,item] of Object.entries(examples)){
  valid(create?'RequestSnapshot':'DecisionResult',item.response);
  assert.equal(item.expected_status_code,create?202:200);
 }
-assert.deepEqual(Object.keys(openapi.paths).filter(p=>!p.includes('purchase')&&!p.includes('/improvement')).sort(),['/api/buyer-profile','/api/requests','/api/requests/{request_id}','/api/requests/{request_id}/decisions']);
+assert.deepEqual(Object.keys(openapi.paths).filter(p=>!p.includes('purchase')&&!p.includes('/improvement')).sort(),['/api/buyer-profile','/api/preferences','/api/requests','/api/requests/{request_id}','/api/requests/{request_id}/decisions']);
 assert.deepEqual(Object.keys(openapi.paths['/api/requests/{request_id}/decisions'].post.responses).sort(),['200','400','404','409','410','500']);
 function refs(value){if(!value||typeof value!=='object')return;for(const [key,v] of Object.entries(value)){
  if(key==='$ref'){

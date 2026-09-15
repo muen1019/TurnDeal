@@ -1,10 +1,8 @@
-# Orchestrator 前段探索與評分 v0.2
+# Discovery scoring
 
-2026-09-12 設定權重擴充：傳入 ranking_weights 且沒有明示 priorities 時，依 [BUYER_SETUP.md](BUYER_SETUP.md) 四項權重評分；沒有目標價時仍依最高預算計算價格分數。不帶權重的舊 query 保留本文件原政策。全部硬限制仍優先，贊助不計分。
+現行政策為 `discovery-score-v0.5`。傳入 `ranking_weights` 且沒有明示 priorities 時，依 [Buyer setup](BUYER_SETUP.md) 的價格、速度、Seller rating 與顏色權重評分；沒有目標價時可依最高預算計算價格分數。全部硬限制優先，Sponsored 不計分。Persona 隔離、公開權益與缺資料處理見 [Seller policies](SELLER_POLICIES.md)。歷史執行紀錄保留原 policy version，不重新計算。
 
-最新政策為 discovery-score-v0.5：新增已驗證公開售後條件，並將明確 price_first 與目標價接近度分開。新公式、Persona 隔離與缺資料處理見 [SELLER_POLICY_IMPLEMENTATION.md](SELLER_POLICY_IMPLEMENTATION.md)。下文保留 v0.4 的基準說明，歷史紀錄不重算。
-
-狀態：已實作 TypeScript service、固定測資、SQLite 快照與執行紀錄。政策版本 `discovery-score-v0.4`。不需要 LLM；輸入為已解析條件，自然語言解析仍交给 Formatter。
+已實作 TypeScript service、固定測資、SQLite 快照與執行紀錄。Discovery 不需要 LLM；輸入為已解析條件，自然語言解析交給 Formatter。
 
 v0.3 將 target_total_twd 改為選填；未提供時價格分數與權重為 0，price_difference_twd=null，其他有效項目按原比例重新分配。可只傳 `{ category: 'mouse' }`。明確提供的 max_total_twd 仍是獨立硬限制，不自動當成目標價。若提供價格，須為正整數；null、0、負數及字串均拒絕。歷史執行紀錄保留原政策版本，不重新計算。
 
@@ -72,7 +70,7 @@ v0.4 加入 product_preferences 完整運算：required 的 in / not_in / range 
 
 SQLite migration `002_discovery` 增加 discovery_catalogs 與 discovery_runs；隊友的 `002_five_seller_negotiation` 是另一個獨立 migration，版本以完整檔名辨識，不是只取數字。前者存不可變的完整 JSON Catalog 快照，後者存 user_id、政策版本、query、完整結果與時間；可用 SQLite json_each 查詢 snapshot 內 listings，不與 canonical 的九筆 products 混用。這是第一版獨立資料集，可在後續升版拆成正規化 listing 表。
 
-`rankCandidates` 是無副作用的純函式；`discover_candidates` 讀取指定 SQLite 快照並新增稽核紀錄。run_id 每次不同，但排名相同。尚未串 UI、付款或議價。
+`rankCandidates` 是無副作用的純函式；`discover_candidates` 讀取指定 SQLite 快照並新增稽核紀錄。run_id 每次不同，但相同輸入的自然排名相同。Integrated runtime 已把結果交給 Orchestrator 與 Negotiation；Purchase 不使用探索排名代替 accepted Offer 驗證。
 
 ## 開發操作
 

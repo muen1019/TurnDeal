@@ -1,47 +1,52 @@
-# A2A Commerce shared contract v0.3
+# TurnDeal contracts
 
-`intent_md` 為本輪意圖原文；`preference_md` 為本次偏好來源快照，不更新帳戶偏好。`NormalizedIntent` 為合併後執行資料。定義、分類與儲存見 [文件語意規格](../docs/INTENT_PREFERENCE_SPEC.md)。
+## Active contracts
 
-完整流程接線新增三個 Status：orchestrating、negotiating、evaluating，前端必須持續輪詢而不是視為終止。現行三個 HTTP 路由不變，詳見 [完整接線說明](../docs/RUN_FULL_APP.md)。
+| 檔案 | 用途 |
+| --- | --- |
+| `a2a-commerce.v0.3.schema.json` | Request、Formatter、Orchestrator、Negotiation、Offer、Evaluator 與 Result 共用資料 |
+| `openai/evaluator-output.schema.json` | Evaluator Structured Outputs |
+| `openai/formatter-output.schema.json` | Formatter Structured Outputs |
+| `purchase.v1.schema.json` | Purchase API |
+| `../backend/openapi.json` | HTTP API |
 
-唯一有效契約為 [a2a-commerce.v0.3.schema.json](a2a-commerce.v0.3.schema.json)。Backend OpenAPI、前後端生成型別、Ajv 驗證器與目前 fixtures 全部引用此契約。
+`a2a-commerce.v0.3.schema.json` 是所有 active producer、consumer、Ajv validator、generated types 與 fixtures 的唯一共用契約。`archive/` 只供歷史及 migration 測試，不能驗證 live response。
 
-協商功能遷移至 v0.3：五家 Seller、最多五輪、明確 final 與 Backend 停止原因。本次依使用者確認的新版 spec，新增 optional `SellerRFQ.competitive_terms`、`SellerNegotiationResult.withdrawn_offer_ids`，以及 `CompetitiveOfferReference`、`SharedNegotiationContext`、`NegotiationOutput`。舊 payload 可省略 optional 欄位，既有 fixtures 仍有效；新增 `fixtures/negotiation-sharing.json` 驗證上一輪來源與去識別化邊界。Evaluator 契約不變。[目標 System Design](../docs/SYSTEM_DESIGN.md) 的 Swipe、文件修訂與長期偏好尚未遷移。
+## 核心語意
 
-## main 與 local 的合併
+- `intent_md` 是本輪需求原文。
+- CreateRequest 的 `preference_md` 是 request-bound input snapshot，不更新帳戶偏好。
+- `NormalizedIntent` 是 Formatter 合併並驗證後的執行資料。
+- Status 包含 `formatting`、`orchestrating`、`negotiating`、`evaluating` 與 Result 終態；consumer 必須把中間狀態當成可輪詢狀態。
+- Seller response 是 untrusted draft；正式 Offer ID 與 eligibility 由 Backend 決定。
+- Sponsored 只供展示，不參與 Seller selection 或 Evaluator ranking。
 
-- 使用 main 的商品 Catalog、來源快照、最多五家 Seller／五輪、is_final、stop_reason 與 Offer 型別。
-- 使用 local 的 accept/reject=200、RequestSnapshot.decision，以及 reject 的 feedback/source_documents 原文交接。
-- reject 不改寫文件、不增加 revision、不建立 child、不扣庫存、不付款或兌換。
-- 舊版 schema 及舊 Result 測資放在 archive/，僅供歷史與遷移驗證，不能拿來驗證現行 HTTP response。
+文件語意見 [intent／preference 規格](../docs/INTENT_PREFERENCE_SPEC.md)，完整資料流見 [系統架構](../docs/SYSTEM_DESIGN.md)。
 
-## 現行 API
+## HTTP lifecycle
 
 | 操作 | 成功回傳 |
 | --- | --- |
-| POST /api/requests | 202 RequestSnapshot，formatting |
-| GET /api/requests/{request_id} | 200 RequestSnapshot，包含 decision |
-| POST /api/requests/{request_id}/decisions | 200 DecisionResult，accepted 或 rejected |
+| `POST /api/requests` | 202 RequestSnapshot，初始 `formatting` |
+| `GET /api/requests/{request_id}` | 200 RequestSnapshot，可能包含 decision |
+| `POST /api/requests/{request_id}/decisions` | 200 accepted 或 rejected result |
+| `GET /api/preferences`／`POST /api/preferences` | 讀取或明示更新 versioned user preference |
 
-所有 POST 需要 Idempotency-Key。HTTP 定義見 [OpenAPI](../backend/openapi.json)。Redemption 的資料型別保留供後續整合，但沒有現行 endpoint；舊範例已移到 archive/redemption-example.v0.2.json。
+所有 POST 使用 `Idempotency-Key`。Reject 保存原始 feedback 與 source documents，不改寫 Request。Accept 保存同一個 immutable Offer；購買需另外呼叫 Purchase API。
 
 ## Fixtures
 
 | 檔案 | 用途 |
 | --- | --- |
-| fixtures/sellers.json | 五家賣家、九個商品、來源連結及模擬策略 |
-| fixtures/marketplace-source-snapshot.json | 公開來源快照；來源價格與模擬商務欄位分離 |
-| fixtures/happy-path.json | 五家／最多五輪交換紀錄與六個最終 Offer |
-| fixtures/api-examples.json | 三個現行 HTTP 操作的輸入輸出 |
-| fixtures/result-v0.3.json、result-api-v0.3.json | 與上述正本一致的 UI 測試入口 |
-| fixtures/edge-cases.json、demo-scenarios.json | 限制、錯誤與模型攻擊場景 |
+| `fixtures/sellers.json` | Canonical A–E、商品與來源 |
+| `fixtures/sales-profiles.json` | Canonical Persona／policy |
+| `fixtures/catalog-negotiation-policies.json` | Discovery Sellers、SKU policies 與 listing bindings |
+| `fixtures/marketplace-source-snapshot.json` | 公開來源快照與 synthetic 商務資料 |
+| `fixtures/happy-path.json` | 完整可重現流程 |
+| `fixtures/document-semantics.json` | Intent／preference precedence |
+| `fixtures/buyer-profile.json` | Buyer profile、ranking weights 與 request binding |
+| `fixtures/clarification-v0.3.json` | Formatter clarification／child lineage |
+| `fixtures/edge-cases.json`、`fixtures/demo-scenarios.json` | 限制、失敗與攻擊情境 |
+| `fixtures/api-examples.json` | HTTP request／response 範例 |
 
-執行根目錄 `npm run test:contracts`。時間使用 RFC 3339，ID 為不透明字串，金額為含稅運整數 TWD。後端配置 immutable offer_id；模型與前端不能自行改價、放寬限制或改排名。Sponsored 僅供展示，不影響賣家選擇或推薦。
-
-## Formatter 函式交接
-
-Formatter service 回傳 v0.3 的新增 FormatterResult（ready 或 needs_clarification，含問題、警告、NormalizedIntent 與選填目標價）。這是函式工具輸出，不是新 HTTP endpoint。
-
-LLM Formatter → Discovery 前五家 → 私有 SellerRFQ 已在根目錄 service/demo 串接。Result server 仍使用 deterministic mock，尚未接上這條真實入口；沒有正式模型議價或 intent 回饋改寫。
-
-openai/evaluator-output.schema.json 與 openai/formatter-output.schema.json 分別定義兩個模型的嚴格輸出，不可混用。fixtures/formatter-scenarios.json 提供解析與澄清測資，執行 npm run test:formatter 驗證。
+執行 `npm run test:contracts` 驗證 schema、refs、fixtures 與跨物件 invariants。任何欄位改名、刪除、型別改變、enum 收窄或狀態語意變更，都要先做 reviewed contract version change，再同步生成型別與 consumers。
