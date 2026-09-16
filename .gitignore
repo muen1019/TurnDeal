@@ -5,6 +5,11 @@ node_modules/
 .env.*
 !.env.example
 
+# Internal AI-agent / dev-process docs (not part of the public product)
+AGENTS.md
+docs/DEVELOPMENT_RULES.md
+openspec/
+
 # Local SQLite runtime files (rebuild with npm run db:init)
 data/*.sqlite
 data/*.sqlite-shm
