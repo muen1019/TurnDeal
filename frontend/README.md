@@ -54,4 +54,4 @@ npm run build
 
 Browser suites 從 root 執行，完整命令見 [測試指南](../docs/TESTING.md)。輸出位於被 Git 忽略的 `test-results/`。
 
-設計參考位於 `img/design/`；curated mobile screenshots 位於 [docs/screenshots/mobile](../docs/screenshots/mobile/README.md)。尚未完成的細部驗收保留在 [OpenSpec tasks](../openspec/changes/define-offer-result-ui-api/tasks.md)。
+設計參考位於 `img/design/`；curated mobile screenshots 位於 [docs/screenshots/mobile](../docs/screenshots/mobile/README.md)。
