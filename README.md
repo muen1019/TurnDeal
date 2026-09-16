@@ -119,7 +119,6 @@ See [mobile UI](docs/MOBILE_UI.md) and [mobile live mode](docs/MOBILE_LIVE.md).
 | `contracts/` | JSON Schema, model output schemas, and fixtures |
 | `db/migrations/` | Authoritative SQLite schema |
 | `docs/` | Current architecture and operating documentation |
-| `openspec/changes/` | Active specifications and unfinished tasks |
 
 Internal `offermesh` package names and `OFFERMESH_*` variables remain compatibility identifiers. The product and repository name is TurnDeal.
 

@@ -40,8 +40,6 @@ Result 使用 src/mockResultProvider.ts：五家虛擬賣家、最多五輪固�
 
 Buyer Agent 之後可用 feedback + source_documents 改寫 intent。此服务只保存和提供資料，没有自動模型、webhook 或 queue 交付；尚未接入時 UI 顯示「回饋已保存」。可從 GET 的 decision 恢復同一份交接資料。
 
-規格：[Result API](../openspec/changes/define-offer-result-ui-api/specs/result-api/spec.md)、[Feedback](../openspec/changes/define-offer-result-ui-api/specs/feedback-loop/spec.md)。
-
 ## 資料庫遷移
 
 Backend 使用 db/migrations 的 main 正規化表格，003_result_decisions.sql 新增 result_state_json、contract_version 與 decisions.result_json。published_snapshot_json 保持不可變；GET 的決策狀態由獨立 Result state 保存。DB 內 reject 對應既有 reject_all action，HTTP 固定為 action=reject。
