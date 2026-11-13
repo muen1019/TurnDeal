@@ -1,0 +1,24 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Demo from './Demo';
+import { copy } from '../content/copy';
+import { base, repo, type Lang } from '../content/links';
+const { lang } = Astro.props as { lang: Lang };
+const t = copy[lang];
+---
+<Layout lang={lang} page="how-it-works/">
+  <section class="ink section product-hero">
+    <div class="wrap split">
+      <div><p class="eyebrow">{t.nav[2]}</p><h1>{t.how[0]}</h1><p class="lead">{t.how[1]}</p><a class="button mint" href="#demo">{t.how[2]} ↓</a></div>
+      <div class="product-visual" aria-hidden="true"><img src={base + 'images/mouse.svg'} alt="" width="236" height="236" /></div>
+    </div>
+  </section>
+  <section class="wrap section compact"><h2>{t.how[3]}</h2><div class="card-grid">
+    {t.steps.map(([label, description], i) => <article class="card"><span class="feature-icon" aria-hidden="true">{i+1}</span><h3>{label}</h3><p>{description}</p></article>)}
+  </div></section>
+  <section class="soft section compact" id="demo"><div class="wrap"><Demo lang={lang} base={base} client:load /></div></section>
+  <section class="wrap section compact"><h2>{t.how[4]}</h2><div class="card-grid team-grid">
+    {t.metrics.map(([number, label]) => <article class="card"><strong class="stat">{number}</strong><p>{label}</p></article>)}
+  </div></section>
+  <section class="ink section compact"><div class="wrap callout"><h2>{t.how[5]}</h2><p>{t.how[6]}</p><a class="button mint" href={repo}>{t.how[7]} ↗</a></div></section>
+</Layout>

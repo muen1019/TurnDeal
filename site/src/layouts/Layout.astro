@@ -1,0 +1,68 @@
+---
+import '../styles/global.css';
+import { copy } from '../content/copy';
+import { base, contact, pages, repo, route, siteUrl, type Lang, type Page } from '../content/links';
+interface Props { lang: Lang; page: Page }
+const { lang, page } = Astro.props;
+const t = copy[lang];
+const index = pages.indexOf(page);
+const alternate = lang === 'en' ? 'zh' : 'en';
+const canon = (language: Lang) => siteUrl + route(language, page);
+const demo = route(lang, 'how-it-works/') + '#demo';
+---
+<!doctype html>
+<html lang={lang === 'zh' ? 'zh-Hant' : 'en'}>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{t.title[index]}</title>
+  <meta name="description" content={t.descriptions[index]} />
+  <link rel="icon" href={base + 'images/favicon.png'} type="image/png" sizes="48x48" />
+  <link rel="canonical" href={canon(lang)} />
+  <link rel="alternate" hreflang="en" href={canon('en')} />
+  <link rel="alternate" hreflang="zh-Hant" href={canon('zh')} />
+  <link rel="alternate" hreflang="x-default" href={canon('en')} />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={t.title[index]} />
+  <meta property="og:description" content={t.descriptions[index]} />
+  <meta property="og:url" content={canon(lang)} />
+  <meta property="og:image" content={siteUrl + base + 'images/social.png'} />
+  <meta name="twitter:card" content="summary_large_image" />
+</head>
+<body>
+  <a class="skip" href="#main">{t.skip}</a>
+  <header class="header">
+    <div class="wrap topbar">
+      <a class="brand" href={route(lang)}><img src={base + 'images/mark.png'} alt="" width="32" height="32" /> TurnDeal</a>
+      <nav class="desktop-nav" aria-label={lang === 'zh' ? '主要導覽' : 'Main navigation'}>
+        {pages.map((item, i) => <a aria-current={item === page ? 'page' : undefined} href={route(lang, item)}>{t.nav[i]}</a>)}
+      </nav>
+      <div class="header-actions">
+        <a class="lang" data-language href={route(alternate, page)} hreflang={alternate === 'zh' ? 'zh-Hant' : 'en'} lang={alternate === 'zh' ? 'zh-Hant' : 'en'}>{lang === 'en' ? '繁中' : 'EN'}</a>
+        <a class="button small" href={demo}>{t.demo} <span aria-hidden="true">↗</span></a>
+        <details class="mobile-nav">
+          <summary aria-label={lang === 'zh' ? '開啟導覽選單' : 'Open navigation menu'}>☰</summary>
+          <nav aria-label={lang === 'zh' ? '主要導覽' : 'Main navigation'}>
+            {pages.map((item, i) => <a aria-current={item === page ? 'page' : undefined} href={route(lang, item)}>{t.nav[i]}</a>)}
+          </nav>
+        </details>
+      </div>
+    </div>
+  </header>
+  <main id="main"><slot /></main>
+  <footer class="footer">
+    <div class="wrap footer-grid">
+      <div><a class="brand" href={route(lang)}><img src={base + 'images/mark.png'} alt="" width="30" height="30" /> TurnDeal</a><p>{t.tagline}.</p></div>
+      <div class="footer-links">
+        <a href={route(lang, 'story/')}>{t.nav[1]}</a><a href={repo}>GitHub ↗</a><a href={contact}>{t.contact} ↗</a>
+      </div>
+    </div>
+  </footer>
+  <script>
+    const language = document.querySelector<HTMLAnchorElement>('[data-language]');
+    language?.addEventListener('click', () => {
+      language.hash = window.location.hash;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+---
+import { copy } from '../content/copy';
+import type { Lang } from '../content/links';
+const { lang } = Astro.props as { lang: Lang };
+const p = copy[lang].preview;
+const rows = [[p[4], '540', p[7], 'A'], [p[5], '710', p[8], 'B'], [p[6], '610', p[9], 'C']];
+---
+<div class="hero-preview">
+  <div class="preview-bar"><div class="dots" aria-hidden="true"><i></i><i></i><i></i></div><span>{p[0]}</span><span class="complete"><i></i>{p[1]}</span></div>
+  <div class="preview-body">
+    <div class="preview-request"><span class="request-icon" aria-hidden="true">↳</span><div><small>{p[2]}</small><p>{p[3]}</p></div></div>
+    <div class="connector" aria-hidden="true"></div>
+    {rows.map(([name, price, terms, letter]) => (
+      <div class="preview-offer">
+        <span class={'seller-symbol symbol-' + letter} aria-hidden="true">{letter}</span>
+        <div><strong>{name}</strong><small>{terms}</small></div>
+        <b>NT${price}</b>
+      </div>
+    ))}
+    <div class="preview-caption"><span aria-hidden="true">◎</span> {p[10]}</div>
+  </div>
+</div>

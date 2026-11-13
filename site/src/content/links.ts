@@ -1,0 +1,10 @@
+export const base = import.meta.env.BASE_URL.replace(/\/$/, '') + '/';
+export const repo = 'https://github.com/muen1019/TurnDeal';
+export const contact = 'mailto:joshuatseng0233@gmail.com';
+export const portfolio = 'https://muenchiu.com/zh/projects/turn-deal';
+export const video = 'https://www.youtube.com/watch?v=M061XBo8QGg';
+export const pages = ['', 'story/', 'how-it-works/'] as const;
+export type Page = typeof pages[number];
+export type Lang = 'en' | 'zh';
+export const route = (lang: Lang, page: Page = '') => base + (lang === 'zh' ? 'zh/' : '') + page;
+export const siteUrl = 'https://muen1019.github.io';

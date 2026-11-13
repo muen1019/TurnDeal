@@ -1,0 +1,71 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Preview from './Preview.astro';
+import { copy } from '../content/copy';
+import { contact, route, type Lang } from '../content/links';
+const { lang } = Astro.props as { lang: Lang };
+const t = copy[lang];
+const demo = route(lang, 'how-it-works/') + '#demo';
+---
+<Layout lang={lang} page="">
+  <section class="home-hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow hero-label"><span></span>{t.tagline}</p>
+        <h1>{t.hero[0]}<br /><em>{t.hero[1]}</em></h1>
+        <p class="hero-intro">{t.intro}</p>
+        <div class="actions"><a class="button mint" href={demo}>{t.experience} <span aria-hidden="true">↗</span></a><a class="button outline" href={route(lang, 'story/')}>{t.discover}</a></div>
+      </div>
+      <Preview lang={lang} />
+    </div>
+  </section>
+  <div class="award-strip"><div class="wrap"><a href={route(lang, 'story/') + '#journey'}><span class="award-icon" aria-hidden="true">✦</span>{t.award}<span aria-hidden="true">↗</span></a></div></div>
+  <section class="wrap section split">
+    <div><p class="eyebrow">{t.future[0]}</p><h2>{t.future[1]}</h2></div><p class="lead">{t.future[2]}</p>
+  </section>
+  <section class="soft section">
+    <div class="wrap split">
+      <div><p class="eyebrow">{t.beyond.label}</p><h2>{t.beyond.title}</h2><p>{t.beyond.description}</p></div>
+      <div class="trade-visual">
+        {t.beyond.examples.map(({ label, text }, index) => (
+          <div>
+            <span class:list={['seller-symbol', index === 0 ? 'symbol-A' : 'symbol-B']} aria-hidden="true">{index === 0 ? '↗' : '＋'}</span>
+            <div><small>{label}</small><strong>{text}</strong></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+  <section class="wrap section">
+    <p class="eyebrow">{t.now[0]}</p><h2>{t.now[1]}</h2><p class="lead">{t.now[2]}</p>
+    <div class="stat-grid">
+      <article class="card"><strong class="stat">≈40%</strong><p>{t.now[3]}</p></article>
+      <article class="card"><strong class="stat">78%</strong><p>{t.now[4]}</p></article>
+    </div>
+    <a class="text-link" href="https://www.iab.com/insights/when-ai-guides-the-shopping-journey/">{t.now[5]} ↗</a>
+    <p>{t.now[6]} <a href="https://developers.openai.com/commerce">ACP ↗</a> · <a href="https://developers.googleblog.com/under-the-hood-universal-commerce-protocol-ucp/">UCP ↗</a></p>
+  </section>
+  <section class="ink section">
+    <div class="wrap split">
+      <div><p class="eyebrow">{t.problem[0]}</p><h2>{t.problem[1]}</h2><p>{t.problem[2]}</p></div>
+      <div class="quote-card"><blockquote>“{t.problem[3]}”</blockquote><a class="button mint" href={demo}>{t.problem[4]} ↗</a></div>
+    </div>
+  </section>
+  <section class="wrap section"><h2>{t.valueTitle}</h2>
+    <div class="card-grid">
+      {t.values.map(([label, title, desc], i) => (
+        <article class="card">
+          <span class="feature-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              {i === 0 && <><path d="M5 8h14l1 12H4L5 8Z"/><path d="M9 10V6a3 3 0 1 1 6 0v4"/></>}
+              {i === 1 && <><path d="M3 10l2-5h14l2 5a2.25 2.25 0 0 1-4.5 0 2.25 2.25 0 0 1-4.5 0 2.25 2.25 0 0 1-4.5 0A2.25 2.25 0 0 1 3 10Z"/><path d="M5 12.2V20h14v-7.8M10 20v-5h4v5"/></>}
+              {i === 2 && <><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M7 6.5h.1m3 0h.1M8 13h2v3H8zm6 0h2v3h-2z"/></>}
+            </svg>
+          </span>
+          <p class="eyebrow">{label}</p><h3>{title}</h3><p>{desc}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+  <section class="soft section"><div class="wrap callout"><h2>{t.cta[0]}</h2><p class="lead">{t.cta[1]}</p><div class="actions"><a class="button" href={demo}>{t.experience} ↗</a><a class="button secondary" href={contact}>{t.contact}</a></div></div></section>
+</Layout>
