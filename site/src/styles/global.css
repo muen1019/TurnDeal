@@ -74,7 +74,7 @@ p{color:var(--body);margin-top:15px}
 .preview-caption{font-size:11px;color:#526983;margin:12px 0 0;text-align:center}
 @keyframes reveal{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
 .award-strip{background:#e9f2f8;border-bottom:1px solid #dce7ef}
-.award-strip a{display:inline-flex;align-items:center;gap:12px;font-size:13px;font-weight:750;text-decoration:none;padding-block:16px}
+.award-strip a{display:inline-flex;align-items:center;gap:12px;font-size:clamp(16px,1.5vw,19px);font-weight:750;line-height:1.4;text-decoration:none;padding-block:16px}
 .award-strip a:hover{text-decoration:underline}
 .award-icon{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#d9e8f4;color:#255a81;flex:none}
 .section{padding-block:84px}
