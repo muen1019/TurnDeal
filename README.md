@@ -14,6 +14,10 @@
 </p>
 
 <p align="center">
+  <a href="https://muen1019.github.io/TurnDeal/"><strong>Official website</strong></a>
+  |
+  <a href="https://muen1019.github.io/TurnDeal/how-it-works/#demo"><strong>Interactive demo</strong></a>
+  |
   <a href="#quick-start"><strong>Quick start</strong></a>
   |
   <a href="#how-it-works"><strong>How it works</strong></a>
