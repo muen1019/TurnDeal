@@ -41,7 +41,7 @@ const websiteLabel = lang === 'zh' ? '個人網站' : 'Personal website';
       <h2>{t.story[5]}</h2><p class="lead">{t.story[6]}</p>
       <div class="card-grid team-grid">
         {team.map(member => <article class="card">
-          <span class="feature-icon" aria-hidden="true">{lang === 'zh' ? member.name.zh[0] : member.initials}</span>
+          <img class="team-portrait" src={base + 'photos/team/' + member.photo} alt="" width="96" height="96" loading="lazy" decoding="async" />
           <h3>{member.name[lang]}</h3><p class="team-role">{member[lang][0]}</p><p>{member[lang][1]}</p>
           <div class="team-links">
             <a href={member.linkedin} aria-label={member.name[lang] + ' · LinkedIn'} title="LinkedIn">

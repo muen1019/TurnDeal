@@ -160,7 +160,7 @@ legend{font-weight:750;margin-bottom:10px}
 
 .team-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 .team-role{font-size:13px;font-weight:800;color:var(--teal)}
-.team-grid .feature-icon{font-size:14px}
+.team-portrait{width:96px;height:96px;object-fit:cover;border-radius:50%;margin-bottom:17px}
 .team-grid .card:has(.team-links){display:flex;flex-direction:column}
 .team-links{display:flex;gap:8px;margin-top:auto;padding-top:16px}
 .team-links a{display:grid;place-items:center;width:42px;height:42px;border:1px solid var(--line);border-radius:9px;background:#f8fafc;color:var(--navy)}
